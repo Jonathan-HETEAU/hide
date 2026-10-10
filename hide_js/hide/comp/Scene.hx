@@ -1,11 +1,17 @@
 package hide.comp;
 
+/**
+	The 3D/2D scene component of the editor: a canvas with its own engine, `s3d`, `s2d`, loading of models, animations and textures, and render props.
+**/
 class Scene extends hide.comp.Component implements h3d.IDrawable {
 
 	static var UID = 0;
 
 	var id = ++UID;
 	var window : hxd.Window;
+	/**
+		The canvas of the scene.
+	**/
 	public var canvas : js.html.CanvasElement;
 	var hmdCache = new Map<String, hxd.fmt.hmd.Library>();
 	var texCache = new Map<String, h3d.mat.Texture>();
@@ -13,26 +19,71 @@ class Scene extends hide.comp.Component implements h3d.IDrawable {
 	var cleanup = new Array<Void->Void>();
 	var defaultCamera : h3d.Camera;
 	var listeners = new Array<Float -> Void>();
+	/**
+		The config of the scene.
+	**/
 	public var config : hide.Config;
+	/**
+		The engine of the scene.
+	**/
 	public var engine : h3d.Engine;
+	/**
+		The width of the canvas, in pixels.
+	**/
 	public var width(get, never) : Int;
+	/**
+		The height of the canvas, in pixels.
+	**/
 	public var height(get, never) : Int;
+	/**
+		The 2D scene.
+	**/
 	public var s2d : h2d.Scene;
+	/**
+		The 3D scene.
+	**/
 	public var s3d : h3d.scene.Scene;
+	/**
+		The scene events.
+	**/
 	public var sevents : hxd.SceneEvents;
+	/**
+		The time speed factor.
+	**/
 	public var speed : Float = 1.0;
+	/**
+		False when the canvas is too small (hidden): the scene is not updated.
+	**/
 	public var visible(default, null) : Bool = true;
+	/**
+		The scene editor using this scene, or null.
+	**/
 	public var editor : hide.comp.SceneEditor;
+	/**
+		Disposes the scene when its canvas is removed from the document.
+	**/
 	public var autoDisposeOutOfDocument : Bool = true;
+	/**
+		Updates and renders the scene each frame.
+	**/
 	public var autoUpdate : Bool = true;
 
 	var currentRenderProps: hrt.prefab.Reference;
 
+	/**
+		The element showing the scene errors.
+	**/
 	public var errorMessageBox : Element;
 	var unFocusedTime = 0.;
 
+	/**
+		The model cache shared by the scenes.
+	**/
 	public static var cache : h3d.prim.ModelCache = new h3d.prim.ModelCache();
 
+	/**
+		Creates a scene in an element. `onReady` is called once the engine is ready.
+	**/
 	public function new(config, parent, el) {
 		super(parent,el);
 		this.config = config;
@@ -83,6 +134,9 @@ class Scene extends hide.comp.Component implements h3d.IDrawable {
 		haxe.Timer.delay(delayedInit,0); // wait canvas added to window
 	}
 
+	/**
+		Disposes the scene and its engine.
+	**/
 	public function dispose() {
 		for( c in cleanup )
 			c();
@@ -109,10 +163,16 @@ class Scene extends hide.comp.Component implements h3d.IDrawable {
 			window.dispose();
 	}
 
+	/**
+		Adds a function called each frame with the elapsed time.
+	**/
 	public function addListener(f) {
 		listeners.push(f);
 	}
 
+	/**
+		Removes a function added by `addListener`.
+	**/
 	public function removeListener(f) {
 		for( f2 in listeners )
 			if( Reflect.compareMethods(f,f2) ) {
@@ -171,6 +231,9 @@ class Scene extends hide.comp.Component implements h3d.IDrawable {
 	}
 
 
+	/**
+		Shows the update errors in `errorMessageBox` instead of throwing them.
+	**/
 	public var enableNewErrorSystem = false;
 	var errorMessageTimer : haxe.Timer;
 	var errorThisFrame: Bool = false;
@@ -190,6 +253,9 @@ class Scene extends hide.comp.Component implements h3d.IDrawable {
 		errorMessageBox.css("visibility", "collapse");
 	}
 
+	/**
+		Hides the objects whose name starts with a `scene.autoHide` config entry. Without `root`, also sets the background color from the config.
+	**/
 	public function init( ?root : h3d.scene.Object ) {
 		var autoHide : Array<String> = config.get("scene.autoHide");
 		function initRec( obj : h3d.scene.Object ) {
@@ -206,6 +272,9 @@ class Scene extends hide.comp.Component implements h3d.IDrawable {
 		initRec(root);
 	}
 
+	/**
+		Makes the engine and window of the scene current.
+	**/
 	public function setCurrent() {
 		engine.setCurrent();
 		window.setCurrent();
@@ -216,6 +285,9 @@ class Scene extends hide.comp.Component implements h3d.IDrawable {
 			throw "Invalid current engine : use setCurrent() first";
 	}
 
+	/**
+		Tells if the canvas has the focus.
+	**/
 	public function hasFocus() {
 		return js.Browser.document.activeElement == canvas;
 	}
@@ -269,6 +341,9 @@ class Scene extends hide.comp.Component implements h3d.IDrawable {
 		}
 	}
 
+	/**
+		Called with an update error. Returns the error to throw, or null if handled.
+	**/
 	public dynamic function errorHandler(e:haxe.Exception) : Null<haxe.Exception> {
 		if (!enableNewErrorSystem)
 			return e;
@@ -348,6 +423,9 @@ class Scene extends hide.comp.Component implements h3d.IDrawable {
 		cleanup.push(function() { ide.fileWatcher.unregister( path, onChange ); });
 	}
 
+	/**
+		Lists the animation files of a model or directory, and of the `hmd.animPaths` config directories (recursive if ending with `*`). `customFilter` adds other files.
+	**/
 	public function listAnims( path : String, customFilter : (f:String) -> Bool = null ) {
 		var isDir = sys.FileSystem.isDirectory(ide.getPath(path));
 
@@ -397,6 +475,9 @@ class Scene extends hide.comp.Component implements h3d.IDrawable {
 		return anims;
 	}
 
+	/**
+		Returns the animation name of a file (without `anim_`, extension and `_loop`).
+	**/
 	public function animationName( path : String ) {
 		var name = path.split("/").pop();
 		if( StringTools.startsWith(name.toLowerCase(), "anim_") )
@@ -407,12 +488,18 @@ class Scene extends hide.comp.Component implements h3d.IDrawable {
 		return name;
 	}
 
+	/**
+		Loads a model with its textures. Returns null on error.
+	**/
 	public function loadModel( path : String, mainScene = false, reload = false ) {
 		checkCurrent();
 		var lib = loadHMD(path, false, reload);
 		return lib?.makeObject(texturePath -> loadTexture(path, texturePath));
 	}
 
+	/**
+		Loads the animation of a file.
+	**/
 	public function loadAnimation( path : String ) {
 		var lib = loadHMD(path,true);
 		return lib?.loadAnimation();
@@ -456,6 +543,9 @@ class Scene extends hide.comp.Component implements h3d.IDrawable {
 		return p;
 	}
 
+	/**
+		Loads a texture from a dot path (`a.b.c` looks for `a/b/c.png` or `.jpg`).
+	**/
 	public function loadTextureDotPath( path : String, ?onReady ) {
 		var path = path.split(".").join("/");
 		var t = resolvePath(null, path + ".png");
@@ -468,6 +558,9 @@ class Scene extends hide.comp.Component implements h3d.IDrawable {
 		return loadTexture("", t, onReady);
 	}
 
+	/**
+		Loads a texture referenced by a model, resolving its path.
+	**/
 	public function loadTexture( modelPath : String, texturePath : String, ?onReady : h3d.mat.Texture -> Void, async=false, ?uncompressed: Bool = false) {
 		checkCurrent();
 		var path = resolvePath(modelPath, texturePath);
@@ -563,6 +656,9 @@ class Scene extends hide.comp.Component implements h3d.IDrawable {
 		return hmd;
 	}
 
+	/**
+		Places the camera to see an object (or the scene) from the origin direction, or loads the default camera.
+	**/
 	public function resetCamera( ?obj : h3d.scene.Object, distanceFactor = 1. , ?maxDist: Float) {
 
 		if( defaultCamera != null ) {
@@ -588,6 +684,9 @@ class Scene extends hide.comp.Component implements h3d.IDrawable {
 	}
 
 
+	/**
+		Places the camera to see an object (or the scene), centered on its bounds, or loads the default camera.
+	**/
 	public function resetCamera2( ?obj : h3d.scene.Object, distanceFactor = 1., ?maxDist: Float) {
 
 		if( defaultCamera != null ) {
@@ -618,6 +717,9 @@ class Scene extends hide.comp.Component implements h3d.IDrawable {
 		s3d.camera.target.set(s.x, s.y, s.z);
 	}
 
+	/**
+		Renders the scene.
+	**/
 	public function render( e : h3d.Engine ) {
 		if (Ide.inst.currentConfig.get("sceneeditor.tog-scene-render", false))
 			return;
@@ -626,6 +728,9 @@ class Scene extends hide.comp.Component implements h3d.IDrawable {
 		s2d.render(e);
 	}
 
+	/**
+		Applies the render props of a prefab, or the default environment if null.
+	**/
 	public function setRenderProps(path: String) {
 		var pbrRenderer = Std.downcast(s3d.renderer, h3d.scene.pbr.Renderer);
 		if ( pbrRenderer != null ) {
@@ -659,15 +764,27 @@ class Scene extends hide.comp.Component implements h3d.IDrawable {
 		}
 	}
 
+	/**
+		Called each frame with the elapsed time.
+	**/
 	public dynamic function onUpdate(dt:Float) {
 	}
 
+	/**
+		Called once the scene is ready.
+	**/
 	public dynamic function onReady() {
 	}
 
+	/**
+		Called when the canvas is resized.
+	**/
 	public dynamic function onResize() {
 	}
 
+	/**
+		Returns the scene of the nearest canvas in an element or its parents.
+	**/
 	public static function getNearest( e : Element ) : Scene {
 		while( e.length > 0 ) {
 			var c : Dynamic = e.find("canvas")[0];
@@ -678,14 +795,23 @@ class Scene extends hide.comp.Component implements h3d.IDrawable {
 		return null;
 	}
 
+	/**
+		Returns the scene of the current engine.
+	**/
 	public static function getCurrent() : Scene {
 		return @:privateAccess h3d.Engine.getCurrent().resCache.get(Scene);
 	}
 
+	/**
+		Returns the material libraries available for a path.
+	**/
 	public function listMatLibraries(path : String) {
 		return ide.listMatLibraries(path);
 	}
 
+	/**
+		Finds a material by `library path/material name` in a list.
+	**/
 	public function findMat(materials : Array<Dynamic>, key:String) : { path : String, mat : h3d.mat.Material } {
 		var p = key.split("/");
 		var name = p.pop();
@@ -698,6 +824,9 @@ class Scene extends hide.comp.Component implements h3d.IDrawable {
 		return null;
 	}
 
+	/**
+		Returns the materials of a library available for a path.
+	**/
 	public function listMaterialFromLibrary( path : String, library : String ) {
 		var libraries = listMatLibraries(path);
 		var lPath = "";
@@ -730,6 +859,9 @@ class Scene extends hide.comp.Component implements h3d.IDrawable {
 	}
 }
 
+/**
+	A simple orbit camera controller for previews.
+**/
 class PreviewCamController extends h3d.scene.Object {
 	var target : h3d.Vector = new h3d.Vector();
 	var targetInterp : h3d.Vector = new h3d.Vector();
@@ -750,6 +882,9 @@ class PreviewCamController extends h3d.scene.Object {
 		pos += targetInterp;
 	}
 
+	/**
+		Sets the distance, angles and target of the camera.
+	**/
 	public function set(r: Float, phi: Float, theta: Float, target: h3d.Vector) {
 		this.r = r;
 		this.phi = phi;
@@ -852,6 +987,9 @@ class PreviewCamController extends h3d.scene.Object {
 	}
 }
 
+/**
+	A simple pan and zoom controller for 2D previews.
+**/
 class Preview2DCamController extends h2d.Object {
 	var pushing : Int;
 	var zoom: Float = 1.0;

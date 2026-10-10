@@ -1,54 +1,156 @@
 package hide.comp;
 
+/**
+	The kind of a toolbar tool.
+**/
 enum ToolType {
+	/**
+		A button.
+	**/
 	Button(click: Void->Void);
+	/**
+		A toggle button.
+	**/
 	Toggle(toggle: Bool->Void);
+	/**
+		A slider.
+	**/
 	Range(onChange: Float->Void);
+	/**
+		A color box.
+	**/
 	Color(onChange: Int -> Void);
+	/**
+		A dropdown menu.
+	**/
 	Menu(items: Array<hrt.ui.HuiMenu.MenuItem>);
+	/**
+		A button opening a popup, created by `click`.
+	**/
 	Popup(click: hide.Element -> hide.comp.Popup);
+	/**
+		Starts a new group of tools.
+	**/
 	Separator;
 }
 
+/**
+	The definition of a tool, for `Toolbar.makeToolbar`.
+**/
 typedef ToolDef = {
-	id: String,
-	title : String,
-	type : ToolType,
-	?icon : String,
-	?iconStyle: Dynamic,
-	?rightClick : Void -> Void,
-	?defaultValue : Dynamic,
-	?saveToggleState: Bool, // default to true
+	/**
+		The tool id, used for the `key.sceneeditor.<id>` shortcut and the saved toggle state.
+	**/
+	var id : String;
+	/**
+		The tooltip.
+	**/
+	var title : String;
+	/**
+		The kind of tool.
+	**/
+	var type : ToolType;
+	/**
+		The icon name.
+	**/
+	var ?icon : String;
+	/**
+		CSS applied to the icon.
+	**/
+	var ?iconStyle : Dynamic;
+	/**
+		Called on right click (buttons, toggles and popups).
+	**/
+	var ?rightClick : Void -> Void;
+	/**
+		The default state of a toggle.
+	**/
+	var ?defaultValue : Dynamic;
+	/**
+		Saves the toggle state in the config (default true).
+	**/
+	var ?saveToggleState : Bool;
 }
 
 //
 
+/**
+	A toggle button of a toolbar.
+**/
 typedef ToolToggle = {
+	/**
+		The toggle id.
+	**/
 	var id : String;
+	/**
+		The menu element.
+	**/
 	var element : Element;
+	/**
+		Sets the state.
+	**/
 	function toggle( v : Bool ) : Void;
+	/**
+		Returns the state.
+	**/
 	function isDown(): Bool;
+	/**
+		Sets the function called on right click.
+	**/
 	function rightClick( v : Void -> Void ) : Void;
+	/**
+		Applies the saved state again.
+	**/
 	function refresh() : Void;
 }
 
+/**
+	A select of a toolbar.
+**/
 typedef ToolSelect<T> = {
+	/**
+		The select element.
+	**/
 	var element : Element;
+	/**
+		Sets the choices.
+	**/
 	dynamic function setContent( elements : Array<{ label : String, value : T }> ) : Void;
+	/**
+		Called when a value is chosen.
+	**/
 	dynamic function onSelect( v : T ) : Void;
 }
 
+/**
+	A dropdown menu of a toolbar.
+**/
 typedef ToolMenu<T> = {
+	/**
+		The button element.
+	**/
 	var element : Element;
+	/**
+		Sets the menu items.
+	**/
 	function setContent( elements : Array<hrt.ui.HuiMenu.MenuItem> ) : Void;
+	/**
+		Called when a value is chosen.
+	**/
 	dynamic function onSelect( v : T ) : Void;
 }
 
+/**
+	A toolbar component of buttons, toggles, sliders, colors, selects and menus, in groups.
+**/
 class Toolbar extends Component {
 
 	var curGroup : Element = null;
 	var toggles : Array<ToolToggle>;
 
+	/**
+		Creates an empty toolbar.
+	**/
 	public function new(?parent,?el) {
 		super(parent,el);
 		element.addClass("hide-toolbar2");
@@ -56,6 +158,9 @@ class Toolbar extends Component {
 		toggles = new Array<ToolToggle>();
 	}
 
+	/**
+		Removes all the tools.
+	**/
 	public function clear() {
 		element.empty();
 		newGroup();
@@ -65,10 +170,16 @@ class Toolbar extends Component {
 		curGroup = new Element("<div>").addClass("tb-group").appendTo(element);
 	}
 
+	/**
+		Starts a new group of tools.
+	**/
 	public function addSeparator() {
 		newGroup();
 	}
 
+	/**
+		Adds a button.
+	**/
 	public function addButton( icon : String, ?label : String, ?onClick : Void -> Void, ?rightClick : Void -> Void ) {
 		var e = new Element('<div class="button2" title="${label==null ? "" : label}"></div>');
         if (icon != "" && icon != null) {
@@ -87,6 +198,9 @@ class Toolbar extends Component {
 		return e;
 	}
 
+	/**
+		Adds a toggle button. Its state is saved in the config as `sceneeditor.<id>` if `saveToggleState`.
+	**/
 	public function addToggle( id: String, icon : String, ?title : String, ?label : String, ?onToggle : Bool -> Void, ?defValue = false, ?toggledIcon : String, saveToggleState : Bool = true, canBeUntoggled : Bool = true) : ToolToggle {
 		var e = new Element('<div class="button2" id="${id}" title="${title==null ? "" : title}"><div class="icon ico ico-$icon"/></div>');
 
@@ -143,6 +257,9 @@ class Toolbar extends Component {
 		};
 	}
 
+	/**
+		Adds a color box. Its value is saved in the display state.
+	**/
 	public function addColor( label : String, onChange : Int -> Void, ?alpha : Bool, ?defValue = 0 ) {
 		var button = new Element("<div class='button2'>");
 		curGroup.append(button);
@@ -160,6 +277,9 @@ class Toolbar extends Component {
 		return color;
 	}
 
+	/**
+		Adds a select with a searchable dropdown. `saveSearchKey` remembers the search.
+	**/
 	public function addSelect<T>( icon : String, ?label : String, ?saveSearchKey: String ) : ToolSelect<T> {
 		var e = new Element('
 			<div class="select" title="${label==null ? "" : label}">
@@ -213,6 +333,9 @@ class Toolbar extends Component {
 		return tool;
 	}
 
+	/**
+		Adds a dropdown menu.
+	**/
 	public function addMenu<T>( icon : String, label : String ) : ToolMenu<T> {
         var menu = new Element('<div class="menu"></div>');
         if (icon != null) {
@@ -238,6 +361,9 @@ class Toolbar extends Component {
 		return tool;
 	}
 
+	/**
+		Adds a slider.
+	**/
 	public function addRange( label : String, onChange : Float -> Void, ?defValue = 0., min = 0., max = 1., ?step:Float, ?className:String) {
 		var elt = new Element('<input title="$label" type="range" min="$min" max="$max" value="$defValue">');
 		if( step != null ) elt.attr("step",""+step);
@@ -246,6 +372,9 @@ class Toolbar extends Component {
 		return r;
 	}
 
+	/**
+		Adds a button opening a popup, if it is not already open.
+	**/
 	public function addPopup(icon: String, title: String, open: hide.Element -> hide.comp.Popup, ?rightClick : Void -> Void) {
 		var el = addButton(icon, title, null, rightClick);
 		var p: hide.comp.Popup = null;
@@ -262,6 +391,9 @@ class Toolbar extends Component {
 		});
 	}
 
+	/**
+		Adds tools from definitions. The shortcuts are read from the `key.sceneeditor.<id>` config entries and registered in `keys`.
+	**/
 	public function makeToolbar(toolsDefs : Array<hide.comp.Toolbar.ToolDef>, ?config : Config, ?keys : hide.ui.Keys) {
 		for (tool in toolsDefs) {
 			var key = null;
@@ -303,6 +435,9 @@ class Toolbar extends Component {
 		}
 	}
 
+	/**
+		Refreshes the toggles.
+	**/
 	public function refreshToggles() {
 		for (tog in toggles)
 			tog.refresh();

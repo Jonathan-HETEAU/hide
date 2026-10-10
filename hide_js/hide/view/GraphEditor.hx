@@ -18,17 +18,63 @@ import hide.view.GraphInterface.IGraphEditor;
 import hide.view.GraphInterface.IGraphNode;
 import hide.view.GraphInterface.Edge;
 
-enum EdgeState { None; FromInput; FromOutput; }
+/**
+	The edge creation mode of the graph editor.
+**/
+enum EdgeState {
+	/**
+		No edge is being created.
+	**/
+	None;
+	/**
+		An edge is dragged from an input.
+	**/
+	FromInput;
+	/**
+		An edge is dragged from an output.
+	**/
+	FromOutput;
+}
 
+/**
+	A reversible operation: applies it, or reverts it if `isUndo`.
+**/
 typedef UndoFn = (isUndo : Bool) -> Void;
+/**
+	A list of operations undone and redone together.
+**/
 typedef UndoBuffer = Array<UndoFn>;
-typedef SelectionUndoSave = {newSelections: Map<Int, Bool>, buffer: UndoBuffer};
-
-typedef CopySelectionData = {
-	nodes: Array<{id: Int, serData: Dynamic}>,
-	edges: Array<Edge>,
+/**
+	The selection change of a rectangle selection, for the undo.
+**/
+typedef SelectionUndoSave = {
+	/**
+		The selected nodes, by id.
+	**/
+	var newSelections : Map<Int, Bool>;
+	/**
+		The selection operations.
+	**/
+	var buffer : UndoBuffer;
 };
 
+/**
+	The copied nodes and edges.
+**/
+typedef CopySelectionData = {
+	/**
+		The node ids and serialized data.
+	**/
+	var nodes : Array<{id: Int, serData: Dynamic}>;
+	/**
+		The edges between the copied nodes.
+	**/
+	var edges : Array<Edge>;
+};
+
+/**
+	Shows the alpha of a preview by blending its color over a checkerboard.
+**/
 class PreviewShaderAlpha extends hxsl.Shader {
 	static var SRC = {
 		@input var input : {
@@ -46,15 +92,27 @@ class PreviewShaderAlpha extends hxsl.Shader {
 	}
 }
 
+/**
+	A generic node graph editor component, editing an `IGraphEditor` (shader graphs, texture graphs, animation graphs).
+**/
 @:access(hide.view.shadereditor.Box)
 class GraphEditor extends hide.comp.Component {
+	/**
+		The edited graph.
+	**/
 	public var editor : hide.view.GraphInterface.IGraphEditor;
 	var heapsScene : JQuery;
 	var editorDisplay : SVG;
 	var editorMatrix : JQuery;
+	/**
+		The config of the editor.
+	**/
 	public var config : hide.Config;
 
 
+	/**
+		The scene rendering the node previews, or null.
+	**/
 	public var previewsScene : hide.comp.Scene = null;
 
 	var boxes : Map<Int, Box> = [];
@@ -101,6 +159,9 @@ class GraphEditor extends hide.comp.Component {
 
 	var miniPreviews : Element = null;
 
+	/**
+		The operations of the current undo step, recorded by `commitUndo`.
+	**/
 	public var currentUndoBuffer : UndoBuffer = [];
 
 	var contextMenu : hide.comp.ContextMenu = null;
@@ -111,6 +172,9 @@ class GraphEditor extends hide.comp.Component {
 	// Maps a packIO of an input to it's visual link in the graph
 	var edges : Map<Int, JQuery> = [];
 
+	/**
+		Creates the editor of a graph.
+	**/
 	public function new(config: hide.Config, editor: hide.view.GraphInterface.IGraphEditor, parent: Element = null) {
 		super(parent, new Element('
 		<div class="flex vertical" >
@@ -123,11 +187,17 @@ class GraphEditor extends hide.comp.Component {
 		this.editor = editor;
 	}
 
+	/**
+		Applies an operation and adds it to the current undo step.
+	**/
 	public function addUndo(fn: UndoFn) {
 		currentUndoBuffer.push(fn);
 		fn(false);
 	}
 
+	/**
+		Records the current operations as an undo step. `noDataChange` marks a step that doesn't change the saved data.
+	**/
 	public function commitUndo(noDataChange: Bool = false) {
 		if (currentUndoBuffer.length <= 0) {
 			return;
@@ -137,6 +207,9 @@ class GraphEditor extends hide.comp.Component {
 		currentUndoBuffer = [];
 	}
 
+	/**
+		Applies the operations of a buffer, or reverts them in reverse order if `isUndo`.
+	**/
 	public function execUndo(buffer: UndoBuffer, isUndo : Bool) {
 		if (isUndo) {
 			for (i in 0...buffer.length) {
@@ -149,6 +222,9 @@ class GraphEditor extends hide.comp.Component {
 		}
 	}
 
+	/**
+		Builds the editor.
+	**/
 	public function onDisplay() {
 		saveDisplayKey = "hideGraphEditor";
 
@@ -304,6 +380,9 @@ class GraphEditor extends hide.comp.Component {
 		haxe.Timer.delay(reloadInternal, 100);
 	}
 
+	/**
+		Creates the scene of the node previews.
+	**/
 	public function createMiniPreviewScene() {
 		if (previewsScene != null) {
 			return;
@@ -317,6 +396,9 @@ class GraphEditor extends hide.comp.Component {
 		previewsScene.enableNewErrorSystem = true;
 	}
 
+	/**
+		Disposes the scene of the node previews.
+	**/
 	public function disposeMiniPreviewScene() {
 		if (previewsScene != null) {
 			previewsScene.dispose();
@@ -329,11 +411,17 @@ class GraphEditor extends hide.comp.Component {
 		snapToGrid = b;
 	}
 
+	/**
+		Cancels the edge being created.
+	**/
 	public function cancelAll() {
 		cleanupCreateEdge();
 	}
 
 	var reloadQueued = false;
+	/**
+		Rebuilds the editor on the next frame.
+	**/
 	public function reload() {
 		reloadQueued = true;
 	}
@@ -400,6 +488,9 @@ class GraphEditor extends hide.comp.Component {
 
 	}
 
+	/**
+		Called when the selection changes.
+	**/
 	public dynamic function onSelectionChanged(selectedNodes: Array<IGraphNode>) {
 
 	}
@@ -505,6 +596,9 @@ class GraphEditor extends hide.comp.Component {
 		undoBuffer.push(exec);
 	}
 
+	/**
+		Resizes a comment node, adding the operation to `undoBuffer`.
+	**/
 	public function opResize(box: Box, w: Float, h: Float, undoBuffer: UndoBuffer) {
 		box.info.comment.getSize(Box.tmpPoint);
 		var id = box.node.id;
@@ -799,6 +893,9 @@ class GraphEditor extends hide.comp.Component {
 		}
 	}
 
+	/**
+		Rebuilds the box of a node.
+	**/
 	public function refreshBox(id: Int) {
 		var node = boxes.get(id).node;
 		removeBox(id);
@@ -884,6 +981,9 @@ class GraphEditor extends hide.comp.Component {
 		commitUndo(true);
 	}
 
+	/**
+		Selects nodes, as an undo step without data change.
+	**/
 	public function setSelection(nodes: Array<IGraphNode>) {
 		clearSelectionBoxesUndo(currentUndoBuffer);
 
@@ -894,6 +994,9 @@ class GraphEditor extends hide.comp.Component {
 		commitUndo(true);
 	}
 
+	/**
+		Centers the view on the selected nodes, or on the graph.
+	**/
 	public function centerSelection() {
 		if (!boxesSelected.iterator().hasNext()) {
 			centerView();
@@ -974,6 +1077,9 @@ class GraphEditor extends hide.comp.Component {
 		commitUndo();
 	}
 
+	/**
+		Shows or hides the preview of a node, adding the operation to `undoBuffer`.
+	**/
 	public function opPreview(box: Box, show: Bool, undoBuffer: UndoBuffer) : Void {
 		var prev = box.info.preview.getVisible();
 		if (prev == show)
@@ -986,6 +1092,9 @@ class GraphEditor extends hide.comp.Component {
 		undoBuffer.push(exec);
 	}
 
+	/**
+		Adds or removes a node, adding the operation to `undoBuffer`. The edges of the node must be removed first.
+	**/
 	public function opBox(node: IGraphNode, doAdd: Bool, undoBuffer: UndoBuffer) : Void {
 		var data = editor.serializeNode(node);
 		if (node.getInfo().dontAddRemove)
@@ -1034,6 +1143,9 @@ class GraphEditor extends hide.comp.Component {
 		boxes.remove(id);
 	}
 
+	/**
+		Changes the text of a comment node, adding the operation to `undoBuffer`.
+	**/
 	public function opComment(box: Box, newComment: String, undoBuffer: UndoBuffer) : Void {
 		var id = box.node.id;
 		var prev = box.info.comment.getComment();
@@ -1311,6 +1423,9 @@ class GraphEditor extends hide.comp.Component {
 		var io = unpackIO(id);
 	}
 
+	/**
+		Refreshes the preview buttons of the nodes.
+	**/
 	public function refreshPreviewButtons() {
 		for (box in boxes) {
 			box.refreshPreviewButton();
@@ -1826,6 +1941,9 @@ class GraphEditor extends hide.comp.Component {
 		};
 	}
 
+	/**
+		Centers the view on the graph.
+	**/
 	public function centerView() {
 		if (!boxes.iterator().hasNext()) return;
 		var dims = getGraphDims();
@@ -1846,10 +1964,16 @@ class GraphEditor extends hide.comp.Component {
 		updateMatrix();
 	}
 
+	/**
+		Returns the view transform as JSON.
+	**/
 	public function saveView() : String {
 		return haxe.Json.stringify(transformMatrix);
 	}
 
+	/**
+		Restores a view transform saved by `saveView`.
+	**/
 	public function loadView(saved: String) {
 		transformMatrix = haxe.Json.parse(saved);
 		updateMatrix();
@@ -1942,25 +2066,43 @@ class GraphEditor extends hide.comp.Component {
 		var dy = y - (rect.top + rect.height / 2);
 		return dx * dx + dy * dy;
 	}
+	/**
+		Converts a graph X to a view X.
+	**/
 	public function gX(x : Float) : Float {
 		return x*transformMatrix[0] + transformMatrix[4];
 	}
+	/**
+		Converts a graph Y to a view Y.
+	**/
 	public function gY(y : Float) : Float {
 		return y*transformMatrix[3] + transformMatrix[5];
 	}
+	/**
+		Converts a graph position to a view position.
+	**/
 	public function gPos(x : Float, y : Float) : Point {
 		return new Point(gX(x), gY(y));
 	}
+	/**
+		Converts a page X to a graph X.
+	**/
 	public function lX(x : Float) : Float {
 		var screenOffset = editorDisplay.element.offset();
 		x -= screenOffset.left;
 		return (x - transformMatrix[4])/transformMatrix[0];
 	}
+	/**
+		Converts a page Y to a graph Y.
+	**/
 	public function lY(y : Float) : Float {
 		var screenOffset = editorDisplay.element.offset();
 		y -= screenOffset.top;
 		return (y - transformMatrix[5])/transformMatrix[3];
 	}
+	/**
+		Converts a page position to a graph position.
+	**/
 	public function lPos(x : Float, y : Float) : Point {
 		return new Point(lX(x), lY(y));
 	}
