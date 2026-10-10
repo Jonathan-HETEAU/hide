@@ -1,9 +1,36 @@
 package hide.ui;
 
 
-typedef EntryDoc = {name: String, category: String};
-typedef Entry = {doc: EntryDoc, cb: Void->Void};
+/**
+	The description of a shortcut, for the shortcuts list.
+**/
+typedef EntryDoc = {
+	/**
+		The action name.
+	**/
+	var name : String;
+	/**
+		The category of the action.
+	**/
+	var category : String;
+};
+/**
+	A registered shortcut action.
+**/
+typedef Entry = {
+	/**
+		The description, or null.
+	**/
+	var doc : EntryDoc;
+	/**
+		The action.
+	**/
+	var cb : Void->Void;
+};
 
+/**
+	The keyboard shortcuts of an element: actions registered by name, triggered by the `key.<name>` config entries.
+**/
 class Keys {
 
 	var keys = new Map<String,Entry>();
@@ -11,16 +38,25 @@ class Keys {
 	var listeners = new Array<Element.Event -> Bool>();
 	var disabledStack : Int = 0;
 
+	/**
+		Disables the shortcuts until `popDisable`.
+	**/
 	public function pushDisable() {
 		disabledStack ++;
 	}
 
+	/**
+		Ends a `pushDisable`.
+	**/
 	public function popDisable() {
 		disabledStack--;
 		if (disabledStack < 0)
 			disabledStack = 0;
 	}
 
+	/**
+		Creates the shortcuts of an element.
+	**/
 	public function new( parent : Element ) {
 		if( parent != null ) {
 			this.parent = parent.get(0);
@@ -29,6 +65,9 @@ class Keys {
 		}
 	}
 
+	/**
+		Detaches the shortcuts from their element.
+	**/
 	public function remove() {
 		if( parent != null ) {
 			Reflect.deleteField(parent,"__keys");
@@ -36,15 +75,24 @@ class Keys {
 		}
 	}
 
+	/**
+		Removes all the actions and listeners.
+	**/
 	public function clear() {
 		listeners = [];
 		keys = [];
 	}
 
+	/**
+		Adds a function called with each key event before the actions. Returns true to stop the event.
+	**/
 	public function addListener( l ) {
 		listeners.push(l);
 	}
 
+	/**
+		Triggers the action of a key event. Returns true if handled.
+	**/
 	public function processEvent( e : Element.Event, config : Config ) {
 		if (disabledStack > 0)
 			return false;
@@ -79,6 +127,9 @@ class Keys {
 		return false;
 	}
 
+	/**
+		Tells if a key event matches the shortcut of the `key.<shortcutName>` config entry.
+	**/
 	static public function matchJsEvent(shortcutName : String, event: js.html.KeyboardEvent, config : Config) {
 		var keyCode : String = config.get("key."+shortcutName);
 
@@ -98,6 +149,9 @@ class Keys {
 		return true;
 	}
 
+	/**
+		Triggers the action whose shortcut is `key` (like `Ctrl-S`). Returns true if handled.
+	**/
 	public function triggerKey( e : Element.Event, key : String, config : Config ) {
 		for( l in listeners )
 			if( l(e) )
@@ -116,14 +170,23 @@ class Keys {
 		return false;
 	}
 
+	/**
+		Registers an action, triggered by the `key.<name>` config entry.
+	**/
 	public function register( name : String, ?doc : EntryDoc, callb : Void -> Void ) {
 		keys.set(name, {doc: doc, cb:callb});
 	}
 
+	/**
+		Returns the shortcuts of an element, or null.
+	**/
 	public static function get( e : Element ) : Keys {
 		return Reflect.field(e.get(0), "__keys");
 	}
 
+	/**
+		Returns the shortcuts by category, for the shortcuts list.
+	**/
 	public function sortDocCategories(config: Config) : Map<String, Array<{name: String, shortcut: String}>> {
 		var ret = new Map();
 		for (k => v in keys) {

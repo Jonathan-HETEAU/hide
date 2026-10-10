@@ -1,16 +1,46 @@
 package hide.comp.cdb;
 
+/**
+	A line of a CDB table.
+**/
 class Line extends Component {
 
+	/**
+		The index of the line in the sheet.
+	**/
 	public var index : Int;
+	/**
+		The table of the line.
+	**/
 	public var table : Table;
+	/**
+		The data of the line.
+	**/
 	public var obj(get, never) : Dynamic;
+	/**
+		The cells.
+	**/
 	public var cells : Array<Cell>;
+	/**
+		The shown columns.
+	**/
 	public var columns : Array<cdb.Data.Column>;
+	/**
+		The open sub table, or null.
+	**/
 	public var subTable : SubTable;
+	/**
+		The result of the validation function of the sheet, or null.
+	**/
 	public var status : Formulas.ValidationResult;
+	/**
+		True if the line is hidden by the search filters.
+	**/
 	public var filtered : Bool = false;
 
+	/**
+		Creates a line of a table.
+	**/
 	public function new(table, columns, index, root) {
 		super(null,root);
 		this.table = table;
@@ -22,6 +52,9 @@ class Line extends Component {
 	inline function get_obj() return table.sheet.lines[index];
 
 
+	/**
+		Returns the id of the line, or null.
+	**/
 	public function getId(): String {
 		var columns = table.displayMode == Table ? columns : table.sheet.columns;
 		var obj = obj;
@@ -32,6 +65,9 @@ class Line extends Component {
 		return null;
 	}
 
+	/**
+		Builds the cells of the line.
+	**/
 	public function create() {
 		filtered = false;
 		var view = table.view;
@@ -60,12 +96,18 @@ class Line extends Component {
 		syncClasses();
 	}
 
+	/**
+		Updates the style of the line and validates it.
+	**/
 	public function syncClasses() {
 		var obj = obj;
 		element.get(0).classList.toggle("locIgnored", Reflect.hasField(obj,cdb.Lang.IGNORE_EXPORT_FIELD));
 		validate();
 	}
 
+	/**
+		Returns the path or title of the separator group of the root line, or null.
+	**/
 	public function getGroupID() {
 		var line = getRootLine();
 		var t = line.table;
@@ -81,6 +123,9 @@ class Line extends Component {
 		return null;
 	}
 
+	/**
+		Returns the line of the root table containing this line.
+	**/
 	public function getRootLine() {
 		var line = this;
 		var t = table;
@@ -91,6 +136,9 @@ class Line extends Component {
 		return line;
 	}
 
+	/**
+		Returns the constants of the line for the script checker: `cdb.objID`, `cdb.groupID` and the objects of the line and its parents.
+	**/
 	public function getConstants( objId ) {
 		var consts = [
 			"cdb.objID" => objId,
@@ -106,11 +154,17 @@ class Line extends Component {
 		return consts;
 	}
 
+	/**
+		Evaluates the formulas of the cells.
+	**/
 	public function evaluate() {
 		for( c in cells )
 			@:privateAccess c.evaluate();
 	}
 
+	/**
+		Closes the sub table and hides the line.
+	**/
 	public function hide() {
 		if( subTable != null ) {
 			subTable.close();
@@ -121,6 +175,9 @@ class Line extends Component {
 		element.addClass("hidden");
 	}
 
+	/**
+		Runs the validation function of the sheet and updates the line status.
+	**/
 	public function validate() {
 		if (table.errors.get(this) != null) {
 			table.errors.remove(this);
