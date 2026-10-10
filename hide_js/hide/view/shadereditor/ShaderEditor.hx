@@ -17,19 +17,50 @@ import hrt.shgraph.ShaderGraph;
 import hrt.shgraph.ShaderNode;
 import hide.view.GraphInterface;
 
+/**
+	An HXSL type.
+**/
 typedef HxslType = hxsl.Ast.Type;
 
-typedef NodeInfo = { name : String, description : String, key : String };
+/**
+	The name, description and key of a node.
+**/
+typedef NodeInfo = {
+	/**
+		The node name.
+	**/
+	var name : String;
+	/**
+		The node description.
+	**/
+	var description : String;
+	/**
+		The node key.
+	**/
+	var key : String;
+};
 
+/**
+	The nodes and edges copied to the clipboard.
+**/
 typedef SavedClipboard = {
-	nodes : Array<{
+	/**
+		The copied nodes.
+	**/
+	var nodes : Array<{
 		pos : Point,
 		nodeType : Class<ShaderNode>,
 		props : Dynamic,
-	}>,
-	edges : Array<{ fromIdx : Int, fromOutputId : Int, toIdx : Int, toInputId : Int }>,
+	}>;
+	/**
+		The edges between the copied nodes, by index in `nodes`.
+	**/
+	var edges : Array<{ fromIdx : Int, fromOutputId : Int, toIdx : Int, toInputId : Int }>;
 }
 
+/**
+	The base shader of the node previews: sets default values for the variables the nodes can read (positions, normals, particle values, material values).
+**/
 class PreviewShaderBase extends hxsl.Shader {
 	static var SRC = {
 
@@ -89,56 +120,104 @@ class PreviewShaderBase extends hxsl.Shader {
 	}
 }
 
+/**
+	A node class shown in the add node menu.
+**/
 typedef ClassRepoEntry =
 {
 	/**
 		Class of the node
 	**/
-	cl: Class<ShaderNode>,
+	var cl : Class<ShaderNode>;
 
 	/**
 		Group where the node is in the search
 	**/
-	group: String,
+	var group : String;
 
 	/**
 		Displayed name in the seach box
 	**/
-	nameSearch: String,
+	var nameSearch : String;
 
 	/**
 		Description of the node in the search box
 	**/
-	description: String,
+	var description : String;
 
 	/**
 		Custom name for the node that will be created
 	**/
-	?nameOverride: String,
+	var ?nameOverride : String;
 
 	/**
 		Arguments passed to the constructor when the node is created
 	**/
-	args: Array<Dynamic>
+	var args : Array<Dynamic>;
 };
 
+/**
+	The settings of the mesh preview, saved in the display state.
+**/
 class PreviewSettings {
+	/**
+		The previewed mesh: `Sphere`, `Plane`, `ScreenFX`, or the path of an FBX or prefab.
+	**/
 	public var meshPath : String = "Sphere";
+	/**
+		The background color.
+	**/
 	public var bgColor : Int = 0;
+	/**
+		The path of the render props prefab, or null.
+	**/
 	public var renderPropsPath : String = null;
+	/**
+		Renders the preview with alpha blending.
+	**/
 	public var alphaBlend: Bool = false;
+	/**
+		Culls the back faces.
+	**/
 	public var backfaceCulling : Bool = true;
+	/**
+		Renders the preview unlit.
+	**/
 	public var unlit : Bool = false;
+	/**
+		Shows the alpha channel.
+	**/
 	public var previewAlpha : Bool = false;
+	/**
+		Enables the shadows.
+	**/
 	public var shadows : Bool = false;
 
+	/**
+		For the `ScreenFX` preview: the screen shader reads the previous target.
+	**/
 	public var screenFXusePrevTarget : Bool = false;
+	/**
+		For the `ScreenFX` preview: the blend mode.
+	**/
 	public var screenFXBlend : h3d.mat.PbrMaterial.PbrBlend = Alpha;
+	/**
+		The preview width in pixels.
+	**/
 	public var width : Int = 300;
+	/**
+		The preview height in pixels.
+	**/
 	public var height : Int = 300;
+	/**
+		Creates the default settings.
+	**/
 	public function new() {};
 }
 
+/**
+	The shader graph editor view (`.shgraph` files): graph, parameters, variables and mesh preview.
+**/
 @:access(hrt.shgraph.ShaderGraph)
 @:access(hrt.shgraph.Graph)
 class ShaderEditor extends hide.view.FileView implements GraphInterface.IGraphEditor {
@@ -1215,6 +1294,9 @@ class ShaderEditor extends hide.view.FileView implements GraphInterface.IGraphEd
 	}
 
 
+	/**
+		Loads the preview settings from the display state.
+	**/
 	public function loadSettings() {
 		var save = haxe.Json.parse(getDisplayState("previewSettings") ?? "{}");
 		previewSettings = new PreviewSettings();
@@ -1248,19 +1330,31 @@ class ShaderEditor extends hide.view.FileView implements GraphInterface.IGraphEd
 		return null;
 	}
 
+	/**
+		Saves the preview settings in the display state.
+	**/
 	public function savePreviewSettings() {
 		saveDisplayState("previewSettings", haxe.Json.stringify(previewSettings));
 	}
 
+	/**
+		Shows a parameter in the parameters list.
+	**/
 	public function revealParameter(id: Int) : Void {
 		var param = shaderGraph.parametersAvailable[id];
 		parametersList.reveal(param.index);
 	}
 
+	/**
+		Shows a variable in the variables list.
+	**/
 	public function revealVariable(id: Int) : Void {
 		variableList.reveal(id);
 	}
 
+	/**
+		Removes the mesh preview.
+	**/
 	public function disposeMeshPreview() {
 		if (meshPreviewScene != null) {
 			meshPreviewScene.dispose();
@@ -1268,6 +1362,9 @@ class ShaderEditor extends hide.view.FileView implements GraphInterface.IGraphEd
 		}
 	}
 
+	/**
+		Creates the mesh preview.
+	**/
 	public function initMeshPreview() {
 		if (meshPreviewScene != null) {
 			disposeMeshPreview();
@@ -1418,6 +1515,9 @@ class ShaderEditor extends hide.view.FileView implements GraphInterface.IGraphEd
 		});
 	}
 
+	/**
+		Sets `screenFXusePrevTarget` and applies it to the preview.
+	**/
 	public function setPreviewScreenFXUsePrevTarget(value: Bool) {
 		previewSettings.screenFXusePrevTarget = value;
 		for (fx in meshPreviewScreenFX) {
@@ -1427,6 +1527,9 @@ class ShaderEditor extends hide.view.FileView implements GraphInterface.IGraphEd
 		savePreviewSettings();
 	}
 
+	/**
+		Sets the previewed mesh and render props in the settings, used when the preview is created.
+	**/
 	public function setPrefabAndRenderDelayed(prefab: String, renderProps: String) {
 		if (previewSettings == null)
 			loadSettings();
@@ -1435,12 +1538,18 @@ class ShaderEditor extends hide.view.FileView implements GraphInterface.IGraphEd
 		savePreviewSettings();
 	}
 
+	/**
+		Removes the render props of the preview.
+	**/
 	public function clearRenderProps() {
 		previewSettings.renderPropsPath = null;
 		refreshRenderProps();
 		savePreviewSettings();
 	}
 
+	/**
+		Opens a file chooser for the render props of the preview.
+	**/
 	public function selectRenderProps() {
 		var basedir = haxe.io.Path.directory(previewSettings.renderPropsPath ?? "");
 		if (basedir == "" || !haxe.io.Path.isAbsolute(basedir)) {
@@ -1454,6 +1563,9 @@ class ShaderEditor extends hide.view.FileView implements GraphInterface.IGraphEd
 		}, true, basedir);
 	}
 
+	/**
+		Opens a color picker for the preview background.
+	**/
 	public function openBackgroundColorMenu() {
 		var prev = element.find("#preview");
 
@@ -1488,6 +1600,9 @@ class ShaderEditor extends hide.view.FileView implements GraphInterface.IGraphEd
 
 	}
 
+	/**
+		Updates the mesh preview each frame, compiling the shader if needed.
+	**/
 	public function onMeshPreviewUpdate(dt: Float) {
 
 		if (queueReloadMesh) {
@@ -1529,16 +1644,25 @@ class ShaderEditor extends hide.view.FileView implements GraphInterface.IGraphEd
 		}
 	}
 
+	/**
+		Applies the render props to the preview.
+	**/
 	public function refreshRenderProps() {
 		meshPreviewScene.setRenderProps(previewSettings.renderPropsPath);
 	}
 
+	/**
+		Disposes the preview.
+	**/
 	public function dispose() {
 		cleanupPreview();
 		meshPreviewScene.dispose();
 
 	}
 
+	/**
+		Removes the previewed objects.
+	**/
 	public function cleanupPreview() {
 		if (meshPreviewPrefab != null) {
 			meshPreviewPrefab.dispose();
@@ -1559,6 +1683,9 @@ class ShaderEditor extends hide.view.FileView implements GraphInterface.IGraphEd
 		meshPreviewRoot3d.removeChildren();
 	}
 
+	/**
+		Previews a mesh.
+	**/
 	public function setMeshPreviewMesh(mesh: h3d.scene.Mesh) {
 		cleanupPreview();
 
@@ -1570,6 +1697,9 @@ class ShaderEditor extends hide.view.FileView implements GraphInterface.IGraphEd
 		resetPreviewCamera();
 	}
 
+	/**
+		Previews a sphere.
+	**/
 	public function setMeshPreviewSphere() {
 		previewSettings.meshPath = "Sphere";
 		savePreviewSettings();
@@ -1581,6 +1711,9 @@ class ShaderEditor extends hide.view.FileView implements GraphInterface.IGraphEd
 		setMeshPreviewMesh(new h3d.scene.Mesh(sp));
 	}
 
+	/**
+		Previews a plane.
+	**/
 	public function setMeshPreviewPlane() {
 		previewSettings.meshPath = "Plane";
 		savePreviewSettings();
@@ -1593,6 +1726,9 @@ class ShaderEditor extends hide.view.FileView implements GraphInterface.IGraphEd
 		setMeshPreviewMesh(m);
 	}
 
+	/**
+		Previews the graph as a screen shader.
+	**/
 	public function setMeshPreviewScreenFX() {
 		cleanupPreview();
 		previewSettings.meshPath = "ScreenFX";
@@ -1613,6 +1749,9 @@ class ShaderEditor extends hide.view.FileView implements GraphInterface.IGraphEd
 		savePreviewSettings();
 	}
 
+	/**
+		Opens a file chooser for an FBX to preview.
+	**/
 	public function chooseMeshPreviewFBX() {
 		var basedir = haxe.io.Path.directory(previewSettings.meshPath ?? "");
 		if (basedir == "" || !haxe.io.Path.isAbsolute(basedir)) {
@@ -1625,6 +1764,9 @@ class ShaderEditor extends hide.view.FileView implements GraphInterface.IGraphEd
 		}, false, basedir);
 	}
 
+	/**
+		Opens a file chooser for a prefab or FX to preview.
+	**/
 	public function chooseMeshPreviewPrefab() {
 		var basedir = haxe.io.Path.directory(previewSettings.meshPath);
 		if (basedir == "" || !haxe.io.Path.isAbsolute(basedir)) {
@@ -1637,12 +1779,18 @@ class ShaderEditor extends hide.view.FileView implements GraphInterface.IGraphEd
 		}, false, basedir);
 	}
 
+	/**
+		Frames the previewed object.
+	**/
 	public function resetPreviewCamera() {
 		var bounds = meshPreviewRoot3d.getBounds();
 		var sp = bounds.toSphere();
 		meshPreviewCameraController.set(sp.r * 3.0, Math.PI / 4, Math.PI * 5 / 13, sp.getCenter());
 	}
 
+	/**
+		Restores the default preview size.
+	**/
 	public function resetPreviewSize() {
 		var def = new PreviewSettings();
 		previewSettings.width = def.width;
@@ -1654,6 +1802,9 @@ class ShaderEditor extends hide.view.FileView implements GraphInterface.IGraphEd
 		savePreviewSettings();
 	}
 
+	/**
+		Previews `Sphere`, `Plane`, `ScreenFX`, or the FBX or prefab at a path.
+	**/
 	public function loadMeshPreviewFromString(str: String) {
 		switch (str){
 			case "Sphere":
@@ -1676,6 +1827,9 @@ class ShaderEditor extends hide.view.FileView implements GraphInterface.IGraphEd
 		}
 	}
 
+	/**
+		Previews the first mesh of an FBX. Falls back to a sphere on error.
+	**/
 	public function setMeshPreviewFBX(str: String) {
 		var model : h3d.scene.Mesh = null;
 		try {
@@ -1694,6 +1848,9 @@ class ShaderEditor extends hide.view.FileView implements GraphInterface.IGraphEd
 		savePreviewSettings();
 	}
 
+	/**
+		Previews a prefab. Falls back to a sphere on error.
+	**/
 	public function setMeshPreviewPrefab(str: String) {
 		cleanupPreview();
 		meshPreviewScene.setCurrent();
@@ -1746,6 +1903,9 @@ class ShaderEditor extends hide.view.FileView implements GraphInterface.IGraphEd
 		savePreviewSettings();
 	}
 
+	/**
+		Called when the preview scene is ready: creates the camera and loads the previewed object.
+	**/
 	public function onMeshPreviewReady() {
 		if (meshPreviewScene.s3d == null)
 			throw "meshPreviewScene not ready";
@@ -1758,6 +1918,9 @@ class ShaderEditor extends hide.view.FileView implements GraphInterface.IGraphEd
 		refreshRenderProps();
 	}
 
+	/**
+		Replaces the shader graph shader on the materials of a mesh.
+	**/
 	public function replaceMeshShader(mesh: h3d.scene.Mesh, newShader: hxsl.DynamicShader) {
 		if (newShader == null)
 			return;
@@ -1805,6 +1968,9 @@ class ShaderEditor extends hide.view.FileView implements GraphInterface.IGraphEd
 	}
 
 	static var I = h3d.Matrix.I();
+	/**
+		Updates the node previews each frame.
+	**/
 	public function onPreviewUpdate() {
 		checkResolveTypes();
 
@@ -1842,6 +2008,9 @@ class ShaderEditor extends hide.view.FileView implements GraphInterface.IGraphEd
 		return true;
 	}
 	var bitmapToShader : Map<h2d.Bitmap, hxsl.DynamicShader> = [];
+	/**
+		Updates the preview of a node.
+	**/
 	public function onNodePreviewUpdate(node: IGraphNode, bitmap: h2d.Bitmap) {
 		if (compiledShaderPreview == null) {
 			bitmap.visible = false;
@@ -1885,6 +2054,9 @@ class ShaderEditor extends hide.view.FileView implements GraphInterface.IGraphEd
 		return currentGraph.getNodes().iterator();
 	}
 
+	/**
+		Returns the edges.
+	**/
 	public function getEdges() : Iterator<Edge> {
 		var edges : Array<Edge> = [];
 		for (id => node in currentGraph.getNodes()) {
@@ -1903,10 +2075,16 @@ class ShaderEditor extends hide.view.FileView implements GraphInterface.IGraphEd
 		return edges.iterator();
 	}
 
+	/**
+		Returns the data of a node, for copy and undo.
+	**/
 	public function serializeNode(node: IGraphNode) : Dynamic {
 		return (cast node:ShaderNode).serializeToDynamic();
 	}
 
+	/**
+		Creates a node from its data, with a new unique id if `newId`.
+	**/
 	public function unserializeNode(data : Dynamic, newId : Bool) : IGraphNode {
 		var node = ShaderNode.createFromDynamic(data, currentGraph);
 		if (newId) {
@@ -1916,6 +2094,9 @@ class ShaderEditor extends hide.view.FileView implements GraphInterface.IGraphEd
 		return node;
 	}
 
+	/**
+		Creates a comment node.
+	**/
 	public function createCommentNode() : Null<IGraphNode> {
 		var node = new hrt.shgraph.nodes.Comment();
 		node.comment = "Comment";
@@ -1924,6 +2105,9 @@ class ShaderEditor extends hide.view.FileView implements GraphInterface.IGraphEd
 		return node;
 	}
 
+	/**
+		Creates a reroute node of the type of `edge`. Returns null if the type is unknown.
+	**/
 	public function createRerouteNode(edge: Edge) : Null<IGraphNode> {
 		var from = currentGraph.getNode(edge.nodeFromId);
 		var type = from?.getOutputs()[edge.outputFromId]?.type;
@@ -1939,6 +2123,9 @@ class ShaderEditor extends hide.view.FileView implements GraphInterface.IGraphEd
 		return node;
 	}
 
+	/**
+		Returns the add node menu entries, compatible with `currentEdge` if set.
+	**/
 	public function getAddNodesMenu(currentEdge: Null<Edge>) : Array<AddNodeMenuEntry> {
 		var entries : Array<AddNodeMenuEntry> = [];
 
@@ -2026,26 +2213,41 @@ class ShaderEditor extends hide.view.FileView implements GraphInterface.IGraphEd
 	}
 
 
+	/**
+		Adds a node to the graph.
+	**/
 	public function addNode(node: IGraphNode) : Void {
 		currentGraph.addNode(cast node);
 		requestRecompile();
 	}
 
+	/**
+		Removes a node from the graph.
+	**/
 	public function removeNode(id: Int) : Void {
 		currentGraph.removeNode(id);
 		requestRecompile();
 	}
 
+	/**
+		Returns false if the edge can't be created because the input/output types don't match.
+	**/
 	public function canAddEdge(edge: Edge) : Bool {
 		return currentGraph.canAddEdge({outputNodeId: edge.nodeFromId, outputId: edge.outputFromId, inputNodeId: edge.nodeToId, inputId: edge.inputToId});
 	}
 
+	/**
+		Adds an edge to the graph.
+	**/
 	public function addEdge(edge: Edge) : Void {
 		var input = currentGraph.getNode(edge.nodeToId);
 		input.connections[edge.inputToId] = {from: currentGraph.getNode(edge.nodeFromId), outputId: edge.outputFromId};
 		requestRecompile();
 	}
 
+	/**
+		Removes the edge connected to an input.
+	**/
 	public function removeEdge(nodeToId: Int, inputToId: Int) : Void {
 		var input = currentGraph.getNode(nodeToId);
 		input.connections[inputToId] = null;
@@ -2059,6 +2261,9 @@ class ShaderEditor extends hide.view.FileView implements GraphInterface.IGraphEd
 		super.save();
 	}
 
+	/**
+		Returns the undo history.
+	**/
 	public function getUndo() : hide.ui.UndoHistory {
 		return undo;
 	}
@@ -2068,6 +2273,9 @@ class ShaderEditor extends hide.view.FileView implements GraphInterface.IGraphEd
 		return haxe.io.Bytes.ofString(ide.toJSON(p));
 	}
 
+	/**
+		Marks the shader to compile again.
+	**/
 	public function requestRecompile() {
 		needRecompile = true;
 		needResolveTypes = true;
@@ -2082,6 +2290,9 @@ class ShaderEditor extends hide.view.FileView implements GraphInterface.IGraphEd
 		graphEditor.refreshPinColors();
 	}
 
+	/**
+		Compiles the shader if the graph changed.
+	**/
 	public function checkCompileShader() {
 		if (!needRecompile)
 			return;

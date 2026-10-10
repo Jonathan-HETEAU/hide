@@ -5,51 +5,144 @@ using hide.tools.Extensions;
 import hrt.tools.CdbUtils;
 
 
+/**
+	A horizontal direction.
+**/
 enum Direction {
+	/**
+		To the left.
+	**/
 	Left;
+	/**
+		To the right.
+	**/
 	Right;
 }
+/**
+	A sheet shown in the editor, as stored in the undo state.
+**/
 typedef UndoSheet = {
+	/**
+		The sheet name.
+	**/
 	var sheet : String;
+	/**
+		The parent sheet, line and column of a sub sheet, or null.
+	**/
 	var parent : { sheet : UndoSheet, line : Int, column : Int };
 }
 
+/**
+	A state of the editor saved in the undo history.
+**/
 typedef UndoState = {
+	/**
+		A copy of the edited data.
+	**/
 	var data : Any;
+	/**
+		The name of the current sheet.
+	**/
 	var sheet : String;
+	/**
+		The expanded state of the separators.
+	**/
 	var separatorsState: Map<String, Bool>;
+	/**
+		The cursor state.
+	**/
 	var cursor : Cursor.CursorState;
+	/**
+		The shown sheets.
+	**/
 	var tables : Array<UndoSheet>;
 }
 
+/**
+	The data access of a CDB editor.
+**/
 typedef EditorApi = {
+	/**
+		Loads data (on undo or redo).
+	**/
 	function load( data : Any ) : Void;
+	/**
+		Returns a copy of the data.
+	**/
 	function copy() : Any;
+	/**
+		Saves the data.
+	**/
 	function save() : Void;
 }
 
+/**
+	The editor properties of a CDB column.
+**/
 typedef EditorColumnProps = {
+	/**
+		The name of the formula of the column.
+	**/
 	var ?formula : String;
+	/**
+		If the column has a formula: the column is not exported.
+	**/
 	var ?ignoreExport : Bool;
+	/**
+		The column is not changed by pasting several cells.
+	**/
 	var ?copyPasteImmutable : Bool;
+	/**
+		The categories of the column, to show it only in these categories.
+	**/
 	var ?categories : Array<String>;
 }
 
+/**
+	The editor properties of a CDB sheet.
+**/
 typedef EditorSheetProps = {
+	/**
+		The position of the sheet in the tabs.
+	**/
 	var ?index : Int;
+	/**
+		The categories of the sheet.
+	**/
 	var ?categories : Array<String>;
 }
 
+/**
+	The empty optional values removed by `Editor.cleanupOptionalLines`, to restore them.
+**/
 typedef OptionalBackup = Array<{line: Dynamic, colName: String, data: Dynamic}>;
 
+/**
+	A kind of line shown by the editor filters.
+**/
 enum FilterFlag {
+	/**
+		The lines without warning or error.
+	**/
 	Regular;
+	/**
+		The lines with a warning.
+	**/
 	Warning;
+	/**
+		The lines with an error.
+	**/
 	Error;
 }
 
+/**
+	A set of `FilterFlag`.
+**/
 typedef FilterFlags = haxe.EnumFlags<FilterFlag>;
 
+/**
+	The CastleDB editor component: shows and edits a sheet of the database, with cursor, undo, clipboard, search and filters.
+**/
 @:allow(hide.comp.cdb)
 class Editor extends Component {
 	static var CLIPBOARD_PREFIX = "[CDB_FORMAT]";
@@ -74,16 +167,43 @@ class Editor extends Component {
 	var filterFlags : FilterFlags = (Regular: FilterFlags) | (Warning: FilterFlags) | (Error: FilterFlags);
 	var filters : Array<String> = [];
 
+	/**
+		The config view restricting what can be edited, or null.
+	**/
 	public var view : cdb.DiffFile.ConfigView;
+	/**
+		The config of the editor.
+	**/
 	public var config : hide.Config;
+	/**
+		The cursor of the editor.
+	**/
 	public var cursor : Cursor;
+	/**
+		The keyboard shortcuts of the editor.
+	**/
 	public var keys : hide.ui.Keys;
+	/**
+		The undo history.
+	**/
 	public var undo : hide.ui.UndoHistory;
+	/**
+		The formulas of the database.
+	**/
 	public var formulas : Formulas;
+	/**
+		Shows the GUID columns.
+	**/
 	public var showGUIDs = false;
 
+	/**
+		The gradient editor in use, or null.
+	**/
 	public var gradientEditor: GradientEditor;
 
+	/**
+		Creates an editor with a config and a data access.
+	**/
 	public function new(config, api, ?cdbTable) {
 		super(null,null);
 		this.api = api;
@@ -93,10 +213,16 @@ class Editor extends Component {
 		undo = new hide.ui.UndoHistory(40);
 	}
 
+	/**
+		Returns the name of the current sheet.
+	**/
 	public function getCurrentSheet() {
 		return currentSheet == null ? null : currentSheet.name;
 	}
 
+	/**
+		Shows a sheet, in `parent` if set.
+	**/
 	public function show( sheet, ?parent : Element ) {
 		if( element != null ) element.remove();
 		element = new Element('<div>');
@@ -299,10 +425,16 @@ class Editor extends Component {
 		return false;
 	}
 
+	/**
+		Called on Ctrl+S in a script cell.
+	**/
 	public dynamic function onScriptCtrlS() {
 	}
 
 
+	/**
+		Applies the search filters to the lines of the current sheet.
+	**/
 	public function updateFilters() {
 		var table = tables.filter((t) -> t.sheet == currentSheet)[0];
 		if (table.displayMode == AllProperties)
@@ -1036,6 +1168,9 @@ class Editor extends Component {
 		}
 	}
 
+	/**
+		Sets the value of a column of a line, as an undoable change. A null value restores the formula.
+	**/
 	public function changeObject( line : Line, column : cdb.Data.Column, value : Dynamic ) {
 		beginChanges();
 		var prev = Reflect.field(line.obj, column.name);
@@ -1169,6 +1304,9 @@ class Editor extends Component {
 
 	static var runningHooks = false;
 	static var queuedCommand: Void -> Void = null;
+	/**
+		Saves the expanded state of the separators.
+	**/
 	public function saveSeparatorState() {
 		saveDisplayState("separatorsState", separatorsState);
 	}
@@ -1251,13 +1389,22 @@ class Editor extends Component {
 		}
 	}
 
+	/**
+		Restores the values removed by `cleanupOptionalLines`.
+	**/
 	public static function restoreOptionals(optionalBackup: OptionalBackup) {
 		for (backup in optionalBackup) {
 			Reflect.setField(backup.line, backup.colName, backup.data);
 		}
 	}
 
+	/**
+		True while `refreshAll` runs.
+	**/
 	public static var inRefreshAll(default,null) : Bool;
+	/**
+		Refreshes all the CDB editors. `eraseUndo` prevents undoing over the changes.
+	**/
 	public static function refreshAll( eraseUndo = false, loadDataFiles = true) {
 		var editors : Array<Editor> = [for( e in new Element(".is-cdb-editor").elements() ) e.data("cdb")];
 		if (loadDataFiles)
@@ -1276,6 +1423,9 @@ class Editor extends Component {
 		inRefreshAll = false;
 	}
 
+	/**
+		Returns the id of the line or reference under the cursor. With `childOnly`, the line id is only used when the cursor is not on a cell.
+	**/
 	public function getCursorId(?sheet, ?childOnly = false): String {
 		var id: String = null;
 		if( sheet == null )
@@ -1301,10 +1451,16 @@ class Editor extends Component {
 		return id;
 	}
 
+	/**
+		Splits a reference path, see `hrt.tools.CdbUtils.splitPath`.
+	**/
 	public static function splitPath(rs: cdb.Sheet.Reference) {
 		return hrt.tools.CdbUtils.splitPath(rs);
 	}
 
+	/**
+		Returns the references to an id of a sheet, in the database and in the code and prefab files if `withCodePaths`. Always empty on HashLink.
+	**/
 	public function getReferences(id: String, withCodePaths = true, returnAtFirstRef = false, sheet: cdb.Sheet, ?codeFileCache: Array<{path: String, data:String}>, ?prefabFileCache: Array<{path: String, data:String}>) : Array<{str:String, ?goto:Void->Void, ?file: String}> {
 		#if hl
 		return [];
@@ -1533,6 +1689,9 @@ class Editor extends Component {
 		#end
 	}
 
+	/**
+		Shows the ids of a column that are referenced nowhere.
+	**/
 	public function findUnreferenced(col: cdb.Data.Column, table: Table) {
 		var sheet = table.getRealSheet();
 
@@ -1552,6 +1711,9 @@ class Editor extends Component {
 		});
 	}
 
+	/**
+		Shows the references to an id (by default the id under the cursor).
+	**/
 	public function showReferences(?id: String, ?cell : hide.comp.cdb.Cell, ?sheet: cdb.Sheet) {
 		if( cursor.table == null ) return;
 		if( sheet == null )
@@ -1593,6 +1755,9 @@ class Editor extends Component {
 		});
 	}
 
+	/**
+		Adds an id to the CDB favorites.
+	**/
 	public function addToFavorites(id: String, ?sheet: cdb.Sheet) {
 		if( cursor.table == null ) return;
 		if( sheet == null )
@@ -1622,6 +1787,9 @@ class Editor extends Component {
 		}
 	}
 
+	/**
+		Opens a CDB table view at a path.
+	**/
 	public static function openReference2(rootSheet : cdb.Sheet, path: Path) {
 		hide.Ide.inst.open("hide.view.CdbTable", {}, null, function(view) Std.downcast(view,hide.view.CdbTable).goto2(rootSheet,path));
 	}
@@ -1630,6 +1798,9 @@ class Editor extends Component {
 		ide.open("hide.view.CdbTable", {}, function(view) Std.downcast(view,hide.view.CdbTable).goto(s,line,column,scriptLine));
 	}
 
+	/**
+		Uses a database (by default the current one) and takes the sheet named `name` again.
+	**/
 	public function syncSheet( ?base, ?name ) {
 		if( base == null ) base = this.base;
 		this.base = base;
@@ -1651,6 +1822,9 @@ class Editor extends Component {
 		return uniq == null || uniq.obj == obj;
 	}
 
+	/**
+		Refreshes the reference and script cells.
+	**/
 	public function refreshRefs() {
 		base.sync();
 
@@ -1670,6 +1844,9 @@ class Editor extends Component {
 		}
 	}
 
+	/**
+		Rebuilds the editor, with a state (by default the current one).
+	**/
 	public function refresh( ?state : UndoState ) {
 		if( state == null )
 			state = getState();
@@ -1904,18 +2081,27 @@ class Editor extends Component {
 		return null;
 	}
 
+	/**
+		Returns the editor properties of a column.
+	**/
 	static public function getColumnProps( c : cdb.Data.Column ) {
 		var pr : EditorColumnProps = c.editor;
 		if( pr == null ) pr = {};
 		return pr;
 	}
 
+	/**
+		Tells if a column is in the shown categories.
+	**/
 	public function isColumnVisible( c : cdb.Data.Column ) {
 		var props = getColumnProps(c);
 		var cats = ide.projectConfig.dbCategories;
 		return cats == null || props.categories == null || cats.filter(c -> props.categories.indexOf(c) >= 0).length > 0;
 	}
 
+	/**
+		Moves a column (and its sub columns) to another sheet. Returns an error, or null.
+	**/
 	public function moveColumn(targetSheet: cdb.Sheet, origSheet: cdb.Sheet, col: cdb.Data.Column) : String {
 		beginChanges(true);
 		var err = targetSheet.addColumn(col);
@@ -1995,6 +2181,9 @@ class Editor extends Component {
 		return err;
 	}
 
+	/**
+		Opens the form to create a column (or edit `col`).
+	**/
 	public function newColumn( sheet : cdb.Sheet, ?index : Int, ?onDone : cdb.Data.Column -> Void, ?col ) {
 		#if js
 		var modal = new hide.comp.cdb.ModalColumnForm(this, sheet, col, element);
@@ -2094,10 +2283,16 @@ class Editor extends Component {
 		#end
 	}
 
+	/**
+		Opens the form to edit a column.
+	**/
 	public function editColumn( sheet : cdb.Sheet, col : cdb.Data.Column ) {
 		newColumn(sheet,col);
 	}
 
+	/**
+		Returns `originalId` if it is unique in its scope, otherwise a new unique id.
+	**/
 	public function ensureUniqueId(originalId : String, table : Table, column : cdb.Data.Column) {
 		var scope = table.getScope();
 		var idWithScope : String = if(column.scope != null)  table.makeId(scope, column.scope, originalId) else originalId;
@@ -2108,6 +2303,9 @@ class Editor extends Component {
 		return getNewUniqueId(originalId, table, column);
 	}
 
+	/**
+		Tells if a sheet has a line with an id.
+	**/
 	public function doesSheetContainsId(sheet:cdb.Sheet, id:String) {
 		var idx = base.getSheet(sheet.name).index;
 
@@ -2115,6 +2313,9 @@ class Editor extends Component {
 		return uniq != null;
 	}
 
+	/**
+		Returns a unique id made by incrementing the number at the end of `originalId` (zero padded).
+	**/
 	public function getNewUniqueId(originalId : String, table : Table, column : cdb.Data.Column) {
 		var str = originalId;
 		var currentValue : Null<Int> = null;
@@ -2158,6 +2359,9 @@ class Editor extends Component {
         return newId;
 	}
 
+	/**
+		Opens the context menu of a column.
+	**/
 	public function popupColumn( table : Table, col : cdb.Data.Column, ?cell : Cell ) {
 		if( view != null )
 			return;
@@ -2294,6 +2498,9 @@ class Editor extends Component {
 	}
 
 
+	/**
+		Opens the context menu of a line.
+	**/
 	public function popupLine( line : Line ) {
 		var sheet = line.table.sheet;
 		var remoteMenu: Array<hrt.ui.HuiMenu.MenuItem> = [];
@@ -2564,6 +2771,9 @@ class Editor extends Component {
 		return menu;
 	}
 
+	/**
+		Asks a name and creates a sheet at a tab position. Returns the sheet or null.
+	**/
 	public function createDBSheet( ?index : Int ) {
 		var value = ide.ask("Sheet name");
 		if( value == "" || value == null ) return null;
@@ -2588,6 +2798,9 @@ class Editor extends Component {
 		return s;
 	}
 
+	/**
+		Opens the context menu of a sheet. `withMacro` adds the add, move, rename, delete and categories actions.
+	**/
 	public function popupSheet( withMacro = true, ?sheet : cdb.Sheet, ?onChange : Void -> Void ) {
 		if( view != null )
 			return;
@@ -2703,11 +2916,17 @@ class Editor extends Component {
 		ContextMenu.createFromPoint(ide.mouseX, ide.mouseY, content);
 	}
 
+	/**
+		Disposes the tables.
+	**/
 	public function close() {
 		for( t in tables.copy() )
 			t.dispose();
 	}
 
+	/**
+		Focuses the editor.
+	**/
 	public function focus() {
 		#if js
 		if( element.is(":focus") ) return;
@@ -2715,12 +2934,18 @@ class Editor extends Component {
 		#end
 	}
 
+	/**
+		Returns the editor properties of a sheet.
+	**/
 	static public function getSheetProps( s : cdb.Sheet ) {
 		var pr : EditorSheetProps = s.props.editor;
 		if( pr == null ) pr = {};
 		return pr;
 	}
 
+	/**
+		Returns the categories used by the sheets and columns of a database.
+	**/
 	static public function getCategories(db: cdb.Database) : Array<String> {
 		var names : Array<String> = [];
 		for( s in db.sheets ) {
