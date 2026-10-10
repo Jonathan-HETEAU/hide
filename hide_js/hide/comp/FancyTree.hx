@@ -171,7 +171,10 @@ typedef TreeButton<TreeItem> = {
 	var ?forceVisiblity : (TreeItem) -> Bool;
 }
 
-typedef Params =  {
+/**
+	The options of a `FancyTree`.
+**/
+typedef Params = {
 	/**
 		The key to save the open state of the items.
 	**/

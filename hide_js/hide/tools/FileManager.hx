@@ -1,26 +1,65 @@
 package hide.tools;
 
 
+/**
+	A message from the thumbnail generator to the file manager.
+**/
 enum abstract GenToManagerCommand(String) {
+	/**
+		A thumbnail was rendered (see `GenToManagerSuccessMessage`).
+	**/
 	var success;
 }
 
+/**
+	A message from the file manager to the thumbnail generator.
+**/
 enum abstract ManagerToGenCommand(String) {
+	/**
+		Renders the thumbnail of a file.
+	**/
 	var queue;
+	/**
+		Changes the priority of a queued file.
+	**/
 	var prio;
+	/**
+		Clears the render queue.
+	**/
 	var clear;
 }
 
+/**
+	The message sent when a thumbnail was rendered.
+**/
 typedef GenToManagerSuccessMessage = {
+	/**
+		The path of the file.
+	**/
 	var originalPath : String;
+	/**
+		The path of the thumbnail image.
+	**/
 	var thumbnailPath : String;
 }
 
+/**
+	The kind of a file entry.
+**/
 enum FileKind {
+	/**
+		A directory.
+	**/
 	Dir;
+	/**
+		A file.
+	**/
 	File;
 }
 
+/**
+	The version control status of a file.
+**/
 enum VCSStatus {
 	/**
 		Pending or no vsc available on system
@@ -38,22 +77,58 @@ enum VCSStatus {
 	Modified;
 }
 
+/**
+	A file or directory of the project resources, kept up to date by the `FileManager`.
+**/
 @:access(hide.tools.FileManager)
 @:allow(hide.tools.FileManager)
 class FileEntry {
+	/**
+		The file name.
+	**/
 	public var name: String;
+	/**
+		The full path.
+	**/
 	public var path: String;
+	/**
+		The path relative to the resource directory.
+	**/
 	public var relPath: String;
+	/**
+		The entries of a directory.
+	**/
 	public var children: Array<FileEntry>;
+	/**
+		The kind of entry.
+	**/
 	public var kind: FileKind;
+	/**
+		The parent directory, or null for the root.
+	**/
 	public var parent: FileEntry;
-	public var iconPath: String; // can be null if the icon has not been loaded, call getIconPath to load it
+	/**
+		The path of the thumbnail, `loading` while it renders, or null if not loaded: call `getIcon` to load it.
+	**/
+	public var iconPath: String;
+	/**
+		True once the entry is disposed.
+	**/
 	public var disposed: Bool = false;
+	/**
+		The version control status.
+	**/
 	public var vcsStatus: VCSStatus = None;
+	/**
+		True if the path matches an ignore pattern of the file manager.
+	**/
 	public var ignored: Bool = false;
 
 	var registeredWatcher : hide.tools.FileWatcher.FileWatchEvent = null;
 
+	/**
+		Creates an entry.
+	**/
 	public function new(name: String, parent: FileEntry, kind: FileKind) {
 		this.name = name;
 		this.parent = parent;
@@ -66,10 +141,16 @@ class FileEntry {
 		FileManager.inst.fileIndex.set(this.getRelPath(), this);
 	}
 
+	/**
+		Returns the name.
+	**/
 	public final function toString() : String{
 		return name;
 	}
 
+	/**
+		Disposes the entry and its children, removing their file watchers.
+	**/
 	public function dispose() {
 		if (children != null) {
 			for (child in children) {
@@ -85,6 +166,9 @@ class FileEntry {
 		FileManager.inst.fileIndex.remove(this.getRelPath());
 	}
 
+	/**
+		Calls `onReady` with the thumbnail path, rendering it if needed.
+	**/
 	public function getIcon(onReady: MiniatureReadyCallback) {
 		if (iconPath != null && iconPath != "loading")
 			onReady(iconPath);
@@ -139,10 +223,16 @@ class FileEntry {
 		registeredWatcher = hide.Ide.inst.fileWatcher.register(rel, FileManager.inst.fileChangeInternal.bind(this), true);
 	}
 
+	/**
+		Returns the path relative to the resource directory.
+	**/
 	public inline function getRelPath() {
 		return this.relPath;
 	}
 
+	/**
+		Returns the full path.
+	**/
 	public inline function getPath() {
 		return this.path;
 	}
@@ -167,6 +257,9 @@ class FileEntry {
 	}
 
 	// sort directories before files, and then dirs and files alphabetically
+	/**
+		Sorts directories before files, then by name.
+	**/
 	static public function compareFile(a: FileEntry, b: FileEntry) {
 		if (a.kind != b.kind) {
 			if (a.kind == Dir) {
@@ -178,6 +271,9 @@ class FileEntry {
 	}
 }
 
+/**
+	Called with the path of a rendered thumbnail.
+**/
 typedef MiniatureReadyCallback = (miniaturePath: String) -> Void;
 
 /**
@@ -185,14 +281,32 @@ typedef MiniatureReadyCallback = (miniaturePath: String) -> Void;
 **/
 class FileManager {
 
+	/**
+		The root directory of the resources.
+	**/
 	public var fileRoot: FileEntry;
 	var fileIndex : Map<String, FileEntry> = [];
 
+	/**
+		The port of the thumbnail generator server.
+	**/
 	public static final thumbnailGeneratorPort = 9669;
+	/**
+		The host of the thumbnail generator server.
+	**/
 	public static final thumbnailGeneratorUrl = "localhost";
 
+	/**
+		The file manager, created on first access.
+	**/
 	public static var inst(get, default) : FileManager;
+	/**
+		Called when a file changes.
+	**/
 	public var onFileChangeHandlers: Array<(entry: FileEntry) -> Void> = [];
+	/**
+		Called when the version control status of the files is updated.
+	**/
 	public var onVCSStatusUpdateHandlers: Array<() -> Void> = [];
 
 	var svnEnabled = false;
@@ -224,6 +338,9 @@ class FileManager {
 
 	}
 
+	/**
+		Stops the thumbnail generator and server before reloading the IDE.
+	**/
 	public static function onBeforeReload() {
 		if (inst != null) {
 			inst.cleanupGenerator();
@@ -254,6 +371,9 @@ class FileManager {
 		}
 	}
 
+	/**
+		Deletes files and directories from the disk.
+	**/
 	public function deleteFiles(files : Array<FileEntry>) {
 		//trace(fullPaths);
 		var roots = getRoots(files);
@@ -268,6 +388,9 @@ class FileManager {
 		}
 	}
 
+	/**
+		Returns the entry of a path, or null.
+	**/
 	public function getFileEntry(path: String) {
 		var relPath = hide.Ide.inst.makeRelative(path);
 		return fileIndex.get(relPath);
@@ -275,6 +398,9 @@ class FileManager {
 
 	// Deduplicate paths if they are contained in a directory
 	// also present in paths, to simplify bulk operations
+	/**
+		Removes from a list the entries contained in a directory of the list, to simplify bulk operations.
+	**/
 	public function getRoots(files: Array<FileEntry>) : Array<FileEntry> {
 		var dirs : Array<FileEntry> = [];
 
@@ -451,12 +577,18 @@ class FileManager {
 		}
 	}
 
+	/**
+		Updates the SVN status of the files if SVN is enabled.
+	**/
 	public function queueRefreshSVN() {
 		if (svnEnabled) {
 			hide.Ide.inst.getSVNModifiedFiles(onSVNFileModified);
 		}
 	}
 
+	/**
+		Asks a name and copies a file or directory next to it. Returns false if cancelled.
+	**/
 	public function cloneFile(entry: FileEntry) {
 		var sourcePath = entry.getPath();
 		var nameNewFile = hide.Ide.inst.ask("New filename:", new haxe.io.Path(sourcePath).file);
@@ -543,6 +675,9 @@ class FileManager {
 		}
 	}
 
+	/**
+		Deletes the thumbnail of a file (and of the files of a directory).
+	**/
 	public function invalidateMiniature(file: FileEntry) {
 		if (file.children != null) {
 			for (child in file.children) {
@@ -559,6 +694,9 @@ class FileManager {
 		file.iconPath = null;
 	}
 
+	/**
+		Tells if the thumbnail generator is ready, opening its window if needed.
+	**/
 	public function checkWindowReady() {
 		if (serverSocket == null)
 			return false;
@@ -582,6 +720,9 @@ class FileManager {
 		return false;
 	}
 
+	/**
+		Clears the thumbnail render queue.
+	**/
 	public function clearRenderQueue() {
 		onReadyCallbacks.clear();
 		if (!checkWindowReady()) {
@@ -595,6 +736,9 @@ class FileManager {
 		pendingMessages = [];
 	}
 
+	/**
+		Changes the render priority of a queued thumbnail.
+	**/
 	public function setPriority(path: String, newPriority: Int) {
 		if (!onReadyCallbacks.exists(path)) {
 			return;
@@ -624,6 +768,9 @@ class FileManager {
 		queueProcessPendingMessages();
 	}
 
+	/**
+		Renames files (`to` is relative to the resource directory) and updates the references to them.
+	**/
 	public static function doRename(operations: Array<{from: String, to: String}>) {
 		for (op in operations) {
 			onRenameRec(op.from, "/" + op.to);
@@ -632,6 +779,9 @@ class FileManager {
 		replacePathInFiles(operations);
 	}
 
+	/**
+		Renames a file or directory (with SVN if possible), its `.dat` directory, and the references to an FBX in `Materials.props`. `name` is a new name, or a path starting with `/`. Swaps the files if the target exists and the user confirms.
+	**/
 	public static function onRenameRec(path:String, name:String) {
 		var ide = hide.Ide.inst;
 		var parts = path.split("/");
@@ -807,6 +957,9 @@ class FileManager {
 		return true;
 	}
 
+	/**
+		Replaces the renamed paths in the project files.
+	**/
 	public static function replacePathInFiles(operations: Array<{from: String, to: String}>) {
 		function filter(ctx: hide.Ide.FilterPathContext) {
 			var p = ctx.valueCurrent;
@@ -840,11 +993,23 @@ class FileManager {
 }
 
 
+/**
+	The state of the thumbnail generator window.
+**/
 enum RenderWindowState {
+	/**
+		The window is opening.
+	**/
 	Pending;
+	/**
+		The window is ready.
+	**/
 	Ready;
 }
 
+/**
+	Opens the hidden window rendering the thumbnails.
+**/
 @:allow(hide.tools.FileManager)
 @:access(hide.tools.FileManager)
 class RenderWindowManager {
