@@ -4,6 +4,9 @@ import hide.comp.SVG;
 import js.jquery.JQuery;
 import hide.view.GraphInterface;
 
+/**
+	The SVG box of a node in the `GraphEditor`: header, pins, properties and preview.
+**/
 @:access(hide.view.GraphEditor)
 class Box {
 
@@ -26,15 +29,36 @@ class Box {
 	var height : Int;
 	var propsHeight : Int = 0;
 
+	/**
+		The header height (34 with a preview, 0 without header).
+	**/
 	public var HEADER_HEIGHT = 22;
+	/**
+		The vertical space between two pins.
+	**/
 	public static final NODE_MARGIN = 18;
+	/**
+		The radius of the pins.
+	**/
 	public static var NODE_RADIUS = 5;
+	/**
+		The radius of the pin hit boxes.
+	**/
 	public static var NODE_HITBOX_RADIUS = NODE_RADIUS * 2;
 	@const var NODE_TITLE_PADDING = 10;
 	@const var NODE_INPUT_PADDING = 3;
+	/**
+		True if the node is selected.
+	**/
 	public var selected : Bool = false;
 
+	/**
+		The input pin elements.
+	**/
 	public var inputs : Array<JQuery> = [];
+	/**
+		The output pin elements.
+	**/
 	public var outputs : Array<JQuery> = [];
 
 	var hasHeader : Bool = true;
@@ -48,6 +72,9 @@ class Box {
 	static final resizeBorder : Int = 8;
 	static final halfResizeBorder : Int = resizeBorder >> 1;
 
+	/**
+		Creates the box of a node.
+	**/
 	public function new(editor : GraphEditor, parent : JQuery, node : IGraphNode) {
 		this.node = node;
 		info = node.getInfo();
@@ -259,6 +286,9 @@ class Box {
 		//editor.editorDisplay.line(element, width/2, HEADER_HEIGHT, width/2, 0, {display: "none"}).addClass("nodes-separator");
 	}
 
+	/**
+		Refreshes the state of the preview button.
+	**/
 	public function refreshPreviewButton() {
 		if (setPreviewThisNode != null) {
 			var status = info.playButton.getActive();
@@ -266,6 +296,9 @@ class Box {
 		}
 	}
 
+	/**
+		Shows or hides the node preview.
+	**/
 	public function setPreviewVisibility(visible: Bool) {
 		if (info.preview != null) {
 			info.preview.setVisible(visible);
@@ -281,6 +314,9 @@ class Box {
 		closePreviewBtn.find(".ico").toggleClass("ico-angle-up", viz);
 	}
 
+	/**
+		Creates the shape of a pin.
+	**/
 	public function genPinShape(editor: GraphEditor, parent: Element, height: Float, shape: PinShape, isOutput: Bool) : Element{
 		var cl = isOutput ? "output-node" : "input-node";
 		var node = editor.editorDisplay.group(parent, "node " + cl).attr({transform : 'translate(${isOutput ? width : 0}, $height)'});
@@ -298,6 +334,9 @@ class Box {
 		return node;
 	}
 
+	/**
+		Adds an input pin, with a default value field if `valueDefault` is set.
+	**/
 	public function addInput(editor : GraphEditor, name : String, valueDefault : String = null, shape: PinShape) {
 		var node = editor.editorDisplay.group(element).addClass("input-node-group");
 		var nodeHeight = getNodeHeight(inputs.length);
@@ -331,6 +370,9 @@ class Box {
 		return node;
 	}
 
+	/**
+		Returns the pin color of a shader graph type.
+	**/
 	public static function getTypeColor(type : hrt.shgraph.ShaderGraph.SgType) {
 		return switch (type) {
 			case SgBool:
@@ -352,6 +394,9 @@ class Box {
 		}
 	}
 
+	/**
+		Adds an output pin.
+	**/
 	public function addOutput(editor : GraphEditor, name : String, shape: PinShape) {
 		var node = editor.editorDisplay.group(element).addClass("output-node-group");
 		var nodeHeight = getNodeHeight(outputs.length);
@@ -386,11 +431,17 @@ class Box {
 		refresh(outputs, info.outputs, newInfo.outputs);
 	}
 
+	/**
+		Returns the vertical position of the pin of an index.
+	**/
 	public function getNodeHeight(id: Int) {
 		var offset = info.noHeader ? 0 : 2;
 		return NODE_MARGIN * (id+offset);
 	}
 
+	/**
+		Adds the node properties to the box.
+	**/
 	public function generateProperties(editor : GraphEditor) {
 		var props = node.getPropertiesHTML(this.width);
 
@@ -428,6 +479,9 @@ class Box {
 		refreshBox();
 	}
 
+	/**
+		Removes the box.
+	**/
 	public function dispose() {
 		element.remove();
 	}
@@ -474,13 +528,22 @@ class Box {
 		closePreviewBtn?.attr("y", getHeight() - 12);
 	}
 
+	/**
+		A temporary point.
+	**/
 	public static var tmpPoint = new h2d.col.Point();
+	/**
+		Moves the box.
+	**/
 	public function setPosition(x : Float, y : Float) {
 		element.attr({transform: 'translate(${x} ${y})'});
 		this.x = x;
 		this.y = y;
 	}
 
+	/**
+		Selects or unselects the box.
+	**/
 	public function setSelected(b : Bool) {
 		selected = b;
 		if (b) {
@@ -491,20 +554,32 @@ class Box {
 			element.addClass("not-selected");
 		}
 	}
+	/**
+		Sets the title of the header.
+	**/
 	public function setTitle(str : String) {
 		if (hasHeader) {
 			element.find(".title-box").html(str);
 		}
 	}
 
+	/**
+		Returns the node.
+	**/
 	public function getInstance() {
 		return this.node;
 	}
 
+	/**
+		Tells if the properties are shown next to the pins (at most one input and one output).
+	**/
 	public function collapseProperties() {
 		return info.inputs.length <= 1 && info.outputs.length <= 1;
 	}
 
+	/**
+		Returns the height of the pins.
+	**/
 	public function getNodesHeight() {
 		var maxNb = Std.int(Math.max(inputs.length, outputs.length));
 		if (info.comment != null) {
@@ -512,6 +587,9 @@ class Box {
 		}
 		return getNodeHeight(maxNb);
 	}
+	/**
+		Returns the height of the box.
+	**/
 	public function getHeight() : Float {
 		if (info.comment != null) {
 			return height;
@@ -523,6 +601,9 @@ class Box {
 		return nodeHeight + propsHeight;
 	}
 
+	/**
+		Returns the position and size of the box.
+	**/
 	inline public function getBounds() : {x: Float, y: Float, w: Float, h: Float} {
 		node.getPos(tmpPoint);
 		var x = tmpPoint.x;
@@ -532,6 +613,9 @@ class Box {
 		return {x:x,y:y,w:w,h:h};
 	}
 
+	/**
+		Returns the box element.
+	**/
 	public function getElement() {
 		return element;
 	}

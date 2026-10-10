@@ -4,6 +4,9 @@ import hxd.Key in K;
 import cdb.FormulaEngine.FormulaType;
 using hide.tools.Extensions;
 
+/**
+	A cell of a CDB table: displays and edits the value of a column of a line.
+**/
 class Cell {
 
 	static var typeNames = [for( t in Type.getEnumConstructs(cdb.Data.ColumnType) ) t.substr(1).toLowerCase()];
@@ -11,21 +14,45 @@ class Cell {
 
 	var ide : hide.Ide;
 
+	/**
+		The cell element.
+	**/
 	public var elementHtml : Element.HTMLElement;
 	var editor : Editor;
 	var currentValue : Dynamic;
 	var watches : Array<String> = new Array<String>();
+	/**
+		The line of the cell.
+	**/
 	public var line(default,null) : Line;
+	/**
+		The column of the cell.
+	**/
 	public var column(default, null) : cdb.Data.Column;
+	/**
+		The index of the column in the table.
+	**/
 	public var columnIndex(get, never) : Int;
+	/**
+		The value of the cell.
+	**/
 	public var value(get, never) : Dynamic;
+	/**
+		The table of the cell.
+	**/
 	public var table(get, never) : Table;
 	var blurOff = false;
 	var formulaCompose : Void -> String;
 	var formulaDrop : Element;
+	/**
+		True while the cell is edited.
+	**/
 	public var inEdit = false;
 	var dropdown : Element.HTMLElement = null;
 
+	/**
+		Creates a cell in an element.
+	**/
 	public function new( root : Element.HTMLElement, line : Line, column : cdb.Data.Column ) {
 		this.elementHtml = root;
 		ide = hide.Ide.inst;
@@ -106,6 +133,9 @@ class Cell {
 		};
 	}
 
+	/**
+		Tells if a file can be dropped on the cell (file column), and sets it if `isDrop`.
+	**/
 	public function dragDropFile( relativePath : String, isDrop : Bool = false ) : Bool {
 		if ( !canEdit() || column.type != TFile) return false;
 		if ( isDrop ) {
@@ -253,6 +283,9 @@ class Cell {
 		}
 	}
 
+	/**
+		Tells if the view allows editing the cell.
+	**/
 	public function canEdit() {
 		return table.canEditColumn(column.name);
 	}
@@ -261,6 +294,9 @@ class Cell {
 	function get_columnIndex() return table.columns.indexOf(column);
 	inline function get_value() return currentValue;
 
+	/**
+		For a polymorphic column, returns the column and object of the set variant, or null.
+	**/
 	public function getPolyEdit() : { col : cdb.Data.Column, obj : Dynamic } {
 		if( column.type != TPolymorph )
 			return null;
@@ -273,6 +309,9 @@ class Cell {
 		return null;
 	}
 
+	/**
+		The edited column: the variant column for a polymorphic column.
+	**/
 	public var editColumn(get,never) : cdb.Data.Column;
 	function get_editColumn() { var pe = getPolyEdit(); return pe == null ? column : pe.col; }
 	var editObject(get,never) : Dynamic;
@@ -293,6 +332,9 @@ class Cell {
 		return def;
 	}
 
+	/**
+		Redraws the cell (and its sub table if `withSubtable`).
+	**/
 	public function refresh(withSubtable = false) {
 		#if js
 		if (dropdown != null) {
@@ -409,6 +451,9 @@ class Cell {
 		return view == null || view.show == null || view.show.indexOf(c.name) >= 0;
 	}
 
+	/**
+		Tells if a sheet is in the id scope of another sheet.
+	**/
 	public static function isIdScope( origin : cdb.Sheet, sheet : cdb.Sheet, ?scope ) {
 		if( origin.idCol == null ) return false;
 		if( scope == null ) scope = origin.idCol.scope;
@@ -805,6 +850,9 @@ class Cell {
 		return code;
 	}
 
+	/**
+		Returns the document name of a script cell, used to find its script API (`sheet.column`, with the group).
+	**/
 	public function getDocumentName() {
 		var name = table.sheet.name.split("@").join(".");
 		if( table.sheet.props.hasGroup ) {
@@ -914,6 +962,9 @@ class Cell {
 	}
 	#end
 
+	/**
+		Tells if the cell is edited with a text input.
+	**/
 	public function isTextInput() {
 		var column = editColumn;
 		return switch( column.type ) {
@@ -926,6 +977,9 @@ class Cell {
 		}
 	}
 
+	/**
+		Moves the cursor to the cell.
+	**/
 	public function focus() {
 		editor.focus();
 		var x = table.displayMode == Properties ? 0 : columnIndex;
@@ -933,6 +987,9 @@ class Cell {
 		editor.cursor.set(table, x, y, [{ x1: x, y1: y, x2: x, y2: y, origin: {x: x, y: y} }]);
 	}
 
+	/**
+		Returns the name of an enum value (stored as an index or a string).
+	**/
 	public static function enumValueName( c : cdb.Data.Column, values : Array<String>, v : Dynamic ) : String {
 		if( v == null ) return null;
 		return Std.isOfType(v, String) ? v : values[v];
@@ -953,6 +1010,9 @@ class Cell {
 	}
 
 	// replace consecutive spaces to non brekable space + a space
+	/**
+		Replaces the spaces followed by a space or at the end with non breaking spaces, to display them.
+	**/
 	public function spacesToNBSP(str: String) {
 		var buf = new StringBuf();
 
@@ -969,12 +1029,18 @@ class Cell {
 		return buf.toString();
 	}
 
+	/**
+		Replaces the non breaking spaces with spaces.
+	**/
 	public function nBSPtoSpaces(str: String) {
 		return StringTools.replace(str, "\u00A0", " ");
 	}
 
 	static final isWhiteSpace = ~/^\s*$/;
 
+	/**
+		Starts editing the cell.
+	**/
 	public function edit() {
 		if( !canEdit() )
 			return;
@@ -1492,6 +1558,9 @@ class Cell {
 		}
 	}
 
+	/**
+		Opens the sub table of a list, properties or script cell.
+	**/
 	public function open( ?immediate : Bool ) {
 		#if js
 		if( column.type == TString && column.kind == Script ) {
@@ -1881,6 +1950,9 @@ class Cell {
 		#end
 	}
 
+	/**
+		Shows an error on the cell, or removes it if null.
+	**/
 	public function setErrorMessage( msg : String ) {
 		var prevError = new Element(elementHtml).find("div.error");
 		if (prevError != null)
@@ -1892,6 +1964,9 @@ class Cell {
 		elementHtml.appendChild(div);
 	}
 
+	/**
+		Tells if an id is unique in its scope (ignoring the line itself if `ignoreSelf`).
+	**/
 	public function isUniqueID(id : String, ignoreSelf:Bool = false) {
 		var scope = table.getScope();
 		var idWithScope : String = if (column.scope != null) table.makeId(scope, column.scope, id) else id;
@@ -2035,6 +2110,9 @@ class Cell {
 		}
 	}
 
+	/**
+		Sets the value of the cell, as an undoable change.
+	**/
 	public function setValue( value : Dynamic ) {
 		var pe = getPolyEdit();
 		if( pe != null ) {
@@ -2047,6 +2125,9 @@ class Cell {
 		editor.changeObject(line,column,value);
 	}
 
+	/**
+		Ends the edition and applies the value.
+	**/
 	public function closeEdit(refreshFocus: Bool = true) {
 		inEdit = false;
 		var input = new Element(elementHtml).find("div[contenteditable]").get(0);
@@ -2067,6 +2148,9 @@ class Cell {
 		}
 	}
 
+	/**
+		Edits a custom type value in a dropdown.
+	**/
 	public function editCustomType(typeName : String, ctValue : Dynamic, col : cdb.Data.Column, parentEl : Element, rightAnchor: Float, topAnchor : Float, depth : Int = 0) {
 		var customType = editor.base.getCustomType(typeName);
 
