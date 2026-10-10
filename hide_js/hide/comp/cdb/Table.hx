@@ -1,38 +1,92 @@
 package hide.comp.cdb;
 import hide.ui.QueryHelper.*;
 
+/**
+	How a CDB table is displayed.
+**/
 enum DisplayMode {
+	/**
+		The lines in rows and the columns in columns.
+	**/
 	Table;
+	/**
+		One line as a list of properties: the optional columns are shown only when set.
+	**/
 	Properties;
+	/**
+		One line as a list of properties, with all the columns.
+	**/
 	AllProperties;
 }
 
+/**
+	A table of a CDB editor, showing the lines of a sheet.
+**/
 class Table extends Component {
 
+	/**
+		The editor.
+	**/
 	public var editor : Editor;
+	/**
+		The parent table of a sub table, or null.
+	**/
 	public var parent : Table;
+	/**
+		The shown sheet.
+	**/
 	public var sheet : cdb.Sheet;
+	/**
+		The lines.
+	**/
 	public var lines : Array<Line>;
+	/**
+		How the table is displayed.
+	**/
 	public var displayMode(default,null) : DisplayMode;
 
+	/**
+		The shown columns.
+	**/
 	public var columns : Array<cdb.Data.Column>;
+	/**
+		The config view restricting the shown and editable columns, or null.
+	**/
 	public var view : cdb.DiffFile.SheetView;
 
 	var separators : Array<Separator>;
 	var previewDrop : Element;
 
+	/**
+		The nesting depth of a sub table.
+	**/
 	public var nestedIndex : Int = 0;
 
 	var resizeObserver : hide.comp.ResizeObserver;
 	var currentDragIndex = -1;
 
+	/**
+		The number of lines with an error.
+	**/
 	public var errorCount = 0;
+	/**
+		The lines with an error.
+	**/
 	public var errors = new Map<Line, Bool>();
+	/**
+		The number of lines with a warning.
+	**/
 	public var warningCount = 0;
+	/**
+		The lines with a warning.
+	**/
 	public var warnings = new Map<Line, Bool>();
 
 	static final reorderLineKey = "x-cdb.reorder";
 
+	/**
+		Creates a table of a sheet.
+	**/
 	public function new(editor, sheet, root, mode) {
 		super(null,root);
 		this.displayMode = mode;
@@ -67,23 +121,38 @@ class Table extends Component {
 		previewDrop.hide();
 	}
 
+	/**
+		Moves the cursor to the table.
+	**/
 	public function setCursor() {
 		editor.cursor.set(this);
 	}
 
+	/**
+		Returns the sheet holding the data (for a sub table, the sheet of the column).
+	**/
 	public function getRealSheet() {
 		return sheet.realSheet;
 	}
 
+	/**
+		Tells if lines can be inserted (not for data files sheets, and if the view allows it).
+	**/
 	public function canInsert() {
 		if( sheet.props.dataFiles != null ) return false;
 		return view == null || view.insert;
 	}
 
+	/**
+		Tells if the view allows editing a column.
+	**/
 	public function canEditColumn( name : String ) {
 		return view == null || (view.edit != null && view.edit.indexOf(name) >= 0);
 	}
 
+	/**
+		Closes the table.
+	**/
 	public function close() {
 		// Close eventual cdb type edition before closing table
 		var children = element.children().find(".cdb-type-string");
@@ -97,10 +166,16 @@ class Table extends Component {
 		dispose();
 	}
 
+	/**
+		Removes the table from the editor.
+	**/
 	public function dispose() {
 		editor.tables.remove(this);
 	}
 
+	/**
+		Rebuilds the table.
+	**/
 	public function refresh() {
 		element.empty();
 		columns = view == null || view.show == null ? sheet.columns : [for( c in sheet.columns ) if( view.show.indexOf(c.name) >= 0 ) c];
@@ -448,6 +523,9 @@ class Table extends Component {
 		return pickedLine;
 	}
 
+	/**
+		Expands the separator containing a line.
+	**/
 	public function revealLine(line: Int) {
 		if (this.separators == null) return;
 		var lastSeparator = -1;
@@ -462,6 +540,9 @@ class Table extends Component {
 		}
 	}
 
+	/**
+		Returns the parent lines of the table, from the root, to make scoped ids.
+	**/
 	public function getScope() : Array<{ s : cdb.Sheet, obj : Dynamic }> {
 		var scope = [];
 		var table = this;
@@ -478,6 +559,9 @@ class Table extends Component {
 		return scope;
 	}
 
+	/**
+		Returns the full id of a scoped id (`parent:id`).
+	**/
 	public function makeId(scopes : Array<{ s : cdb.Sheet, obj : Dynamic }>, scope : Int, id : String) : String {
 		var ids = [];
 		if( id != null ) ids.push(id);
@@ -499,6 +583,9 @@ class Table extends Component {
 		return ids.join(":");
 	}
 
+	/**
+		Tells if a column is shown in properties mode.
+	**/
 	public function shouldDisplayProp(props: Dynamic, c:cdb.Data.Column) {
 		return !( c.opt && props != null && !Reflect.hasField(props,c.name) && displayMode != AllProperties );
 	}
@@ -591,6 +678,9 @@ class Table extends Component {
 		return false;
 	}
 
+	/**
+		Sorts the lines by a column, inside each separator group.
+	**/
 	public function sortBy(col: cdb.Data.Column) {
 		editor.beginChanges();
 		var group : Array<Dynamic> = [];
@@ -626,6 +716,9 @@ class Table extends Component {
 		refresh();
 	}
 
+	/**
+		Opens the sub table of a cell, or closes it if already open.
+	**/
 	public function toggleList( cell : Cell, ?immediate : Bool, ?make : Void -> SubTable ) {
 		var line = cell.line;
 		var cur = line.subTable;
@@ -638,6 +731,9 @@ class Table extends Component {
 		sub.setCursor();
 	}
 
+	/**
+		Rebuilds the sub table of a cell if it is open.
+	**/
 	public function refreshList( cell : Cell, ?make : Void -> SubTable ) {
 		var line = cell.line;
 		var cur = line.subTable;
@@ -653,6 +749,9 @@ class Table extends Component {
 	}
 
 
+	/**
+		Inserts a line after `index`. In properties mode, shows the choice of an optional column to add.
+	**/
 	public function insertLine(index : Int = 0) {
 		if( !canInsert() )
 			return;
@@ -689,6 +788,9 @@ class Table extends Component {
 		refresh();
 	}
 
+	/**
+		Moves lines up or down by `delta`.
+	**/
 	public function moveLines(lines : Array<Line>, delta : Int) {
 		if( !canInsert() )
 			return;
@@ -744,6 +846,9 @@ class Table extends Component {
 		editor.refresh();
 	}
 
+	/**
+		Moves lines to an index.
+	**/
 	public function moveLinesTo(lines : Array<Line>, targetIdx : Int) {
 		var fromIdx = lines[0].index;
 		for (l in lines)
@@ -763,6 +868,9 @@ class Table extends Component {
 		editor.cursor.set(this, editor.cursor.x, targetIdx, [{ x1: -1, y1: targetIdx, x2: -1, y2: targetIdx + (lines.length - 1) }]);
 	}
 
+	/**
+		Inserts a copy of a line after it.
+	**/
 	public function duplicateLine(index : Int = 0) {
 		if( !canInsert() || displayMode != Table )
 			return;
@@ -789,6 +897,9 @@ class Table extends Component {
 		getRealSheet().sync();
 	}
 
+	/**
+		Updates the warning and error counts shown by the CDB view.
+	**/
 	public function refreshLinesStatus() {
 		if (editor.cdbTable == null)
 			return;

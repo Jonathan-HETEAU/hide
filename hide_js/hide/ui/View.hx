@@ -1,28 +1,78 @@
 package hide.ui;
 
+/**
+	Where a view is opened in the layout.
+**/
 enum abstract DisplayPosition(String) from String to String {
+	/**
+		The left column.
+	**/
 	var Left = "content_left";
+	/**
+		The center.
+	**/
 	var Center = "content_center";
+	/**
+		The right column.
+	**/
 	var Right = "content_right";
+	/**
+		The bottom of the center.
+	**/
 	var Bottom = "content_bottom";
+	/**
+		The column holding the center and bottom, used internally.
+	**/
 	var MiddleColumnInternal = "content_middle_internal";
 }
 
-typedef ViewOptions = { ?position : DisplayPosition, ?width : Int, ?id: String }
+/**
+	The options of a view class, given to `View.register`.
+**/
+typedef ViewOptions = {
+	/**
+		Where the view opens (`Center` by default).
+	**/
+	var ?position : DisplayPosition;
+	/**
+		The width of the view.
+	**/
+	var ?width : Int;
+	/**
+		The id of the layout item.
+	**/
+	var ?id : String;
+}
 
+/**
+	The base class of the IDE views (tabs): state, config, keys, undo, clipboard, file watches and layout container.
+	A view class is registered with `View.register`.
+**/
 @:keepSub @:allow(hide.Ide)
 class View<T> extends hide.comp.Component {
 
 	#if !hl
 	var container : golden.Container;
 	var containerView : golden.ContentItem;
+	/**
+		Shows the view in full screen.
+	**/
 	public var fullScreen(get,set) : Bool;
 	var contentWidth(get,never) : Int;
 	var contentHeight(get,never) : Int;
 	#end
 	var watches : Array<{ keep : Bool, path : String, callb : Void -> Void }> = [];
+	/**
+		The keyboard shortcuts of the view.
+	**/
 	public var keys(get,null) : Keys;
+	/**
+		The saved state of the view.
+	**/
 	public var state(default, null) : T;
+	/**
+		The undo history of the view.
+	**/
 	public var undo(get, never) : hide.ui.UndoHistory;
 
 	function get_undo() : hide.ui.UndoHistory {
@@ -31,11 +81,23 @@ class View<T> extends hide.comp.Component {
 
 	var undoStack: Array<UndoHistory> = [new hide.ui.UndoHistory()];
 
+	/**
+		The config of the view.
+	**/
 	public var config(get, null) : Config;
+	/**
+		The class name of the view.
+	**/
 	public var viewClass(get, never) : String;
+	/**
+		The options the view class was registered with.
+	**/
 	public var defaultOptions(get,never) : ViewOptions;
 	var needRebuild : Bool;
 
+	/**
+		Creates a view with a state.
+	**/
 	public function new(state:T) {
 		super(null,null);
 		element = null;
@@ -46,6 +108,9 @@ class View<T> extends hide.comp.Component {
 		#end
 	}
 
+	/**
+		Calls `onChange` when a file changes. The watch is removed on rebuild unless `keepOnRebuild`.
+	**/
 	public function watch( filePath : String, onChange : Void -> Void, ?opts : { ?checkDelete : Bool, ?keepOnRebuild : Bool } ) {
 		if( opts == null ) opts = {};
 		ide.fileWatcher.register(filePath, onChange, opts.checkDelete);
@@ -54,6 +119,9 @@ class View<T> extends hide.comp.Component {
 		return w;
 	}
 
+	/**
+		Removes a watch returned by `watch`.
+	**/
 	public function unwatch(w) {
 		if( watches.remove(w) )
 			ide.fileWatcher.unregister(w.path, w.callb);
@@ -76,10 +144,16 @@ class View<T> extends hide.comp.Component {
 		return keys;
 	}
 
+	/**
+		Returns the title of the tab.
+	**/
 	public function getTitle() {
 		return viewClass.split(".").pop();
 	}
 
+	/**
+		Called before the view closes. Returns false to cancel.
+	**/
 	public function onBeforeClose() {
 		return true;
 	}
@@ -112,16 +186,25 @@ class View<T> extends hide.comp.Component {
 	}
 
 	#if !hl
+	/**
+		Copies a value to the clipboard, tagged with a type (the view class by default).
+	**/
 	public function setClipboard( v : Dynamic, ?type : String, ?opts : {} ) {
 		nw.Clipboard.get().set(ide.toJSON({ type : type == null ? viewClass : type, value : v, opts : opts }));
 	}
 
+	/**
+		Tells if the clipboard holds a value of a type (the view class by default).
+	**/
 	public function hasClipboard( ?type : String ) {
 		if( type == null ) type = viewClass;
 		var v : Dynamic = try haxe.Json.parse(nw.Clipboard.get().get()) catch( e : Dynamic ) null;
 		return v != null && v.type == type;
 	}
 
+	/**
+		Returns the clipboard value of a type (the view class by default), or null. `opts.ref` receives the copied options.
+	**/
 	public function getClipboard( ?type : String, ?opts : { ref : Dynamic } ) : Dynamic {
 		if( type == null ) type = viewClass;
 		var v : Dynamic = try haxe.Json.parse(nw.Clipboard.get().get()) catch( e : Dynamic ) null;
@@ -149,6 +232,9 @@ class View<T> extends hide.comp.Component {
 		return false;
 	}
 
+	/**
+		Handles a key event with the shortcuts of the focused elements, then of the view. Returns true if handled.
+	**/
 	public function processKeyEvent( e : js.jquery.Event ) {
 		if( isKeysLocked(e) ) {
 			e.stopPropagation();
@@ -167,6 +253,9 @@ class View<T> extends hide.comp.Component {
 		return keys.processEvent(e,config);
 	}
 
+	/**
+		Sets the layout container of the view.
+	**/
 	public function setContainer(cont) {
 		this.container = cont;
 		@:privateAccess ide.views.push(this);
@@ -205,6 +294,9 @@ class View<T> extends hide.comp.Component {
 		element = cont.getElement();
 	}
 
+	/**
+		Rebuilds the view (once it is shown).
+	**/
 	public final function rebuild() {
 		function checkRebuild() {
 			if( container == null || !needRebuild ) return;
@@ -240,6 +332,9 @@ class View<T> extends hide.comp.Component {
 	#end
 
 	#if hl
+	/**
+		Rebuilds the view (once it is shown).
+	**/
 	public final function rebuild() {
 		onDisplay();
 	}
@@ -252,17 +347,29 @@ class View<T> extends hide.comp.Component {
 	function onHide() {
 	}
 
+	/**
+		Called when the view is resized.
+	**/
 	public function onResize() {
 	}
 
+	/**
+		Called when files are dragged over the view. Returns true if handled.
+	**/
 	public function onDrag(e : js.html.DragEvent) {
 		return false;
 	}
 
+	/**
+		Called when a drag over the view ends.
+	**/
 	public function onDragEnd(e : js.html.DragEvent) {
 		return false;
 	}
 
+	/**
+		Called when files are dropped on the view. Returns true if handled.
+	**/
 	public function onDrop(e : js.html.DragEvent) {
 		return false;
 	}
@@ -275,10 +382,16 @@ class View<T> extends hide.comp.Component {
 
 	#if !hl
 
+	/**
+		Tells if the view is shown.
+	**/
 	public function isActive() {
 		return container != null && !container.isHidden;
 	}
 
+	/**
+		Called when the view is shown.
+	**/
 	public function onActivate() {
 	}
 
@@ -297,6 +410,9 @@ class View<T> extends hide.comp.Component {
 		container.setState(state);
 	}
 
+	/**
+		Closes the view.
+	**/
 	public function close() {
 		if( container != null )
 			container.close();
@@ -344,7 +460,13 @@ class View<T> extends hide.comp.Component {
 	}
 	#end
 
+	/**
+		The registered view classes, by name.
+	**/
 	public static var viewClasses = new Map<String,{ name : String, cl : Class<View<Dynamic>>, options : ViewOptions }>();
+	/**
+		Registers a view class. Returns null, to be used as a static initializer.
+	**/
 	public static function register<T>( cl : Class<View<T>>, ?options : ViewOptions ) {
 		var name = Type.getClassName(cl);
 		if( options == null )

@@ -1,24 +1,83 @@
 package hide.comp.cdb;
 import hscript.Checker;
 
-typedef Formula = { name : String, type : String, call : Dynamic -> Null<Float> }
+/**
+	A CDB formula: a function of the formulas file computing a number column from a line.
+**/
+typedef Formula = {
+	/**
+		The function name.
+	**/
+	var name : String;
+	/**
+		The type name of the sheet (see `Formulas.getTypeName`).
+	**/
+	var type : String;
+	/**
+		Computes the value from the line.
+	**/
+	var call : Dynamic -> Null<Float>;
+}
 
+/**
+	The result of a line validation function.
+**/
 enum ValidationResult {
+	/**
+		The line is valid.
+	**/
 	Ok;
+	/**
+		The line has an error.
+	**/
 	Error(message: String);
+	/**
+		The line has a warning.
+	**/
 	Warning(message: String);
 }
 
-typedef ValidationFunction = { name : String, type : String, call : Dynamic -> ValidationResult }
+/**
+	A line validation function of the formulas file: a function whose name starts with `validate`.
+**/
+typedef ValidationFunction = {
+	/**
+		The function name.
+	**/
+	var name : String;
+	/**
+		The type name of the sheet.
+	**/
+	var type : String;
+	/**
+		Validates a line.
+	**/
+	var call : Dynamic -> ValidationResult;
+}
 
 
+/**
+	The access to a sheet given to the formulas, as a global named after the sheet type.
+**/
 class SheetAccess {
+	/**
+		The formulas.
+	**/
 	public var form : Formulas;
+	/**
+		The type name of the sheet.
+	**/
 	public var name : String;
+	/**
+		Iterates over the lines of the sheet.
+	**/
 	public var all(get,never) : Iterator<Dynamic>;
 	var sheetName : String;
 	var resolveCache : Map<String,Dynamic>;
 
+	/**
+		Creates the access to a sheet type.
+	**/
 	public function new(form,name) {
 		this.form = form;
 		this.name = name;
@@ -40,6 +99,9 @@ class SheetAccess {
 		return null;
 	}
 
+	/**
+		Returns the line with an id, or null.
+	**/
 	public function resolve(id:String) : Dynamic {
 		if( resolveCache == null )
 			resolveCache = new Map();
@@ -60,6 +122,10 @@ class SheetAccess {
 
 }
 
+/**
+	The formulas of a CDB editor, loaded from the `cdb.formulasFile` hscript file.
+	Each function taking a line of a sheet type is a formula for that sheet, or a validation function if its name starts with `validate`.
+**/
 class Formulas {
 
 	var ide : hide.Ide;
@@ -71,8 +137,14 @@ class Formulas {
 	var currentMap : Map<String,Dynamic>;
 	var validationFuncs : Map<String, ValidationFunction> = [];
 
+	/**
+		Evaluates the formulas.
+	**/
 	public var enable = true;
 
+	/**
+		Loads the formulas of an editor and watches the file.
+	**/
 	public function new( editor : Editor ) {
 		ide = hide.Ide.inst;
 		this.editor = editor;
@@ -88,6 +160,9 @@ class Formulas {
 		Editor.refreshAll();
 	}
 
+	/**
+		Evaluates the formulas of all the lines (or only those of `sheet`).
+	**/
 	public function evaluateAll( ?sheet : cdb.Sheet ) {
 		if( !enable )
 			return;
@@ -123,6 +198,9 @@ class Formulas {
 		currentMap = null;
 	}
 
+	/**
+		Runs the validation function of a sheet on a line. Returns null if the sheet has none.
+	**/
 	public function validateLine(sheet: cdb.Sheet, lineIndex: Int): ValidationResult {
 		var validationFunc = validationFuncs.get(sheet.name);
 		if( validationFunc == null ) return null;
@@ -203,6 +281,9 @@ class Formulas {
 		return m;
 	}
 
+	/**
+		Replaces the characters not allowed in an identifier with `_`.
+	**/
 	public static function toIdent( name : String ) {
 		return ~/[^A-Za-z0-9_]/g.replace(name,"_");
 	}
@@ -299,11 +380,17 @@ class Formulas {
 		browseRec(expr);
 	}
 
+	/**
+		Returns the formulas of a sheet.
+	**/
 	public function getList( s : cdb.Sheet ) : Array<Formula> {
 		var type = getTypeName(s);
 		return [for( f in formulas ) if( f.type == type ) f];
 	}
 
+	/**
+		Returns the formula of a cell, or null.
+	**/
 	public function get( c : Cell ) : Null<Formula> {
 		var tmap = fmap.get(c.table.sheet.name);
 		if( tmap == null )
@@ -316,18 +403,30 @@ class Formulas {
 		return tmap.get(f);
 	}
 
+	/**
+		Sets the formula of a cell, or removes it if null.
+	**/
 	public function set( c : Cell, f : Formula ) {
 		setForValue(c.line.obj, c.table.getRealSheet(), c.column, f == null ? null : f.name);
 	}
 
+	/**
+		Tells if a cell has a formula (its own or the column default).
+	**/
 	public inline function has(c:Cell) {
 		return Reflect.field(c.line.obj, c.column.name+"__f") != null || (c.column.editor != null && (c.column.editor:Editor.EditorColumnProps).formula != null);
 	}
 
+	/**
+		Removes the formula of a value.
+	**/
 	public function removeFromValue( obj : Dynamic, c : cdb.Data.Column ) {
 		Reflect.deleteField(obj, c.name+"__f");
 	}
 
+	/**
+		Sets the formula of a value (or removes it if null), and computes the value.
+	**/
 	public function setForValue( obj : Dynamic, sheet : cdb.Sheet, c : cdb.Data.Column, fname : String ) {
 		var field = c.name+"__f";
 		var fdef = Editor.getColumnProps(c).formula;
@@ -345,6 +444,9 @@ class Formulas {
 			Reflect.setField(obj, field, fname);
 	}
 
+	/**
+		Calls `f` with a cache of the line accesses, for consecutive evaluations.
+	**/
 	public function evalBlock<T>( f : Void -> T ) : T {
 		var old = currentMap;
 		if( currentMap == null ) currentMap = new Map();
@@ -357,6 +459,9 @@ class Formulas {
 		return Reflect.field(obj, c.name+"__f");
 	}
 
+	/**
+		Returns the type name of a sheet in the formulas (`a@b` becomes `A_b`).
+	**/
 	public static function getTypeName( s : cdb.Sheet ) {
 		var name = s.name.split("@").join("_");
 		name = name.charAt(0).toUpperCase() + name.substr(1);
@@ -371,6 +476,9 @@ class Formulas {
 	}
 
 	#if !hl
+	/**
+		Asks a name and adds a formula for the sheet of a cell to the formulas file.
+	**/
 	public function createNew( c : Cell, ?onCreated : Formula -> Void ) {
 		var name = ide.ask("Formula name");
 		if( name == null ) return;
@@ -378,6 +486,9 @@ class Formulas {
 		edit('function $name( v : $t ) {\n}\n');
 	}
 
+	/**
+		Opens the formulas file, adding `insert` at its end if set.
+	**/
 	public function edit( ?insert : String ) {
 		var fullPath = ide.getPath(formulasFile);
 		var created = false;
@@ -398,6 +509,9 @@ class Formulas {
 }
 
 #if !hl
+/**
+	The script view of the formulas file, with the sheet types for the checker.
+**/
 class FormulasView extends hide.view.Script {
 
 	override function getScriptChecker() {
