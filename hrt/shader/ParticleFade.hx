@@ -1,5 +1,8 @@
 package hrt.shader;
 
+/**
+	Fades the particles in and out over their life.
+**/
 class ParticleFade extends hxsl.Shader {
 
 	static var SRC = {

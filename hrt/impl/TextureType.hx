@@ -2,12 +2,27 @@ package hrt.impl;
 
 import hrt.impl.Gradient;
 
+/**
+	The type of a texture value of a prefab property.
+**/
 enum abstract TextureType(String) from String to String {
+    /**
+    	A gradient: `{ type : "gradient", data : GradientData }`.
+    **/
     var gradient;
-    var path;       // Not used as a type inside the json (the playload is a string), default value
+    /**
+		A texture path (the default; not used as a type in the JSON, where the value is the path string).
+	**/
+    var path;
 }
 
+/**
+	Helpers for the texture values of prefab properties: a path, or a gradient.
+**/
 class Utils {
+    /**
+    	Returns the texture of a value, or `null`.
+    **/
     public static function getTextureFromValue(val : Any, wrap : h3d.mat.Data.Wrap = Repeat) : h3d.mat.Texture {
         if (Std.isOfType(val, String)) {
             var t = hxd.res.Loader.currentInstance.load(val).toTexture();
@@ -36,6 +51,9 @@ class Utils {
     }
 
     // Returns null if value is not a GradientData
+    /**
+    	Returns the gradient data of a value, or `null` if it is not a gradient.
+    **/
     public static function getGradientData(value : Any)  : Null<Gradient.GradientData> {
         if (getTextureType(value) == gradient) {
             var gradientData = ((value:Dynamic).data:GradientData);
@@ -47,6 +65,9 @@ class Utils {
         return null;
     }
 
+    /**
+    	Returns the type of a value (`path` for a string or `null`), or `null` if unknown.
+    **/
     public static function getTextureType(value : Any) : Null<TextureType> {
         if (value == null || Std.isOfType(value, String)) {
             return TextureType.path;
@@ -66,6 +87,9 @@ class Utils {
         return null;
     }
 
+    /**
+    	Returns a copy of a value.
+    **/
     public static function copyTextureData(val : Any) : Any {
         if (Type.typeof(val) == TObject)
             return haxe.Json.parse(haxe.Json.stringify(val));

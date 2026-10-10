@@ -4,6 +4,9 @@ package hrt.tools;
     Static extension for h3d.scene.Graphics
 **/
 class GraphicsTools {
+    /**
+    	Draws a 3D cross at a point.
+    **/
     static public function drawPointCross(g: h3d.scene.Graphics, x: Float, y: Float, z: Float, width: Float) {
         g.moveTo(x-width, y, z);
         g.lineTo(x+width, y, z);

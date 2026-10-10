@@ -1,5 +1,8 @@
 package hrt.shader;
 
+/**
+	The PBR forward lighting of the particles, with a cheap normal basis.
+**/
 class ParticleForward extends h3d.shader.pbr.DefaultForward {
 
 	static var SRC = {

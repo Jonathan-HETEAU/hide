@@ -1,5 +1,8 @@
 package hrt.shader;
 
+/**
+	Colors the particles with a gradient over their life.
+**/
 class GradientMapLife extends hxsl.Shader {
 
 	static var SRC = {

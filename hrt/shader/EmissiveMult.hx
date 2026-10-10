@@ -1,5 +1,8 @@
 package hrt.shader;
 
+/**
+	Multiplies the emissive.
+**/
 class EmissiveMult extends hxsl.Shader {
 	static var SRC = {
 		@param var power : Float;

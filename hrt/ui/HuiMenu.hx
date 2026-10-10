@@ -1,20 +1,62 @@
 package hrt.ui;
 
+/**
+	The icon of a menu item: a path in JS, an image otherwise.
+**/
 typedef MenuIcon = #if js String #else hxd.res.Image #end;
 
+/**
+	An item of a menu.
+**/
 typedef MenuItem = {
-    ?label: String,
-    ?isSeparator: Bool,
-    ?menu: Array<MenuItem>,
-    ?click: Void -> Void,
-    ?enabled: Bool,
-    ?stayOpen : Bool,
-    ?icon: MenuIcon,
-    ?keys: String,
-    ?checked: Bool,
-    ?tooltip: String,
-    ?radio: () -> Bool, // Radio button instead of checked.
-	?color: Int
+    /**
+    	The label.
+    **/
+    var ?label : String;
+    /**
+    	Makes a separator.
+    **/
+    var ?isSeparator : Bool;
+    /**
+    	The sub menu items.
+    **/
+    var ?menu : Array<MenuItem>;
+    /**
+    	Called when the item is clicked.
+    **/
+    var ?click : Void -> Void;
+    /**
+    	Enables the item.
+    **/
+    var ?enabled : Bool;
+    /**
+    	Keeps the menu open when the item is clicked.
+    **/
+    var ?stayOpen : Bool;
+    /**
+    	The icon.
+    **/
+    var ?icon : MenuIcon;
+    /**
+    	The keyboard shortcut displayed.
+    **/
+    var ?keys : String;
+    /**
+    	Shows a check mark.
+    **/
+    var ?checked : Bool;
+    /**
+    	The tooltip.
+    **/
+    var ?tooltip : String;
+    /**
+    	Returns if the item is selected, shown as a radio button instead of a check mark.
+    **/
+    var ?radio : () -> Bool;
+	/**
+		The color.
+	**/
+	var ?color : Int;
 }
 
 #if hui

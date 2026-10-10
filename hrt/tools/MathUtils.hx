@@ -1,6 +1,12 @@
 package hrt.tools;
 
+/**
+	Math helpers.
+**/
 class MathUtils {
+	/**
+		Rounds a value to a number of significant digits.
+	**/
 	static public function roundToSignificantFigures(value: Float, numDigits: Int ) : Float {
 		if (value == 0)
 			return 0;

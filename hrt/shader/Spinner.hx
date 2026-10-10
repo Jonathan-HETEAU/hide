@@ -1,5 +1,8 @@
 package hrt.shader;
 
+/**
+	Draws animated trails along a shape (signed distance field).
+**/
 class Spinner extends hxsl.Shader {
 
 	static var SRC = {

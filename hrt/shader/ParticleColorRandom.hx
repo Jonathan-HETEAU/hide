@@ -1,5 +1,8 @@
 package hrt.shader;
 
+/**
+	Multiplies the color of the particles by a random color of a gradient.
+**/
 class ParticleColorRandom extends hxsl.Shader {
 
 	static var SRC = {

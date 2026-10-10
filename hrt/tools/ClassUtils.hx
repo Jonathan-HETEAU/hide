@@ -1,6 +1,12 @@
 package hrt.tools;
 
+/**
+	Class hierarchy helpers.
+**/
 class ClassUtils {
+    /**
+    	Returns the classes from `baseClass` to `startClass`.
+    **/
     public static function getInheritance<T>(startClass:Class<T>, baseClass: Class<T>) : Array<Class<T>> {
         var classes : Array<Class<T>> = [];
         var cl : Class<Dynamic> = startClass;

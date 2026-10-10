@@ -4,30 +4,84 @@ import haxe.Int32;
 import h3d.mat.Texture;
 import h3d.Vector4;
 
-typedef ColorStop = {position : Float, color : Int};
+/**
+	A color stop of a gradient.
+**/
+typedef ColorStop = {
+	/**
+		The position, from `0` to `1`.
+	**/
+	var position : Float;
+	/**
+		The color, as ARGB.
+	**/
+	var color : Int;
+};
 
+/**
+	The interpolation between the stops of a gradient.
+**/
 enum abstract GradientInterpolation(String) from String to String {
+	/**
+		Linear.
+	**/
 	var Linear;
+	/**
+		Cubic.
+	**/
 	var Cubic;
+	/**
+		Constant: the color of the previous stop.
+	**/
 	var Constant;
 }
 
+/**
+	The data of a gradient.
+**/
 typedef GradientData = {
+	/**
+		The color stops, by position.
+	**/
 	var stops : Array<ColorStop>;
+	/**
+		The size of the texture.
+	**/
 	var resolution : Int;
+	/**
+		Makes a vertical texture.
+	**/
 	var isVertical : Bool;
+	/**
+		The interpolation between the stops.
+	**/
 	var interpolation: GradientInterpolation;
+	/**
+		The color space of the interpolation, as an index in `ColorSpace.colorModes`.
+	**/
 	var colorMode: Int;
 };
 
 #if editor
+/**
+	A cached gradient texture of the editor.
+**/
 typedef EditorCacheData = {
+	/**
+		The texture.
+	**/
 	var tex : Texture;
 };
 #end
 
+/**
+	A color gradient, as stops interpolated in a color space, rendered to textures (cached).
+**/
 class Gradient {
 
+	/**
+		The data.
+	**/
 	public var data : GradientData = {
 		stops: new Array<ColorStop>(),
 		resolution: 32,
@@ -36,14 +90,23 @@ class Gradient {
 		colorMode: 0,
 	};
 
+	/**
+		Creates an empty gradient.
+	**/
 	public function new () {
 	}
 
+	/**
+		Returns a black to white gradient.
+	**/
 	public static function getDefaultGradientData() : GradientData {
 		var data : GradientData = {stops: [{position: 0.0, color:0xFF000000}, {position: 1.0, color:0xFFFFFFFF}], resolution: 64, isVertical : false, interpolation: Linear, colorMode: 0};
 		return data;
 	}
 
+	/**
+		Returns the color of the gradient at a position, from `0` to `1`.
+	**/
 	public static function evalData(data : GradientData, position : Float, ?outVector : Vector4) : Vector4 {
 		if (outVector == null) outVector = new Vector4();
 		var i : Int = 0;
@@ -123,6 +186,9 @@ class Gradient {
 		return outVector;
 	}
 
+	/**
+		Returns the color at a position, from `0` to `1`.
+	**/
 	public function eval(position : Float, ?outVector : Vector4) : Vector4 {
 		return evalData(data, position, outVector);
 	}
@@ -140,6 +206,9 @@ class Gradient {
 	#end
 
 	#if editor
+	/**
+		Returns the cache of the editor textures (editor only).
+	**/
 	public static function getEditorCache() : Map<{}, EditorCacheData> {
 		var engine = h3d.Engine.getCurrent();
 		var cache : Map<{}, EditorCacheData> = @:privateAccess engine.resCache.get(Gradient);
@@ -150,6 +219,9 @@ class Gradient {
 		return cache;
 	}
 
+	/**
+		Disposes the textures of the editor cache (editor only).
+	**/
 	public static function purgeEditorCache() {
 		var cache = getEditorCache();
 		for (c in cache) {
@@ -161,6 +233,9 @@ class Gradient {
 	}
 	#end
 
+	/**
+		Returns the hash of a gradient, the key of the texture cache.
+	**/
 	public static function getDataHash(data : GradientData, ?forceOrientation: Bool) : Int32 {
 
 		var hash = hxd.Rand.hash(data.resolution);
@@ -180,6 +255,9 @@ class Gradient {
 	}
 
 	#if castle
+	/**
+		Returns the texture of a CastleDB gradient, or `null`.
+	**/
 	public static function textureFromCDB( g : cdb.Types.Gradient, size : Int ) {
 		if( g == null ) return null;
 		var d : GradientData = {
@@ -193,6 +271,9 @@ class Gradient {
 	}
 	#end
 
+	/**
+		Renders a gradient in a layer of a texture array.
+	**/
 	public static function fillTexArrayFromData(tex : h3d.mat.TextureArray, data : GradientData, idx : Int) {
 		function genPixels(data : hrt.impl.Gradient.GradientData) : hxd.Pixels {
 			var xScale = data.isVertical ? 0 : 1;
@@ -210,6 +291,9 @@ class Gradient {
 		tex.uploadPixels(genPixels(data), 0, idx);
 	}
 
+	/**
+		Returns the texture of a gradient (cached).
+	**/
 	public static function textureFromData(data : GradientData, ?forceOrientation: Bool) : h3d.mat.Texture {
 		function genPixels() {
 			var xScale = (forceOrientation ?? data.isVertical) ? 0 : 1;
@@ -265,6 +349,9 @@ class Gradient {
 		return texture;
 	}
 
+	/**
+		Returns the texture of the gradient (cached).
+	**/
 	public function toTexture() : h3d.mat.Texture {
 		return textureFromData(data);
 	}

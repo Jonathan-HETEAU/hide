@@ -1,5 +1,8 @@
 package hrt.shader;
 
+/**
+	Computes the texture coordinates of the trails (stretch and repeat).
+**/
 class BaseTrails extends hxsl.Shader {
 
 	static var SRC = {

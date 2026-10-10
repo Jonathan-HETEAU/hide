@@ -1,5 +1,8 @@
 package hrt.shader;
 
+/**
+	Dissolves the surface with a noise texture, with a burning edge color.
+**/
 class DissolveBurn extends hxsl.Shader {
 	static var SRC = {
 		@param var noise : Sampler2D;

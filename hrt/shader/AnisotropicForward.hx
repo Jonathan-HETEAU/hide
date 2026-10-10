@@ -1,5 +1,8 @@
 package hrt.shader;
 
+/**
+	Gives a constant anisotropy direction, rotated by a noise along the texture coordinates.
+**/
 class FrequencyValue extends hxsl.Shader {
 	static var SRC = {
 
@@ -25,6 +28,9 @@ class FrequencyValue extends hxsl.Shader {
 	}
 }
 
+/**
+	Gives a constant anisotropy intensity and direction.
+**/
 class FlatValue extends hxsl.Shader {
 	static var SRC = {
 
@@ -41,6 +47,9 @@ class FlatValue extends hxsl.Shader {
 	}
 }
 
+/**
+	Gives the anisotropy direction from a flow map.
+**/
 class FlowmapValue extends hxsl.Shader {
 	static var SRC = {
 
@@ -84,6 +93,9 @@ class FlowmapValue extends hxsl.Shader {
 	}
 }
 
+/**
+	Gives the anisotropy intensity and direction from textures.
+**/
 class NoiseTextureValue extends hxsl.Shader {
 	static var SRC = {
 
@@ -103,6 +115,9 @@ class NoiseTextureValue extends hxsl.Shader {
 	}
 }
 
+/**
+	Gives the anisotropy direction from the vertex data.
+**/
 class VertexValue extends hxsl.Shader {
 	static var SRC = {
 
@@ -131,6 +146,9 @@ class VertexValue extends hxsl.Shader {
 	}
 }
 
+/**
+	Displays the anisotropy direction as a color.
+**/
 class DebugDir extends hxsl.Shader {
 	static var SRC = {
 
@@ -144,6 +162,9 @@ class DebugDir extends hxsl.Shader {
 	}
 }
 
+/**
+	The PBR forward lighting with anisotropic specular reflections.
+**/
 class AnisotropicForward extends h3d.shader.pbr.DefaultForward {
 	static var SRC = {
 

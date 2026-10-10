@@ -1,19 +1,49 @@
 package hrt.impl;
 
+/**
+	An entry of the editor menus registered by the game.
+**/
 typedef RemoteMenuAction = {
-	name : String,
-	?cdbSheet : String,
+	/**
+		The name of the menu entry.
+	**/
+	var name : String;
+	/**
+		The CastleDB sheet whose lines have the entry, or `null`.
+	**/
+	var ?cdbSheet : String;
 }
 
+/**
+	A message of the remote prefab edition.
+**/
 typedef RemotePrefabAction = {
-	kind: RemotePrefabActionKind,
-	data: Dynamic,
-	id: String,
+	/**
+		The kind of action.
+	**/
+	var kind : RemotePrefabActionKind;
+	/**
+		The serialized prefab.
+	**/
+	var data : Dynamic;
+	/**
+		The id of the edition.
+	**/
+	var id : String;
 };
 
+/**
+	The kind of a remote prefab message.
+**/
 enum abstract RemotePrefabActionKind(String) {
-	var Open; /** Game -> Hide : Request open of the prefab data contained in data**/
-	var Update; /** Hide -> Game : Update the opened prefab in the game with the new provided data**/
+	/**
+		Game -> Hide: requests to open the prefab data contained in `data`.
+	**/
+	var Open;
+	/**
+		Hide -> Game: updates the prefab opened in the game with the new `data`.
+	**/
+	var Update;
 }
 
 /**
@@ -30,21 +60,45 @@ enum abstract RemotePrefabActionKind(String) {
 	```
  */
 class RemoteConsole {
+	/**
+		The default host.
+	**/
 	public static var DEFAULT_HOST : String = "127.0.0.1";
+	/**
+		The default port.
+	**/
 	public static var DEFAULT_PORT : Int = 40001;
+	/**
+		Does not log the connection attempts and errors.
+	**/
 	public static var SILENT_CONNECT : Bool = true;
 
+	/**
+		The host.
+	**/
 	public var host : String;
+	/**
+		The port.
+	**/
 	public var port : Int;
 	var sock : hxd.net.Socket;
+	/**
+		The connections.
+	**/
 	public var connections : Array<RemoteConsoleConnection>;
 
+	/**
+		Creates the console.
+	**/
 	public function new( ?port : Int, ?host : String ) {
 		this.host = host ?? DEFAULT_HOST;
 		this.port = port ?? DEFAULT_PORT;
 		this.connections = [];
 	}
 
+	/**
+		Starts a server (in the editor), calling `onClient` for each client.
+	**/
 	public function startServer( ?onClient : RemoteConsoleConnection -> Void ) {
 		close();
 		sock = new hxd.net.Socket();
@@ -68,6 +122,9 @@ class RemoteConsole {
 		log('Server started at $host:$port');
 	}
 
+	/**
+		Connects to the server (from the game).
+	**/
 	public function connect( ?onConnected : Bool -> Void ) {
 		close();
 		sock = new hxd.net.Socket();
@@ -90,6 +147,9 @@ class RemoteConsole {
 			log('Connecting to $host:$port');
 	}
 
+	/**
+		Closes the socket and the connections.
+	**/
 	public function close() {
 		if( sock != null ) {
 			sock.close();
@@ -104,21 +164,36 @@ class RemoteConsole {
 		onClose();
 	}
 
+	/**
+		Tells if the socket is open.
+	**/
 	public function isConnected() {
 		return sock != null;
 	}
 
+	/**
+		Called when the console is closed.
+	**/
 	public dynamic function onClose() {
 	}
 
+	/**
+		Logs a message. Traces it by default.
+	**/
 	public dynamic function log( msg : String ) {
 		trace(msg);
 	}
 
+	/**
+		Logs an error. Traces it by default.
+	**/
 	public dynamic function logError( msg : String ) {
 		trace('[Error] $msg');
 	}
 
+	/**
+		Sends a command to the connections, calling `onResult` with the reply.
+	**/
 	public function sendCommand( cmd : String, ?args : Dynamic, ?onResult : Dynamic -> Void ) {
 		if( connections.length == 0 ) {
 			// Ignore send when not really connected
@@ -133,6 +208,9 @@ class RemoteConsole {
 
 }
 
+/**
+	A connection of a `RemoteConsole`. Messages are JSON lines; the `@cmd` methods are the commands it handles.
+**/
 @:keep
 @:rtti
 class RemoteConsoleConnection {
@@ -143,12 +221,18 @@ class RemoteConsoleConnection {
 	var waitReply : Map<Int, Dynamic->Void> = [];
 	var commands : Map<String, (args:Dynamic, onDone:Dynamic->Void) -> Void> = [];
 
+	/**
+		Creates the connection.
+	**/
 	public function new( parent : RemoteConsole, s : hxd.net.Socket ) {
 		this.parent = parent;
 		this.sock = s;
 		registerCommands(this);
 	}
 
+	/**
+		Closes the connection.
+	**/
 	public function close() {
 		UID = 0;
 		waitReply = [];
@@ -162,21 +246,36 @@ class RemoteConsoleConnection {
 		onClose();
 	}
 
+	/**
+		Tells if the socket is open.
+	**/
 	public function isConnected() {
 		return sock != null;
 	}
 
+	/**
+		Called when the connection is closed.
+	**/
 	public dynamic function onClose() {
 	}
 
+	/**
+		Logs a message. Traces it by default.
+	**/
 	public dynamic function log( msg : String ) {
 		trace(msg);
 	}
 
+	/**
+		Logs an error. Traces it by default.
+	**/
 	public dynamic function logError( msg : String ) {
 		trace('[Error] $msg');
 	}
 
+	/**
+		Sends a command, calling `onResult` with the reply.
+	**/
 	public function sendCommand( cmd : String, ?args : Dynamic, ?onResult : Dynamic -> Void ) {
 		if( sock == null )
 			return;
@@ -193,6 +292,9 @@ class RemoteConsoleConnection {
 		sock.out.writeBytes(bytes, 0, bytes.length);
 	}
 
+	/**
+		Reads the received messages: replies, or commands to run.
+	**/
 	public function handleOnData() {
 		while( sock.input.available > 0 ) {
 			var str = sock.input.readLine().toString();
@@ -329,11 +431,17 @@ class RemoteConsoleConnection {
 		return onConsoleCommand(args?.cmd ?? "");
 	}
 
+	/**
+		Runs a console command received from the editor. Logs an error by default.
+	**/
 	public dynamic function onConsoleCommand( cmd : String ) : Int {
 		sendLogError('onConsoleCommand not implemented, received $cmd');
 		return -1;
 	}
 
+	/**
+		The menu entries registered by the game.
+	**/
 	public var menuActions(default, null) : Array<RemoteMenuAction> = null;
 	@cmd function registerMenuActions( args : { actions : Array<RemoteMenuAction> } ) {
 		menuActions = args?.actions;
@@ -343,6 +451,9 @@ class RemoteConsoleConnection {
 		return onMenuAction(args?.action, args?.id);
 	}
 
+	/**
+		Runs a menu entry chosen in the editor. Logs an error by default.
+	**/
 	public dynamic function onMenuAction( action : RemoteMenuAction, id : String ) : Int {
 		sendLogError('onMenuAction not implemented');
 		return -1;
@@ -351,6 +462,9 @@ class RemoteConsoleConnection {
 	@cmd function handleUri( path : String ) {
 		onUri(path);
 	}
+	/**
+		Handles a URI received from the editor. Logs an error by default.
+	**/
 	public dynamic function onUri( uri : String ) {
 		sendLogError('onUri not implemented');
 	}
@@ -597,6 +711,9 @@ class RemoteConsoleConnection {
 
 	// ----- Heaps ------
 
+	/**
+		Returns the GPU memory allocations as text, by size.
+	**/
 	public static function allocStatsFormat( stats : Array<h3d.impl.MemoryManager.AllocStats> ) {
 		var sb = new StringBuf();
 		stats.sort((s1, s2) -> (s1.size > s2.size && s2.size > 0) ? -1 : 1);

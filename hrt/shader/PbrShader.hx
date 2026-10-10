@@ -1,5 +1,8 @@
 package hrt.shader;
 
+/**
+	The base of the PBR screen shaders: reads the depth, occlusion and HDR maps.
+**/
 class PbrShader extends h3d.shader.ScreenShader {
 
 	static var SRC = {

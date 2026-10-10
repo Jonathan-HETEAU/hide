@@ -7,6 +7,9 @@ import haxe.macro.Type;
 using haxe.macro.TypeTools;
 #end
 
+/**
+	The options of `@:forwardDecls`.
+**/
 typedef ForwardConfig = {
 	/** Prepended to forwarded names, with the member name's first letter uppercased. **/
 	var ?prefix : String;
@@ -29,6 +32,9 @@ typedef ForwardConfig = {
 @:autoBuild(hrt.tools.Macros.forward())
 interface ForwardDecls {}
 
+/**
+	Build macros of the tools.
+**/
 class Macros {
 
 	#if macro

@@ -8,10 +8,16 @@ class Delayer<Item> {
 	var queuedItems : Map<{}, Bool> = [];
 	var callback : (Item) -> Void;
 
+	/**
+		Creates the delayer calling `callback`.
+	**/
 	public function new(callback: (Item) -> Void) {
 		this.callback = callback;
 	}
 
+	/**
+		Queues an item: `callback` is called once for it on the next frame.
+	**/
 	public function queue(item: Item) {
 		var empty = !queuedItems.iterator().hasNext();
 		queuedItems.set(cast item, true);

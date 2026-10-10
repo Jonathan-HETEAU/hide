@@ -1,7 +1,13 @@
 package hrt.tools;
 
+/**
+	An action: applies it, or reverts it if `isUndo`.
+**/
 typedef Action = (isUndo: Bool) -> Void;
 
+/**
+	An undo history of actions.
+**/
 class Undo {
 	var stack : Array<{action: Action, hasDataChanges: Bool}> = [];
 	var currentAction : Int = -1;
@@ -10,10 +16,16 @@ class Undo {
 	/** True while onRecord is called **/
 	var inRecordStep : Bool = false;
 
+	/**
+		Creates an empty history.
+	**/
 	public function new() {
 		reset();
 	}
 
+	/**
+		Clears the history.
+	**/
 	public function reset() {
 		stack = [];
 		currentAction = -1;
@@ -67,6 +79,9 @@ class Undo {
 		action(false);
 	}
 
+	/**
+		Applies an action and records it. `hasDataChanges` tells if it modifies the saved data.
+	**/
 	public function run(action: Action, hasDataChanges: Bool, ?info: Any) {
 		if (action == null)
 			return;
@@ -74,10 +89,16 @@ class Undo {
 		record(action, hasDataChanges, info);
 	}
 
+	/**
+		Called after each record, undo or redo.
+	**/
 	public dynamic function onAfterChange() {
 
 	}
 
+	/**
+		Reverts the current action.
+	**/
 	public function undo() {
 		if (canUndo()) {
 			stack[currentAction].action(true);
@@ -86,10 +107,16 @@ class Undo {
 		}
 	}
 
+	/**
+		Tells if there is an action to undo.
+	**/
 	public function canUndo() {
 		return currentAction >= 0;
 	}
 
+	/**
+		Applies the next action again.
+	**/
 	public function redo() {
 		if (canRedo()) {
 			currentAction++;
@@ -98,6 +125,9 @@ class Undo {
 		}
 	}
 
+	/**
+		Tells if there is an action to redo.
+	**/
 	public function canRedo() {
 		return currentAction < stack.length -1;
 	}
@@ -109,6 +139,9 @@ class Undo {
 		return stack[currentAction];
 	}
 
+	/**
+		Tells if an action with data changes was applied since the last `markClean`.
+	**/
 	public function isDirty() : Bool {
 		var current = currentAction;
 		while(current >= -1) {
@@ -121,10 +154,16 @@ class Undo {
 		return true;
 	}
 
+	/**
+		Marks the current state as saved.
+	**/
 	public function markClean() {
 		lastSaveUndo = getCurrentUndo();
 	}
 
+	/**
+		Returns an action applying several actions (reverted in reverse order).
+	**/
 	public static function actionFromActions(actions: Array<Action>) : Action {
 		return (isUndo) -> {
 			for (i in 0...actions.length) {

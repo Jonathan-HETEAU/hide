@@ -1,8 +1,20 @@
 package hrt.tools;
 
+/**
+	Displays the orientation of the camera as axes in a corner of the view, clickable to align the camera.
+**/
 class ViewportAxis extends h2d.Object {
+	/**
+		The color of the X axis.
+	**/
 	public static final X_COLOR = new h3d.Vector4(0.96, 0.21, 0.32, 1);
+	/**
+		The color of the Y axis.
+	**/
 	public static final Y_COLOR = new h3d.Vector4(0.43, 0.64, 0.10, 1);
+	/**
+		The color of the Z axis.
+	**/
 	public static final Z_COLOR = new h3d.Vector4(0.18, 0.51, 0.89, 1);
 
 	var parentSceneCam : h3d.Camera;
@@ -17,6 +29,9 @@ class ViewportAxis extends h2d.Object {
 	var backgroundColor : Int = 0;
 	var gizmo : h3d.scene.Object;
 
+	/**
+		Creates the axes of a camera and its controller.
+	**/
 	public function new(parentSceneCam : h3d.Camera, parentSceneCamCtrl : h3d.scene.CameraController, ?parent : h2d.Object) {
 		super(parent);
 		this.parentSceneCam = parentSceneCam;

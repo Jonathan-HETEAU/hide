@@ -1,5 +1,8 @@
 package hrt.shader;
 
+/**
+	Multiplies the color by a texture.
+**/
 class TextureMult extends hxsl.Shader {
 
 	static var SRC = {

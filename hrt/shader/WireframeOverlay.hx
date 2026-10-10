@@ -1,5 +1,8 @@
 package hrt.shader;
 
+/**
+	Draws the mesh slightly inflated, in a flat color.
+**/
 class WireframeOverlayShader extends hxsl.Shader {
 	static var SRC = {
 
@@ -24,10 +27,22 @@ class WireframeOverlayShader extends hxsl.Shader {
 	}
 }
 
+/**
+	Draws an overlay of the mesh in a flat color.
+**/
 class WireframeOverlay extends hrt.prefab.Shader {
 
+	/**
+		The color, as RGB.
+	**/
 	@:s public var color : Int = 0xFFFFFF;
+	/**
+		The opacity.
+	**/
 	@:s public var alpha : Float = 0.5;
+	/**
+		The inflation along the normals.
+	**/
 	@:s public var thickness : Float = 0.01;
 
 	public function new(parent, shared) {

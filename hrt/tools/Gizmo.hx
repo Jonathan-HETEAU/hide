@@ -2,27 +2,81 @@ package hrt.tools;
 import hxd.Math;
 import hxd.Key as K;
 
+/**
+	The mode of a `Gizmo`.
+**/
 enum EditMode {
+	/**
+		All the handles.
+	**/
 	Full;
+	/**
+		No handle: selection only.
+	**/
 	Selection;
+	/**
+		The translation handles.
+	**/
 	Translation;
+	/**
+		The rotation handles.
+	**/
 	Rotation;
+	/**
+		The scale handles.
+	**/
 	Scale;
 }
 
+/**
+	A handle of a `Gizmo`.
+**/
 enum Handle {
+	/**
+		The X translation arrow.
+	**/
 	XArrow;
+	/**
+		The Y translation arrow.
+	**/
 	YArrow;
+	/**
+		The Z translation arrow.
+	**/
 	ZArrow;
+	/**
+		The X rotation ring.
+	**/
 	XRing;
+	/**
+		The Y rotation ring.
+	**/
 	YRing;
+	/**
+		The Z rotation ring.
+	**/
 	ZRing;
+	/**
+		The XY translation plane.
+	**/
 	XYPlane;
+	/**
+		The XZ translation plane.
+	**/
 	XZPlane;
+	/**
+		The YZ translation plane.
+	**/
 	YZPlane;
+	/**
+		The center, moving in the view plane (or scaling uniformly).
+	**/
 	Center;
 }
 
+/**
+	Displays the rotation rings.
+**/
 class RotateAxisShader extends hxsl.Shader {
 	static var SRC = {
 		@global var camera : {
@@ -45,6 +99,9 @@ class RotateAxisShader extends hxsl.Shader {
 	}
 }
 
+/**
+	Displays the rotation sphere.
+**/
 class RotateSphereShader extends hxsl.Shader {
 	static var SRC = {
 		@global var camera : {
@@ -67,10 +124,25 @@ class RotateSphereShader extends hxsl.Shader {
 	}
 }
 
+/**
+	A 3D gizmo to move, rotate and scale objects in the editor.
+**/
 class Gizmo extends h3d.scene.Object {
+	/**
+		The color of the X axis, as ARGB.
+	**/
 	public static final X_COLOR = 0xfff44336;
+	/**
+		The color of the Y axis, as ARGB.
+	**/
 	public static final Y_COLOR = 0xff4dae51;
+	/**
+		The color of the Z axis, as ARGB.
+	**/
 	public static final Z_COLOR = 0xff2196f3;
+	/**
+		The color of the other handles, as ARGB.
+	**/
 	public static final DEFAULT_COLOR = 0xFFAAAAAA;
 
 	#if hui
@@ -81,7 +153,13 @@ class Gizmo extends h3d.scene.Object {
 	static public var gizmoScaleCommand = new hrt.ui.HuiCommands.HuiCommand("Gizmo Scale", {key: hxd.Key.R});
 	#end
 
+	/**
+		The mode.
+	**/
 	public var mode : EditMode = Translation;
+	/**
+		Aligns the gizmo with the objects instead of the world.
+	**/
 	public var isLocalTransform(default, set) : Bool = false;
 	function set_isLocalTransform(v) {
 		if (v != isLocalTransform)
@@ -89,12 +167,27 @@ class Gizmo extends h3d.scene.Object {
 		return isLocalTransform = v;
 	}
 
+	/**
+		Tells if a handle is dragged.
+	**/
 	public var isDragged(default, null) : Bool = false;
+	/**
+		Called when a handle starts being dragged.
+	**/
 	public var onStartMove : Handle -> Void;
 	// offsetPosition & offsetRotation are in absolute coordinates
 	// offsetScale is in local coordinate
+	/**
+		Called while dragging, with the offsets since the start.
+	**/
 	public var onMove : (offsetPosition: h3d.Vector, offsetRotation: h3d.Quat, offsetScale: h3d.Vector) -> Void;
+	/**
+		Called when the drag ends.
+	**/
 	public var onFinishMove : Void -> Void;
+	/**
+		Called when the drag is canceled.
+	**/
 	public var onCancelMove : Void -> Void;
 
 	var window(get, never) : hxd.Window;
@@ -118,6 +211,9 @@ class Gizmo extends h3d.scene.Object {
 	var initialMousePos : h2d.col.Point;
 	var interactives : Array<h3d.scene.Interactive> = [];
 
+	/**
+		Creates the gizmo.
+	**/
 	public function new(parent: h3d.scene.Object) {
 		super(parent);
 		gizmo = loadGizmoModel();
@@ -125,6 +221,9 @@ class Gizmo extends h3d.scene.Object {
 		translationMode();
 	}
 
+	/**
+		Keeps the gizmo at a constant size on screen.
+	**/
 	public function update(dt : Float) {
 		var cam = this.getScene().camera;
 		var abs = gizmo.getAbsPos();
@@ -153,6 +252,9 @@ class Gizmo extends h3d.scene.Object {
 	}
 
 
+	/**
+		Places the gizmo at the center of the objects.
+	**/
 	public function moveToObjects(objs : Array<h3d.scene.Object>) {
 		objects = objs;
 		updateTransformSpace();
@@ -172,19 +274,31 @@ class Gizmo extends h3d.scene.Object {
 		setPosition(centroid.x, centroid.y, centroid.z);
 	}
 
+	/**
+		Tells if an object is part of the gizmo.
+	**/
 	public function isGizmo(obj : h3d.scene.Object) {
 		return gizmo.findAll((f) -> f).contains(obj);
 	}
 
+	/**
+		Shows or hides the gizmo.
+	**/
 	public function setVisible(visible : Bool) {
 		this.gizmo.visible = visible;
 	}
 
+	/**
+		Tells if the gizmo is visible.
+	**/
 	public function isVisible() {
 		return this.gizmo.visible;
 	}
 
 
+	/**
+		Switches to the next mode: translation, rotation, scale, selection.
+	**/
 	public function switchMode() {
 		switch (mode) {
  			case Translation:
@@ -199,6 +313,9 @@ class Gizmo extends h3d.scene.Object {
 		}
 	}
 
+	/**
+		Switches to the selection mode.
+	**/
 	public function selectionMode() {
 		for (o in gizmo.getMeshes()) {
 			o.visible = false;
@@ -209,6 +326,9 @@ class Gizmo extends h3d.scene.Object {
 		onChangeMode(mode);
 	}
 
+	/**
+		Switches to the translation mode.
+	**/
 	public function translationMode() {
 		for (o in gizmo.getMeshes()) {
 			if (o.name == null) continue;
@@ -223,6 +343,9 @@ class Gizmo extends h3d.scene.Object {
 		onChangeMode(mode);
 	}
 
+	/**
+		Switches to the rotation mode.
+	**/
 	public function rotationMode() {
 		for (o in gizmo.getMeshes()) {
 			if (o.name == null) continue;
@@ -235,6 +358,9 @@ class Gizmo extends h3d.scene.Object {
 		onChangeMode(mode);
 	}
 
+	/**
+		Switches to the scale mode.
+	**/
 	public function scalingMode() {
 		for (o in gizmo.getMeshes()) {
 			var visible = o.name.indexOf("_Scale") >= 0
@@ -247,6 +373,9 @@ class Gizmo extends h3d.scene.Object {
 		onChangeMode(mode);
 	}
 
+	/**
+		Aligns the gizmo with the objects (local transform or scale mode) or the world.
+	**/
 	public function updateTransformSpace() {
 		var localEuler = getGizmoLocalRotation();
 		if (isLocalTransform || mode.match(Scale))
@@ -586,8 +715,20 @@ class Gizmo extends h3d.scene.Object {
 		return -1;
 	}
 
+	/**
+		Returns a snapped value. Returns `v` by default.
+	**/
 	public dynamic function snap(v: Float, mode: EditMode) : Float { return v; }
+	/**
+		Tells if the values are snapped. Returns `false` by default.
+	**/
 	public dynamic function shouldSnap() : Bool { return false; }
+	/**
+		Called when the mode changes.
+	**/
 	public dynamic function onChangeMode(mode : EditMode) {}
+	/**
+		Called when the transform space changes.
+	**/
 	public dynamic function onChangeTransformSpace(isLocalTransform : Bool) {}
 }

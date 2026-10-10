@@ -1,5 +1,8 @@
 package hrt.shader;
 
+/**
+	Blends the color with a gradient texture along the texture coordinates.
+**/
 class GradientFlat extends hxsl.Shader {
 	static var SRC = {
 		@const var USE_SOURCE_UV : Bool = false;

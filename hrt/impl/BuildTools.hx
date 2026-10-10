@@ -1,5 +1,8 @@
 package hrt.impl;
 
+/**
+	Builds the resources of a project.
+**/
 class BuildTools {
 
 	static function log( str : String ) {

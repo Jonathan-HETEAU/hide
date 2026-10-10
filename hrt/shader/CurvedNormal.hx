@@ -1,5 +1,8 @@
 package hrt.shader;
 
+/**
+	Curves the normals of a flat mesh, as if it was a sphere cap.
+**/
 class CurvedNormal extends hxsl.Shader {
 
 	static var SRC = {
@@ -43,6 +46,9 @@ class CurvedNormal extends hxsl.Shader {
 		}
 	};
 
+	/**
+		Creates the shader with a curvature (`0` flat, `1` hemisphere).
+	**/
 	public function new( curvature : Float = 1.0 ) {
 		super();
 		this.curvature = curvature;

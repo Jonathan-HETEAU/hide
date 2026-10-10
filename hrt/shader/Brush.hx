@@ -1,5 +1,8 @@
 package hrt.shader;
 
+/**
+	Displays the terrain brush.
+**/
 class Brush extends hxsl.Shader {
 
 	static var SRC = {

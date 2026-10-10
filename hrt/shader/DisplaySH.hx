@@ -1,5 +1,8 @@
 package hrt.shader;
 
+/**
+	Displays the irradiance of spherical harmonics.
+**/
 class DisplaySH extends hxsl.Shader {
 
 	static var SRC = {
@@ -58,6 +61,9 @@ class DisplaySH extends hxsl.Shader {
 		}
 	}
 
+	/**
+		Creates the shader.
+	**/
 	public function new() {
 		super();
 		strength = 1.0;

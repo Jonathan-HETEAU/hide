@@ -1,6 +1,12 @@
 package hrt.tools;
 
+/**
+	The element of the one side of a `OneToMany`.
+**/
 typedef Left = Int;
+/**
+	The element of the many side of a `OneToMany`.
+**/
 typedef Right = Int;
 
 /**
@@ -11,6 +17,9 @@ class OneToMany {
     var left : Map<Left, Map<Right, Bool>>;
     var right : Map<Right, Left>;
 
+    /**
+    	Creates an empty collection.
+    **/
     public function new() {
         left = new Map<Left, Map<Right, Bool>>();
         right = new Map<Right, Left>();
@@ -31,6 +40,9 @@ class OneToMany {
         right.set(r, l);
     }
 
+    /**
+    	Removes the relation of a right element. Returns its left element, or `null`.
+    **/
     public function removeRight(r: Right) : Null<Left> {
         var prevL = right.get(r);
         right.remove(r);
@@ -40,6 +52,9 @@ class OneToMany {
         return prevL;
     }
 
+    /**
+    	Removes the relations of a left element.
+    **/
     public function removeLeft(l: Left) {
         var prevRs = left.get(l);
         left.remove(l);
@@ -50,6 +65,9 @@ class OneToMany {
         }
     }
 
+    /**
+    	Iterates on the left elements and their right elements.
+    **/
     public function iterAll() : KeyValueIterator<Int, Iterator<Right>> {
         var iter = left.keyValueIterator();
         return {
@@ -63,6 +81,9 @@ class OneToMany {
         };
     }
 
+    /**
+    	Iterates on the right elements of a left element.
+    **/
     public function iterRights(l: Left) : Iterator<Right> {
         var rights = left.get(l);
         if (rights != null) {
@@ -78,10 +99,16 @@ class OneToMany {
         };
     }
 
+    /**
+    	Returns the left element of a right element, or `null`.
+    **/
     public function getLeft(r: Right) {
         return right.get(r);
     }
 
+    /**
+    	Removes all the relations.
+    **/
     public function clear() {
         right.clear();
         left.clear();

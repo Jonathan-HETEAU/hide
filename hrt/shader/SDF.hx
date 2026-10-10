@@ -1,5 +1,8 @@
 package hrt.shader;
 
+/**
+	Renders a signed distance field texture, antialiased.
+**/
 class SDF extends hxsl.Shader {
 
 	static var SRC = {

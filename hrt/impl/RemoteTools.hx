@@ -1,5 +1,8 @@
 package hrt.impl;
 
+/**
+	Called with the new data of a prefab edited remotely.
+**/
 typedef RemotePrefabCallback = (data: Dynamic) -> Void;
 
 /**
@@ -7,6 +10,9 @@ typedef RemotePrefabCallback = (data: Dynamic) -> Void;
  */
 class RemoteTools {
 
+	/**
+		The delay between connection attempts, in seconds.
+	**/
 	public static var RETRY_DELAY : Float = 2;
 
 	static var rc : hrt.impl.RemoteConsole;
@@ -17,6 +23,9 @@ class RemoteTools {
 	static var uriActions : Array<{ path : String, f : (uri: String) -> Void }> = [];
 	static var remotePrefabsCallbacks: Map<String, RemotePrefabCallback> = [];
 
+	/**
+		Connects to the editor (host and port from `remoteconsole` in `props.json`), retrying every `RETRY_DELAY` seconds.
+	**/
 	public static function autoConnect( ?onConnected : Bool -> Void ) {
 		RemoteTools.onConnected = onConnected;
 		if( rc != null )
@@ -33,6 +42,9 @@ class RemoteTools {
 		mainEvent = haxe.MainLoop.add(update);
 	}
 
+	/**
+		Stops the connection.
+	**/
 	public static function stop() {
 		if( mainEvent != null ) {
 			mainEvent.stop();
@@ -44,15 +56,24 @@ class RemoteTools {
 		rc = null;
 	}
 
+	/**
+		Tells if the game is connected to the editor.
+	**/
 	public static function isConnected() {
 		return rc != null && rc.isConnected();
 	}
 
+	/**
+		Runs a console command received from the editor. Logs an error by default.
+	**/
 	public static dynamic function onConsoleCommand( cmd : String ) : Int {
 		logError('onConsoleCommand not implemented, received $cmd');
 		return -1;
 	}
 
+	/**
+		Adds an entry to the menu of the lines of a CastleDB sheet in the editor, calling `f` with the line id.
+	**/
 	public static function registerCdbMenu( sheet : String, name : String, f : (id:String) -> Int ) {
 		menuActions.push({ action : { name : name, cdbSheet: sheet }, f : f});
 		// Send menuActions if already connected
@@ -72,6 +93,9 @@ class RemoteTools {
 		return -1;
 	}
 
+	/**
+		Parses a URI (`scheme://path?a=b&c=d`) and calls `onUri`.
+	**/
 	public static function handleUri(uri: String) {
 		if (onUri == null)
 			return;
@@ -91,6 +115,9 @@ class RemoteTools {
 		}
 		onUri(uri, path, args);
 	}
+	/**
+		Called with the URIs received from the editor, their path and arguments.
+	**/
 	public static var onUri: (uri: String, path: String, args: Map<String, String>) -> Void = null;
 
 	static function update() {
@@ -118,10 +145,16 @@ class RemoteTools {
 
 	// ----- Commands -----
 
+	/**
+		Logs a message in the editor.
+	**/
 	public static function log( msg : String ) {
 		rc?.sendCommand("log", msg);
 	}
 
+	/**
+		Logs an error in the editor.
+	**/
 	public static function logError( msg : String ) {
 		rc?.sendCommand("logError", msg);
 	}
@@ -135,10 +168,16 @@ class RemoteTools {
 		rc?.sendCommand("open", { cdbsheet : sheet, line : line, column : column, selectExpr : selectExpr });
 	}
 
+	/**
+		Opens a resource file in the editor.
+	**/
 	public static function openRes( file : String ) {
 		rc?.sendCommand("open", { file : file });
 	}
 
+	/**
+		Opens a domkit file in the editor, at a line and column.
+	**/
 	public static function openDomkit( file : String, ?line : Int, ?column : Int ) {
 		rc?.sendCommand("open", { file : file, line : line, column : column });
 	}
@@ -152,6 +191,9 @@ class RemoteTools {
 		rc?.sendCommand("open", { file : file, selectExpr : selectExpr });
 	}
 
+	/**
+		Opens a prefab of the game in the editor, calling `callback` with the new data when it is modified there.
+	**/
 	public static function editPrefab( prefab: hrt.prefab.Prefab, id: String, callback: RemotePrefabCallback) {
 		rc?.sendCommand("remotePrefab", {kind: hrt.impl.RemoteConsole.RemotePrefabActionKind.Open, data: @:privateAccess prefab.serialize(), id: id});
 		remotePrefabsCallbacks.set(id, callback);

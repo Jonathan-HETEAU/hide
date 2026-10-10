@@ -1,8 +1,17 @@
 package hrt.ui;
 
+/**
+	An option of a select.
+**/
 typedef HuiSelectOption = {
-	label: String,
-	value: Dynamic
+	/**
+		The label.
+	**/
+	var label : String;
+	/**
+		The value.
+	**/
+	var value : Dynamic;
 }
 
 #if hui

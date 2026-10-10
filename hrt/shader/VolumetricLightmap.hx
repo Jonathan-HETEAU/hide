@@ -1,5 +1,8 @@
 package hrt.shader;
 
+/**
+	Applies the irradiance of a volumetric lightmap, interpolated between its probes.
+**/
 class VolumetricLightmap extends hxsl.Shader {
 
 	static var SRC =

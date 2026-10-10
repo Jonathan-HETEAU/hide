@@ -9,6 +9,9 @@ class ProcessAsync {
 	var onCompletion: (process: sys.io.Process) -> Void;
 	var timer : haxe.Timer;
 
+	/**
+		Starts the process, calling `onCompletion` when it exits.
+	**/
 	public function new(command: String, ?args: Array<String>, onCompletion: (process: sys.io.Process) -> Void) {
 		process = new sys.io.Process(command, args);
 		this.onCompletion = onCompletion;

@@ -1,5 +1,8 @@
 package hrt.shader;
 
+/**
+	Computes the spherical harmonics of an environment cube map.
+**/
 class ComputeSH extends h3d.shader.ScreenShader {
 	static var SRC = {
 

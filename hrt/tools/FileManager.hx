@@ -1,17 +1,44 @@
 package hrt.tools;
 
+/**
+	A message of the thumbnail generator to the file manager.
+**/
 enum abstract GenToManagerCommand(String) {
+	/**
+		A thumbnail was generated.
+	**/
 	var success;
 }
 
+/**
+	A message of the file manager to the thumbnail generator.
+**/
 enum abstract ManagerToGenCommand(String) {
+	/**
+		Queues files.
+	**/
 	var queue;
+	/**
+		Generates files first.
+	**/
 	var prio;
+	/**
+		Clears the queue.
+	**/
 	var clear;
 }
 
+/**
+	A generated thumbnail.
+**/
 typedef GenToManagerSuccessMessage = {
+	/**
+		The path of the file.
+	**/
 	var originalPath : String;
+	/**
+		The path of the thumbnail.
+	**/
 	var thumbnailPath : String;
 }
 

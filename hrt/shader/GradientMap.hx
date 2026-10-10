@@ -1,5 +1,8 @@
 package hrt.shader;
 
+/**
+	Replaces the color with a gradient indexed by its luminance (or alpha).
+**/
 class GradientMap extends hxsl.Shader {
 	static var SRC = {
 		@const var USE_ALPHA : Bool;

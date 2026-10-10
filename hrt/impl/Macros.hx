@@ -3,8 +3,14 @@ import haxe.macro.Context;
 import haxe.macro.Expr;
 import haxe.macro.Type;
 
+/**
+	Macros and helpers for the serialization of enums.
+**/
 class Macros {
 
+	/**
+		Returns the enum value of a name, or the first value of the enum if invalid.
+	**/
 	public static function enumOrNullByName<T>(e:Enum<T>, constr:String, ?params:Array<Dynamic>):T {
 		var value = try {
 			haxe.EnumTools.createByName(e, constr, params);
@@ -100,6 +106,9 @@ class Macros {
 		return contains;
 	}
 
+	/**
+		Returns the serializable value of a field containing enums.
+	**/
 	public static macro function serializeValue(val : Expr) {
 		var type = Context.typeof(val);
 		if (type == null) throw "assert";
@@ -119,6 +128,9 @@ class Macros {
 		}
 	}
 
+	/**
+		Restores the enums of an unserialized field.
+	**/
 	public static macro function fixupEnumUnserialise(original : Expr, val : Expr) {
 		var exprs = new Array<Expr>();
 
@@ -158,6 +170,9 @@ class Macros {
 		return macro $b{exprs};
 	}
 
+	/**
+		Deletes a field of an object: `deleteField(obj.field)`.
+	**/
 	public static macro function deleteField(value: Expr) : Expr {
 		#if macro
 		var pos = Context.currentPos();

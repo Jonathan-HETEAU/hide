@@ -1,5 +1,8 @@
 package hrt.shader;
 
+/**
+	Sets the refraction parameters of a surface.
+**/
 class RefractionPropsShader extends hxsl.Shader {
 	static var SRC = {
 		@param var intensityInput : Float;
@@ -14,6 +17,9 @@ class RefractionPropsShader extends hxsl.Shader {
 		}
 	}
 }
+/**
+	Makes the material refract the scene behind it (rendered by the `hrt.prefab.rfx.Refraction` effect).
+**/
 class Refraction extends hrt.prefab.Shader {
 
 	@:s var intensity : Float = 0.25;

@@ -1,5 +1,8 @@
 package hrt.shader;
 
+/**
+	Sets the specular color to the albedo.
+**/
 class SpecularColorAlbedo extends hxsl.Shader {
 	static var SRC = {
 		var albedoGamma : Vec3;
@@ -10,6 +13,9 @@ class SpecularColorAlbedo extends hxsl.Shader {
 	}
 }
 
+/**
+	Sets the specular color to a constant.
+**/
 class SpecularColorFlat extends hxsl.Shader {
 	static var SRC = {
 		@param var specularColorValue : Vec3;
@@ -20,6 +26,9 @@ class SpecularColorFlat extends hxsl.Shader {
 	}
 }
 
+/**
+	Sets the specular color from a texture.
+**/
 class SpecularColorTexture extends hxsl.Shader {
 	static var SRC = {
 		@param var specularColorTexture : Sampler2D;
@@ -31,6 +40,9 @@ class SpecularColorTexture extends hxsl.Shader {
 	}
 }
 
+/**
+	Applies the specular color and tint to the PBR lighting.
+**/
 class SpecularColor extends hxsl.Shader {
 	static var SRC = {
 

@@ -1,5 +1,8 @@
 package hrt.tools;
 
+/**
+	Draws the lines of the grid, fading with the distance.
+**/
 class GridShader extends hxsl.Shader {
 	static var SRC = {
 		@global var camera : {
@@ -47,9 +50,21 @@ class GridShader extends hxsl.Shader {
 	}
 }
 
+/**
+	An infinite-looking grid on the XY plane, for the editor.
+**/
 class Grid extends h3d.scene.Object {
+	/**
+		The color of the lines, as RGB.
+	**/
 	public var color(default, set) : Int = 0x4C4C4C;
+	/**
+		The width of the lines.
+	**/
 	public var lineWidth(default, set) : Float = 0.01;
+	/**
+		The spacing between the lines.
+	**/
 	public var lineSpacing(default, set) : Float = 1;
 
 	var plane : h3d.scene.Mesh = null;
@@ -58,6 +73,9 @@ class Grid extends h3d.scene.Object {
 	var cam : h3d.Camera;
 	var prevDistance : Float;
 
+	/**
+		Creates the grid.
+	**/
 	public function new(?parent : h3d.scene.Object) {
 		super(parent);
 

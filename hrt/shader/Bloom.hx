@@ -1,5 +1,8 @@
 package hrt.shader;
 
+/**
+	Keeps the pixels brighter than a threshold, for the bloom.
+**/
 class Bloom extends h3d.shader.ScreenShader {
 
 	static var SRC = {

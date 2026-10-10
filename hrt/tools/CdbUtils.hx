@@ -1,15 +1,39 @@
 package hrt.tools;
 
+/**
+	A part of the path to a CastleDB cell.
+**/
 enum PathPart {
+	/**
+		A line by its id, in the column `targetCol`.
+	**/
 	Id(idCol:String, name:String, ?targetCol: String);
+	/**
+		A property.
+	**/
 	Prop(name: String);
+	/**
+		A line by its index, in the column `targetCol`.
+	**/
 	Line(lineNo:Int, ?targetCol: String);
+	/**
+		A line of a script.
+	**/
 	Script(lineNo:Int);
 }
 
+/**
+	The path to a CastleDB cell.
+**/
 typedef Path = Array<PathPart>;
 
+/**
+	CastleDB helpers.
+**/
 class CdbUtils {
+	/**
+		Returns the readable path (ids or columns with indexes) and the coordinates of a reference.
+	**/
 	public static function splitPath(rs: cdb.Sheet.Reference) {
 		var path = [];
 		var coords = [];

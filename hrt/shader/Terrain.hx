@@ -1,5 +1,8 @@
 package hrt.shader;
 
+/**
+	Renders a terrain tile: displacement by the height map, and blending of the surfaces by their weights.
+**/
 class Terrain extends hxsl.Shader {
 
 	static var SRC = {

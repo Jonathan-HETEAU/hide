@@ -1,5 +1,8 @@
 package hrt.shader;
 
+/**
+	The base shader of the particles of an emitter: gives their life, lifetime and random value, and the billboard orientation.
+**/
 class BaseEmitter extends hxsl.Shader {
 
 	static var SRC = {

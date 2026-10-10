@@ -1,14 +1,38 @@
 package hrt.shader;
 
+/**
+	The axis along which `ParticleRandomMesh` picks a cell.
+**/
 enum ParticleRandomMeshAxis {
+	/**
+		+X.
+	**/
 	PosX;
+	/**
+		-X.
+	**/
 	NegX;
+	/**
+		+Y.
+	**/
 	PosY;
+	/**
+		-Y.
+	**/
 	NegY;
+	/**
+		+Z.
+	**/
 	PosZ;
+	/**
+		-Z.
+	**/
 	NegZ;
 }
 
+/**
+	Shows a random cell of a mesh made of several variations along an axis, per particle.
+**/
 class ParticleRandomMesh extends hxsl.Shader {
 
 	static var SRC = {

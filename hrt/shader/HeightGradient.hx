@@ -1,5 +1,8 @@
 package hrt.shader;
 
+/**
+	Colors the surface with a gradient along a direction (height).
+**/
 class HeightGradient extends hxsl.Shader {
 
 	static var SRC = {

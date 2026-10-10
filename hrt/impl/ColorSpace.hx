@@ -3,18 +3,48 @@ package hrt.impl;
 import h3d.Vector4;
 import h3d.Vector4;
 
+/**
+	A color space, with its conversions.
+**/
 typedef ColorMode = {
-	name: String,
-	valueToARGB : (value : Vector4,  outColor : Color) -> Color,
-	ARGBToValue : (color : Color, outVector: Vector4) -> Vector4
+	/**
+		The name.
+	**/
+	var name : String;
+	/**
+		Converts a value of the color space to a color.
+	**/
+	var valueToARGB : (value : Vector4,  outColor : Color) -> Color;
+	/**
+		Converts a color to a value of the color space.
+	**/
+	var ARGBToValue : (color : Color, outVector: Vector4) -> Vector4;
 };
 
+/**
+	A color with 8 bits components.
+**/
 class Color {
+	/**
+		The red component, from `0` to `255`.
+	**/
 	public var r : Int = 0;
+	/**
+		The green component, from `0` to `255`.
+	**/
 	public var g : Int = 0;
+	/**
+		The blue component, from `0` to `255`.
+	**/
 	public var b : Int = 0;
+	/**
+		The alpha component, from `0` to `255`.
+	**/
 	public var a : Int = 0;
 
+	/**
+		Creates a color.
+	**/
 	inline public function new(r:Int = 0, g:Int = 0, b:Int = 0, a:Int = 0) {
 		this.r = r;
 		this.g = g;
@@ -22,12 +52,18 @@ class Color {
 		this.a = a;
 	}
 
+	/**
+		Returns the color of an RGB or ARGB integer (alpha `255` without alpha).
+	**/
 	inline static public function fromInt(rgb: Int, withAlpha: Bool = true) : Color {
 		var c = new Color();
 		c.load(rgb, withAlpha);
 		return c;
 	}
 
+	/**
+		Sets the components from an RGB or ARGB integer (alpha `255` without alpha).
+	**/
 	public function load(rgb: Int, withAlpha: Bool = true) {
 		r = (rgb >> 16) & 0xFF;
 		g = (rgb >> 8) & 0xFF;
@@ -39,11 +75,17 @@ class Color {
 		}
 	}
 
+	/**
+		Returns the color as an RGB or ARGB integer.
+	**/
 	inline public function toInt(includeAlpha: Bool) : Int {
 		return if (!includeAlpha) (r << 16) + (g << 8) + b
 		else (r << 16) + (g << 8) + (b << 0) + (a << 24);
 	}
 
+	/**
+		Returns the color of a hexadecimal string (`#` optional): `GG` gray, `RGB`, `RRGGBB` or `AARRGGBB`, or `null` if invalid. The alpha is set to `0xFF` or removed according to `withAlpha`.
+	**/
 	static public function intFromString(str:String, withAlpha: Bool) : Null<Int> {
 		if (str.charAt(0) == "#")
 			str = str.substr(1);
@@ -85,7 +127,13 @@ class Color {
 
 }
 
+/**
+	Conversions between 8 bits RGB colors (`iRGB`) and other color spaces, stored in `h3d.Vector4`.
+**/
 class ColorSpace {
+    /**
+    	Returns the color as floats from `0` to `1`.
+    **/
     public static function iRGBtofRGB(color : Color, outVector: Vector4) : Vector4 {
 		if (outVector == null)
 			outVector = new Vector4();
@@ -93,6 +141,9 @@ class ColorSpace {
 		return outVector;
 	}
 
+	/**
+		Sets `outColor` (created if `null`) to the color of floats from `0` to `1`, and returns it.
+	**/
 	public static function fRGBtoiRGB(color : Vector4, outColor : Color) {
 		if (outColor == null)
 			outColor = new Color();
@@ -103,6 +154,9 @@ class ColorSpace {
 		return outColor;
 	}
 
+	/**
+		Returns the color in HSV (hue, saturation, value and alpha, from `0` to `1`).
+	**/
 	public static function iRGBtoHSV(color: Color, outVector: Vector4 = null) : Vector4 {
 		var r = color.r / 255.0;
 		var g = color.g / 255.0;
@@ -133,6 +187,9 @@ class ColorSpace {
 		return outVector;
 	}
 
+	/**
+		Sets `outColor` (created if `null`) to the color of a value in HSV (hue, saturation, value and alpha, from `0` to `1`), and returns it.
+	**/
 	public static function HSVtoiRGB(hsv:Vector4, outColor : Color) {
 		if (outColor == null)
 			outColor = new Color();
@@ -163,6 +220,9 @@ class ColorSpace {
 		return outColor;
 	}
 
+	/**
+		Returns the color in HSL (hue, saturation, lightness and alpha, from `0` to `1`).
+	**/
 	public static function iRGBtoHSL(color : Color, outVector: Vector4 = null) : Vector4 {
 		var r = color.r / 255.0;
 		var g = color.g / 255.0;
@@ -190,6 +250,9 @@ class ColorSpace {
 		return outVector;
 	}
 
+	/**
+		Sets `outColor` (created if `null`) to the color of a value in HSL (hue, saturation, lightness and alpha, from `0` to `1`), and returns it.
+	**/
 	public static function HSLtoiRGB(hsl : Vector4, outColor : Color) {
 		if (outColor == null)
 			outColor = new Color();
@@ -221,6 +284,9 @@ class ColorSpace {
 
 
 
+	/**
+		Returns the color in CIE XYZ.
+	**/
 	public static function iRGBtoXYZ(color : Color, outVector: Vector4 = null) : Vector4 {
 		outVector = iRGBtofRGB(color, outVector);
 
@@ -243,6 +309,9 @@ class ColorSpace {
 	}
 
 	static var tmpVector : Vector4 = new Vector4();
+	/**
+		Sets `outColor` (created if `null`) to the color of a value in CIE XYZ, and returns it.
+	**/
 	public static function XYZtoiRGB(value: Vector4, outColor : Color) : Color {
 		if (outColor == null)
 			outColor = new Color();
@@ -271,6 +340,9 @@ class ColorSpace {
 	static final Yn = 100;
 	static final Zn = 108.8840;
 
+	/**
+		Sets `outColor` (created if `null`) to the color of a value in CIE L*a*b*, and returns it.
+	**/
 	public static function LABtoiRGB(value: Vector4, outColor : Color) : Color {
 		// lab -> XYZ
 		inline function fn(t:Float) : Float {
@@ -293,6 +365,9 @@ class ColorSpace {
 		return XYZtoiRGB(tmpVector, outColor);
 	}
 
+	/**
+		Returns the color in CIE L*a*b*.
+	**/
 	public static function iRGBtoLAB(color : Color, outVector: Vector4 = null) : Vector4 {
 		tmpVector = iRGBtoXYZ(color, tmpVector);
 
@@ -316,6 +391,9 @@ class ColorSpace {
 		return outVector;
 	}
 
+	/**
+		Returns the color in HCL (hue, chroma, luminance).
+	**/
 	public static function iRGBtoHCL(color: Color, outVector: Vector4 = null) : Vector4 {
 		outVector = iRGBtoLAB(color, outVector);
 
@@ -334,6 +412,9 @@ class ColorSpace {
 		return outVector;
 	}
 
+	/**
+		Sets `outColor` (created if `null`) to the color of a value in HCL (hue, chroma, luminance), and returns it.
+	**/
 	public static function HCLtoiRGB(value: Vector4, outColor : Color) : Color {
 
 		tmpVector.x = value.z;
@@ -353,6 +434,9 @@ class ColorSpace {
 
 
 
+	/**
+		The color spaces: RGB, HSV, HSL, XYZ, LAB and HCL.
+	**/
 	public static var colorModes : Array<ColorMode> = [
 		{name:"RGB", valueToARGB: fRGBtoiRGB, ARGBToValue: iRGBtofRGB},
 		{name:"HSV", valueToARGB: HSVtoiRGB, ARGBToValue: iRGBtoHSV},

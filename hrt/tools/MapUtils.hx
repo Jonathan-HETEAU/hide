@@ -1,6 +1,9 @@
 package hrt.tools;
 import haxe.macro.Expr;
 
+/**
+	Map helpers.
+**/
 class MapUtils {
 	/**
 		Returns `map[key]` if key if present, else evaluate `def` and puts the result into `map[key]`, then retunrs `map[key]`

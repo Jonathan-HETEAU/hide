@@ -1,5 +1,8 @@
 package hrt.shader;
 
+/**
+	Rotates (and flips) the texture coordinates.
+**/
 class TextureRotate extends hxsl.Shader {
 
 	static var SRC = {

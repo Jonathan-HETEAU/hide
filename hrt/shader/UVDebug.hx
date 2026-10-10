@@ -1,5 +1,8 @@
 package hrt.shader;
 
+/**
+	Displays the texture coordinates as colors.
+**/
 class UVDebug extends hxsl.Shader {
 
 	static var SRC = {

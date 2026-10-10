@@ -1,5 +1,8 @@
 package hrt.shader;
 
+/**
+	Tints the surface with a color through a mask texture.
+**/
 class MaskColorAlpha extends hxsl.Shader {
 	static var SRC = {
 		@const var MULTIPLY : Bool;

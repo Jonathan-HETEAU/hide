@@ -1,5 +1,8 @@
 package hrt.shader;
 
+/**
+	Deforms a mesh with waves along an axis.
+**/
 class MeshWave extends hxsl.Shader {
 
 	static var SRC = {
