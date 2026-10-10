@@ -1,7 +1,7 @@
 package hide.view;
 
 /**
-	props.json configuration (all champs are optional):
+	props.json configuration (all fields are optional):
 	```json
 	"remoteconsole": {
 		"host": "127.0.0.1",
@@ -22,6 +22,9 @@ class RemoteConsoleView extends hide.ui.View<{}> {
 	var panelsView : Element;
 	var newPanelBtn : Element;
 
+	/**
+		Creates the view.
+	**/
 	public function new( ?state ) {
 		super(state);
 		panels = [];
@@ -113,12 +116,18 @@ class RemoteConsoleView extends hide.ui.View<{}> {
 		refreshNewPanelButton();
 	}
 
+	/**
+		Removes a panel and closes its connection.
+	**/
 	public function removePanel( p : RemoteConsolePanel ) {
 		panels.remove(p);
 		p.element.remove();
 		p.close(true);
 	}
 
+	/**
+		Updates the connection icon of the status bar.
+	**/
 	public static function refreshStatusIcon() {
 		if( statusBarIcon == null ) {
 			statusBarIcon = new Element('<div class="ico ico-dot-circle-o" style="cursor:default;"></div>');
@@ -158,10 +167,16 @@ class RemoteConsoleView extends hide.ui.View<{}> {
 			rcmd.close();
 	}
 
+	/**
+		Stops the server before the IDE reloads.
+	**/
 	public static function onBeforeReload() {
 		stopServer();
 	}
 
+	/**
+		Returns the menu actions of the connected games for a CDB line.
+	**/
 	public static function getCdbMenuActions( sheet : String, id : String ) : Array<hrt.ui.HuiMenu.MenuItem> {
 		if( rcmd == null || !rcmd.isConnected() || rcmd.connections.length == 0)
 			return [];
@@ -181,6 +196,9 @@ class RemoteConsoleView extends hide.ui.View<{}> {
 		return actions;
 	}
 
+	/**
+		Sends an URI to the connected games (`handleUri` command).
+	**/
 	public static function onOpenUri( uri : String ) {
 		if( rcmd == null || !rcmd.isConnected() || rcmd.connections.length == 0)
 			return;
@@ -197,6 +215,9 @@ class RemoteConsoleView extends hide.ui.View<{}> {
 		rcmd?.sendCommand("runInConsole", { cmd : cmd });
 	}
 
+	/**
+		The command controls shown in the panels, by name.
+	**/
 	public static var commandViews = new Map<String, Class<RemoteConsoleCommand>>();
 	/**
 		For hide-plugin: add/modify game-specific hide command control
@@ -230,12 +251,27 @@ class RemoteConsoleView extends hide.ui.View<{}> {
 	}
 }
 
+/**
+	A panel of the remote console view: the logs and command controls of a connection.
+**/
 class RemoteConsolePanel extends hide.comp.Component {
 	var view : RemoteConsoleView;
 	var statusIcon : Element;
+	/**
+		The connection, or null.
+	**/
 	public var connection(default, set) : hrt.impl.RemoteConsole.RemoteConsoleConnection;
+	/**
+		The program path of the connected game.
+	**/
 	public var peerPath(default, null) : String;
+	/**
+		The working directory of the connected game.
+	**/
 	public var peerCwd(default, null) : String;
+	/**
+		Creates a panel with the command controls `commands` (all by default).
+	**/
 	public function new( view : RemoteConsoleView, connection : Null<hrt.impl.RemoteConsole.RemoteConsoleConnection>, commands : Null<Array<String>> ) {
 		super(null, null);
 		this.view = view;
@@ -319,6 +355,9 @@ class RemoteConsolePanel extends hide.comp.Component {
 			statusIcon.prop("title", "Disconnected");
 		}
 	}
+	/**
+		Closes the panel, and the connection if `disconnect`.
+	**/
 	public function close( disconnect : Bool ) {
 		if( disconnect && connection != null ) {
 			connection.close();
@@ -326,9 +365,15 @@ class RemoteConsolePanel extends hide.comp.Component {
 		}
 		connection = null;
 	}
+	/**
+		Tells if the connection is open.
+	**/
 	public function isConnected() {
 		return connection != null && connection.isConnected();
 	}
+	/**
+		Adds a message to the logs.
+	**/
 	public function log( msg : String, error : Bool = false ) {
 		var logsView = element.find(".logs");
 		var el = new Element('<p>${StringTools.htmlEscape(msg)}</p>').appendTo(logsView);
@@ -336,6 +381,9 @@ class RemoteConsolePanel extends hide.comp.Component {
 			el.addClass("error");
 		logsView.scrollTop(logsView.get(0).scrollHeight);
 	}
+	/**
+		Sends a command to the game. `onResult` is called with its result.
+	**/
 	public function sendCommand( cmd : String, ?args : Dynamic, ?onResult : Dynamic -> Void ) {
 		if( isConnected() )
 			connection.sendCommand(cmd, args, onResult);
@@ -344,8 +392,14 @@ class RemoteConsolePanel extends hide.comp.Component {
 	}
 }
 
+/**
+	A group of command controls of a remote console panel.
+**/
 class RemoteConsoleCommand extends hide.comp.Component {
 	var panel : RemoteConsolePanel;
+	/**
+		Creates the controls for a panel.
+	**/
 	public function new( panel : RemoteConsolePanel ) {
 		super(null, null);
 		this.panel = panel;
@@ -353,8 +407,17 @@ class RemoteConsoleCommand extends hide.comp.Component {
 	}
 }
 
+/**
+	A dump control: asks the game for a dump file, then exports or opens it.
+**/
 class RemoteConsoleSubCommandDump extends hide.comp.Component {
+	/**
+		The field showing the dump file.
+	**/
 	public var dumpFile : Element;
+	/**
+		Creates a dump control. `doDump` asks for the dump, `doOpen` opens it (automatically if `autoOpen`), and `onExport` is called after an export.
+	**/
 	public function new( panel : RemoteConsolePanel,
 			doDump : (onResult:(file:String,?filedesc:String,?dir:String)->Void) -> Void,
 			?doOpen : (file:String) -> Void, autoOpen : Bool = true,
@@ -432,7 +495,13 @@ class RemoteConsoleSubCommandDump extends hide.comp.Component {
 	}
 }
 
+/**
+	The HashLink controls: garbage collection, memory dumps, live objects, CPU and allocation profiling.
+**/
 class RemoteConsoleCommandHL extends RemoteConsoleCommand {
+	/**
+		Creates the controls for a panel.
+	**/
 	public function new( panel : RemoteConsolePanel ) {
 		super(panel);
 		new Element('<legend>Hashlink</legend>').appendTo(element);
@@ -581,7 +650,13 @@ class RemoteConsoleCommandHL extends RemoteConsoleCommand {
 	static var _ = RemoteConsoleView.registerCommandView("hashlink", RemoteConsoleCommandHL);
 }
 
+/**
+	The Heaps controls: GPU allocation tracking, scene profiling and resources.
+**/
 class RemoteConsoleCommandHeaps extends RemoteConsoleCommand {
+	/**
+		Creates the controls for a panel.
+	**/
 	public function new( panel : RemoteConsolePanel ) {
 		super(panel);
 		new Element('<legend>Heaps</legend>').appendTo(element);
@@ -638,8 +713,14 @@ class RemoteConsoleCommandHeaps extends RemoteConsoleCommand {
 	static var _ = RemoteConsoleView.registerCommandView("heaps", RemoteConsoleCommandHeaps);
 }
 
+/**
+	The custom controls: raw and console commands typed by the user.
+**/
 class RemoteConsoleCommandCustom extends RemoteConsoleCommand {
 	var newCustomCommandBtn : Element;
+	/**
+		Creates the controls for a panel.
+	**/
 	public function new( panel : RemoteConsolePanel ) {
 		super(panel);
 		new Element('<legend>Custom</legend>').appendTo(element);

@@ -13,7 +13,13 @@ import h3d.Vector;
 import js.html.CanvasElement;
 using hide.tools.Extensions;
 
+/**
+	Displays a gradient. Opens a gradient editor on click.
+**/
 class GradientBox extends Component {
+	/**
+		The gradient.
+	**/
 	public var value(get, set) : GradientData;
 	var innerValue : GradientData;
 	var gradientView : GradientView;
@@ -40,10 +46,16 @@ class GradientBox extends Component {
 		return innerValue;
 	}
 
+	/**
+		Called when the gradient changes. `isDragging` is true during a drag.
+	**/
 	public dynamic function onChange(isDragging : Bool) {
 
 	}
 
+	/**
+		Creates a gradient box. `root` is replaced by the box.
+	**/
 	public function new(?parent : Element, ?root : Element) {
 		var e = new Element("<div class='gradient-box'>");
 		if (root != null)
@@ -110,7 +122,13 @@ class GradientBox extends Component {
 	}
 }
 
+/**
+	A gradient editor popup: stops, colors, interpolation and resolution settings, and an optional prefab preview.
+**/
 class GradientEditor extends Popup {
+	/**
+		The gradient.
+	**/
 	public var value(get, set) : GradientData;
 	var innerValue : GradientData;
 
@@ -146,10 +164,16 @@ class GradientEditor extends Popup {
 	var checkboardId : String;
 	var shadowId : String;
 
+	/**
+		Keeps the preview scene when the editor closes.
+	**/
 	public var keepPreviewAlive : Bool = false;
 
 	var keys : hide.ui.Keys;
 
+	/**
+		Called when the gradient changes. `isDragging` is true during a drag.
+	**/
 	public dynamic function onChange(isDragging : Bool) {
 		set_value(innerValue);
 	}
@@ -167,6 +191,9 @@ class GradientEditor extends Popup {
 
 	static var uid = 0;
 
+	/**
+		Creates the editor. `editGradientSettings` shows the settings of the gradient.
+	**/
 	public function new(?parent : Element, editGradientSettings: Bool = true) {
 		super(parent);
 
@@ -378,6 +405,9 @@ class GradientEditor extends Popup {
 		return !colorbox.isPickerOpen();
 	}
 
+	/**
+		Selects a stop.
+	**/
 	public function selectStop(stop:Element, repaint: Bool = true) {
 		if (selectedStop != null) {
 			selectedStop.removeClass("selected");
@@ -391,6 +421,9 @@ class GradientEditor extends Popup {
 		}
 	}
 
+	/**
+		Redraws the editor.
+	**/
 	public function repaint() {
 		for (i in innerValue.stops.length...stopMarquers.length) {
 			var elem = stopMarquers.pop();
@@ -547,6 +580,9 @@ class GradientEditor extends Popup {
 		}
 	}
 
+	/**
+		Shows a preview prefab from the settings and the CDB line. `currentPath` is the path of the edited gradient.
+	**/
 	public function setPreview(previewSettings: PreviewSettings, baseData: Dynamic, currentPath: String) {
 		previewCurrentPath = currentPath;
 		if (previewDiv == null) {
@@ -776,6 +812,9 @@ class GradientEditor extends Popup {
 		previewScene.onUpdate = onPreviewUpdate;
 	}
 
+	/**
+		Removes the preview.
+	**/
 	public function cleanupPreview() {
 		if (previewScene != null) {
 			previewScene.dispose();
@@ -815,10 +854,19 @@ class GradientEditor extends Popup {
 }
 
 // Displays a GradientData inside a canvas
+/**
+	Draws a gradient on a canvas.
+**/
 class GradientView extends Component {
+	/**
+		The gradient.
+	**/
 	public var value(get, set) : GradientData;
 	var innerValue : GradientData;
 
+	/**
+		The canvas.
+	**/
 	public var canvas : CanvasElement;
 
 	function set_value(value: GradientData) {
@@ -850,6 +898,9 @@ class GradientView extends Component {
 		c2d.putImageData(image_data,0,0);
 	}
 
+	/**
+		Creates the view.
+	**/
 	public function new(?parent : Element) {
 		var e = new Element("<div class='gradient-container checkerboard-bg'>");
 		super(parent, e);
@@ -860,12 +911,46 @@ class GradientView extends Component {
 	}
 }
 
-typedef DataOverride = {cdbPath: String, targetPath: String, type: String};
+/**
+	A value of the CDB line set in the preview prefab.
+**/
+typedef DataOverride = {
+	/**
+		The path of the value in the CDB line (`a.b`). For the path of the edited gradient, the value being edited is used.
+	**/
+	var cdbPath : String;
+	/**
+		The prefab and property to set: `parent/child.prop.subProp` (`*` matches the children, `**` all the descendants).
+	**/
+	var targetPath : String;
+	/**
+		`gradient` to convert a CDB gradient to a prefab gradient, or null to copy the value.
+	**/
+	var type : String;
+};
 
+/**
+	A gradient preview of the `cdb.gradientCustomPreviews` config: shows a prefab using the edited gradient.
+**/
 typedef PreviewSettings = {
-	cdbPaths: Array<String>, // table.column names to match to apply the preview setting
-	prefab: String, // prefab path or `cdb@column_with_the_path`
-	?prefabs: Array<String>, // multiple prefab path or `cdb@column_with_the_path`, take the first one not null
-	?renderProps: String, // render props for the preview
-	?overrides: Array<DataOverride>, // Overrides to load with the prefab data
+	/**
+		The `sheet.column` names the preview applies to.
+	**/
+	var cdbPaths : Array<String>;
+	/**
+		The prefab path, or `cdb@column_with_the_path`.
+	**/
+	var prefab : String;
+	/**
+		Several prefab paths or `cdb@column_with_the_path`: the first one not null is used.
+	**/
+	var ?prefabs : Array<String>;
+	/**
+		The render props of the preview.
+	**/
+	var ?renderProps : String;
+	/**
+		The values of the CDB line to set in the prefab.
+	**/
+	var ?overrides : Array<DataOverride>;
 };
