@@ -1,15 +1,30 @@
 package hide.view;
 import hxd.Key as K;
 
+/**
+	The collision settings of a model in the model view, from the conversion rules.
+**/
 class CollisionSettings {
+	/**
+		The collision mode: default, none, auto, mesh or shapes.
+	**/
 	public var mode : Int;
+	/**
+		The collision conversion parameters.
+	**/
 	public var params : hxd.fmt.fbx.HMDOut.CollideParams;
 
+	/**
+		Creates the settings.
+	**/
 	public function new( mode : Int, params : hxd.fmt.fbx.HMDOut.CollideParams ) {
 		this.mode = mode;
 		this.params = params;
 	}
 
+	/**
+		Returns the collision shapes for the shape editor (empty if not in shapes mode).
+	**/
 	public function toShapeEditor() {
 		if( params == null || mode != Shapes || params.shapes == null )
 			return [];
@@ -43,6 +58,9 @@ class CollisionSettings {
 		return arr;
 	}
 
+	/**
+		Sets the collision shapes from the shape editor.
+	**/
 	public function fromShapeEditor( arr : Array<hide.comp.ShapeEditor.Shape> ) {
 		var shapes : Array<hxd.fmt.fbx.HMDOut.ShapeColliderParams> = [];
 		for( s in arr ) {
@@ -71,6 +89,9 @@ class CollisionSettings {
 		return shapes;
 	}
 
+	/**
+		Returns an object drawing the collider of a mesh, or null.
+	**/
 	public function getDebugCollider(mesh : h3d.scene.Mesh, convertRule : hxd.fs.FileConverter.ConvertRule) : h3d.scene.Object {
 		var hmd = Std.downcast(mesh.primitive, h3d.prim.HMDModel);
 		if (hmd == null)
@@ -201,11 +222,17 @@ private enum abstract CollisionMode(Int) from Int to Int {
 	}
 }
 
+/**
+	The scene editor of the model view.
+**/
 @:access(hide.view.Model)
 @:allow(hide.view.Model)
 class ModelSceneEditor extends hide.comp.SceneEditor {
 	var parent : hide.view.Model;
 
+	/**
+		Creates the scene editor of a view.
+	**/
 	public function new(view) {
 		super(view);
 		parent = cast view;
@@ -314,6 +341,9 @@ class ModelSceneEditor extends hide.comp.SceneEditor {
 	}
 }
 
+/**
+	The model view (`.fbx` and `.hmd` files): scene, objects tree, materials, animations and collision settings.
+**/
 class Model extends FileView {
 	static var KEY_ANIM_PLAYING = "AnimationPlaying";
 
@@ -3130,6 +3160,9 @@ class Model extends FileView {
 	}
 
 
+	/**
+		Shows or hides the render props edition.
+	**/
 	public function setRenderPropsEditionVisibility(visible : Bool) {
 		if (element == null)
 			return;

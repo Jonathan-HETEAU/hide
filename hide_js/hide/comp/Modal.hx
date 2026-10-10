@@ -1,11 +1,20 @@
 package hide.comp;
 
+/**
+	A modal dialog stopping the events to the page.
+**/
 class Modal extends Component {
 
+	/**
+		The content element.
+	**/
 	public var content(default,null) : Element;
 	var downTarget : Dynamic;
 	var upTarget : Dynamic;
 
+	/**
+		Creates the dialog.
+	**/
 	public function new(?parent,?el) {
 		super(parent,el);
 		element.addClass('hide-modal');
@@ -26,20 +35,35 @@ class Modal extends Component {
 		});
 	}
 
+	/**
+		Called when the user clicks outside the content.
+	**/
 	public dynamic function modalClick(e: Element.Event) {
 	}
 
+	/**
+		Removes the dialog.
+	**/
 	public function close() {
 		element.remove();
 	}
 }
 
+/**
+	A modal popover with a title bar and a close button. Its size is saved in the display state.
+**/
 class Modal2 extends Component {
 
+	/**
+		The content element.
+	**/
 	public var content: Element;
 	var titleBar : Element;
 	var titleElem : Element;
 
+	/**
+		The title.
+	**/
 	public var title(default, set) : String;
 
 	function set_title(v: String) : String{
@@ -48,6 +72,9 @@ class Modal2 extends Component {
 		return title;
 	}
 
+	/**
+		Creates the popover. `saveKey` is the display state key.
+	**/
 	public function new(?parent, title: String, saveKey: String) {
 		saveDisplayKey = saveKey ?? "genericPopover";
 		super(parent, new Element(
@@ -91,12 +118,18 @@ class Modal2 extends Component {
 		}
 	}
 
+	/**
+		Closes the popover.
+	**/
 	public function close() {
 		beforeToggle({newState: 'closed'}); // for some reason hidePopover does not trigger beforeToggle/toggle. Maybe a bug with nwjs
 		untyped element.get(0).hidePopover();
 		toggle({newState: 'closed'});
 	}
 
+	/**
+		Called when the popover closes.
+	**/
 	dynamic public function onClose() {
 	}
 }

@@ -1,10 +1,19 @@
 package hide.comp;
 
+/**
+	A tabs component: each `.tab` child element is a tab.
+**/
 class Tabs extends Component {
 
+	/**
+		The current tab element.
+	**/
 	public var currentTab(default, set) : Element;
 	var header : Element;
 
+	/**
+		Creates the tabs, with the headers at the bottom if `bottomTabs`.
+	**/
 	public function new(?parent,?el,bottomTabs=false) {
 		super(parent,el);
 		element.addClass("hide-tabs");
@@ -15,6 +24,9 @@ class Tabs extends Component {
 		if( t != null ) currentTab = new Element(t);
 	}
 
+	/**
+		Adds a tab. A `group` tab is shown in a separate group.
+	**/
 	public function createTab(title : String, ?icon : String, ?group : Bool) {
 		var e = new Element('<div class="tab${group ? ' tab-group' : ''}" name="$title">');
 		if( icon != null ) e.attr("icon",icon);
@@ -25,6 +37,9 @@ class Tabs extends Component {
 		return e;
 	}
 
+	/**
+		Returns the header of a tab, or null.
+	**/
 	public function getHeader( tab : Element ) {
 		var index = [for( t in getTabs() ) t].indexOf(tab.get(0));
 		if( index < 0 ) return null;
@@ -32,6 +47,9 @@ class Tabs extends Component {
 	}
 
 	#if !hl
+	/**
+		Adds a button folding the tabs, resizing the scene.
+	**/
 	public function allowMask(scene : hide.comp.Scene) {
 		new Element('<a href="#" class="maskToggle"></a>').prependTo(element).click((_) -> {
 			element.toggleClass("masked");
@@ -50,18 +68,33 @@ class Tabs extends Component {
 		return e;
 	}
 
+	/**
+		Returns the tab elements.
+	**/
 	public function getTabs() : Element {
 		return element.children(".tab");
 	}
 
+	/**
+		Returns the group tab elements.
+	**/
 	public function getGroupTabs() : Element {
 		return element.children(".tab-group");
 	}
 
+	/**
+		Called when a tab header is clicked.
+	**/
 	public dynamic function onTabClick( index : Int ) {}
 
+	/**
+		Called when a tab header is right clicked.
+	**/
 	public dynamic function onTabRightClick( index : Int ) {}
 
+	/**
+		Called when the current tab changes.
+	**/
 	public dynamic function onTabChange( index : Int ) {}
 
 	function syncTabs() {

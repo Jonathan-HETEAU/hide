@@ -1,17 +1,44 @@
 package hide.view;
 
+/**
+	The references found in a file.
+**/
 typedef Reference = {
-	file : String,
-	path : String,
-	results : Array<Result>
+	/**
+		The file name.
+	**/
+	var file : String;
+	/**
+		The file path.
+	**/
+	var path : String;
+	/**
+		The references.
+	**/
+	var results : Array<Result>;
 };
 
+/**
+	A reference.
+**/
 typedef Result =  {
-	text: String,
-	goto : () -> Void
+	/**
+		The description of the reference.
+	**/
+	var text : String;
+	/**
+		Opens the reference.
+	**/
+	var goto : () -> Void;
 }
 
+/**
+	The view listing the references to an element, or the unreferenced elements.
+**/
 class RefViewer extends hide.ui.View<{}> {
+	/**
+		Creates the view.
+	**/
 	public function new(state: Dynamic) {
 		super(state);
 	}
@@ -23,6 +50,9 @@ class RefViewer extends hide.ui.View<{}> {
 		return "References Viewer";
 	}
 
+	/**
+		Shows references to `original`, grouped by file.
+	**/
 	public function showRefs(references: Array<Reference>, original: String, gotoOriginal: Void -> Void, foldedByDefault : Bool = false) {
 		element.html("");
 		var div = new Element('<div class="ref-viewer hide-scroll">').appendTo(element);
@@ -78,6 +108,9 @@ class RefViewer extends hide.ui.View<{}> {
 		}
 	}
 
+	/**
+		Shows elements referenced nowhere.
+	**/
 	public function showUnreferenced(unreferenceds: Array<Result>) {
 		element.html("");
 		var div = new Element('<div class="ref-viewer hide-scroll">').appendTo(element);
