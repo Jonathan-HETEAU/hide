@@ -1,0 +1,3 @@
+hide.hxml
+--no-output
+-xml docs/api/hide_js.xml

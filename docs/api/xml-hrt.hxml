@@ -1,0 +1,12 @@
+-cp .
+-lib heaps
+-lib castle
+-lib hscript
+-lib hlsdl
+-D hscriptPos
+-D hide
+--macro include('hrt')
+-D doc-gen
+--no-output
+-hl hrt.hl
+-xml docs/api/hide_hrt.xml
