@@ -2,9 +2,18 @@ package hide.view.l3d;
 
 import h3d.scene.pbr.Renderer;
 
+/**
+	Bakes the light probes of a volumetric lightmap by rendering cube maps of the scene.
+**/
 class LightProbeBaker {
 
+	/**
+		Converts the probes to spherical harmonics on the GPU.
+	**/
 	public var useGPU = false;
+	/**
+		The environment of the bake.
+	**/
 	public var environment : h3d.scene.pbr.Environment;
 
 	var offScreenScene : h3d.scene.Scene = null;
@@ -32,6 +41,9 @@ class LightProbeBaker {
 	var output7 : h3d.mat.Texture;
 	var textureArray: Array<h3d.mat.Texture>;
 
+	/**
+		Creates the baker.
+	**/
 	public function new(){
 		customCamera = new h3d.Camera();
 		customCamera.screenRatio = 1.0;
@@ -39,6 +51,9 @@ class LightProbeBaker {
 		customCamera.zFar = 100;
 	}
 
+	/**
+		Disposes the baker resources.
+	**/
 	public function dispose() {
 		if( envMap != null ) {
 			envMap.dispose();
@@ -56,6 +71,9 @@ class LightProbeBaker {
 		if(offScreenScene != null) offScreenScene.dispose();
 	}
 
+	/**
+		Creates the off screen scene to bake from a prefab.
+	**/
 	public function initScene( sceneData : hrt.prefab.Prefab, scene : hide.comp.Scene , env : h3d.scene.pbr.Environment) {
 		if(offScreenScene != null) offScreenScene.dispose();
 		offScreenScene = new h3d.scene.Scene();
@@ -128,6 +146,9 @@ class LightProbeBaker {
 	}
 
 	var pixels : hxd.Pixels = null;
+	/**
+		Bakes probes of a volumetric lightmap, for at most `time` seconds if set.
+	**/
 	public function bake( volumetricLightMap : hrt.prefab.vlm.VolumetricMesh, resolution : Int, ?time :Float ) {
 
 		var timer = haxe.Timer.stamp();

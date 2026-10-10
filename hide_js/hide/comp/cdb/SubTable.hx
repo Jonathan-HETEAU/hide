@@ -1,13 +1,25 @@
 package hide.comp.cdb;
 
+/**
+	The table of a list, properties or polymorphic cell, shown under its line.
+**/
 class SubTable extends Table {
 
 	var insertedTR : Element;
 	var slider : Element;
+	/**
+		The cell of the sub table.
+	**/
 	public var cell : Cell;
-	// null for simple variants and the empty-poly picker, so getRealSheet() stays stable across edits
+	/**
+		The column and object of the variant of a polymorphic cell.
+		Null for simple variants and the empty-poly picker, so getRealSheet() stays stable across edits.
+	**/
 	public var polyVal(default,null) : { col : cdb.Data.Column, obj : Dynamic };
 
+	/**
+		Creates the sub table of a cell.
+	**/
 	public function new(editor, cell:Cell) {
 		this.editor = editor;
 		this.cell = cell;
@@ -143,6 +155,9 @@ class SubTable extends Table {
 		},key, { sheet : t.parent, column : t.parent.columns.indexOf(c), line : index });
 	}
 
+	/**
+		Shows the sub table, with an animation unless `immediate`.
+	**/
 	public function show( ?immediate ) {
 		if( immediate )
 			slider.show();
@@ -160,6 +175,9 @@ class SubTable extends Table {
 		super.close();
 	}
 
+	/**
+		Removes the sub table without animation.
+	**/
 	public function immediateClose() {
 		if( cell.line.subTable == this ) cell.line.subTable = null;
 		cell.elementHtml.classList.remove("parent-sub-table");

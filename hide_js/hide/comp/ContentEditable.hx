@@ -1,12 +1,24 @@
 package hide.comp;
 
+/**
+	An editable text element: Enter validates, Escape cancels.
+**/
 class ContentEditable extends Component {
+	/**
+		The text.
+	**/
 	public var value(get, set) : String;
+	/**
+		Enables the spell checking.
+	**/
 	public var spellcheck(never, set) : Bool;
 
 	var html : js.html.Element = null;
 	var initialValue: String;
 
+	/**
+		Creates the element.
+	**/
 	public function new(?parent : Element, ?element : Element) {
 		if (element == null) {
 			element = new Element("<div contenteditable></div>");
@@ -79,7 +91,13 @@ class ContentEditable extends Component {
 		return html.innerText;
 	}
 
+	/**
+		Called when Escape is pressed.
+	**/
 	public dynamic function onCancel() {};
 
+	/**
+		Called with the text when it is validated.
+	**/
 	public dynamic function onChange(v: String) {};
 }

@@ -1,16 +1,34 @@
 package hide.comp;
 using hide.tools.Extensions;
 
+/**
+	What the global seek searches.
+**/
 enum SeekMode {
+    /**
+    	The sheets.
+    **/
     Sheets;
+    /**
+    	The ids of the current sheet.
+    **/
     LocalIds;
+    /**
+    	The ids of all the sheets.
+    **/
     GlobalIds;
 }
 
+/**
+	A search dialog going to a CDB sheet or line.
+**/
 class GlobalSeek extends Modal {
     var cdbTable: hide.view.CdbTable;
 
     // Seeking files is not supported yet
+    /**
+    	Opens the dialog.
+    **/
     public function new(?parent, cdbTable, mode: SeekMode, ?currentSheet: cdb.Sheet) {
         super(parent);
         this.cdbTable = cdbTable;

@@ -3,6 +3,9 @@ using hide.tools.Extensions;
 
 import cdb.Data;
 
+/**
+	The form creating or editing a CDB column.
+**/
 class ModalColumnForm extends Modal {
 
 	var contentModal : Element;
@@ -10,6 +13,9 @@ class ModalColumnForm extends Modal {
 	var editor : Editor;
 	var sheet : cdb.Sheet;
 
+	/**
+		Creates the form for a column of a sheet (a new one if null).
+	**/
 	public function new( editor : Editor, sheet : cdb.Sheet, column : cdb.Data.Column, ?parent,?el) {
 		super(parent,el);
 
@@ -359,6 +365,9 @@ class ModalColumnForm extends Modal {
 			toggleHide();
 	}
 
+	/**
+		Sets the function called when the form is validated.
+	**/
 	public function setCallback(callback : (Void -> Void)) {
 		form.find("#createBtn").click(function(e) {
 			e.preventDefault();
@@ -370,6 +379,9 @@ class ModalColumnForm extends Modal {
 		});
 	}
 
+	/**
+		Closes the form.
+	**/
 	public function closeModal() {
 		content.empty();
 		close();
@@ -377,6 +389,9 @@ class ModalColumnForm extends Modal {
 
 	var validIdentifierReg = ~/^[_a-zA-Z][_a-zA-Z0-9]*$/;
 
+	/**
+		Returns the column described by the form, or null with an error.
+	**/
 	public function getColumn( refColumn : cdb.Data.Column) : Column{
 		var base = editor.base;
 		var v : Dynamic<String> = { };
@@ -553,6 +568,9 @@ class ModalColumnForm extends Modal {
 		return c;
 	}
 
+	/**
+		Shows an error.
+	**/
 	public function error(str : String) {
 		contentModal.find("#errorModal").html(str);
 	}

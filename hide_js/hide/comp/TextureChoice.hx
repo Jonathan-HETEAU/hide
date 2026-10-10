@@ -6,11 +6,20 @@ import hrt.impl.Gradient;
 
 // Allow the user to choose between picking a texture on disk,
 // creating a gradient, and future other choices of texture generation
+/**
+	Edits a texture value: a texture file or a gradient.
+**/
 class TextureChoice extends Component {
+	/**
+		The value: a texture path, or a gradient (`{type, data}`).
+	**/
 	public var value(get, set):Any;
 
 	var innerValue:Any;
 
+	/**
+		Creates the choice.
+	**/
 	public function new(?parent:Element, ?root:Element) {
 		var e = new Element("<div class='texture-choice'>");
 		if (root != null) {
@@ -22,8 +31,14 @@ class TextureChoice extends Component {
 		rebuildUi();
 	}
 
+	/**
+		Called when the value is set.
+	**/
 	public dynamic function onValueChange() {}
 
+	/**
+		Rebuilds the inputs for the kind of value.
+	**/
 	public function rebuildUi() {
 		element.empty();
 
@@ -148,5 +163,8 @@ class TextureChoice extends Component {
 		return innerValue;
 	}
 
+	/**
+		Called when the user changes the value. `shouldUndo` is false during a drag.
+	**/
 	public dynamic function onChange(shouldUndo:Bool) {}
 }
