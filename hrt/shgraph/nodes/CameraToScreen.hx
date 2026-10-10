@@ -2,6 +2,11 @@ package hrt.shgraph.nodes;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "CameraToScreen" (Property): transform a position from camera space to screen space.
+	Inputs: `input`.
+	Outputs: `output`.
+**/
 @name("CameraToScreen")
 @description("Transform a position from camera space to screen space")
 @group("Property")

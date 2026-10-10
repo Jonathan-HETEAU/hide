@@ -2,6 +2,10 @@ package hrt.shgraph.nodes;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "ObjectPos" (Property): returns the position of the object (in world space).
+	Outputs: `output`.
+**/
 @name("ObjectPos")
 @description("Returns the position of the object (in world space)")
 @group("Property")

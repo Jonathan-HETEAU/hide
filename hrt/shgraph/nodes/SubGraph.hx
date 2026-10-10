@@ -2,6 +2,9 @@ package hrt.shgraph.nodes;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "SubGraph": include a subgraph.
+**/
 @name("SubGraph")
 @description("Include a subgraph")
 @width(200)
@@ -10,6 +13,9 @@ using hxsl.Ast;
 @:access(hrt.shgraph.NodeGenContextSubGraph)
 class SubGraph extends ShaderNode {
 
+	/**
+		The path of the included shader graph.
+	**/
 	@prop() public var pathShaderGraph : String;
 
 	override function new(path: String) {

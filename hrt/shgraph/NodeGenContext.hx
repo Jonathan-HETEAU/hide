@@ -8,7 +8,13 @@ import hrt.shgraph.AstTools.*;
 import hrt.shgraph.ShaderGraph;
 import hrt.shgraph.ShaderNode;
 
+/**
+	The generation context of a sub graph: its globals become the inputs and outputs of the `SubGraph` node.
+**/
 class NodeGenContextSubGraph extends NodeGenContext {
+	/**
+		Creates the context of a sub graph, generated in `parentCtx`.
+	**/
 	public function new(graph: ShaderGraph.Graph, parentCtx : NodeGenContext) {
 		super(graph, parentCtx?.domain ?? Fragment);
 		this.parentCtx = parentCtx;
@@ -72,16 +78,31 @@ class NodeGenContextSubGraph extends NodeGenContext {
 	var outputCount = 0;
 }
 
+/**
+	The context of the generation of the nodes of a graph: gives them their inputs and the global variables, and collects their expressions and outputs.
+**/
 @:allow(hrt.shgraph.ShaderGraph)
 class NodeGenContext {
 	// Pour les rares nodes qui ont besoin de differencier entre vertex et fragment
+	/**
+		The domain generated, for the nodes that differ between vertex and fragment.
+	**/
 	public var domain : ShaderGraph.Domain;
+	/**
+		The domain of the node previews, or `null`.
+	**/
 	public var previewDomain: ShaderGraph.Domain = null;
+	/**
+		The graph.
+	**/
 	public var graph: ShaderGraph.Graph = null;
 
 	/**If true, generate human readable names for variables in the shader cache (exists to support backward shader generation when var names where not explicit)**/
 	public var explicitVarNames: Bool = false;
 
+	/**
+		Creates the context.
+	**/
 	public function new(graph: ShaderGraph.Graph, domain: ShaderGraph.Domain) {
 		this.domain = domain;
 		this.graph = graph;
@@ -89,6 +110,9 @@ class NodeGenContext {
 
 	// For general input/output of the shader graph. Allocate a new global var if name is not found,
 	// else return the previously allocated variable and assert that v.type == type and devValue == v.defValue
+	/**
+		Returns the expression reading a global, allocated on first use.
+	**/
 	public function getGlobalInput(id: Variables.Global) : TExpr {
 		var global = Variables.Globals[id];
 		switch (global.varkind) {
@@ -101,10 +125,16 @@ class NodeGenContext {
 		}
 	}
 
+	/**
+		Returns the expression reading an external variable, allocated on first use.
+	**/
 	public function getGlobalTVar(tvar: TVar) : TExpr {
 		return makeVar(getOrAllocateFromTVar(tvar));
 	}
 
+	/**
+		Assigns an expression to a global.
+	**/
 	public function setGlobalOutput(id: Variables.Global, expr: TExpr) : Void {
 		var global = Variables.Globals[id];
 		switch (global.varkind) {
@@ -117,15 +147,24 @@ class NodeGenContext {
 		}
 	}
 
+	/**
+		Returns the expression reading a shader parameter, allocated on first use.
+	**/
 	public function getGlobalParam(name: String, type: Type) : TExpr {
 		return makeVar(MapUtils.getOrPut(globalVars, name, {v: {id: hxsl.Ast.Tools.allocVarId(), name: name, type: type, kind: Param}, defValue:null, __init__: null}).v);
 	}
 
+	/**
+		Assigns an expression to a named variable, allocated on first use.
+	**/
 	public function setGlobalCustomOutput(name: String, expr: TExpr) : Void {
 		var v = makeVar(MapUtils.getOrPut(globalVars, name, {v: {id: hxsl.Ast.Tools.allocVarId(), name: name, type: expr.t, kind: Param}, defValue:null, __init__: null}).v);
 		expressions.push(makeAssign(v, expr));
 	}
 
+	/**
+		Returns the variable of a local variable of the graph, assigned with `init` the first time.
+	**/
 	public function getShaderVariable(id: Int, init: TExpr = null) : TVar {
 		var graphVar = graph.parent.variables[id];
 		var type = ShaderGraph.sgTypeToType(graphVar.type);
@@ -257,6 +296,9 @@ class NodeGenContext {
 	// Generate a preview block that displays the content of expr
 	// in the preview box of the node. Expr must be a type that
 	// can be casted a Vec4
+	/**
+		Displays `expr` (converted to a color) in the preview of the current node.
+	**/
 	public function addPreview(expr: TExpr) {
 		if (previewDomain != domain) return;
 		var selector = getGlobalInput(PreviewSelect);
@@ -267,6 +309,9 @@ class NodeGenContext {
 		preview = ifExpr;
 	}
 
+	/**
+		Returns `sourceExpr` converted to a float or float vector type: repeated, extended (alpha `1`) or truncated. Booleans become `0` or `1`.
+	**/
 	public static function convertToType(targetType: hxsl.Ast.Type, sourceExpr: TExpr) : TExpr {
 
 		if (sourceExpr.t.equals(targetType))
@@ -324,12 +369,18 @@ class NodeGenContext {
 		throw "unreachable";
 	}
 
+	/**
+		Adds a function to the shader.
+	**/
 	public function addFunction(e: TFunction) {
 		if (functions.get(e.ref.id) == null) {
 			functions.set(e.ref.id, e);
 		}
 	}
 
+	/**
+		Adds an expression to the shader.
+	**/
 	public function addExpr(e: TExpr) {
 
 		if (explicitVarNames == true) {
@@ -351,6 +402,9 @@ class NodeGenContext {
 		expressions.push(e);
 	}
 
+	/**
+		Sets the expression of an output of the current node. Throws if its type is not the declared one.
+	**/
 	public function setOutput(id: Int, e: TExpr) {
 		var expectedType = getType(nodeOutputInfo[id].type);
 		if (!expectedType.equals(e.t))
@@ -358,6 +412,9 @@ class NodeGenContext {
 		outputs[id]=e;
 	}
 
+	/**
+		Returns the HXSL type of a node type, with the generics resolved.
+	**/
 	public function getType(type: SgType) : Type {
 		switch (type) {
 			case SgGeneric(id, consDtraint):
@@ -367,6 +424,9 @@ class NodeGenContext {
 		}
 	}
 
+	/**
+		Returns the resolved type of a generic.
+	**/
 	public inline function getGenericType(id: Int) {
 		return genericTypes[id];
 	}

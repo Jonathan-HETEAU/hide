@@ -2,6 +2,11 @@ package hrt.shgraph.nodes;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "Triplanar normal map" (Math): sample a normal map using triplanar params.
+	Inputs: `texture`, `weight`, `uvX`, `uvY`, `uvZ`.
+	Outputs: `normalWS`.
+**/
 @name("Triplanar normal map")
 @description("Sample a normal map using triplanar params")
 @width(160)

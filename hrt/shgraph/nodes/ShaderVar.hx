@@ -1,6 +1,12 @@
 package hrt.shgraph.nodes;
 
+/**
+	The base of the nodes reading or writing a local variable of the graph.
+**/
 abstract class ShaderVar extends ShaderNode {
+	/**
+		The index of the variable in `ShaderGraph.variables`.
+	**/
 	@prop() public var varId : Int = 0;
 
 	#if editor

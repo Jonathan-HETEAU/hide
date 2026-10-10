@@ -7,19 +7,52 @@ import hrt.tools.MapUtils;
 
 using Lambda;
 
+/**
+	A function of a `ShaderNodeHxsl` node.
+**/
 typedef FunctionCache = {
-	fun: TFunction,
-	needPatching: Bool,
+	/**
+		The function.
+	**/
+	var fun : TFunction;
+	/**
+		Tells if the function must be patched with the node variables.
+	**/
+	var needPatching : Bool;
 }
+/**
+	The parsed HXSL code of a `ShaderNodeHxsl` node class.
+**/
 typedef CacheEntry = {
-	expr: TExpr,
-	funs: Array<FunctionCache>,
-	inputs: Array<ShaderNode.InputInfo>,
-	outputs: Array<ShaderNode.OutputInfo>,
-	idInputOrder: Map<Int, Int>,
-	idOutputOrder: Map<Int,Int>,
+	/**
+		The expression of the node.
+	**/
+	var expr : TExpr;
+	/**
+		The functions of the node.
+	**/
+	var funs : Array<FunctionCache>;
+	/**
+		The inputs.
+	**/
+	var inputs : Array<ShaderNode.InputInfo>;
+	/**
+		The outputs.
+	**/
+	var outputs : Array<ShaderNode.OutputInfo>;
+	/**
+		The input index of each input variable id.
+	**/
+	var idInputOrder : Map<Int, Int>;
+	/**
+		The output index of each output variable id.
+	**/
+	var idOutputOrder : Map<Int,Int>;
 };
 
+/**
+	A HXSL serializer keeping the variable ids, used to read the code of the nodes.
+**/
 class CustomSerializer extends hxsl.Serializer {
 
 	// we override readvar to remove the allocation of new variable id
@@ -73,6 +106,9 @@ class CustomSerializer extends hxsl.Serializer {
 	}
 }
 
+/**
+	A node written in HXSL (`static var SRC`), its inputs and outputs being the variables with `@sginput` and `@sgoutput` metadata.
+**/
 @:autoBuild(hrt.shgraph.Macros.buildNode())
 class ShaderNodeHxsl extends ShaderNode {
 

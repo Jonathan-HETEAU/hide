@@ -2,6 +2,11 @@ package hrt.shgraph.nodes;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "Dissolve" (Math): dissolve input.
+	Inputs: `dissolveMap`, `progress` (default `0.5`), `saturation` (default `0.5`), `width` (default `1.0`).
+	Outputs: `alpha`.
+**/
 @name("Dissolve")
 @description("Dissolve input")
 @width(180)

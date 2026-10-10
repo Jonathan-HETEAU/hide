@@ -2,6 +2,10 @@ package hrt.shgraph.nodes;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "MainLightColor" (Property): get the main light color.
+	Outputs: `output`.
+**/
 @name("MainLightColor")
 @description("Get the main light color")
 @group("Property")

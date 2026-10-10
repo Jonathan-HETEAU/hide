@@ -1,65 +1,212 @@
 package hrt.shgraph;
 
+/**
+	A global variable available to the shader graph nodes (see `Variables.Globals`).
+**/
 enum abstract Global(Int) to Int {
+	/**
+		`pixelColor`: the color of the pixel.
+	**/
 	var PixelColor;
+	/**
+		The RGB of the pixel color (not in `Variables.Globals`).
+	**/
 	var PixelColorColor;
+	/**
+		The alpha of the pixel color (not in `Variables.Globals`).
+	**/
 	var PixelColorAlpha;
+	/**
+		`global.time`: the time, in seconds.
+	**/
 	var Time;
+	/**
+		`global.pixelSize`: the size of a pixel.
+	**/
 	var PixelSize;
+	/**
+		`global`: the global variables.
+	**/
 	var Global;
 
+	/**
+		`calculatedUV`: the texture coordinates computed by the shaders.
+	**/
 	var CalculatedUV;
 
+	/**
+		`input`: the vertex inputs.
+	**/
 	var Input;
+	/**
+		`input.uv`: the first texture coordinates.
+	**/
 	var UV;
 
+	/**
+		`relativePosition`: the position in the space of the object.
+	**/
 	var RelativePosition;
+	/**
+		`transformedPosition`: the position in world space.
+	**/
 	var TransformedPosition;
+	/**
+		`projectedPosition`: the projected position.
+	**/
 	var ProjectedPosition;
 
+	/**
+		`input.normal`: the normal in the space of the object.
+	**/
 	var Normal;
+	/**
+		`fakeNormal`: the replacement of the normal in the previews.
+	**/
 	var FakeNormal;	// used as replacement for normal in previews
+	/**
+		`transformedNormal`: the normal in world space.
+	**/
 	var TransformedNormal;
 
+	/**
+		`depth`: the depth.
+	**/
 	var Depth;
+	/**
+		`metalness`: the PBR metalness.
+	**/
 	var Metalness;
+	/**
+		`roughness`: the PBR roughness.
+	**/
 	var Roughness;
+	/**
+		`emissive`: the PBR emissive.
+	**/
 	var Emissive;
+	/**
+		`occlusion`: the PBR occlusion.
+	**/
 	var Occlusion;
 
+	/**
+		The parameter selecting the node preview.
+	**/
 	var PreviewSelect;
+	/**
+		`_previewColor`: the color of a node preview.
+	**/
 	var PreviewColor;
 
+	/**
+		`camera`: the camera variables.
+	**/
 	var Camera;
+	/**
+		`camera.position`: the position of the camera.
+	**/
 	var CameraPosition;
 
 	// Particles
+	/**
+		`particleLife`: the age of the particle.
+	**/
 	var ParticleLife;
+	/**
+		`particleLifeTime`: the lifetime of the particle.
+	**/
 	var ParticleLifeTime;
+	/**
+		`particleRandom`: the random value of the particle.
+	**/
 	var ParticleRandom;
 
 	// Internal Shadergraph vars
+	/**
+		`_sg_out_color`: the RGB output of the graph.
+	**/
 	var SGPixelColor;
+	/**
+		`_sg_out_alpha`: the alpha output of the graph.
+	**/
 	var SGPixelAlpha;
 
+	/**
+		`emitterPosition`: the position of the particle emitter.
+	**/
 	var EmitterPosition;
 
+	/**
+		`global.screenShaderInput`: the input texture of a screen shader graph.
+	**/
 	var SourceTexture;
 
+	/**
+		`input.uv2`: the second texture coordinates.
+	**/
 	var UV2;
+	/**
+		`input.uv3`: the third texture coordinates.
+	**/
 	var UV3;
+	/**
+		`input.uv4`: the fourth texture coordinates.
+	**/
 	var UV4;
 }
 
+/**
+	The kind of a global variable.
+**/
 enum VariableKind {
+	/**
+		A HXSL variable of kind `kind`, in the struct `parent` if set, with the default value `def`.
+	**/
 	KVar(kind: hxsl.Ast.VarKind, ?parent: Global, ?def: Dynamic);
+	/**
+		Components of another global.
+	**/
 	KSwizzle(global: Global, swiz: Array<hxsl.Ast.Component>);
 }
 
-typedef GlobalInfo = {type: hxsl.Ast.Type, name: String, varkind: VariableKind, ?__init__: TExpr, ?_fullNameCache: String};
+/**
+	The definition of a global variable.
+**/
+typedef GlobalInfo = {
+	/**
+		The HXSL type.
+	**/
+	var type : hxsl.Ast.Type;
+	/**
+		The HXSL name.
+	**/
+	var name : String;
+	/**
+		The kind of variable.
+	**/
+	var varkind : VariableKind;
+	/**
+		The initial value, or `null`.
+	**/
+	var ?__init__ : TExpr;
+	/**
+		The cached full path.
+	**/
+	var ?_fullNameCache : String;
+};
+/**
+	The global variables of the shader graphs.
+**/
 class Variables {
+	/**
+		The name of the parameter selecting the node preview.
+	**/
 	public static var previewSelectName = "previewSelect_SG";
 
+	/**
+		The definitions of the globals, by `Global`.
+	**/
 	public static var Globals : Array<GlobalInfo> = {
 		var g : Array<GlobalInfo> = [];
 
@@ -111,6 +258,9 @@ class Variables {
 		g;
 	};
 
+	/**
+		Returns the full path of a global, as `parent.name`.
+	**/
 	public static function getFullPath(g: GlobalInfo) : String {
 		if (g._fullNameCache != null)
 			return g._fullNameCache;
@@ -126,6 +276,9 @@ class Variables {
 		return path;
 	}
 
+	/**
+		Returns the globals by full path.
+	**/
 	public static function getGlobalNameMap() {
 		static var GlobalNameMap : Map<String, Global>;
 		if (GlobalNameMap == null)

@@ -2,14 +2,23 @@ package hrt.shgraph;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "Global" (Input): reads a global (time, pixel size, camera position, screen shader source).
+**/
 @name("Global")
 @description("Global Inputs")
 @group("Input")
 @color("#0e8826")
 class ShaderGlobalInput extends ShaderNode {
 
+	/**
+		The index of the global in `globalInputs`.
+	**/
 	@prop("Variable") public var variableIdx : Int = 0;
 
+	/**
+		The available globals.
+	**/
 	static public var globalInputs : Array<{display: String, g: Variables.Global}> =
 		[
 			{display: "Time", g: Time},
@@ -18,6 +27,9 @@ class ShaderGlobalInput extends ShaderNode {
 			{display: "Screen shader source", g: SourceTexture},
 		];
 
+	/**
+		Creates the node for the global at `idx`.
+	**/
 	public function new(idx: Null<Int>) {
 		variableIdx = idx ?? variableIdx;
 	}

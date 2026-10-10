@@ -2,6 +2,11 @@ package hrt.shgraph.nodes;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "Random" (Math): gives a random number from a vec2 seed.
+	Inputs: `seed` (default `0.0`).
+	Outputs: `output`.
+**/
 @name("Random")
 @description("Gives a random number from a vec2 seed")
 @width(80)

@@ -6,6 +6,9 @@ import hxsl.Ast;
 using hxsl.Ast;
 using haxe.macro.Tools;
 
+/**
+	Builds the shader graph nodes: parses the HXSL code (`SRC`) of `ShaderNodeHxsl` nodes and registers the nodes.
+**/
 class Macros {
 	#if macro
 	static function buildNode() {

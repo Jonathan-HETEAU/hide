@@ -6,6 +6,9 @@ package hrt.shgraph.nodes;
 //@description("The output is the sinus of A")
 //@width(120)
 //@group("Generation")
+/**
+	A gradient noise node (disabled).
+**/
 class SimpleNoise extends ShaderNodeHxsl {
 
 	static var SRC = {

@@ -2,6 +2,11 @@ package hrt.shgraph.nodes;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "Cross" (Math): the output is the cross product of a and b.
+	Inputs: `a`, `b`.
+	Outputs: `output`.
+**/
 @name("Cross")
 @description("The output is the cross product of a and b")
 @width(80)

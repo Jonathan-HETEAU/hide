@@ -4,9 +4,18 @@ using hxsl.Ast;
 
 #if editor
 // TODO block or raise an error on illegal names
+/**
+	A component choosing the name and type of a custom variable (editor only).
+**/
 class CustomVarChooser extends hide.comp.Component {
+	/**
+		The variable.
+	**/
 	public var variable : TVar = null;
 
+	/**
+		Creates the component. `onChange` is called with the new variable.
+	**/
 	public function new(?parent : hide.Element, ?initialName : String, ?initialType : Type, onChange : (TVar) -> Void) {
 		var el = new hide.Element('<div class="custom-var">
 			<div class="custom-var-row">
@@ -63,10 +72,16 @@ class CustomVarChooser extends hide.comp.Component {
 		textInput.on("change", changedFun);
 	}
 
+	/**
+		Shows the component.
+	**/
 	public function show() {
 		element.show();
 	}
 
+	/**
+		Hides the component.
+	**/
 	public function hide() {
 		element.hide();
 	}

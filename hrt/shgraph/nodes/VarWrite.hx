@@ -1,5 +1,8 @@
 package hrt.shgraph.nodes;
 
+/**
+	The shader graph node "Var Write" (Variables): write a value to a local variable.
+**/
 @name("Var Write")
 @description("Write a value to a local variable")
 @width(80)
@@ -7,6 +10,9 @@ package hrt.shgraph.nodes;
 @hideInAddMenu
 class VarWrite extends ShaderVar {
 
+	/**
+		Creates the node.
+	**/
 	public function new() {
 	}
 

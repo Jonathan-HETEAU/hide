@@ -2,6 +2,11 @@ package hrt.shgraph.nodes;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "Mix" (Math): linear interpolation between A and B using Mix.
+	Inputs: `a` (default `0.0`), `b` (default `0.0`), `fact` (default `0.5`).
+	Outputs: `output`.
+**/
 @name("Mix")
 @description("Linear interpolation between A and B using Mix")
 @width(80)

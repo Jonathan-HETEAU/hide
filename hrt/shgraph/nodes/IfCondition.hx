@@ -3,6 +3,9 @@ package hrt.shgraph.nodes;
 using hxsl.Ast;
 import hrt.shgraph.AstTools.*;
 
+/**
+	The shader graph node "If" (Condition): return the correct input according to the condition.
+**/
 @name("If")
 @description("Return the correct input according to the condition")
 @group("Condition")

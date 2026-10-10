@@ -2,6 +2,11 @@ package hrt.shgraph.nodes;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "Cosinus" (Math): the output is the cosinus of A.
+	Inputs: `a` (default `0.0`).
+	Outputs: `output`.
+**/
 @name("Cosinus")
 @description("The output is the cosinus of A")
 @width(80)

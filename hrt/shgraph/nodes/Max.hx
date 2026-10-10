@@ -2,6 +2,11 @@ package hrt.shgraph.nodes;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "Max" (Math): the output is the maximum between A and B.
+	Inputs: `a` (default `0.0`), `b` (default `0.0`).
+	Outputs: `output`.
+**/
 @name("Max")
 @description("The output is the maximum between A and B")
 @width(80)

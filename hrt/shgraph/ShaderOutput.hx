@@ -3,18 +3,30 @@ package hrt.shgraph;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "Outputs" (Output): writes a shader output (see `availableOutputs`).
+**/
 @name("Outputs")
 @description("Parameters outputs, it's dynamic")
 @group("Output")
 @color("#A90707")
 class ShaderOutput extends ShaderNode {
 
+	/**
+		The key of the output in `availableOutputs`.
+	**/
 	@prop("Variable") public var variable : String = "_sg_out_color";
 
 	var components = [X, Y, Z, W];
 
+	/**
+		Generates the preview.
+	**/
 	public var generatePreview = false;
 
+	/**
+		Creates the node for an output.
+	**/
 	public function new(variable = "_sg_out_color") {
 		this.variable = variable;
 	}
@@ -48,6 +60,9 @@ class ShaderOutput extends ShaderNode {
 		return aliases;
 	}
 
+	/**
+		The available outputs, by key.
+	**/
 	public static var availableOutputs : Map<String, {display: String, g: Variables.Global}> = [
 		"_sg_out_color" => {display: "Pixel Color", g:SGPixelColor},
 		"_sg_out_alpha" => {display: "Alpha", g:SGPixelAlpha},

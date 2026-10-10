@@ -2,6 +2,9 @@ package hrt.shgraph;
 
 using hxsl.Ast;
 
+/**
+	The base of the math operation nodes.
+**/
 class Operation extends ShaderNodeHxsl {
 
 	// @input("A", true) var a = SType.Number;

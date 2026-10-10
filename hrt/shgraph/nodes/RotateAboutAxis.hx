@@ -1,5 +1,10 @@
 package hrt.shgraph.nodes;
 
+/**
+	The shader graph node "RotateAboutAxis" (Math): rotate position around normalized rotation axis by Rotation angle.
+	Inputs: `position`, `axis`, `rotation`.
+	Outputs: `output`.
+**/
 @name("RotateAboutAxis")
 @description("Rotate position around normalized rotation axis by Rotation angle")
 @width(100)

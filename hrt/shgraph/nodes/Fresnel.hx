@@ -2,6 +2,11 @@ package hrt.shgraph.nodes;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "Fresnel" (Math): fresnel input.
+	Inputs: `rgba`, `worldPosition`, `normals`, `color`, `bias` (default `0.2`), `scale` (default `1.0`), `power` (default `1.0`), `totalAlpha` (default `1.0`), `fresnalAlpha` (default `1.0`), `cameraPosition` (default `"camera.position"`).
+	Outputs: `output`.
+**/
 @name("Fresnel")
 @description("Fresnel input")
 @width(180)

@@ -2,6 +2,11 @@ package hrt.shgraph.nodes;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "Sinus" (Math): the output is the sinus of A.
+	Inputs: `a` (default `0.0`).
+	Outputs: `output`.
+**/
 @name("Sinus")
 @description("The output is the sinus of A")
 @width(80)

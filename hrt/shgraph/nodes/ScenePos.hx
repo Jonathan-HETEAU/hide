@@ -2,6 +2,11 @@ package hrt.shgraph.nodes;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "Scene Pos" (Property): get scene position behind current pixel.
+	Inputs: `uv` (default `"calculatedUV"`).
+	Outputs: `output`.
+**/
 @name("Scene Pos")
 @description("Get scene position behind current pixel")
 @group("Property")

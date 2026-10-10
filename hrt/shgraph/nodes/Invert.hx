@@ -2,6 +2,11 @@ package hrt.shgraph.nodes;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "Invert" (Math): the output is 1 - in.
+	Inputs: `a` (default `0.0`).
+	Outputs: `output`.
+**/
 @name("Invert")
 @description("The output is 1 - in")
 @width(80)

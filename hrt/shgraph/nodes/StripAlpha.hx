@@ -2,6 +2,11 @@ package hrt.shgraph.nodes;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "Strip Alpha" (Channel): separate the rgb and a components of an rgba vector.
+	Inputs: `rgba`.
+	Outputs: `rgb`, `a`.
+**/
 @name("Strip Alpha")
 @description("Separate the rgb and a components of an rgba vector")
 @group("Channel")

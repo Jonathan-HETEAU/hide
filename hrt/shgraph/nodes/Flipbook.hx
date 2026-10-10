@@ -3,6 +3,11 @@ package hrt.shgraph.nodes;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "Flipbook" (UV): animate UV by as a flipbook animation.
+	Inputs: `uv` (default `calculatedUV`), `width` (default `2`), `height` (default `2`), `frame` (default `0`).
+	Outputs: `output`.
+**/
 @name("Flipbook")
 @description("Animate UV by as a flipbook animation")
 @width(100)

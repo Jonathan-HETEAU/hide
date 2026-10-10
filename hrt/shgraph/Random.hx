@@ -1,5 +1,8 @@
 package hrt.shgraph;
 
+/**
+	The shader graph node "Math" (Channel): a random value between `min` and `max`. Currently broken: returns `0`.
+**/
 @name("Math")
 @description("[CURRENTLY BROKEN] Generate a random value between min and max using the given seed")
 @group("Channel")

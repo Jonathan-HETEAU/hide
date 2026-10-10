@@ -2,6 +2,11 @@ package hrt.shgraph.nodes;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "Abs" (Math): the output is the result of |A|.
+	Inputs: `a` (default `0.0`).
+	Outputs: `output`.
+**/
 @name("Abs")
 @description("The output is the result of |A|")
 @width(80)

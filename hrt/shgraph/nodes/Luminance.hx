@@ -2,6 +2,11 @@ package hrt.shgraph.nodes;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "Luminance" (Math): the output is the luminance of the rgb color.
+	Inputs: `rgb` (default `0.0`).
+	Outputs: `output`.
+**/
 @name("Luminance")
 @description("The output is the luminance of the rgb color")
 @width(80)

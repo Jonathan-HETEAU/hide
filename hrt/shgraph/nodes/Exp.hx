@@ -2,6 +2,11 @@ package hrt.shgraph.nodes;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "Exp" (Math): the output is the result of exp(x).
+	Inputs: `a` (default `0.0`).
+	Outputs: `output`.
+**/
 @name("Exp")
 @description("The output is the result of exp(x)")
 @width(80)

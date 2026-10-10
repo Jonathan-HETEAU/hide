@@ -1,5 +1,10 @@
 package hrt.shgraph.nodes;
 
+/**
+	The shader graph node "Polar Coordinates" (UV): convert UV in carthesian coordinates to polar coordinates UV. output X is the distance from the center and output Y is the angle in radient around that point.
+	Inputs: `uv` (default `calculatedUV`), `center` (default `0.5`), `radialScale` (default `1.0`), `lengthScale` (default `1.0`).
+	Outputs: `output`.
+**/
 @name("Polar Coordinates")
 @description("Convert UV in carthesian coordinates to polar coordinates UV. output X is the distance from the center and output Y is the angle in radient around that point")
 @width(130)

@@ -1,5 +1,8 @@
 package hrt.shgraph;
 
+/**
+	HXSL functions shared by the nodes (`random`).
+**/
 class Functions extends ShaderNodeHxsl {
 
     static var SRC = {

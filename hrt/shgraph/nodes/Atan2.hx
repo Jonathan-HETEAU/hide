@@ -2,6 +2,11 @@ package hrt.shgraph.nodes;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "Arc Tangent 2" (Math): the output is the arc tangent of a.y / a.x.
+	Inputs: `a` (default `0.0`).
+	Outputs: `output`.
+**/
 @name("Arc Tangent 2")
 @description("The output is the arc tangent of a.y / a.x")
 @width(80)

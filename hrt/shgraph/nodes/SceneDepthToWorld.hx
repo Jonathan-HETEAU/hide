@@ -2,6 +2,11 @@ package hrt.shgraph.nodes;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "SceneDepthToWorld" (Property): transform a scene depth to a world space position.
+	Inputs: `depth`.
+	Outputs: `output`.
+**/
 @name("SceneDepthToWorld")
 @description("Transform a scene depth to a world space position")
 @group("Property")

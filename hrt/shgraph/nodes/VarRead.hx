@@ -1,6 +1,9 @@
 package hrt.shgraph.nodes;
 
 
+/**
+	The shader graph node "Var Read" (Variables): read a value from a local variable.
+**/
 @name("Var Read")
 @description("Read a value from a local variable")
 @width(80)
@@ -8,6 +11,9 @@ package hrt.shgraph.nodes;
 @hideInAddMenu
 class VarRead extends ShaderVar {
 
+	/**
+		Creates the node.
+	**/
 	public function new() {
 	}
 

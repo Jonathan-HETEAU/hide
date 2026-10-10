@@ -16,6 +16,9 @@ class Reroute extends ShaderNode {
 	var inputs : Array<ShaderNode.InputInfo>;
 	var outputs : Array<ShaderNode.OutputInfo>;
 
+	/**
+		Creates the node.
+	**/
 	public function new() {
 	}
 
@@ -57,6 +60,9 @@ class Reroute extends ShaderNode {
 	#end
 }
 
+/**
+	The shader graph node "Reroute Float" (Other): forwards a float or vector unchanged.
+**/
 @name("Reroute Float")
 @description("Forward a float or vector unchanged. Used to tidy up the graph")
 @group("Other")
@@ -64,6 +70,9 @@ class RerouteFloat extends Reroute {
 	override function getRerouteType() : SgType return SgGeneric(0, ConstraintFloat);
 }
 
+/**
+	The shader graph node "Reroute Sampler" (Other): forwards a texture unchanged.
+**/
 @name("Reroute Sampler")
 @description("Forward a texture unchanged. Used to tidy up the graph")
 @group("Other")
@@ -71,6 +80,9 @@ class RerouteSampler extends Reroute {
 	override function getRerouteType() : SgType return SgSampler;
 }
 
+/**
+	The shader graph node "Reroute Bool" (Other): forwards a bool unchanged.
+**/
 @name("Reroute Bool")
 @description("Forward a bool unchanged. Used to tidy up the graph")
 @group("Other")
@@ -78,6 +90,9 @@ class RerouteBool extends Reroute {
 	override function getRerouteType() : SgType return SgBool;
 }
 
+/**
+	The shader graph node "Reroute Int" (Other): forwards an int unchanged.
+**/
 @name("Reroute Int")
 @description("Forward an int unchanged. Used to tidy up the graph")
 @group("Other")

@@ -2,6 +2,11 @@ package hrt.shgraph.nodes;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "Scene Depth" (Property): read depth behind current pixel.
+	Inputs: `uv` (default `"calculatedUV"`).
+	Outputs: `output`.
+**/
 @name("Scene Depth")
 @description("Read depth behind current pixel")
 @group("Property")

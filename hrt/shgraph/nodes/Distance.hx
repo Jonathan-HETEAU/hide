@@ -2,6 +2,11 @@ package hrt.shgraph.nodes;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "Distance" (Math): the distance between A and B.
+	Inputs: `a` (default `0.0`), `b` (default `0.0`).
+	Outputs: `output`.
+**/
 @name("Distance")
 @description("")
 @width(80)

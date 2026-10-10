@@ -2,6 +2,10 @@ package hrt.shgraph.nodes;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "ObjectScale" (Property): returns the scale of the object.
+	Outputs: `output`.
+**/
 @name("ObjectScale")
 @description("Returns the scale of the object")
 @group("Property")

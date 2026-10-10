@@ -2,6 +2,9 @@ package hrt.shgraph.nodes;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "Text" (Other): only UI, to add text.
+**/
 @name("Text")
 @description("Only UI, to add text")
 @group("Other")

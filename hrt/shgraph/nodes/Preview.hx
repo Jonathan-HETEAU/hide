@@ -6,6 +6,9 @@ using Lambda;
 using hxsl.Ast;
 
 
+/**
+	Displays the transparency of a node preview on a checkerboard.
+**/
 class AlphaPreview extends hxsl.Shader {
 	static var SRC = {
 		var pixelColor : Vec4;
@@ -26,6 +29,9 @@ class AlphaPreview extends hxsl.Shader {
 	}
 }
 
+/**
+	The shader graph node "Preview" (Output): displays its input, to debug.
+**/
 @name("Preview")
 @description("Preview node, just to debug :)")
 @group("Output")
@@ -33,6 +39,9 @@ class AlphaPreview extends hxsl.Shader {
 @noheader()
 class Preview extends ShaderNode {
 
+	/**
+		The id of the preview.
+	**/
 	public var previewID : Int = 1;
 
 	override function getInputs() {

@@ -5,6 +5,11 @@ import hxsl.*;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "Vec3" (Channel): create a vector of size 3 from 3 floats.
+	Inputs: `x` (default `0.0`), `y` (default `0.0`), `z` (default `0.0`).
+	Outputs: `output`.
+**/
 @name("Vec3")
 @description("Create a vector of size 3 from 3 floats")
 @group("Channel")

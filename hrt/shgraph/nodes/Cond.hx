@@ -4,6 +4,9 @@ using hxsl.Ast;
 
 import hrt.shgraph.AstTools.*;
 
+/**
+	The shader graph node "Condition" (Condition): create a custom condition between two inputs.
+**/
 @name("Condition")
 @description("Create a custom condition between two inputs")
 @group("Condition")

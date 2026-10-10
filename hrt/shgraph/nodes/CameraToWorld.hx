@@ -2,6 +2,11 @@ package hrt.shgraph.nodes;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "CameraToWorld" (Property): transform a position from camera space to world space.
+	Inputs: `input`.
+	Outputs: `output`.
+**/
 @name("CameraToWorld")
 @description("Transform a position from camera space to world space")
 @group("Property")

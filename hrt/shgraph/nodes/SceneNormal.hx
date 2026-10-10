@@ -2,6 +2,11 @@ package hrt.shgraph.nodes;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "Scene Normal" (Property): get scene normal behind current pixel.
+	Inputs: `uv` (default `calculatedUV`).
+	Outputs: `output`.
+**/
 @name("Scene Normal")
 @description("Get scene normal behind current pixel")
 @group("Property")

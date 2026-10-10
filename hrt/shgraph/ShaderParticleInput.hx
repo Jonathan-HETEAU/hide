@@ -2,13 +2,22 @@ package hrt.shgraph;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "Particle Inputs" (Input): reads a particle input (see `availableInputs`).
+**/
 @name("Particle Inputs")
 @description("Particle specific shader inputs")
 @group("Input")
 @color("#0e8826")
 class ShaderParticleInputs extends ShaderNode {
+	/**
+		The key of the input in `availableInputs`.
+	**/
 	@prop("Variable") public var variable : String = "life";
 
+	/**
+		Creates the node for an input.
+	**/
 	public function new(variable = "life") {
 		this.variable = variable;
 	}
@@ -49,6 +58,9 @@ class ShaderParticleInputs extends ShaderNode {
 		}
 	}
 
+	/**
+		The available inputs, by key.
+	**/
 	public static var availableInputs : Map<String, {display: String, g: Variables.Global}> = [
 		"life" => {display: "Particle Life", g: ParticleLife},
 		"lifetime" => {display: "Particle Life Time", g: ParticleLifeTime},

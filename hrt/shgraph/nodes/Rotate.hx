@@ -1,5 +1,10 @@
 package hrt.shgraph.nodes;
 
+/**
+	The shader graph node "Rotate" (UV): rotate UV around Center by Rotation radians.
+	Inputs: `uv` (default `calculatedUV`), `center` (default `0.5`), `rotation` (default `0.0`).
+	Outputs: `output`.
+**/
 @name("Rotate")
 @description("Rotate UV around Center by Rotation radians")
 @width(100)

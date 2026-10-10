@@ -2,6 +2,9 @@ package hrt.shgraph.nodes;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "Const Color" (Property): color property (static).
+**/
 @name("Const Color")
 @description("Color property (static)")
 @group("Property")

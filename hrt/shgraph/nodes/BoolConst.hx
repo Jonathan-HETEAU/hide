@@ -2,6 +2,9 @@ package hrt.shgraph.nodes;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "Const Bool" (Property): boolean input (static).
+**/
 @name("Const Bool")
 @description("Boolean input (static)")
 @group("Property")

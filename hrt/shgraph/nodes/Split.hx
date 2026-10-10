@@ -2,6 +2,11 @@ package hrt.shgraph.nodes;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "Split" (Channel): split all components of a vector into floats.
+	Inputs: `rgba`.
+	Outputs: `r`, `g`, `b`, `a`.
+**/
 @name("Split")
 @description("Split all components of a vector into floats")
 @group("Channel")

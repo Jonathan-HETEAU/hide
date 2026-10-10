@@ -2,6 +2,9 @@ package hrt.shgraph.nodes;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "Const Value" (Property): number input (static).
+**/
 @name("Const Value")
 @alias("Const Float")
 @description("Number input (static)")

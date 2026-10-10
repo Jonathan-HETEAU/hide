@@ -7,8 +7,17 @@ using Lambda;
 import hrt.shgraph.AstTools.*;
 import hrt.shgraph.SgHxslVar.ShaderDefInput;
 
+/**
+	The unit of an angle input of a node.
+**/
 enum abstract AngleUnit(String) {
+	/**
+		Radians.
+	**/
 	var Radian;
+	/**
+		Degrees.
+	**/
 	var Degree;
 }
 
@@ -42,10 +51,25 @@ function getAngleUnitDropdown(self: Dynamic, width: Float) : hide.Element {
 }
 #end
 
+/**
+	The type of an input or output of a shader graph node.
+**/
 enum SgType {
+	/**
+		A float (`dimension` 1) or a vector of `dimension` floats.
+	**/
 	SgFloat(dimension: Int);
+	/**
+		A texture.
+	**/
 	SgSampler;
+	/**
+		An integer.
+	**/
 	SgInt;
+	/**
+		A boolean.
+	**/
 	SgBool;
 
 	/**
@@ -158,73 +182,237 @@ function ConstraintFloat(newType: Type, previousType: Type) : Null<Type> {
 	}
 }
 
-typedef ShaderNodeDefInVar = {v: TVar, internal: Bool, ?defVal: ShaderDefInput, isDynamic: Bool};
-typedef ShaderNodeDefOutVar = {v: TVar, internal: Bool, isDynamic: Bool};
+/**
+	An input of a node definition.
+**/
+typedef ShaderNodeDefInVar = {
+	/**
+		The variable.
+	**/
+	var v : TVar;
+	/**
+		Tells if the input is hidden in the editor.
+	**/
+	var internal : Bool;
+	/**
+		The default value when not connected.
+	**/
+	var ?defVal : ShaderDefInput;
+	/**
+		Tells if the type is resolved from the connected types.
+	**/
+	var isDynamic : Bool;
+};
+/**
+	An output of a node definition.
+**/
+typedef ShaderNodeDefOutVar = {
+	/**
+		The variable.
+	**/
+	var v : TVar;
+	/**
+		Tells if the output is hidden in the editor.
+	**/
+	var internal : Bool;
+	/**
+		Tells if the type is resolved from the input types.
+	**/
+	var isDynamic : Bool;
+};
+/**
+	The HXSL definition of a node.
+**/
 typedef ShaderNodeDef = {
-	expr: TExpr,
-	inVars: Array<ShaderNodeDefInVar>, // If internal = true, don't show input in ui
-	outVars: Array<ShaderNodeDefOutVar>,
-	externVars: Array<TVar>, // other external variables like globals and stuff
-	inits: Array<{variable: TVar, value: Dynamic}>, // Default values for some variables
-	?__inits__: Array<{name: String, e:TExpr}>,
-	?functions: Array<TFunction>,
+	/**
+		The expression of the node.
+	**/
+	var expr : TExpr;
+	/**
+		The inputs.
+	**/
+	var inVars : Array<ShaderNodeDefInVar>;
+	/**
+		The outputs.
+	**/
+	var outVars : Array<ShaderNodeDefOutVar>;
+	/**
+		The other external variables, like globals.
+	**/
+	var externVars : Array<TVar>;
+	/**
+		The default values of variables.
+	**/
+	var inits : Array<{variable: TVar, value: Dynamic}>;
+	/**
+		The initialization expressions.
+	**/
+	var ?__inits__ : Array<{name: String, e:TExpr}>;
+	/**
+		The functions used by the expression.
+	**/
+	var ?functions : Array<TFunction>;
 };
 
+/**
+	A serialized connection between an output and an input.
+**/
 typedef Edge = {
-	?outputNodeId : Int,
-	?nameOutput : String, // Fallback if name has changed
-	?outputId : Int,
-	?inputNodeId : Int,
-	?nameInput : String, // Fallback if name has changed
-	?inputId : Int,
+	/**
+		The node of the output.
+	**/
+	var ?outputNodeId : Int;
+	/**
+		The name of the output, used if its id changed.
+	**/
+	var ?nameOutput : String;
+	/**
+		The output.
+	**/
+	var ?outputId : Int;
+	/**
+		The node of the input.
+	**/
+	var ?inputNodeId : Int;
+	/**
+		The name of the input, used if its id changed.
+	**/
+	var ?nameInput : String;
+	/**
+		The input.
+	**/
+	var ?inputId : Int;
 };
 
+/**
+	The connection of an input of a node.
+**/
 typedef Connection = {
-	from : ShaderNode,
-	outputId : Int,
+	/**
+		The node of the connected output.
+	**/
+	var from : ShaderNode;
+	/**
+		The connected output.
+	**/
+	var outputId : Int;
 };
 
+/**
+	A parameter of a shader graph: a shader parameter editable in the materials.
+**/
 typedef Parameter = {
-	name : String,
-	type : Type,
-	defaultValue : Dynamic,
-	?id : Int,
-	?variable : TVar,
-	?internal: Bool,
-	?min : Float,
-	?max : Float,
-	index : Int
+	/**
+		The name.
+	**/
+	var name : String;
+	/**
+		The type.
+	**/
+	var type : Type;
+	/**
+		The default value.
+	**/
+	var defaultValue : Dynamic;
+	/**
+		The id.
+	**/
+	var ?id : Int;
+	/**
+		The shader variable.
+	**/
+	var ?variable : TVar;
+	/**
+		Tells if the parameter is hidden in the material properties.
+	**/
+	var ?internal : Bool;
+	/**
+		The minimum value in the editor.
+	**/
+	var ?min : Float;
+	/**
+		The maximum value in the editor.
+	**/
+	var ?max : Float;
+	/**
+		The display order.
+	**/
+	var index : Int;
 };
 
+/**
+	The shader function of a graph.
+**/
 enum Domain {
+	/**
+		The vertex shader.
+	**/
 	Vertex;
+	/**
+		The fragment shader.
+	**/
 	Fragment;
 }
 
+/**
+	An external variable of the generated shader.
+**/
 @:structInit @:publicFields
-class
-ExternVarDef {
+class ExternVarDef {
+	/**
+		The variable.
+	**/
 	var v: TVar;
+	/**
+		The default value.
+	**/
 	var defValue: Dynamic;
 	var __init__: TExpr;
+	/**
+		The index of the parameter, or `null`.
+	**/
 	var paramIndex: Null<Int> = null;
 }
 
+/**
+	A local variable of a shader graph, read and written by the `VarRead` and `VarWrite` nodes.
+**/
 @:structInit @:publicFields
 class ShaderGraphVariable {
+	/**
+		The name.
+	**/
 	var name: String;
+	/**
+		The type.
+	**/
 	var type: SgType;
+	/**
+		The default value.
+	**/
 	var defValue: Dynamic;
+	/**
+		Tells if the value is edited as a color.
+	**/
 	var isColor: Bool = false;
+	/**
+		Tells if the variable is shared with the other shaders (a global).
+	**/
 	var isGlobal: Bool = false;
 }
 
+/**
+	Generates the HXSL expression of a graph, by sorting and generating its nodes.
+**/
 @:access(hrt.shgraph.Graph)
 class ShaderGraphGenContext {
 	var graph : Graph;
 
 	var includePreviews : Bool;
 
+	/**
+		Creates the context. `includePreviews` adds the preview outputs of the nodes.
+	**/
 	public function new(graph: Graph, includePreviews: Bool = false) {
 		this.graph = graph;
 		this.includePreviews = includePreviews;
@@ -238,6 +426,9 @@ class ShaderGraphGenContext {
 
 	var inputNodes : Array<Int> = [];
 
+	/**
+		Initializes the node data.
+	**/
 	public function initNodes() {
 		nodes = [];
 		for (id => node in graph.nodes) {
@@ -245,6 +436,9 @@ class ShaderGraphGenContext {
 		}
 	}
 
+	/**
+		Returns the expression of the graph.
+	**/
 	public function generate(?genContext: NodeGenContext) : TExpr {
 		initNodes();
 		var sortedNodes = sortGraph();
@@ -404,17 +598,32 @@ class ShaderGraphGenContext {
 	}
 }
 
+/**
+	A compiled shader graph in the cache.
+**/
 @:structInit
 class ShaderGraphCacheEntry {
+	/**
+		The modification time of the file.
+	**/
 	public var lastTime : Float;
+	/**
+		The compiled shader.
+	**/
 	public var def: hrt.prefab.Cache.ShaderDef;
 }
 
+/**
+	A shader made with nodes in the editor (`.shgraph` file): a vertex and a fragment graph, compiled to HXSL.
+**/
 @:privateAccess(hrt.shgraph.Graph)
 @:prefabHideInAddMenu
 class ShaderGraph extends hrt.prefab.Prefab {
 
 	var graphs : Array<Graph> = [];
+	/**
+		The local variables.
+	**/
 	public var variables : Array<ShaderGraphVariable> = [];
 
 	static var shaderGraphCache: Map<String, ShaderGraphCacheEntry> = [];
@@ -509,10 +718,16 @@ class ShaderGraph extends hrt.prefab.Prefab {
 		return json;
 	}
 
+	/**
+		Returns the serialized graph, as JSON.
+	**/
 	public function saveToText() : String {
 		return haxe.Json.stringify(save(), "\t");
 	}
 
+	/**
+		Returns the type of the dynamic inputs: the smallest vector connected to a dynamic input, or `TFloat`. Throws for incompatible types.
+	**/
 	static public function resolveDynamicType(inputTypes: Array<Type>, inVars: Array<ShaderNodeDefInVar>) : Type {
 		var dynamicType : Type = TFloat;
 		for (i => t in inputTypes) {
@@ -543,6 +758,9 @@ class ShaderGraph extends hrt.prefab.Prefab {
 		return dynamicType;
 	}
 
+	/**
+		Compiles the graph to a shader (cached at runtime). `previewDomain` compiles the preview of a domain, `explicitVarNames` keeps readable variable names.
+	**/
 	public function compile(options: {?previewDomain: Domain, ?explicitVarNames: Bool}) : hrt.prefab.Cache.ShaderDef {
 		var previewDomain = options.previewDomain;
 		#if !editor
@@ -723,6 +941,9 @@ class ShaderGraph extends hrt.prefab.Prefab {
 		return cachedDef;
 	}
 
+	/**
+		Compiles the graph and returns a shader with the default values of the parameters.
+	**/
 	public function makeShaderInstance() : hxsl.DynamicShader {
 		var def = compile({});
 		var s = new hxsl.DynamicShader(def.shader);
@@ -749,6 +970,9 @@ class ShaderGraph extends hrt.prefab.Prefab {
 
 	var allParameters = [];
 	var current_param_id = 0;
+	/**
+		The parameters, by id.
+	**/
 	public var parametersAvailable : Map<Int, Parameter> = [];
 
 	function generateParameter(name : String, type : Type) : TVar {
@@ -761,6 +985,9 @@ class ShaderGraph extends hrt.prefab.Prefab {
 			};
 	}
 
+	/**
+		Returns the parameter of an id.
+	**/
 	public function getParameter(id : Int) {
 		return parametersAvailable.get(id);
 	}
@@ -803,6 +1030,9 @@ class ShaderGraph extends hrt.prefab.Prefab {
 
 	}
 
+	/**
+		Renames a parameter. Returns `false` if the name is used.
+	**/
 	public function setParameterTitle(id : Int, newName : String) {
 		var p = parametersAvailable.get(id);
 		if (p != null) {
@@ -820,6 +1050,9 @@ class ShaderGraph extends hrt.prefab.Prefab {
 		return false;
 	}
 
+	/**
+		Sets the default value of a parameter. Returns `false` if it did not change.
+	**/
 	public function setParameterDefaultValue(id : Int, newDefaultValue : Dynamic) : Bool {
 		var p = parametersAvailable.get(id);
 		if (p != null) {
@@ -829,6 +1062,9 @@ class ShaderGraph extends hrt.prefab.Prefab {
 		return false;
 	}
 
+	/**
+		Removes a parameter.
+	**/
 	public function removeParameter(id : Int) {
 		parametersAvailable.remove(id);
 	}
@@ -843,6 +1079,9 @@ class ShaderGraph extends hrt.prefab.Prefab {
 		}
 	}
 
+	/**
+		Returns the graph of a domain.
+	**/
 	public function getGraph(domain: Domain) {
 		return graphs[domain.getIndex()];
 	}
@@ -853,6 +1092,9 @@ class ShaderGraph extends hrt.prefab.Prefab {
 	static var trimWhitepsaceEnd = ~/\s*$/;
 	static var removeLocal = ~/@local\s*/gm;
 
+	/**
+		Writes the compiled graph as a HXSL shader class in a `.hx` file under `src` (editor only).
+	**/
 	static public function convertToHXSL(shgraphPath: String, hxslPath: String) {
  		var shaderGraph = Std.downcast(hide.Ide.inst.loadPrefab(shgraphPath, null,  true), hrt.shgraph.ShaderGraph);
 
@@ -895,6 +1137,9 @@ class $className extends hxsl.Shader {
 	#end
 }
 
+/**
+	The graph of a domain of a `ShaderGraph`: its nodes and their connections.
+**/
 class Graph {
 
 	var cachedGen : ShaderNodeDef = null;
@@ -902,21 +1147,36 @@ class Graph {
 	var current_node_id = 0;
 	var nodes : Map<Int, ShaderNode> = [];
 
+	/**
+		The shader graph.
+	**/
 	public var parent : ShaderGraph = null;
 
+	/**
+		The domain.
+	**/
 	public var domain : Domain = Fragment;
 
 
+	/**
+		Creates an empty graph.
+	**/
 	public function new(parent: ShaderGraph, domain: Domain) {
 		this.parent = parent;
 		this.domain = domain;
 	}
 
+	/**
+		Loads the serialized nodes and edges.
+	**/
 	public function load(json : Dynamic) {
 		nodes = [];
 		generate(Reflect.getProperty(json, "nodes"), Reflect.getProperty(json, "edges"));
 	}
 
+	/**
+		Creates the nodes and edges.
+	**/
 	public function generate(nodes : Array<Dynamic>, edges : Array<Edge>) {
 		current_node_id = 0;
 		for (n in nodes) {
@@ -938,6 +1198,9 @@ class Graph {
 		}
 	}
 
+	/**
+		Tells if the edge can be added: the input and output exist, have compatible types, and the edge creates no cycle.
+	**/
 	public function canAddEdge(edge : Edge) {
 		var node = this.nodes.get(edge.inputNodeId);
 		var output = this.nodes.get(edge.outputNodeId);
@@ -1012,12 +1275,18 @@ class Graph {
 		return true;
 	}
 
+	/**
+		Returns the node writing the variable read by `read`, or `null`.
+	**/
 	public function findLocalVarWrite(read: hrt.shgraph.nodes.VarRead) : Null<hrt.shgraph.nodes.VarWrite> {
 		if (read == null)
 			return null;
 		return cast nodes.find((f) -> Std.downcast(f, hrt.shgraph.nodes.VarWrite)?.varId == read.varId);
 	}
 
+	/**
+		Connects an output to an input. Returns `false` if it is not possible.
+	**/
 	public function addEdge(edge : Edge, checkCycles: Bool = true) {
 		var node = this.nodes.get(edge.inputNodeId);
 		var output = this.nodes.get(edge.outputNodeId);
@@ -1077,10 +1346,16 @@ class Graph {
 		return true;
 	}
 
+	/**
+		Adds a node.
+	**/
 	public function addNode(shNode : ShaderNode) {
 		this.nodes.set(shNode.id, shNode);
 	}
 
+	/**
+		Tells if an output of type `output` can be connected to an input of type `input`.
+	**/
 	static public function areTypesCompatible(input: SgType, output: SgType) : Bool {
 		return switch (input) {
 			case SgFloat(_):
@@ -1097,6 +1372,9 @@ class Graph {
 		}
 	}
 
+	/**
+		Disconnects an input.
+	**/
 	public function removeEdge(idNode, inputId, update = true) {
 		var node = this.nodes.get(idNode);
 		if (node.connections[inputId] == null) return;
@@ -1104,20 +1382,32 @@ class Graph {
 		node.connections[inputId] = null;
 	}
 
+	/**
+		Moves a node.
+	**/
 	public function setPosition(idNode : Int, x : Float, y : Float) {
 		var node = this.nodes.get(idNode);
 		node.x = x;
 		node.y = y;
 	}
 
+	/**
+		Returns the nodes, by id.
+	**/
 	public function getNodes() {
 		return this.nodes;
 	}
 
+	/**
+		Returns the node of an id.
+	**/
 	public function getNode(id : Int) {
 		return this.nodes.get(id);
 	}
 
+	/**
+		Returns the parameter of an id, or `null`.
+	**/
 	public function getParameter(id : Int) {
 		return parent.getParameter(id);
 	}
@@ -1177,6 +1467,9 @@ class Graph {
 	}
 	#end
 
+	/**
+		Tells if the graph has a cycle.
+	**/
 	public function hasCycle() : Bool {
 		var ctx = new ShaderGraphGenContext(this, false);
 		@:privateAccess ctx.initNodes();
@@ -1184,10 +1477,16 @@ class Graph {
 		return res == null;
 	}
 
+	/**
+		Removes a node.
+	**/
 	public function removeNode(idNode : Int) {
 		this.nodes.remove(idNode);
 	}
 
+	/**
+		Returns the serialized nodes and edges.
+	**/
 	public function saveToDynamic() : Dynamic {
 		var edgesJson : Array<Edge> = [];
 		for (n in nodes) {

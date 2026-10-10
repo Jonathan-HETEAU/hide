@@ -2,6 +2,11 @@ package hrt.shgraph.nodes;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "Triplanar sampler" (Math): sample a texture using triplanar params.
+	Inputs: `texture`, `weight`, `uvX`, `uvY`, `uvZ`.
+	Outputs: `RGBA`.
+**/
 @name("Triplanar sampler")
 @description("Sample a texture using triplanar params")
 @width(160)

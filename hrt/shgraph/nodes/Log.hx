@@ -2,6 +2,11 @@ package hrt.shgraph.nodes;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "Log" (Math): the output is the result of log(x).
+	Inputs: `a` (default `0.0`).
+	Outputs: `output`.
+**/
 @name("Log")
 @description("The output is the result of log(x)")
 @width(80)

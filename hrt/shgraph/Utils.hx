@@ -1,6 +1,9 @@
 package hrt.shgraph;
 import haxe.macro.Expr;
 
+/**
+	Macros on arrays.
+**/
 class ArrayUtils {
 	/**
 		Returns arr[pos] if key if present, else execute def and puts it into arr[pos]

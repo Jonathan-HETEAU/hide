@@ -2,6 +2,11 @@ package hrt.shgraph.nodes;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "Square Wave" (Math): a square wave of period 1 oscilating between -1 and 1.
+	Inputs: `a` (default `0.0`).
+	Outputs: `output`.
+**/
 @name("Square Wave")
 @description("A square wave of period 1 oscilating between -1 and 1")
 @width(120)

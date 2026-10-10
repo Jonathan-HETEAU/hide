@@ -2,6 +2,11 @@ package hrt.shgraph.nodes;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "Linear Depth" (Property): linearize depth.
+	Inputs: `d`.
+	Outputs: `output`.
+**/
 @name("Linear Depth")
 @description("Linearize depth")
 @group("Property")

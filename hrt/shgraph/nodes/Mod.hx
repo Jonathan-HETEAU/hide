@@ -2,6 +2,11 @@ package hrt.shgraph.nodes;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "Modulo" (Math): the output is the result of X modulo MOD.
+	Inputs: `a` (default `0.0`), `b` (default `1.0`).
+	Outputs: `output`.
+**/
 @name("Modulo")
 @description("The output is the result of X modulo MOD")
 @width(80)

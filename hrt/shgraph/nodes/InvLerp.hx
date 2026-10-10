@@ -2,6 +2,11 @@ package hrt.shgraph.nodes;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "InvLerp" (Math): inverse linear interpolation : returns a value between 0 and 1 that indicated where value lies between A and B (0 <= A, 1 >= B).
+	Inputs: `a` (default `0.0`), `b` (default `1.0`), `value` (default `0.5`).
+	Outputs: `output`.
+**/
 @name("InvLerp")
 @description("Inverse linear interpolation : returns a value between 0 and 1 that indicated where value lies between A and B (0 <= A, 1 >= B)")
 @width(80)

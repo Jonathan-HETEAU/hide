@@ -2,13 +2,30 @@ package hrt.shgraph.nodes;
 
 using hxsl.Ast;
 
+/**
+	The space of the triplanar mapping.
+**/
 enum abstract TriplanarMode(String) from String to String {
+	/**
+		World space.
+	**/
 	var World;
+	/**
+		The space of the object.
+	**/
 	var Local;
+	/**
+		World space, rotated with the object.
+	**/
 	var LocalRotation;
 }
 var modes = [World, Local, LocalRotation];
 
+/**
+	The shader graph node "Triplanar params" (Math): returns parameters useful to sample a texture using triplanar mapping.
+	Inputs: `sharpness` (default `2.0`), `tiling` (default `1.0`), `offset` (default `0.0`).
+	Outputs: `weight`, `uvX`, `uvY`, `uvZ`.
+**/
 @name("Triplanar params")
 @description("Returns parameters useful to sample a texture using triplanar mapping")
 @width(160)

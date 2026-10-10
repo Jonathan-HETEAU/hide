@@ -2,6 +2,11 @@ package hrt.shgraph.nodes;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "Random3D" (Math): gives a random vec3 from a vec2 seed.
+	Inputs: `seed` (default `0.0`).
+	Outputs: `output`.
+**/
 @name("Random3D")
 @description("Gives a random vec3 from a vec2 seed")
 @width(80)

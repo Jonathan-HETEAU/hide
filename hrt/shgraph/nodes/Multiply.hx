@@ -2,6 +2,11 @@ package hrt.shgraph.nodes;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "Multiply" (Math): the output is the result of A * B.
+	Inputs: `a` (default `1.0`), `b` (default `1.0`).
+	Outputs: `output`.
+**/
 @name("Multiply")
 @description("The output is the result of A * B")
 @width(80)

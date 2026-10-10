@@ -3,22 +3,51 @@ package hrt.shgraph.nodes;
 using hxsl.Ast;
 
 
+/**
+	The filter of the `Sampler` node.
+**/
 enum abstract TexFilter(String) from String to String {
+	/**
+		Nearest.
+	**/
 	var Nearest;
+	/**
+		Linear.
+	**/
 	var Linear;
 }
 
 var filters = [Nearest, Linear];
 
+/**
+	The wrapping of the `Sampler` node.
+**/
 enum abstract TexWrap(String) from String to String {
+	/**
+		Clamped.
+	**/
 	var Clamp;
+	/**
+		Repeated.
+	**/
 	var Repeat;
+	/**
+		Clamped horizontally, repeated vertically.
+	**/
 	var ClampX;
+	/**
+		Clamped vertically, repeated horizontally.
+	**/
 	var ClampY;
 }
 
 var wraps = [Clamp, Repeat, ClampX, ClampY];
 
+/**
+	The shader graph node "Sample Texture 2D" (Property): get color from texture and UV.
+	Inputs: `texture`, `uv` (default `calculatedUV`).
+	Outputs: `RGBA`.
+**/
 @name("Sample Texture 2D")
 @description("Get color from texture and UV")
 @group("Property")

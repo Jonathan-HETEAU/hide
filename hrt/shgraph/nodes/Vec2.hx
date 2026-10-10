@@ -5,6 +5,11 @@ import hxsl.*;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "Vec2" (Channel): create a vector of size 2 from 2 floats.
+	Inputs: `x` (default `0.0`), `y` (default `0.0`).
+	Outputs: `output`.
+**/
 @name("Vec2")
 @description("Create a vector of size 2 from 2 floats")
 @group("Channel")

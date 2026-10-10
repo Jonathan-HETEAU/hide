@@ -2,6 +2,11 @@ package hrt.shgraph.nodes;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "Power" (Math): the output is the result of x ^ b.
+	Inputs: `a` (default `0.0`), `b` (default `2.0`).
+	Outputs: `output`.
+**/
 @name("Power")
 @description("The output is the result of x ^ b")
 @width(80)

@@ -2,6 +2,11 @@ package hrt.shgraph.nodes;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "Deg to Rad" (Math): convert an angle in degree to an angle in radians.
+	Inputs: `a` (default `0.0`).
+	Outputs: `output`.
+**/
 @name("Deg to Rad")
 @description("Convert an angle in degree to an angle in radians")
 @width(80)

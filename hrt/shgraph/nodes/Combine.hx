@@ -5,6 +5,11 @@ import hxsl.*;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "Combine" (Channel): create a vector of size 4 from 4 floats.
+	Inputs: `r` (default `0.0`), `g` (default `0.0`), `b` (default `0.0`), `a` (default `0.0`).
+	Outputs: `output`.
+**/
 @name("Combine")
 @description("Create a vector of size 4 from 4 floats")
 @group("Channel")

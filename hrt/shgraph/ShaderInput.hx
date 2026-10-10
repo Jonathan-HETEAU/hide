@@ -2,18 +2,36 @@ package hrt.shgraph;
 
 using hxsl.Ast;
 
+/**
+	The kind of a `ShaderInput`.
+**/
 enum InputKind {
+	/**
+		A global variable.
+	**/
 	IGlobal(g: Variables.Global);
+	/**
+		A custom expression of type `t`.
+	**/
 	ICustom(gen:(ctx:NodeGenContext) -> TExpr, t: hxsl.Ast.Type);
 }
 
+/**
+	The shader graph node "Inputs" (Input): reads a shader input of Heaps (see `availableInputs`).
+**/
 @name("Inputs")
 @description("Shader inputs of Heaps, it's dynamic")
 @group("Input")
 @color("#0e8826")
 class ShaderInput extends ShaderNode {
+	/**
+		The key of the input in `availableInputs`.
+	**/
 	@prop("Variable") public var variable : String = "pixelColor";
 
+	/**
+		Creates the node for an input.
+	**/
 	public function new(variable = "pixelColor") {
 		this.variable = variable;
 	}
@@ -70,6 +88,9 @@ class ShaderInput extends ShaderNode {
 	}
 
 
+	/**
+		The available inputs, by key.
+	**/
 	public static var availableInputs : Map<String, {display: String, k: InputKind}> = [
 		"pixelColor" => {display: "Pixel Color", k: ICustom((ctx:NodeGenContext) -> makeSwizzle(ctx.getGlobalInput(PixelColor), [X,Y,Z]), TVec(3, VFloat))},
 		"alpha" => {display: "Alpha", k: ICustom((ctx:NodeGenContext) -> makeSwizzle(ctx.getGlobalInput(PixelColor), [W]), TFloat)},

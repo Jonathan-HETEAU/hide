@@ -2,6 +2,11 @@ package hrt.shgraph.nodes;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "UV Scroll" (UV): scroll UV according to U & V speed.
+	Inputs: `uv` (default `"calculatedUV"`), `uSpeed` (default `1.0`), `vSpeed` (default `1.0`), `time` (default `"global.time"`).
+	Outputs: `output`.
+**/
 @name("UV Scroll")
 @description("Scroll UV according to U & V speed")
 @group("UV")

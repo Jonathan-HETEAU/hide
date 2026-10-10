@@ -1,5 +1,10 @@
 package hrt.shgraph.nodes;
 
+/**
+	The shader graph node "Remap" (Math): remap value in range [inMin, inMax] to range [outMin, outMax].
+	Inputs: `input` (default `0.0`), `inMin` (default `0.0`), `inMax` (default `1.0`), `outMin` (default `0.0`), `outMax` (default `1.0`).
+	Outputs: `output`.
+**/
 @name("Remap")
 @description("Remap value in range [inMin, inMax] to range [outMin, outMax]")
 @width(100)

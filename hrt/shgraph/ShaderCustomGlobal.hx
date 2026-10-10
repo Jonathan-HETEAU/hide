@@ -1,12 +1,21 @@
 package hrt.shgraph;
 
+/**
+	The shader graph node "Custom Global" (Input): reads a shader global by name.
+**/
 @name("Custom Global")
 @description("Custom shader global input")
 @group("Input")
 @color("#0e8826")
 class ShaderCustomGlobal extends ShaderNode {
 
+	/**
+		The name of the global (`vec4(0, 0, 0, 1)` if empty).
+	**/
 	@prop() public var name : String = "";
+	/**
+		The type of the global: `vec4`, `vec3`, `vec2`, `float`, `int`, `bool` or `sampler`.
+	**/
 	@prop() public var type : String = "vec4";
 
 	static var types : Map<String, {display: String, type: SgType}> = [

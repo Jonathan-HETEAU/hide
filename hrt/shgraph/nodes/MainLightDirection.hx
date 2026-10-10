@@ -2,6 +2,10 @@ package hrt.shgraph.nodes;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "MainLightDirection" (Property): get the main light direction.
+	Outputs: `output`.
+**/
 @name("MainLightDirection")
 @description("Get the main light direction")
 @group("Property")

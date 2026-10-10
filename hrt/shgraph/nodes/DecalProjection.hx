@@ -2,6 +2,10 @@ package hrt.shgraph.nodes;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "Decal Projection" (UV): compute decal projection.
+	Outputs: `output`.
+**/
 @name("Decal Projection")
 @description("Compute decal projection")
 @group("UV")

@@ -1,5 +1,10 @@
 package hrt.shgraph.nodes;
 
+/**
+	The shader graph node "Tiling and Offset" (UV): tiles and offsets the value of input UV by the inputs Tiling and Offset respectively. Output is uv * tiling + offset.
+	Inputs: `uv` (default `calculatedUV`), `tiling` (default `1.0`), `offset` (default `0.0`).
+	Outputs: `output`.
+**/
 @name("Tiling and Offset")
 @description("Tiles and offsets the value of input UV by the inputs Tiling and Offset respectively. Output is uv * tiling + offset")
 @width(120)

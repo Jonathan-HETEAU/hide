@@ -1,5 +1,8 @@
 package hrt.shgraph;
 
+/**
+	A type of the old shader graph nodes.
+**/
 enum SType {
 	/** Bool **/
 	Bool;
@@ -25,8 +28,14 @@ enum SType {
 	Variant;
 }
 
+/**
+	Conversions between `SType` and HXSL types.
+**/
 class ShaderType {
 
+	/**
+		Returns the HXSL type of a `SType`.
+	**/
 	static public function getType(type : SType) : hxsl.Ast.Type {
 		switch (type) {
 			case Vec2:
@@ -52,6 +61,9 @@ class ShaderType {
 		return null;
 	}
 
+	/**
+		Returns the `SType` of a HXSL type (`Variant` if none).
+	**/
 	static public function getSType(type : hxsl.Ast.Type) : SType {
 		switch (type) {
 			case TVec(2, VFloat):
@@ -77,10 +89,16 @@ class ShaderType {
 		return Variant;
 	}
 
+	/**
+		Tells if one type converts to the other.
+	**/
 	static public function checkCompatibilities (a : SType, b : SType) : Bool {
 		return (checkConversion(a, b) || checkConversion(b, a));
 	}
 
+	/**
+		Tells if `from` converts to `to`.
+	**/
 	static public function checkConversion(from : SType, to : SType) {
 		switch (to) {
 			case Vec2:

@@ -2,6 +2,11 @@ package hrt.shgraph.nodes;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "ScreenToWorld" (Property): transform a position from screen space to world space.
+	Inputs: `input`.
+	Outputs: `output`.
+**/
 @name("ScreenToWorld")
 @description("Transform a position from screen space to world space")
 @group("Property")

@@ -2,6 +2,11 @@ package hrt.shgraph.nodes;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "Triangle Wave" (Math): a triangle wave of period 1 oscilating between -1 and 1.
+	Inputs: `a` (default `0.0`).
+	Outputs: `output`.
+**/
 @name("Triangle Wave")
 @description("A triangle wave of period 1 oscilating between -1 and 1")
 @width(120)

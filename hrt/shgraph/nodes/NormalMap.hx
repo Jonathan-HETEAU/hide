@@ -2,6 +2,11 @@ package hrt.shgraph.nodes;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "Normal map" (Math): returns normal in world space using a normal map.
+	Inputs: `texture`, `uv` (default `calculatedUV`).
+	Outputs: `normalWS`.
+**/
 @name("Normal map")
 @description("Returns normal in world space using a normal map")
 @width(160)

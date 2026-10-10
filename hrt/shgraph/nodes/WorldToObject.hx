@@ -2,6 +2,11 @@ package hrt.shgraph.nodes;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "WorldToObject" (Property): transform a position from world space to object space.
+	Inputs: `input`.
+	Outputs: `output`.
+**/
 @name("WorldToObject")
 @description("Transform a position from world space to object space")
 @group("Property")

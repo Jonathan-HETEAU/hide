@@ -2,13 +2,25 @@ package hrt.shgraph;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "Parameter": reads a parameter of the graph.
+**/
 @name("Parameter")
 @width(120)
 @color("#d6d6d6")
 class ShaderParam extends ShaderNode {
+	/**
+		The id of the parameter.
+	**/
 	@prop() public var parameterId : Int;
+	/**
+		Makes the parameter per instance.
+	**/
 	@prop() public var perInstance : Bool;
 
+	/**
+		Creates the node.
+	**/
 	public function new() {
 
 	}

@@ -2,6 +2,11 @@ package hrt.shgraph.nodes;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "Normalize" (Math): the output is the result of normalize(x).
+	Inputs: `a` (default `0.0`).
+	Outputs: `output`.
+**/
 @name("Normalize")
 @description("The output is the result of normalize(x)")
 @width(80)

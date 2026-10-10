@@ -1,6 +1,11 @@
 
 package hrt.shgraph.nodes;
 
+/**
+	The shader graph node "Project" (Math): project the given world space vector into view space.
+	Inputs: `a` (default `0.0`).
+	Outputs: `out`.
+**/
 @name("Project")
 @description("Project the given world space vector into view space")
 @width(100)

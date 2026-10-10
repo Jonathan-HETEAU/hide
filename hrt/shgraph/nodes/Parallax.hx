@@ -2,6 +2,11 @@ package hrt.shgraph.nodes;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "Parallax" (UV): parallaxed uv offset.
+	Inputs: `cameraPosition` (default `"camera.position"`), `range` (default `1.0`).
+	Outputs: `output`.
+**/
 @name("Parallax")
 @description("Parallaxed uv offset")
 @group("UV")

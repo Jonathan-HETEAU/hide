@@ -2,6 +2,11 @@ package hrt.shgraph.nodes;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "One minus" (Math): returns 1 - a.
+	Inputs: `a` (default `0.0`).
+	Outputs: `output`.
+**/
 @name("One minus")
 @description("Returns 1 - a")
 @width(80)

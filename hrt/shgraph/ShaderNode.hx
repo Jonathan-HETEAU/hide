@@ -16,6 +16,9 @@ import hide.view.GraphInterface;
 #end
 
 
+/**
+	Displays the transparency of a node preview on a checkerboard.
+**/
 class AlphaPreview extends hxsl.Shader {
 	static var SRC = {
 		var pixelColor : Vec4;
@@ -36,10 +39,85 @@ class AlphaPreview extends hxsl.Shader {
 	}
 }
 
-typedef InputInfo = {name: String, type: SgType, def: ShaderDefInput, ?inlineEditable: Bool};
-typedef OutputInfo = {name: String, type: SgType};
-typedef VariableDecl = {v: TVar, display: String, ?vertexOnly: Bool};
-typedef AliasInfo = {?nameSearch: String, ?nameOverride : String, ?description : String, ?args : Array<Dynamic>, ?group: String};
+/**
+	An input of a node.
+**/
+typedef InputInfo = {
+	/**
+		The name.
+	**/
+	var name : String;
+	/**
+		The type.
+	**/
+	var type : SgType;
+	/**
+		The default value when not connected.
+	**/
+	var def : ShaderDefInput;
+	/**
+		Tells if the default value can be edited on the node.
+	**/
+	var ?inlineEditable : Bool;
+};
+/**
+	An output of a node.
+**/
+typedef OutputInfo = {
+	/**
+		The name.
+	**/
+	var name : String;
+	/**
+		The type.
+	**/
+	var type : SgType;
+};
+/**
+	A variable available as a node input or output.
+**/
+typedef VariableDecl = {
+	/**
+		The variable.
+	**/
+	var v : TVar;
+	/**
+		The display name.
+	**/
+	var display : String;
+	/**
+		Tells if the variable is only available in the vertex shader.
+	**/
+	var ?vertexOnly : Bool;
+};
+/**
+	Another entry of a node in the node menu.
+**/
+typedef AliasInfo = {
+	/**
+		The name used by the search.
+	**/
+	var ?nameSearch : String;
+	/**
+		The name of the node.
+	**/
+	var ?nameOverride : String;
+	/**
+		The description.
+	**/
+	var ?description : String;
+	/**
+		The arguments of the node constructor.
+	**/
+	var ?args : Array<Dynamic>;
+	/**
+		The group.
+	**/
+	var ?group : String;
+};
+/**
+	A node of a shader graph. Subclasses are registered automatically, and declare their inputs and outputs (`getInputs`, `getOutputs`) and generate their expressions (`generate`). The fields with `@prop` metadata are saved.
+**/
 @:autoBuild(hrt.shgraph.Macros.autoRegisterNode())
 @:keepSub
 @:keep
@@ -49,29 +127,59 @@ implements hide.view.GraphInterface.IGraphNode
 #end
 {
 
+	/**
+		The id in the graph.
+	**/
 	public var id : Int;
+	/**
+		The X position in the editor.
+	**/
 	public var x : Float;
+	/**
+		The Y position in the editor.
+	**/
 	public var y : Float;
+	/**
+		Shows the preview of the node in the editor.
+	**/
 	public var showPreview : Bool = true;
+	/**
+		The graph.
+	**/
 	public var graph : ShaderGraph.Graph;
 
+	/**
+		The displayed name, or `null` for the name of the class.
+	**/
 	@prop public var nameOverride : String;
 
 
 	#if editor
 	/** Types of the inputs/outputs with their dynamic types resolved, set by Graph.resolveTypes() (null entries are unresolved) **/
 	public var resolvedInputTypes : Array<Null<SgType>> = null;
+	/**
+		The types of the outputs, with their dynamic types resolved by `Graph.resolveTypes` (`null` entries are unresolved; editor only).
+	**/
 	public var resolvedOutputTypes : Array<Null<SgType>> = null;
 
+	/**
+		Returns the resolved type of an input (editor only).
+	**/
 	public function getResolvedInputType(id: Int) : Null<SgType> {
 		return (resolvedInputTypes != null ? resolvedInputTypes[id] : null) ?? getInputs()[id]?.type;
 	}
 
+	/**
+		Returns the resolved type of an output (editor only).
+	**/
 	public function getResolvedOutputType(id: Int) : Null<SgType> {
 		return (resolvedOutputTypes != null ? resolvedOutputTypes[id] : null) ?? getOutputs()[id]?.type;
 	}
 
 	// IGraphNode Interface
+	/**
+		Returns the display information of the node (editor only).
+	**/
 	public function getInfo() : GraphNodeInfo {
 		var metas = haxe.rtti.Meta.getType(HaxeType.getClass(this));
 		return {
@@ -169,35 +277,59 @@ implements hide.view.GraphInterface.IGraphNode
 		}
 	}
 
+	/**
+		Returns the id.
+	**/
 	public function getId() : Int {
 		return id;
 	}
 
+	/**
+		Sets `p` to the position.
+	**/
 	public function getPos(p : h2d.col.Point) : Void {
 		p.set(x,y);
 	}
 
+	/**
+		Sets the position.
+	**/
 	public function setPos(p : h2d.col.Point) : Void {
 		x = p.x;
 		y = p.y;
 	}
 
+	/**
+		Returns the elements editing the properties of the node (editor only).
+	**/
 	public function getPropertiesHTML(width : Float) : Array<hide.Element> {
 		return [];
 	}
 
+	/**
+		The graph editor (editor only).
+	**/
 	public var editor : hide.view.GraphEditor;
 
+	/**
+		Sets the default value of an input and recompiles (editor only).
+	**/
 	public function setDefaultParam(name: String, value: String) {
 		Reflect.setField(defaults, name, Std.parseFloat(value));
 		requestRecompile();
 	}
 
+	/**
+		Asks the shader editor to recompile (editor only).
+	**/
 	public function requestRecompile() {
 		Std.downcast(editor.editor, hide.view.shadereditor.ShaderEditor)?.requestRecompile();
 	}
 	#end
 
+	/**
+		Returns the serialized node.
+	**/
 	public function serializeToDynamic() : Dynamic {
 		return {
 			x: x,
@@ -208,6 +340,9 @@ implements hide.view.GraphInterface.IGraphNode
 		};
 	}
 
+	/**
+		Creates a node from its serialized data.
+	**/
 	public static function createFromDynamic(data: Dynamic, graph: ShaderGraph.Graph) : ShaderNode {
 		var type = std.Type.resolveClass(data.type);
 		var inst = std.Type.createInstance(type, []);
@@ -220,6 +355,9 @@ implements hide.view.GraphInterface.IGraphNode
 		return inst;
 	}
 
+	/**
+		The default values of the inputs, by name.
+	**/
 	public var defaults : Dynamic = {};
 
 	/**
@@ -252,6 +390,9 @@ implements hide.view.GraphInterface.IGraphNode
 		return cast(value, Float);
 	}
 
+	/**
+		Returns the other entries of the node in the node menu, from its `@alias` metadata.
+	**/
 	public function getAliases(name: String, group: String, description: String) : Array<AliasInfo> {
 		var cl = HaxeType.getClass(this);
 		var meta = haxe.rtti.Meta.getType(cl);
@@ -264,12 +405,21 @@ implements hide.view.GraphInterface.IGraphNode
 		}
 		return aliases;
 	}
+	/**
+		The connections of the inputs, by input id.
+	**/
 	public var connections : Array<ShaderGraph.Connection> = [];
 
+	/**
+		Sets the id.
+	**/
 	public function setId(id : Int) {
 		this.id = id;
 	}
 
+	/**
+		Loads the saved properties.
+	**/
 	public function loadProperties(props : Dynamic) {
 		var fields = Reflect.fields(props);
 		showPreview = props.showPreview ?? true;
@@ -287,14 +437,23 @@ implements hide.view.GraphInterface.IGraphNode
 		}
 	}
 
+	/**
+		Tells if the preview is shown.
+	**/
 	final public function shouldShowPreview() : Bool {
 		return showPreview && canHavePreview();
 	}
 
+	/**
+		Tells if the node can have a preview. Returns `true` by default.
+	**/
 	public function canHavePreview() : Bool {
 		return true;
 	}
 
+	/**
+		Returns the properties to save: the `@prop` fields and the default values.
+	**/
 	public function saveProperties() : Dynamic {
 		var parameters : Dynamic = {};
 
@@ -329,13 +488,22 @@ implements hide.view.GraphInterface.IGraphNode
 	}
 
 	#if editor
+	/**
+		Returns the elements editing the properties of the node (editor only).
+	**/
 	final public function getHTML(width: Float, config: hide.Config) {
 		var props = getPropertiesHTML(width);
 		return props;
 	}
 
+	/**
+		The node classes, by name (editor only).
+	**/
 	static public var registeredNodes = new Map<String, Class<ShaderNode>>();
 
+	/**
+		Registers a node class (editor only).
+	**/
 	static public function register(key : String, cl : Class<ShaderNode>) : Bool {
 		registeredNodes.set(key, cl);
 		return true;

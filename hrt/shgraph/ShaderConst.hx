@@ -2,8 +2,14 @@ package hrt.shgraph;
 
 using hxsl.Ast;
 
+/**
+	A node with a constant name (no output).
+**/
 class ShaderConst extends ShaderNode {
 
+	/**
+		The name.
+	**/
 	@prop() public var name : String = "";
 
 	override function generate(ctx:NodeGenContext) {

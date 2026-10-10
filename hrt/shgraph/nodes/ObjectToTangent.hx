@@ -2,6 +2,11 @@ package hrt.shgraph.nodes;
 
 using hxsl.Ast;
 
+/**
+	The shader graph node "ObjectToTangent" (Property): transform a direction from object space to tangent space.
+	Inputs: `direction`.
+	Outputs: `output`.
+**/
 @name("ObjectToTangent")
 @description("Transform a direction from object space to tangent space")
 @group("Property")
