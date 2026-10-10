@@ -5,6 +5,9 @@ import haxe.macro.Context;
 import haxe.macro.Type;
 using haxe.macro.ExprTools;
 
+/**
+	Macros of the editor tools.
+**/
 class Macros {
 
 	#if macro

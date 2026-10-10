@@ -2,7 +2,13 @@ package hide.kit;
 
 #if domkit
 
+/**
+	A line of sliders that can be locked together.
+**/
 class SliderGroup extends Line {
+	/**
+		Changes all the sliders together.
+	**/
 	public var isLocked : Bool = true;
 
 	var labelGroup : NativeElement;

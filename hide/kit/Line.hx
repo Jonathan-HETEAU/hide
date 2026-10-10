@@ -2,14 +2,32 @@ package hide.kit;
 
 #if domkit
 
+/**
+	A line, with a label and content.
+**/
 class Line extends Element {
+	/**
+		The label.
+	**/
 	@:attr public var label: String;
+	/**
+		Shows the content under the label.
+	**/
 	@:attr public var multiline: Bool = false;
+	/**
+		Takes the whole width, without label column.
+	**/
 	@:attr public var full: Bool = false;
 
 	var decorationsLeft: Array<Element> = null;
 
+	/**
+		The label element.
+	**/
 	public var labelElement: NativeElement;
+	/**
+		The content element of a multiline line.
+	**/
 	public var multilineElement: NativeElement;
 	override function get_nativeContent():NativeElement {
 		return multilineElement ?? native;

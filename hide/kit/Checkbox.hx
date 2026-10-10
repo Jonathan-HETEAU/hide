@@ -2,6 +2,9 @@ package hide.kit;
 
 #if domkit
 
+/**
+	A checkbox.
+**/
 class Checkbox extends Widget<Bool> {
 	#if js
 	var checkbox : js.html.InputElement;

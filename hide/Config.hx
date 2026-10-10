@@ -13,83 +13,203 @@ typedef ConfigField = {
 }
 #end
 
+/**
+	The global settings of the editor, per user (the `hide` field of the global `props.json`).
+**/
 typedef HideGlobalConfig = {
+	/**
+		Saves the layout of the panels automatically.
+	**/
 	var autoSaveLayout : Null<Bool>;
+	/**
+		Uses the alternate font.
+	**/
 	var useAlternateFont : Null<Bool>;
 
+	/**
+		The path of the current project.
+	**/
 	var currentProject : String;
+	/**
+		The paths of the recent projects, most recent first.
+	**/
 	var recentProjects : Array<String>;
 
+	/**
+		The position and size of the window, and if it is maximized.
+	**/
 	var windowPos : { x : Int, y : Int, w : Int, h : Int, max : Bool };
 
+	/**
+		The layout of the scene editor columns.
+	**/
 	@:optional var sceneEditorLayout : { colsVisible : Bool, colsCombined : Bool };
 
 	// General
+	/**
+		Saves the prefabs automatically.
+	**/
 	var autoSavePrefab : Bool;
+	/**
+		Shows the SVN versioned files in the file tree.
+	**/
 	var svnShowVersionedFiles : Bool;
+	/**
+		Shows the SVN modified files in the file tree.
+	**/
 	var svnShowModifiedFiles : Bool;
+	/**
+		Enables the formulas of CastleDB.
+	**/
 	var enableDBFormulas : Bool;
+	/**
+		The resolution of the screen captures.
+	**/
 	var screenCaptureResolution : Int;
+	/**
+		The minimum distance to the camera of the objects dragged in the scene.
+	**/
 	var minDistFromCameraOnDrag : Float;
+	/**
+		Escape cancels the changes of the color picker.
+	**/
 	var colorPickerEscUndo : Bool;
 
 
 	// Search
+	/**
+		Closes the search when a file is opened.
+	**/
 	var closeSearchOnFileOpen : Bool;
+	/**
+		Closes the search when the CastleDB sheet changes.
+	**/
 	var closeSearchOnCDBSheetChange : Bool;
+	/**
+		The delay before searching while typing, in milliseconds.
+	**/
 	var typingDebounceThreshold : Int;
 
 	// Performance
+	/**
+		Tracks the GPU allocations.
+	**/
 	var trackGpuAlloc : Bool;
+	/**
+		Reduces the frame rate when the window is not focused.
+	**/
 	var unfocusCPUSavingMode : Bool;
 
 	// Scene Editor
+	/**
+		Orients the meshes dragged in the scene along the surface.
+	**/
 	var orientMeshOnDrag : Bool;
+	/**
+		Places the objects dragged in the scene on the surfaces.
+	**/
 	var collisionOnDrag : Bool;
+	/**
+		Clicking again cycles through the objects under the mouse.
+	**/
 	var sceneEditorClickCycleObjects : Bool;
 
 	// hidehl
+	/**
+		Shows the scene editor sidebar vertically (HL editor).
+	**/
 	var sceneEditorVerticalSidebar: Bool;
 
 	// CDB
+	/**
+		Starts searching when typing in CastleDB.
+	**/
 	var searchOnKeyPress : Bool;
+	/**
+		Highlights the active line in CastleDB.
+	**/
 	var highlightActiveLine : Bool;
+	/**
+		Highlights the header of the active line in CastleDB.
+	**/
 	var highlightActiveLineHeader : Bool;
+	/**
+		Highlights the header of the active column in CastleDB.
+	**/
 	var highlightActiveColumnHeader : Bool;
 
 	// Filebrowser
+	/**
+		Ignores the thumbnail cache of the file browser (debug).
+	**/
 	var filebrowserDebugIgnoreThumbnailCache : Bool;
+	/**
+		Logs the commands of the thumbnail server (debug).
+	**/
 	var filebrowserDebugServerCommands : Bool;
+	/**
+		Shows the window of the thumbnail generator (debug).
+	**/
 	var filebrowserDebugShowWindow : Bool;
+	/**
+		Shows the debug menu of the file browser.
+	**/
 	var filebrowserDebugShowMenu : Bool;
 };
 
+/**
+	The content of a `props.json` file.
+**/
 typedef ConfigDef = {
+	/**
+		The editor settings.
+	**/
 	var hide : {};
 };
 
+/**
+	A `props.json` configuration file, merged over its parent configuration. Fields ending with `+` append to the parent arrays.
+**/
 class Config {
 #if !macro
 
 	var ide : Ide;
 	var parent : Config;
+	/**
+		The path of the file, or `null`.
+	**/
 	public var path(default,null) : String;
+	/**
+		The content of the file.
+	**/
 	public var source(default, null) : ConfigDef = cast {};
+	/**
+		The merged configuration.
+	**/
 	public var current : ConfigDef = cast {};
 
 	var prevConfig: String = null;
 
+	/**
+		Creates a configuration over `parent`.
+	**/
 	public function new( ?parent : Config ) {
 		ide = Ide.inst;
 		this.parent = parent;
 		sync();
 	}
 
+	/**
+		Tells if the file is in the project.
+	**/
 	public function isLocal() {
 		if( path == null && parent != null ) return parent.isLocal();
 		return path == null || StringTools.startsWith(path, ide.projectDir);
 	}
 
+	/**
+		Loads a file (empty if missing). Throws if it is invalid.
+	**/
 	public function load( path : String ) {
 		this.path = path;
 		var fullPath = ide.getPath(path);
@@ -100,6 +220,9 @@ class Config {
 		sync();
 	}
 
+	/**
+		Saves the file.
+	**/
 	public function save() {
 		ide.removeDefaultValues();
 		sync();
@@ -167,6 +290,9 @@ class Config {
 
 	#end
 
+	/**
+		Merges the parent configuration and the source again.
+	**/
 	public function sync() {
 		if( parent != null ) parent.sync();
 		current = cast {};
@@ -210,12 +336,18 @@ class Config {
 		}
 	}
 
+	/**
+		Returns a value of the merged configuration, or `defaultVal`.
+	**/
 	public function get( key : String, ?defaultVal : Dynamic ) : Dynamic {
 		var val = Reflect.field(current,key);
 		if(val != null) return val;
 		return defaultVal;
 	}
 
+	/**
+		Returns a value defined in the project files, or `defaultVal`.
+	**/
 	public function getLocal( key : String, ?defaultVal : Dynamic ) : Dynamic {
 		var v = get(key);
 		if( v == null ) return defaultVal;
@@ -224,6 +356,9 @@ class Config {
 		return parent.getLocal(key,defaultVal);
 	}
 
+	/**
+		Sets a value in the source (removed if `null`) and saves.
+	**/
 	public function set( key : String, val : Dynamic ) {
 		if (val == Reflect.field(current, key))
 			return;
@@ -246,6 +381,9 @@ class Config {
 		#end
 	}
 
+	/**
+		Loads a file into a configuration, alerting on error.
+	**/
 	public static function loadConfig(config : Config, path : String) : Config {
 		try {
 			config.load(path);
@@ -255,6 +393,9 @@ class Config {
 		return config;
 	}
 
+	/**
+		Loads the configurations of a project: defaults, user globals, project and user project.
+	**/
 	public static function loadForProject( projectPath : String, resourcePath : String, appDataPath : String ) {
 		var hidePath = Ide.inst.appPath;
 
@@ -309,6 +450,9 @@ class Config {
 		};
 	}
 
+	/**
+		Returns the configuration of a file, merging the `props.json` files of its folders.
+	**/
 	public static function loadForFile( ide : hide.tools.IdeData, path : String ) {
 		var parts = path.split("/");
 		var propFiles = [];

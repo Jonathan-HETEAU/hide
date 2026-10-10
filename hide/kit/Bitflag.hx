@@ -2,6 +2,9 @@ package hide.kit;
 
 #if domkit
 
+/**
+	A checkbox editing a bit of an integer.
+**/
 class Bitflag extends Widget<Int> {
 	#if js
 	var checkbox : js.html.InputElement;
@@ -10,6 +13,9 @@ class Bitflag extends Widget<Int> {
 	#end
 
 	var bit: Int;
+	/**
+		Creates the widget for the bit `bit`.
+	**/
 	public function new(parent: Element, id: String, bit: Int) {
 		super(parent, id);
 		this.bit = bit;

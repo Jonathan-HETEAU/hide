@@ -2,7 +2,13 @@ package hide.kit;
 
 #if domkit
 
+/**
+	An editable list of items, with add, remove and reorder.
+**/
 class List<T> extends Widget<Array<T>> {
+	/**
+		Keeps the list open.
+	**/
 	public var noCollapse = false;
 
 	var openState : Bool;
@@ -14,14 +20,23 @@ class List<T> extends Widget<Array<T>> {
 
 	var currentDragIndex = -1;
 
+	/**
+		Builds the elements of an item.
+	**/
 	public dynamic function makeLine(header: hide.kit.Element, content: hide.kit.Element, item: T, index:Int) : Void {
 
 	}
 
+	/**
+		Returns a new item.
+	**/
 	public dynamic function createItem() : T {
 		return cast {};
 	}
 
+	/**
+		Creates the list, building the items with `makeLine` and creating them with `createItem`.
+	**/
 	public function new(parent: Element, id: String, makeLine: (header: hide.kit.Element, content: hide.kit.Element, item: T, index:Int) -> Void, createItem: () -> Dynamic) {
 		super(parent, id);
 		this.makeLine = makeLine;
@@ -365,7 +380,13 @@ class List<T> extends Widget<Array<T>> {
 	}
 }
 
+/**
+	The header line of a list item.
+**/
 class KitListHeader extends hide.kit.Line {
+	/**
+		The element receiving the children.
+	**/
 	public var target : NativeElement;
 
 	override function get_nativeContent():NativeElement {

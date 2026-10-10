@@ -2,7 +2,13 @@ package hide.kit;
 
 #if domkit
 
+/**
+	A color picker, editing an integer (or a vector or array with `vec` or `arr`).
+**/
 class Color extends Widget<Dynamic> {
+	/**
+		Edits the alpha.
+	**/
 	public var alpha : Bool = false;
 
 	/**

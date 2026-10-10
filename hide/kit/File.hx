@@ -2,8 +2,14 @@ package hide.kit;
 
 #if domkit
 
+/**
+	A file selector.
+**/
 class File extends Widget<String> {
 
+	/**
+		The kind of file, a key of `types`.
+	**/
 	public var type : String = "file";
 
 	/**
@@ -60,6 +66,9 @@ class File extends Widget<String> {
 		return null;
 	}
 
+	/**
+		Called to open the file.
+	**/
 	public dynamic function onView() {
 		#if js
 		hide.Ide.inst.openFile(file.getFullPath());

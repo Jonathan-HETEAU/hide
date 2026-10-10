@@ -1,5 +1,8 @@
 package hide.prefab.propsEditor;
 
+/**
+	Edits the properties of a `h3d.scene.pbr.Renderer`.
+**/
 class PbrRenderer extends AnyPropsEditor<h3d.scene.pbr.Renderer> {
 
 	override function edit2(ctx:hrt.prefab.EditContext2, root: hide.kit.Element, ?customProps: Dynamic, onChange: (tmp: Bool) -> Void = null) {

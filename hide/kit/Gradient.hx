@@ -2,6 +2,9 @@ package hide.kit;
 
 #if domkit
 
+/**
+	A gradient editor.
+**/
 class Gradient extends Widget<hrt.impl.Gradient.GradientData> {
 	#if js
 	var gradientBox: hide.comp.GradientEditor.GradientBox;

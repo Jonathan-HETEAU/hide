@@ -2,14 +2,29 @@ package hide.kit;
 
 #if domkit
 
+/**
+	The root of the properties of a prefab, with copy and paste of the values.
+**/
 class KitRoot #if !macro extends Element #end {
 	#if !macro
+	/**
+		The roots of all the edited prefabs, when editing several prefabs.
+	**/
 	public var editedPrefabsProperties : Array<KitRoot> = [];
 	var prefab : hrt.prefab.Prefab;
 	var prefabUndoPoint : Dynamic = null;
+	/**
+		The edit context.
+	**/
 	public var editor(default, null) : hrt.prefab.EditContext2;
+	/**
+		Tells if several prefabs are edited.
+	**/
 	public var isMultiEdit(default, null) : Bool;
 
+	/**
+		Creates the root of the properties of a prefab.
+	**/
 	public function new(parent: Element, id: String, prefab: hrt.prefab.Prefab, editor: hrt.prefab.EditContext2) {
 		super(parent, id);
 		this.prefab = prefab;
@@ -49,6 +64,9 @@ class KitRoot #if !macro extends Element #end {
 		#end
 	}
 
+	/**
+		Returns the element of a path of ids separated by `.`, or `null`.
+	**/
 	public function getElementByPath(path: String) {
 		var parts = path.split(".");
 		var currentElement : Element = this;
@@ -164,6 +182,9 @@ class KitRoot #if !macro extends Element #end {
 		}
 	}
 
+	/**
+		Adds the CastleDB properties.
+	**/
 	public function postEditStep() {
 		#if castle
 		if (prefab != null) {

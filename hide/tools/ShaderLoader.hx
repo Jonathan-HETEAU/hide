@@ -1,24 +1,51 @@
 package hide.tools;
 
+/**
+	A shader loaded by the `ShaderLoader`.
+**/
 typedef CachedShader = {
+	/**
+		The source file.
+	**/
 	var file : String;
+	/**
+		The class name.
+	**/
 	var name : String;
+	/**
+		The compiled shader.
+	**/
 	var shader : hxsl.SharedShader;
+	/**
+		The initial values of the variables.
+	**/
 	var inits : Array<{ variable : hxsl.Ast.TVar, value : Dynamic }>;
+	/**
+		The file watch function.
+	**/
 	var watch : Void -> Void;
 }
 
+/**
+	Loads and compiles HXSL shaders from their source files (in the `haxe.classPath` of the configuration), reloaded when they change.
+**/
 class ShaderLoader {
 
 	var ide : hide.Ide;
 	var shaderPath : Array<String>;
 	var shaderCache = new Map<String, CachedShader>();
 
+	/**
+		Creates the loader.
+	**/
 	public function new() {
 		ide = hide.Ide.inst;
 		shaderPath = ide.currentConfig.get("haxe.classPath");
 	}
 
+	/**
+		Returns a new instance of a shader by class name, or `null`.
+	**/
 	public function load( name : String ) {
 		var s = loadSharedShader(name);
 		if( s == null )
@@ -29,6 +56,9 @@ class ShaderLoader {
 		return d;
 	}
 
+	/**
+		Returns the compiled shader of a class name (cached), or `null`.
+	**/
 	public function loadSharedShader( name : String, ?file : String ) {
 		var s = shaderCache.get(name);
 		if( s != null )

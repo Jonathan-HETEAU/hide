@@ -1,6 +1,9 @@
 package hide;
 
 // ----- Default Rendering --------------------------------
+/**
+	The material setup of the editor (forward renderer).
+**/
 class MaterialSetup extends h3d.mat.MaterialSetup {
     override public function createRenderer() {
 	    return new Renderer();
@@ -17,8 +20,14 @@ class MaterialSetup extends h3d.mat.MaterialSetup {
 	}
 }
 
+/**
+	The forward renderer of the editor, with the editor passes.
+**/
 class Renderer extends h3d.scene.fwd.Renderer {
 
+	/**
+		Creates the renderer.
+	**/
 	public function new() {
 		super();
 	}
@@ -55,6 +64,9 @@ class Renderer extends h3d.scene.fwd.Renderer {
 // ----- PBR Rendering --------------------------------
 
 #if editor
+/**
+	The PBR material setup of the editor.
+**/
 class PbrSetup extends h3d.mat.PbrMaterialSetup {
 
 	function getEnvMap() {
@@ -94,6 +106,9 @@ class PbrSetup extends h3d.mat.PbrMaterialSetup {
 }
 #end
 
+/**
+	Draws the outline of the highlighted objects.
+**/
 class ScreenOutline extends h3d.shader.ScreenShader {
 	static var SRC = {
 
@@ -110,7 +125,13 @@ class ScreenOutline extends h3d.shader.ScreenShader {
 	};
 }
 
+/**
+	The PBR renderer of the editor: renders the `highlight` passes and the `ui` overlay pass.
+**/
 class PbrRenderer extends h3d.scene.pbr.Renderer {
+	/**
+		Creates the renderer with an environment.
+	**/
 	public function new(env) {
 		super(env);
 		#if editor

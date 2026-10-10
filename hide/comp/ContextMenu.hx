@@ -9,6 +9,9 @@ import hrt.ui.HuiMenu.MenuItem;
 typedef ContextMenuItem = hrt.ui.HuiMenu.MenuItem;
 
 
+/**
+	The search of a context menu.
+**/
 enum SearchMode {
     /**
         No search bar or search functionality
@@ -26,19 +29,28 @@ enum SearchMode {
     Visible;
 }
 
+/**
+	The options of a context menu.
+**/
 typedef MenuOptions = {
-    ?search: SearchMode, // default to Hidden for top level context menus
-    ?widthOverride: Int, // if set, force the width of the first menu
+    /**
+    	The search mode (`Hidden` by default for the top level menus).
+    **/
+    var ?search : SearchMode;
+    /**
+    	Forces the width of the first menu.
+    **/
+    var ?widthOverride : Int;
 
     /**
         Used to automaticaly widthOverride based on context (see createDropdown)
     **/
-    ?autoWidth: Bool,
+    var ?autoWidth : Bool;
 
     /**
         Set this to true if you have no icons/checkmarks in your menu and you want to hide the padding on the left of the entries names
     **/
-    ?noIcons: Bool,
+    var ?noIcons : Bool;
 
     /**
         If this set, it will be used to place the element if it goes offscreen like so
@@ -46,22 +58,28 @@ typedef MenuOptions = {
                | - placementWidth - |
         | --- your context menu --- |  <--
     **/
-    ?placementWidth: Int,
+    var ?placementWidth : Int;
 
-    ?placementHeight: Int,
+    /**
+        Like `placementWidth`, vertically.
+    **/
+    var ?placementHeight : Int;
 
     /**
         If true, the sub-menus will be inlined (like they are when the search is active)
     **/
-    ?flat: Bool,
+    var ?flat : Bool;
 
 	 /**
 		If true, will save the search string to this key name
 	 **/
-	 ?rememberSearchKey: String
+	 var ?rememberSearchKey : String;
 
 }
 
+/**
+	A context menu, or a dropdown, made of `MenuItem`s, with an optional search.
+**/
 class ContextMenu {
     var rootElement : js.html.Element;
     var menu : js.html.MenuElement;
@@ -322,6 +340,9 @@ class ContextMenu {
         return false;
     }
 
+    /**
+    	Called when the menu is closed.
+    **/
     public dynamic function onClose() {
 
     }
@@ -467,6 +488,9 @@ class ContextMenu {
         refreshPos();
     }
 
+    /**
+    	Closes the menu.
+    **/
     public function close() {
         cleanup();
     }

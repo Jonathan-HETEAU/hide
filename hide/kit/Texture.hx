@@ -2,6 +2,9 @@ package hide.kit;
 
 #if domkit
 
+/**
+	A texture selector (a file or a gradient).
+**/
 class Texture extends Widget<Dynamic> {
 	#if js
 	var textureChoice: hide.comp.TextureChoice2;

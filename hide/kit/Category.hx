@@ -2,6 +2,9 @@ package hide.kit;
 
 #if domkit
 
+/**
+	A collapsible category, whose open state is saved.
+**/
 class Category extends Widget<Null<Bool>> {
 	/**
 		If this category should be closed by default
@@ -12,6 +15,9 @@ class Category extends Widget<Null<Bool>> {
 	var openState : Bool;
 
 
+	/**
+		Creates a category named `name`.
+	**/
 	public function new(parent: Element, id: String, name: String) : Void {
 		this.name = name;
 		super(parent, id ?? name);
@@ -140,6 +146,9 @@ class Category extends Widget<Null<Bool>> {
 		#end
 	}
 
+	/**
+		Opens or closes the category (toggles if `force` is `null`).
+	**/
 	public function toggleOpenState(?force: Bool) {
 		openState = force ?? !openState;
 		if (openState == closed) {

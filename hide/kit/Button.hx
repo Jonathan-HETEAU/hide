@@ -2,14 +2,38 @@ package hide.kit;
 
 #if domkit
 
+/**
+	A button.
+**/
 class Button extends Element {
 	var label : String;
+	/**
+		Highlights the button.
+	**/
 	public var highlight(default, set) : Bool = false;
+	/**
+		The path of the icon.
+	**/
 	public var image : String;
+	/**
+		Medium size.
+	**/
 	public var medium : Bool = false;
+	/**
+		Big size.
+	**/
 	public var big : Bool = false;
+	/**
+		Huge size.
+	**/
 	public var huge : Bool = false;
+	/**
+		Without background.
+	**/
 	public var quiet : Bool = false;
+	/**
+		Does not record an undo step when clicked.
+	**/
 	public var noUndo: Bool = false;
 
 	var button : NativeElement;
@@ -20,11 +44,17 @@ class Button extends Element {
 		return v;
 	}
 
+	/**
+		Creates a button with a label.
+	**/
 	public function new(parent: Element, id: String, label: String) {
 		super(parent, id);
 		this.label = label;
 	}
 
+	/**
+		Called when the button is clicked.
+	**/
 	public dynamic function onClick() {
 
 	}

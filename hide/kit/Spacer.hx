@@ -2,6 +2,9 @@ package hide.kit;
 
 #if domkit
 
+/**
+	An empty space.
+**/
 class Spacer extends Element {
 	override function makeSelf():Void {
 		#if js

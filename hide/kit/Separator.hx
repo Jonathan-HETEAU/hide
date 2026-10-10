@@ -2,6 +2,9 @@ package hide.kit;
 
 #if domkit
 
+/**
+	A separator line.
+**/
 class Separator extends Element {
 	override function makeSelf():Void {
 		#if js

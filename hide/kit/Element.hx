@@ -3,6 +3,30 @@ package hide.kit;
 #if domkit
 
 /**
+	A change of a value of the kit, recorded for the undo.
+**/
+typedef ChangeParams = {
+	/**
+		Applies the change.
+	**/
+	var callback: () -> Void;
+	/**
+		Tells if the change is temporary (while dragging), not recorded.
+	**/
+	var isTemporaryEdit: Bool;
+	/**
+		Records an undo step.
+	**/
+	var recordUndo: Bool;
+
+	/**Function to run after callback and after each undo/redo operation concerning these changes**/
+	var ?sideEffects: (isUndo: Bool) -> Void;
+}
+
+
+/**
+	An element of the property editor kit (`hide.kit`), built with `ctx.build(<markup/>)` in `Prefab.edit2`.
+
 	# hrt.prefab.edit -> hrt.prefab.edit2 Migration notes
 
 	- new function signature : edit2(ctx: hrt.prefab.EditContext2).
@@ -44,17 +68,6 @@ package hide.kit;
 		`<input title="Tooltip"/>` -> `<element tooltip="Tooltip"/>`
 		Callbacks bound in the onChange function should be bound on the relevant widget onValueChange instead
 	**/
-
-typedef ChangeParams = {
-	var callback: () -> Void;
-	var isTemporaryEdit: Bool;
-	var recordUndo: Bool;
-
-	/**Function to run after callback and after each undo/redo operation concerning these changes**/
-	var ?sideEffects: (isUndo: Bool) -> Void;
-}
-
-
 @:keepSub
 class Element {
 	#if !macro
@@ -89,6 +102,9 @@ class Element {
 	var parent(default, null) : Element;
 
 	var children : Array<Element> = [];
+	/**
+		The number of children.
+	**/
 	public var numChildren(get, never) : Int;
 
 
@@ -102,6 +118,9 @@ class Element {
 	**/
 	var nativeContent(get, never) : NativeElement;
 
+	/**
+		Returns the children.
+	**/
 	public function getChildren() : haxe.ds.ReadOnlyArray<Element> {
 		return children;
 	}
@@ -124,6 +143,9 @@ class Element {
 		return isDisabled();
 	}
 
+	/**
+		Creates the element, child of `parent`, with an id unique among its siblings.
+	**/
 	public function new(parent: Element, id: String) {
 		this.parent = parent;
 		this.root = this.parent?.root ?? Std.downcast(this.parent, KitRoot);
@@ -320,6 +342,9 @@ class Element {
 		return false;
 	}
 
+	/**
+		Collapses the categories of the children.
+	**/
 	public function collapse() {
 		for (child in children) {
 			child.collapse();
@@ -650,6 +675,9 @@ class Element {
 		}
 	}
 
+	/**
+		Adds the widget of a property definition, editing `props`.
+	**/
 	public function buildProp(def: hrt.prefab.Props.PropDef, props: Dynamic) {
 		var defValue: Dynamic = null;
 		var widget : hide.kit.Widget<Dynamic> = switch(def.t) {
@@ -743,6 +771,9 @@ class Element {
 		return widget;
 	}
 
+	/**
+		Removes the element from its parent.
+	**/
 	public function remove() {
 		if (parent != null) {
 			parent.children.remove(this);
@@ -750,6 +781,9 @@ class Element {
 		this.parent = null;
 	}
 
+	/**
+		Sets the color class of a native element.
+	**/
 	static public function setNativeColor(element: NativeElement, color: KitColor) {
 		if (element != null) {
 			element.toggleClass("color-red", color == Red);

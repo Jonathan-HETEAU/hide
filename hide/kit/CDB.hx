@@ -4,10 +4,16 @@ package hide.kit;
 
 import hide.comp.cdb.DataFiles;
 
+/**
+	Edits the CastleDB properties of the prefab (editor only).
+**/
 class CDB extends Element {
 	var cdbCategory : Category;
 	var curType : cdb.Sheet;
 
+	/**
+		Creates the element.
+	**/
 	override public function new(parent: Element, id: String) {
 		super(parent, id);
 

@@ -7,17 +7,44 @@ using haxe.macro.TypeTools;
 using Lambda;
 
 #if domkit
+/**
+	The arguments of the generation of the elements of a markup.
+**/
 typedef BuildExprArgs = {
-	parent: Expr,
-	contextObj: Expr,
-	globalElements: Array<Var>,
-	markup: domkit.MarkupParser.Markup,
-	outputExprs: Array<Expr>,
-	?onAnyChange: haxe.macro.Expr.ExprOf<(isTemp:Bool) -> Void>,
-	index: Int,
+	/**
+		The expression of the parent element.
+	**/
+	var parent : Expr;
+	/**
+		The object whose fields are bound.
+	**/
+	var contextObj : Expr;
+	/**
+		The variables of the elements with an id.
+	**/
+	var globalElements : Array<Var>;
+	/**
+		The markup.
+	**/
+	var markup : domkit.MarkupParser.Markup;
+	/**
+		The generated expressions.
+	**/
+	var outputExprs : Array<Expr>;
+	/**
+		The callback bound to all the widgets.
+	**/
+	var ?onAnyChange : haxe.macro.Expr.ExprOf<(isTemp:Bool) -> Void>;
+	/**
+		The index of the element.
+	**/
+	var index : Int;
 };
 #end
 
+/**
+	Builds the kit elements from the markup of `ctx.build`.
+**/
 class Macros {
 	/** Used for unit tests to ensure that dml errors are correctly handled **/
 	public static macro function testError(dml : Expr, contextObj: Expr, wantedErrorExpr: ExprOf<String>) : Expr {
@@ -41,6 +68,9 @@ class Macros {
 		return macro {};
 	}
 
+	/**
+		Tests that a markup compiles (unit tests).
+	**/
 	public static macro function testNoError(dml : Expr, contextObj: Expr) : Expr {
 		#if domkit
 		try {
@@ -515,6 +545,9 @@ class Macros {
 	}
 	#end
 
+	/**
+		Returns a camel case name as words: `fooBar` becomes `Foo Bar`.
+	**/
 	public static function camelToSpaceCase(str:String):String {
 		var wasCap = false;
 		var finalString = "";
@@ -562,6 +595,9 @@ class Macros {
 		return finalString;
 	}
 
+	/**
+		Returns the type path of a type.
+	**/
 	public static function makeTypePath( t : BaseType ) {
 		var path = t.module.split(".");
 		if( t.name != path[path.length-1] ) path.push(t.name);
@@ -589,6 +625,9 @@ class Macros {
 		return macro false;
 	}
 
+	/**
+		Fills the entries of a select from the values of an enum.
+	**/
 	macro public static function tryAutoSelect(enumExpr: Expr, targetSelect: Expr) : Expr {
 		var enumType = Context.typeof(enumExpr);
 

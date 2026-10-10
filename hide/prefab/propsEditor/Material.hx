@@ -1,5 +1,8 @@
 package hide.prefab.propsEditor;
 
+/**
+	Edits the properties of a `h3d.mat.Material`.
+**/
 class Material extends AnyPropsEditor<h3d.mat.Material> {
 
 	override function edit2(ctx:hrt.prefab.EditContext2, root: hide.kit.Element, ?customProps: Dynamic, onChange: (tmp: Bool) -> Void = null) {

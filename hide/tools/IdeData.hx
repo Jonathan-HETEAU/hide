@@ -1,12 +1,33 @@
 package hide.tools;
 
+/**
+	The data of the editor shared by the JS and HL editors: project paths, configurations, database and files.
+**/
 class IdeData {
 
+	/**
+		The project folder.
+	**/
 	public var projectDir(get,never) : String;
+	/**
+		The resource folder of the project (`res`).
+	**/
 	public var resourceDir(get,never) : String;
+	/**
+		The folder of the editor.
+	**/
 	public var appPath(get, null): String;
+	/**
+		The folder of the user settings.
+	**/
 	public var userStatePath(get, null): String;
+	/**
+		The CastleDB database.
+	**/
 	public var database : cdb.Database = new cdb.Database();
+	/**
+		The file watcher.
+	**/
 	public var fileWatcher : hide.tools.FileWatcher;
 
 	static final dBReloadMaxRetries = 5;
@@ -14,6 +35,9 @@ class IdeData {
 	var databaseDiff : String;
 	var originDataBase : cdb.Database;
 	var dbWatcher : hide.tools.FileWatcher.FileWatchEvent;
+	/**
+		The shader loader.
+	**/
 	public var shaderLoader : hide.tools.ShaderLoader;
 
 	/**
@@ -27,6 +51,9 @@ class IdeData {
 
 
 	// Default settings for HideGlobalConfig since we can't init values in a typedef
+	/**
+		The default values of the global settings.
+	**/
 	public var defaultIdeConfig : Map<String, Dynamic> = [
 		"closeSearchOnFileOpen" => false,
 		"typingDebounceThreshold" => 300,
@@ -44,9 +71,21 @@ class IdeData {
 		"searchOnKeyPress" => true
 	];
 
+	/**
+		The configuration of the user for the project.
+	**/
 	public var currentConfig(get,never) : Config;
+	/**
+		The global settings.
+	**/
 	public var ideConfig(get, never) : hide.Config.HideGlobalConfig;
+	/**
+		The project settings of the user.
+	**/
 	public var projectConfig(get, never) : hide.HideProjectConfig;
+	/**
+		The configurations: `global` (per user), `user` (per user and project), `project` (per project) and `current` (merged).
+	**/
 	public var config : {
 		global : Config, // Per user, for all projects
 		user : Config, // Per user, specific project
@@ -54,6 +93,9 @@ class IdeData {
 		current : Config, // Merge of all configs above
 	};
 
+	/**
+		Creates the data.
+	**/
 	public function new() {
 	}
 
@@ -76,6 +118,9 @@ class IdeData {
 		fileWatcher = new hide.tools.FileWatcher();
 	}
 
+	/**
+		Tells if a project is open.
+	**/
 	public function isProjectValid() : Bool {
 		return ideConfig.currentProject != "" && ideConfig.currentProject != null;
 	}
@@ -109,6 +154,9 @@ class IdeData {
 		shaderLoader = new hide.tools.ShaderLoader();
 	}
 
+	/**
+		Returns the material libraries available for a path.
+	**/
 	public function listMatLibraries(path : String) {
 		var config = hide.Config.loadForFile(this, path);
 
@@ -127,6 +175,9 @@ class IdeData {
 		return matLibs;
 	}
 
+	/**
+		Reports an error.
+	**/
 	public function error( e : Dynamic ) {
 		throw e;
 	}
@@ -179,6 +230,9 @@ class IdeData {
 		return appPath;
 	}
 
+	/**
+		Returns a path relative to the resource folder.
+	**/
 	public function makeRelative( path : String ) {
 		path = path.split("\\").join("/");
 		if( StringTools.startsWith(path.toLowerCase(), resourceDir.toLowerCase()+"/") )
@@ -203,6 +257,9 @@ class IdeData {
 		return path;
 	}
 
+	/**
+		Returns the absolute path of a resource path (`${HIDE}` is the editor folder).
+	**/
 	public function getPath( relPath : String ) {
 		if( relPath == null )
 			return null;
@@ -212,6 +269,9 @@ class IdeData {
 		return resourceDir+"/"+relPath;
 	}
 
+	/**
+		Returns an absolute path relative to the resource folder.
+	**/
 	public function getRelPath(absPath: String) {
 		if (absPath == null)
 			return null;
@@ -220,6 +280,9 @@ class IdeData {
 		return StringTools.replace(absPath, resourceDir + "/", "");
 	}
 
+	/**
+		Returns the folder of a path.
+	**/
 	public function getDirPath(path: String) {
 		return path.substring(0, path.lastIndexOf("/"));
 	}
@@ -276,6 +339,9 @@ class IdeData {
 			});
 	}
 
+	/**
+		Opens a file with the default application of the system.
+	**/
 	public static function openExternalFile(filePath: String) {
 		if(!haxe.io.Path.isAbsolute(filePath)) {
 			filePath = Ide.inst.getPath(filePath);
@@ -295,6 +361,9 @@ class IdeData {
 		}
 	}
 
+	/**
+		Shows a file in the file explorer of the system.
+	**/
 	public static function showFileInExplorer(path : String) {
 		if(!haxe.io.Path.isAbsolute(path)) {
 			path = Ide.inst.getPath(path);
@@ -320,6 +389,9 @@ class IdeData {
 		return stats.mtime.getTime() > lastStats.mtime.getTime();
 	}
 
+	/**
+		Saves the database and its data files.
+	**/
 	public function saveDatabase( ?forcePrefabs ) {
 		if (readOnlyConfig)
 			return;
@@ -376,12 +448,18 @@ class IdeData {
 		#end
 	}
 
+	/**
+		Tells if a resource file exists.
+	**/
 	public function fileExists( path : String ) {
 		if( sys.FileSystem.exists(getPath(path)) ) return true;
 		if( pakFile != null && pakFile.exists(path) ) return true;
 		return false;
 	}
 
+	/**
+		Returns the stats of a resource file, or `null`.
+	**/
 	public function fileStat( path : String ) : Null<sys.FileStat> {
 		var fullPath = getPath(path);
 		if( !sys.FileSystem.exists(fullPath) )
@@ -389,6 +467,9 @@ class IdeData {
 		return sys.FileSystem.stat(fullPath);
 	}
 
+	/**
+		Returns the content of a resource file.
+	**/
 	public function getFile( path : String ) {
 		var fullPath = getPath(path);
 		try {
@@ -400,6 +481,9 @@ class IdeData {
 		}
 	}
 
+	/**
+		Returns the text of a resource file.
+	**/
 	public function getFileText( path : String ) {
 		var fullPath = getPath(path);
 		try {
@@ -411,12 +495,18 @@ class IdeData {
 		}
 	}
 
+	/**
+		Parses JSON (or binary prefab data).
+	**/
 	public function parseJSON( str : String ) : Dynamic {
 		// remove comments
 		str = ~/^[ \t]+\/\/[^\n]*/gm.replace(str, "");
 		return haxe.Json.parse(str);
 	}
 
+	/**
+		Returns a value as formatted JSON.
+	**/
 	public function toJSON( v : Dynamic ) {
 		var replaceFn =
 		#if( js_es == 5 )
@@ -429,6 +519,9 @@ class IdeData {
 		return haxe.Json.stringify(v, replaceFn, "\t");
 	}
 
+	/**
+		Loads a prefab file.
+	**/
 	public function loadPrefab<T:hrt.prefab.Prefab>( file : String, ?cl : Class<T>, ?checkExists ) : T {
 		if( file == null )
 			return null;
@@ -447,11 +540,17 @@ class IdeData {
 		}
 	}
 
+	/**
+		Saves a prefab to a file.
+	**/
 	public function savePrefab( file : String, f : hrt.prefab.Prefab ) {
 		@:privateAccess var content = f.serialize();
 		sys.io.File.saveContent(getPath(file), toJSON(content));
 	}
 
+	/**
+		Sets the default values of the missing global settings.
+	**/
 	public function applyDefaultValues() {
 		var ideConfig = config.global.source.hide;
 		for (field => value in defaultIdeConfig) {
@@ -460,6 +559,9 @@ class IdeData {
 		}
 	}
 
+	/**
+		Removes the global settings equal to their default value, before saving.
+	**/
 	public function removeDefaultValues() {
 		var ideConfig = config.global.source.hide;
 		for (field => value in defaultIdeConfig) {

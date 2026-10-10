@@ -1,9 +1,24 @@
 package hide.comp.cdb;
 
+/**
+	Where a line of a CastleDB sheet with data files comes from.
+**/
 typedef DataProps = {
+	/**
+		The file.
+	**/
 	var file : String;
+	/**
+		The path of the prefab in the file.
+	**/
 	var path : String;
+	/**
+		The index of the line in the file.
+	**/
 	var index : Int;
+	/**
+		The original content, to detect the changes.
+	**/
 	var origin : String;
 }
 
@@ -16,18 +31,30 @@ private typedef DataDef = {
 	var linesData: Array<DataProps>;
 }
 
+/**
+	The CastleDB sheets whose lines come from prefab files (`dataFiles` sheet property).
+**/
 class DataFiles {
 
 	static var skip : Int = 0;
 	static var watching : Map<String, Void -> Void > = new Map();
 
 	#if (editor || cdb_datafiles)
+	/**
+		The database.
+	**/
 	static var base(get,never) : cdb.Database;
 	static function get_base() return Ide.inst.database;
 	#else
+	/**
+		The database.
+	**/
 	public static var base : cdb.Database;
 	#end
 
+	/**
+		Loads the lines of the sheets with data files.
+	**/
 	public static function load() {
 		var cache = new Map<String, Array<String>>();
 		for( sheet in base.sheets ) {
@@ -36,6 +63,9 @@ class DataFiles {
 		}
 	}
 
+	/**
+		Loads the lines of a sheet from a file.
+	**/
 	public static function loadFile( file : String, sheet : cdb.Sheet) @:privateAccess {
 		var sheetName = getTypeName(sheet);
 		var levelID = file.split("/").pop().split(".").shift();
@@ -694,6 +724,9 @@ class DataFiles {
 			browseRec(r, 0);
 	}
 
+	/**
+		Returns the prefabs at a path of names separated by `.` (`*` allowed).
+	**/
 	public static function getPrefabsByPath(prefab: hrt.prefab.Prefab, path : String ) : Array<hrt.prefab.Prefab> {
 		function rec(prefab: hrt.prefab.Prefab, parts : Array<String>, index : Int, out : Array<hrt.prefab.Prefab> ) {
 			var name = parts[index++];
@@ -722,6 +755,9 @@ class DataFiles {
 
 	#if (editor || cdb_datafiles)
 
+	/**
+		Returns the value of a key in an object, for a path (keys can be a list of choices).
+	**/
 	public static function resolveCDBValue( path : String, key : Dynamic, obj : Dynamic ) : Dynamic {
 		// allow Array as key (first choice)
 		if( Std.isOfType(key,Array) ) {
@@ -775,6 +811,9 @@ class DataFiles {
 		return obj;
 	}
 
+	/**
+		Saves the lines back to their files.
+	**/
 	public static function save( ?onSaveBase, ?force, ?prevSheetNames : Map<String,String> ) {
 		var ide = Ide.inst;
 		var temp = [];
@@ -862,6 +901,9 @@ class DataFiles {
 
 	// ---- TYPES Instances API -----
 
+	/**
+		Returns the sheets with data files.
+	**/
 	public static function getAvailableTypes() {
 		var sheets = [];
 		var ide = Ide.inst;
@@ -871,6 +913,9 @@ class DataFiles {
 		return sheets;
 	}
 
+	/**
+		Returns the sheet with data files of a type name, or `null`.
+	**/
 	public static function resolveType( name : String ) {
 		if( name == null )
 			return null;
@@ -882,6 +927,9 @@ class DataFiles {
 
 	#end
 
+	/**
+		Returns the type name of a sheet (without the `@` prefix).
+	**/
 	public static function getTypeName( sheet : cdb.Sheet ) {
 		return sheet.name.split("@").pop();
 	}

@@ -1,8 +1,17 @@
 package hide.prefab.propsEditor;
 
+/**
+	Edits the properties of a `hxd.impl.AnyProps` object (materials, renderers...).
+**/
 class AnyPropsEditor<T:hxd.impl.AnyProps> {
+	/**
+		The edited properties.
+	**/
 	public var props : T;
 
+	/**
+		Returns the editor of an object, for its class or a parent class.
+	**/
 	public static function makeEditor(props: hxd.impl.AnyProps) {
 		var propsClass = Type.getClass(props);
 		var editorClass = null;

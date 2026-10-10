@@ -2,6 +2,9 @@ package hide.kit;
 
 #if domkit
 
+/**
+	Selects a material of a material library.
+**/
 class Matlib extends Widget<String> {
 
 	var path : String;
@@ -9,6 +12,9 @@ class Matlib extends Widget<String> {
 	var matSelect : Select;
 	var category : Element;
 
+	/**
+		Creates the selector for the library `path`.
+	**/
 	override public function new(parent: Element, id: String, path: String) {
 		super(parent, id);
 		this.path = path;

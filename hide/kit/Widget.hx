@@ -6,12 +6,21 @@ package hide.kit;
 	Base class for all hide elements that manipulate a Value, like sliders, inputs etc...
 **/
 abstract class Widget<ValueType> extends Element {
+	/**
+		The label.
+	**/
 	public var label(default, set): String;
+	/**
+		The edited value.
+	**/
 	@:isVar public var value(get, set): ValueType;
 
 	/** Value that will be set if the user use the "reset to default value" feature **/
 	public var defaultValue: ValueType;
 
+	/**
+		The color of the label.
+	**/
 	public var labelColor(default, set): KitColor = White;
 
 	/** If set, modifying the value don't save an undo step (use ctx.recordUndo to handle that yourself))**/

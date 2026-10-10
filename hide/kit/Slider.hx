@@ -2,6 +2,9 @@ package hide.kit;
 
 #if domkit
 
+/**
+	A number slider.
+**/
 class Slider<T:Float> extends Widget<T> {
 	/**
 		If set, the slider won't go bellow the given value

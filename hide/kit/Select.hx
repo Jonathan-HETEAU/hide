@@ -2,23 +2,44 @@ package hide.kit;
 
 #if domkit
 
+/**
+	An entry of a select.
+**/
 typedef SelectEntry = {
-	value:Dynamic,
-	label:String,
-	?equalsNull: Bool, // if true, this value will be displayed if the input value is null
+	/**
+		The value.
+	**/
+	var value : Dynamic;
+	/**
+		The label.
+	**/
+	var label : String;
+	/**
+		Displays this entry when the value is `null`.
+	**/
+	var ?equalsNull : Bool;
 };
 
+/**
+	The entries of a select, or strings used as values and labels.
+**/
 abstract EntriesOrStrings(Array<SelectEntry>) from Array<SelectEntry> to Array<SelectEntry> {
 	inline function new(i:Array<SelectEntry>) {
 		this = i;
 	}
 
+	/**
+		Returns the entries of strings.
+	**/
 	@:from
 	static public function fromStringArray(strings:Array<String>) {
 		return new EntriesOrStrings([for (string in strings) {value: string, label: string}]);
 	}
 }
 
+/**
+	A dropdown select.
+**/
 class Select extends Widget<Dynamic> {
 	/**
 		List of entries to be displayed in the select list. If field is set and the field is an enum or an abstract enum,
@@ -26,6 +47,9 @@ class Select extends Widget<Dynamic> {
 	**/
 	public var entries(default, null) : Array<SelectEntry>;
 
+	/**
+		Sets the entries and clears the value.
+	**/
 	public function setEntries(entries: EntriesOrStrings) {
 		this.entries = entries;
 		value = null;
@@ -40,6 +64,9 @@ class Select extends Widget<Dynamic> {
 	var select : hrt.ui.HuiSelect;
 	#end
 
+	/**
+		Creates the select.
+	**/
 	public function new(parent: Element, id: String, entries: EntriesOrStrings = null) {
 		super(parent, id);
 		this.entries = entries;

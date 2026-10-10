@@ -1,6 +1,30 @@
 package hide.tools;
 
-typedef FileWatchEvent = {path:String,fun:Void->Void,checkDel:Bool,element:Element.HTMLElement,?ignoreCheck:String};
+/**
+	A watch of a file.
+**/
+typedef FileWatchEvent = {
+	/**
+		The absolute path watched.
+	**/
+	var path : String;
+	/**
+		Called when the file changes.
+	**/
+	var fun : Void->Void;
+	/**
+		Also calls `fun` when the file is deleted.
+	**/
+	var checkDel : Bool;
+	/**
+		The element the watch belongs to: the watch is removed when it leaves the document.
+	**/
+	var element : Element.HTMLElement;
+	/**
+		The signature of the content whose change is ignored.
+	**/
+	var ?ignoreCheck : String;
+};
 
 private typedef Watch = {
 	path : String,
@@ -17,16 +41,25 @@ private typedef Watch = {
 	version : Int
 };
 
+/**
+	Watches files and calls functions when they change.
+**/
 class FileWatcher {
 
 	var ide : hide.Ide;
 	var watches : Map<String, Watch> = new Map();
 	var timer : haxe.Timer;
 
+	/**
+		Creates the watcher.
+	**/
 	public function new() {
 		ide = hide.Ide.inst;
 	}
 
+	/**
+		Stops watching, remembering the content of the files.
+	**/
 	public function pause() {
 		for( w in watches )
 			if( w.w != null ) {
@@ -40,6 +73,9 @@ class FileWatcher {
 			}
 	}
 
+	/**
+		Watches again, notifying the files changed while paused.
+	**/
 	public function resume() {
 		for( w in watches )
 			if( w.w == null && w.events.length > 0 ) {
@@ -66,6 +102,9 @@ class FileWatcher {
 			}
 	}
 
+	/**
+		Ignores the current change of the file (after the editor wrote it).
+	**/
 	public function ignorePrevChange( f : FileWatchEvent ) {
 		f.ignoreCheck = getSignature(f.path);
 	}
@@ -84,6 +123,9 @@ class FileWatcher {
 		#end
 	}
 
+	/**
+		Stops all the watches.
+	**/
 	public function dispose() {
 		if( timer != null ) {
 			timer.stop();
@@ -95,6 +137,9 @@ class FileWatcher {
 		watches = new Map();
 	}
 
+	/**
+		Calls `updateFun` when the file changes (and when deleted if `checkDelete`). The watch is removed when `element` leaves the document.
+	**/
 	public function register( path : String, updateFun, ?checkDelete : Bool, ?element : Element ) : FileWatchEvent {
 		path = ide.getPath(path);
 		var w = getWatches(path);
@@ -107,6 +152,9 @@ class FileWatcher {
 		return f;
 	}
 
+	/**
+		Like `register`, with an HTML element.
+	**/
 	public function registerRaw( path : String, updateFun, ?checkDelete : Bool, ?element : Element.HTMLElement) : FileWatchEvent {
 		path = ide.getPath(path);
 		var w = getWatches(path);
@@ -119,6 +167,9 @@ class FileWatcher {
 		return f;
 	}
 
+	/**
+		Removes a watch.
+	**/
 	public function unregister( path : String, updateFun : Void -> Void ) {
 		path = ide.getPath(path);
 		var w = getWatches(path);
@@ -133,6 +184,9 @@ class FileWatcher {
 		}
 	}
 
+	/**
+		Removes the watches of an element.
+	**/
 	public function unregisterElement( element : Element ) {
 		for( path => w in watches ) {
 			for( e in w.events.copy() )
@@ -145,6 +199,9 @@ class FileWatcher {
 		}
 	}
 
+	/**
+		Returns the number of changes of the file.
+	**/
 	public function getVersion( path : String ) : Int {
 		var w = watches.get(ide.getPath(path));
 		if( w == null )
@@ -152,6 +209,9 @@ class FileWatcher {
 		return w.version;
 	}
 
+	/**
+		Tells if a change of the file is pending.
+	**/
 	public function isChangePending( f : FileWatchEvent ) : Bool {
 		var w = watches.get(f.path);
 		if( w != null && w.changed ) {

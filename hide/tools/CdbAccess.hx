@@ -1,7 +1,13 @@
 package hide.tools;
 
+/**
+	Typed access to the lines of a CastleDB sheet, by id.
+**/
 class CdbAccess<T,Kind> {
 
+	/**
+		All the lines.
+	**/
 	public var all(get,never) : cdb.Types.ArrayRead<T>;
 	var name : String;
 	var map : Map<String,T> = [];
@@ -10,6 +16,9 @@ class CdbAccess<T,Kind> {
 	#end
 	var lines : Array<T>;
 
+	/**
+		Loads the lines of a sheet.
+	**/
 	public function new( sheet : String ) {
 		this.name = sheet;
 		lines = hide.Ide.inst.getCDBContent(sheet);
@@ -40,6 +49,9 @@ class CdbAccess<T,Kind> {
 		return lines;
 	}
 
+	/**
+		Returns the line of an id, or `null`.
+	**/
 	public function get( kind : Kind ) : T {
 		return map.get(cast kind);
 	}
@@ -50,6 +62,9 @@ class CdbAccess<T,Kind> {
 	}
 	#end
 
+	/**
+		Returns the line of an id (or the shortest id starting with it if `approximate`). Throws if missing, unless `opt`.
+	**/
 	public function resolve( id : String, ?opt : Bool, ?approximate : Bool ) : T {
 		var v = map.get(id);
 		if( v == null && approximate ) {

@@ -1,8 +1,17 @@
 package hide.kit;
 
+/**
+	The native element: an HTML element in JS, an `h2d.Object` otherwise.
+**/
 typedef NativeElementType = #if js js.html.Element #else h2d.Object #end;
+/**
+	A native element of the kit.
+**/
 abstract NativeElement(NativeElementType) from NativeElementType to NativeElementType {
 
+	/**
+		Adds a CSS class.
+	**/
 	public function addClass(name: String) {
 		#if js
 		this.classList.add(name);
@@ -11,6 +20,9 @@ abstract NativeElement(NativeElementType) from NativeElementType to NativeElemen
 		#end
 	}
 
+	/**
+		Toggles a CSS class (sets it if `force` is not `null`).
+	**/
 	public function toggleClass(name: String, ?force: Bool) {
 		#if js
 		this.classList.toggle(name, force);
@@ -20,10 +32,16 @@ abstract NativeElement(NativeElementType) from NativeElementType to NativeElemen
 	}
 
 
+	/**
+		Returns the native element.
+	**/
 	public function get() : NativeElementType {
 		return this;
 	}
 
+	/**
+		Adds a child.
+	**/
 	public function addChild(other: NativeElement) {
 		#if js
 		this.appendChild(other);
@@ -32,6 +50,9 @@ abstract NativeElement(NativeElementType) from NativeElementType to NativeElemen
 		#end
 	}
 
+	/**
+		Creates an element of a kind (tag name, or class in Hui).
+	**/
 	public static function create(kind: String) : NativeElement {
 		#if js
 		return js.Browser.document.createElement(kind);

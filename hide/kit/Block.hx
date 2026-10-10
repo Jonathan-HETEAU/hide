@@ -2,6 +2,9 @@ package hide.kit;
 
 #if domkit
 
+/**
+	A container whose children are added to its parent.
+**/
 class Block extends Element {
 	override function makeSelf() {
 		#if js

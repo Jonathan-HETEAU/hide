@@ -2,8 +2,17 @@ package hide.kit;
 
 #if domkit
 
+/**
+	A text.
+**/
 class Text extends Element {
+	/**
+		The text.
+	**/
 	public var content(default, set) : String;
+	/**
+		The color.
+	**/
 	public var color(default, set) : KitColor;
 
 	function set_color(v: KitColor) : KitColor {
@@ -20,6 +29,9 @@ class Text extends Element {
 		return content;
 	}
 
+	/**
+		Creates a text.
+	**/
 	public function new(parent: Element, id: String, content: String) : Void {
 		super(parent, id);
 		this.content = content;

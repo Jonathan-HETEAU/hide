@@ -2,7 +2,13 @@ package hide.kit;
 
 #if domkit
 
+/**
+	A curve editor.
+**/
 class Curve extends Element {
+	/**
+		The edited curve.
+	**/
 	public var value(default, set) : hrt.prefab.Curve;
 	var curveEditor: #if hui hrt.ui.HuiCurveBox #elseif js hide.comp.CurveEditor #else NativeElement #end;
 
@@ -12,6 +18,9 @@ class Curve extends Element {
 		return value;
 	}
 
+	/**
+		Creates the editor of a curve.
+	**/
 	public function new(parent: Element, id: String, value: hrt.prefab.Curve) : Void {
 		super(parent, id);
 		this.value = value;

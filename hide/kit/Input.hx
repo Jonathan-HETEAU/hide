@@ -2,7 +2,13 @@ package hide.kit;
 
 #if domkit
 
+/**
+	A text input.
+**/
 class Input extends Widget<String> {
+	/**
+		The text displayed when empty.
+	**/
 	public var placeholder(default, set) : String;
 	function set_placeholder(v) {
 		placeholder = v;
