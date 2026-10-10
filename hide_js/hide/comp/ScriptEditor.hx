@@ -1,6 +1,10 @@
 package hide.comp;
 import hscript.Checker;
 
+/**
+	The `script.api` config: the API of the scripts, by document name pattern.
+	Each entry can set `globals` (global name to type, `#Type` for the statics of a class or the constructors of an enum, null to remove), `context` or `contexts` (classes whose fields are globals), `publicFields` (only the public methods of the contexts are accessible), `events` (type of the event functions), `evalTo` (expected type of the script value), `allowGlobalsDefine`, `cdbEnums` (CDB sheets available as enums) and `parentScripts` (scripts checked before).
+**/
 typedef GlobalsDef = haxe.DynamicAccess<{
 	var globals : haxe.DynamicAccess<String>;
 	var context : String;
@@ -13,17 +17,35 @@ typedef GlobalsDef = haxe.DynamicAccess<{
 	var parentScripts : Array<String>;
 }>;
 
+/**
+	The cache of the script check results and of the API types, stored in the local storage.
+**/
 class ScriptCache {
 
 	var content : Map<String,Bool> = [];
 	var configSign : String;
+	/**
+		The API files.
+	**/
 	public var files : Array<String>;
+	/**
+		The hash of the API files.
+	**/
 	public var apiHash : String;
+	/**
+		The types of the API files.
+	**/
 	public var types : hscript.Checker.CheckerTypes;
 
+	/**
+		Creates an empty cache.
+	**/
 	public function new() {
 	}
 
+	/**
+		Loads the cached results if they were made with the same config signature.
+	**/
 	public function loadConfig( sign : String ) {
 		this.configSign = sign;
 		var key = hide.Ide.inst.localStorage.getItem("script_cache_key");
@@ -34,6 +56,9 @@ class ScriptCache {
 		}
 	}
 
+	/**
+		Loads the types of API files, unless they did not change.
+	**/
 	public function loadFiles( files : Array<String> ) {
 		var hash = getFilesHash(files);
 		if( hash == apiHash ) return;
@@ -56,10 +81,16 @@ class ScriptCache {
 		}
 	}
 
+	/**
+		Returns the cached result of a script hash (true if it has an error), or null.
+	**/
 	public function getResult( hash : String ) {
 		return content.get(hash);
 	}
 
+	/**
+		Stores the result of a script hash.
+	**/
 	public function setResult( hash : String, b : Bool ) {
 		if( content.get(hash) == b ) return;
 		content.set(hash, b);
@@ -116,6 +147,9 @@ class ScriptCache {
 		return CHECK_CACHE;
 	}
 
+	/**
+		Tells if a script has an error, checking it only if not in the cache.
+	**/
 	public static function getCachedResult( config : hide.Config, documentName : String, constants : Map<String,Dynamic>, code : String ) : Bool {
 		var cache = loadCache(config);
 		var signature = hashString(code+":"+documentName+":"+haxe.Json.stringify(constants));
@@ -132,6 +166,9 @@ class ScriptCache {
 	static var LAST_API_FILES = null;
 	static var LAST_API_TYPES = null;
 
+	/**
+		Loads the types of the `script.api.files` config files.
+	**/
 	public static function loadApiFiles( config : hide.Config ) {
 		var files = config.get("script.api.files");
 		if( files != null && (files != LAST_API_FILES || LAST_API_TYPES == null) ) {
@@ -150,6 +187,9 @@ class ScriptCache {
 
 }
 
+/**
+	Type checks hscript scripts against the API configured in `script.api` for their document name.
+**/
 class ScriptChecker {
 
 	static var ERROR_SAVE = new Map();
@@ -157,16 +197,40 @@ class ScriptChecker {
 	var ide : hide.Ide;
 	var api : ScriptCache;
 	var checkEvents : Bool;
+	/**
+		The config.
+	**/
 	public var config : hide.Config;
+	/**
+		The document name, matched against the `script.api` entries.
+	**/
 	public var documentName : String;
+	/**
+		The constant values available to the API (for example `cdb.objID`).
+	**/
 	public var constants : Map<String,Dynamic>;
+	/**
+		The expected type of the script value, or null.
+	**/
 	public var evalTo : String;
+	/**
+		The hscript type checker.
+	**/
 	public var checker(default,null) : hscript.Checker;
+	/**
+		The CDB sheets available as enums.
+	**/
 	public var cdbEnums : Array<String>;
+	/**
+		The default of `publicFields` for the contexts.
+	**/
 	public var defaultPublicFields : Bool = false;
 	var initDone = false;
 	var apiHash : String;
 
+	/**
+		Creates a checker for a document.
+	**/
 	public function new( config : hide.Config, documentName : String, ?constants : Map<String,Dynamic> ) {
 		this.config = config;
 		this.documentName = documentName;
@@ -321,6 +385,9 @@ class ScriptChecker {
 		return true;
 	}
 
+	/**
+		Called after the API types are initialized.
+	**/
 	public dynamic function onInitTypes() {}
 
 	function resolveApis( path : String ) {
@@ -571,6 +638,9 @@ class ScriptChecker {
 	}
 
 	static var buf = new StringBuf();
+	/**
+		Makes a CDB sheet available as an enum of its ids.
+	**/
 	public function addCDBEnum( name : String, ?cdbPack : String ) {
 		var path = name.split(".");
 		var sname = path.join("@");
@@ -664,6 +734,9 @@ class ScriptChecker {
 		return null;
 	}
 
+	/**
+		Returns a parser with the script options.
+	**/
 	public function makeParser() {
 		var parser = new hscript.Parser();
 		parser.allowMetadata = true;
@@ -672,6 +745,9 @@ class ScriptChecker {
 		return parser;
 	}
 
+	/**
+		Returns the type completed at the end of a script, or null.
+	**/
 	public function getCompletion( script : String ) {
 		var parser = makeParser();
 		parser.resumeErrors = true;
@@ -686,6 +762,9 @@ class ScriptChecker {
 		}
 	}
 
+	/**
+		Parses a script and checks its types. Returns the error, or null.
+	**/
 	public function check( script : String, checkTypes = true ) {
 		var parser = makeParser();
 		try {
@@ -727,11 +806,20 @@ class ScriptChecker {
 }
 
 #if !hl
+/**
+	A code editor for hscript scripts, checking them as they are edited.
+**/
 class ScriptEditor extends CodeEditor {
 
+	/**
+		The script checker.
+	**/
 	public var checker(default,null) : ScriptChecker;
 	var checkTypes : Bool;
 
+	/**
+		Creates the editor of a script. Without checker, only the syntax is checked.
+	**/
 	public function new( script : String, ?checker : ScriptChecker, ?parent : Element, ?root : Element, ?lang = "javascript" ) {
 		super(script, lang, parent,root);
 		if( checker == null ) {
@@ -826,6 +914,9 @@ class ScriptEditor extends CodeEditor {
 		return results;
 	}
 
+	/**
+		Checks the script and shows the error.
+	**/
 	public function doCheckScript() {
 		var script = code;
 		var error = checker.check(script, checkTypes);
@@ -835,6 +926,9 @@ class ScriptEditor extends CodeEditor {
 			setError(hscript.Printer.errorToString(error), error.line, error.pmin, error.pmax);
 	}
 
+	/**
+		Registers a class created with each checker (to add types). Returns true, to be used as a static initializer.
+	**/
 	public static function register( cl : Class<Dynamic> ) : Bool {
 		@:privateAccess ScriptChecker.TYPE_CHECK_HOOKS.push(function(checker) {
 			Type.createInstance(cl,[checker]);

@@ -3,30 +3,64 @@ import hide.comp.GradientEditor.GradientBox;
 import hrt.impl.TextureType.Utils;
 import hrt.prefab.Props;
 
+/**
+	The field groups of a properties editor, by name, with their copy and paste functions.
+**/
 typedef GroupMap = Map<String, {serialize: () -> Dynamic, pasteFn: (refresh: Bool, undo: hide.ui.UndoHistory, data: Dynamic) -> Void, fields: Array<PropsField>}>;
 
+/**
+	The properties panel component: binds the inputs of an HTML description (`field` attributes) to the fields of an object, with undo, sections, groups and multi-edition.
+**/
 class PropsEditor extends Component {
 
+	/**
+		The undo history.
+	**/
 	public var undo : hide.ui.UndoHistory;
+	/**
+		The time of the last change.
+	**/
 	public var lastChange : Float = 0.;
+	/**
+		The bound fields.
+	**/
 	public var fields(default, null) : Array<PropsField>;
+	/**
+		The field groups.
+	**/
 	public var groups(default, null) : GroupMap;
 
-	// Called when the props editor want a full refresh
+	/**
+		Called when the props editor wants a full refresh.
+	**/
 	public dynamic function onRefresh() {
 
 	}
 
+	/**
+		The editors of the other edited objects: the changes are applied to their fields too.
+	**/
 	public var multiPropsEditor : Array<PropsEditor> = [];
 
+	/**
+		True while the current change is temporary (during a drag).
+	**/
 	public var isTempChange = false;
+	/**
+		The editor is one of the `multiPropsEditor` of another one.
+	**/
 	public var isShadowEditor = false;
 
-	// Called once a change has been propagated to all the multiPropsEditor, the returned function is called after undo/redo of that change
+	/**
+		Called once a change has been propagated to all the `multiPropsEditor`. The returned function is called after undo/redo of that change.
+	**/
 	public dynamic function onMultiEditEnd() : Void -> Void {
 		return null;
 	}
 
+	/**
+		Creates an editor.
+	**/
 	public function new(?undo,?parent,?el) {
 		super(parent,el);
 		element.addClass("hide-properties");
@@ -35,6 +69,9 @@ class PropsEditor extends Component {
 		groups = new Map();
 	}
 
+	/**
+		Removes all the fields.
+	**/
 	public function clear() {
 		element.empty();
 		fields = [];
@@ -61,6 +98,9 @@ class PropsEditor extends Component {
 	// 	return false;
 	// }
 
+	/**
+		Adds the properties of a material.
+	**/
 	public function addMaterial( m : h3d.mat.Material, ?parent : Element, ?onChange ) {
 		var def = m.editProps();
 		def = add(def, m.props, function(name) {
@@ -75,6 +115,9 @@ class PropsEditor extends Component {
 			def.appendTo(parent);
 	}
 
+	/**
+		Adds the input of a property definition to an element.
+	**/
 	public static function makePropEl(p: PropDef, parent: Element) {
 		switch( p.t ) {
 		case PInt(min, max):
@@ -129,12 +172,18 @@ class PropsEditor extends Component {
 		}
 	}
 
+	/**
+		Returns a collapsible group element.
+	**/
 	public static function makeGroupEl(name: String, content: Element) {
 		var el = new Element('<div class="group" name="${name}"></div>');
 		content.appendTo(el);
 		return el;
 	}
 
+	/**
+		Returns a collapsible section element.
+	**/
 	public static function makeSectionEl(name: String, content: Element, ?headerContent: Element) {
 		var el = new Element('<div class="section"><h1><span>${name}</span></h1><div class="content"></div></div>');
 		if (headerContent != null) headerContent.appendTo(el.find("h1"));
@@ -142,12 +191,18 @@ class PropsEditor extends Component {
 		return el;
 	}
 
+	/**
+		Returns a labeled property element.
+	**/
 	public static function makeLabelEl(name: String, content: Element) {
 		var el = new Element('<span><dt>${name}</dt><dd></dd></span>');
 		content.appendTo(el.find("dd"));
 		return el;
 	}
 
+	/**
+		Returns a list of property elements.
+	**/
 	public static function makeListEl(content:Array<Element>) {
 		var el = new Element("<dl>");
 		for ( e in content ) e.appendTo(el);
@@ -158,6 +213,9 @@ class PropsEditor extends Component {
 		return prop.charAt(0).toUpperCase() + prop.substr(1);
 	}
 
+	/**
+		Returns the category of a property (the name prefix before `_`), or null.
+	**/
 	public static function getCategory(p: PropDef) {
 		if (p.name != null) {
 			return p.name.split("_")[0];
@@ -165,6 +223,9 @@ class PropsEditor extends Component {
 		return null;
 	}
 
+	/**
+		Returns a list of labeled inputs for property definitions.
+	**/
 	public static function makePropsList(props : Array<PropDef>) : Element {
 		var e = new Element('<dl>');
 		var currentParent = e;
@@ -193,16 +254,25 @@ class PropsEditor extends Component {
 		return e;
 	}
 
+	/**
+		Adds property definitions bound to an object.
+	**/
 	public function addProps( props : Array<PropDef>, context : Dynamic, ?onChange : String -> Void) {
 		var e = makePropsList(props);
 		return add(e, context, onChange);
 	}
 
+	/**
+		Adds an HTML description bound to an object. `onChange` is called with the changed field name.
+	**/
 	public function add( e : Element, ?context : Dynamic, ?onChange : String -> Void ) {
 		e.appendTo(element);
 		return build(e,context,onChange);
 	}
 
+	/**
+		Binds the inputs of an HTML description to an object and sets up its sections and groups.
+	**/
 	public function build( e : Element, ?context : Dynamic, ?onChange : String -> Void ) {
 		e = e.wrap("<div></div>").parent(); // necessary to have find working on top level element
 
@@ -476,6 +546,9 @@ class PropsEditor extends Component {
 		return e;
 	}
 
+	/**
+		Makes a label a button resetting its field (ctrl+click rounds it).
+	**/
 	public static function wrapDt(dt : Element, defValue : String, onClick : (e : js.jquery.Event) -> Void) {
 		var tooltip = 'Click to reset ($defValue)\nCtrl+Click to round';
 		var button = dt.wrapInner('<input type="button" tabindex="-1" value="${upperCase(dt.text())}" title="$tooltip"/>');
@@ -485,8 +558,14 @@ class PropsEditor extends Component {
 }
 
 
+/**
+	An input of a properties editor bound to a field of an object.
+**/
 @:allow(hide.comp.PropsEditor)
 class PropsField extends Component {
+	/**
+		The field name (can be a path `a.b`).
+	**/
 	public var fname : String;
 	var undoHistory : hide.ui.UndoHistory;
 	var isTempChange : Bool;
@@ -508,10 +587,16 @@ class PropsField extends Component {
 
 	// function that set the value of field then call the regular code on it. Used to make the multi prefab edit work
 	var propagateValueChange : (value: Dynamic, isTemp: Bool) -> Void = null;
+	/**
+		Called before a change is recorded in the undo history.
+	**/
 	public dynamic function onBeforeUndo() : Void {};
 
 	var subfields : Array<String>;
 
+	/**
+		Binds an input to a field of an object.
+	**/
 	public function new(props, el, context) {
 		super(null,el);
 		viewRoot = element.closest(".lm_content");
@@ -1004,6 +1089,9 @@ class PropsField extends Component {
 		onChange(false);
 	}
 
+	/**
+		Called when the field changes. `wasUndo` is true on undo or redo.
+	**/
 	public dynamic function onChange( wasUndo : Bool ) {
 	}
 

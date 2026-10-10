@@ -1,24 +1,70 @@
 package hide.comp;
 
+/**
+	What a gallery refresh must update.
+**/
 enum GalleryRefreshFlag {
+	/**
+		A search change: refreshes without a specific update.
+	**/
 	Search;
+	/**
+		Reloads the items.
+	**/
 	Items;
+	/**
+		Regenerates the item elements.
+	**/
 	RegenHeader;
+	/**
+		Scrolls to the current item.
+	**/
 	FocusCurrent;
 }
 
+/**
+	A set of `GalleryRefreshFlag`.
+**/
 typedef GalleryRefreshFlags = haxe.EnumFlags<GalleryRefreshFlag>;
 
+/**
+	The internal data of a gallery item.
+**/
 typedef GalleryItemData<GalleryItem> = {
-	item: GalleryItem,
-	name: String,
-	element: js.html.Element,
-	thumbnailStringCache: String,
-	iconStringCache: String,
-	ranges: hide.comp.FancySearch.SearchRanges,
-	title: String,
+	/**
+		The item.
+	**/
+	var item : GalleryItem;
+	/**
+		The item name.
+	**/
+	var name : String;
+	/**
+		The element of the item, or null if not built.
+	**/
+	var element : js.html.Element;
+	/**
+		The last displayed thumbnail.
+	**/
+	var thumbnailStringCache : String;
+	/**
+		The last displayed icon.
+	**/
+	var iconStringCache : String;
+	/**
+		The ranges of the name matching the search.
+	**/
+	var ranges : hide.comp.FancySearch.SearchRanges;
+	/**
+		The tooltip of the item.
+	**/
+	var title : String;
 };
 
+/**
+	A virtualized grid of item thumbnails with zoom levels, selection, renaming and drag and drop.
+	The items are given by the `getItems`, `getName` and `getThumbnail` callbacks.
+**/
 class FancyGallery<GalleryItem> extends hide.comp.Component {
 
 	var currentData : Array<GalleryItemData<GalleryItem>> = [];
@@ -62,6 +108,9 @@ class FancyGallery<GalleryItem> extends hide.comp.Component {
 		return currentVisible;
 	}
 
+	/**
+		Creates a gallery in a `fancy-gallery` element (or a new one).
+	**/
 	public function new(parent: Element, el: Element) {
 		saveDisplayKey = "fancyGallery";
 		if (el != null) {
@@ -158,6 +207,9 @@ class FancyGallery<GalleryItem> extends hide.comp.Component {
 		scroll.onscroll = (e) -> queueRefresh();
 	}
 
+	/**
+		Sets the zoom level (index of the thumbnail sizes).
+	**/
 	public function setZoom(newLevel: Int) {
 		lastSavedZoomPercent = (scroll.scrollTop + scroll.getBoundingClientRect().height / 2) / scroll.scrollHeight;
 		zoom = hxd.Math.iclamp(newLevel, 0, zoomLevels.length-1);
@@ -168,6 +220,9 @@ class FancyGallery<GalleryItem> extends hide.comp.Component {
 	var refreshQueued : Bool = false;
 	var currentRefreshFlags : GalleryRefreshFlags = GalleryRefreshFlags.ofInt(0);
 
+	/**
+		Refreshes the gallery on the next frame, with a flag.
+	**/
 	public function queueRefresh(flag: GalleryRefreshFlag = null) {
 		if (flag != null) {
 			currentRefreshFlags.set(flag);
@@ -178,30 +233,51 @@ class FancyGallery<GalleryItem> extends hide.comp.Component {
 		}
 	}
 
+	/**
+		Returns the items. Default is none.
+	**/
 	public dynamic function getItems() : Array<GalleryItem> {
 		return [];
 	}
 
+	/**
+		Returns the ranges of the name of an item to highlight.
+	**/
 	public dynamic function getItemRanges(item: GalleryItem) : hide.comp.FancySearch.SearchRanges {
 		return [];
 	}
 
+	/**
+		Returns the name of an item.
+	**/
 	public dynamic function getName(item: GalleryItem) : String {
 		return "";
 	}
 
+	/**
+		Returns the tooltip of an item (its name by default).
+	**/
 	public dynamic function getTitle(item: GalleryItem) : String {
 		return getName(item);
 	}
 
+	/**
+		Returns the thumbnail URL of an item, or null.
+	**/
 	public dynamic function getThumbnail(item: GalleryItem) : String {
 		return null;
 	}
 
+	/**
+		Returns the HTML of the icon of an item, or null.
+	**/
 	public dynamic function getIcon(item: GalleryItem) : String {
 		return null;
 	}
 
+	/**
+		Called when an item is double clicked.
+	**/
 	public dynamic function onDoubleClick(item: GalleryItem) : Void {
 	}
 
@@ -261,6 +337,9 @@ class FancyGallery<GalleryItem> extends hide.comp.Component {
 		queueRefresh(RegenHeader);
 	}
 
+	/**
+		Clears the selection.
+	**/
 	public function clearSelection() {
 		selection.clear();
 		queueRefresh();
@@ -274,10 +353,16 @@ class FancyGallery<GalleryItem> extends hide.comp.Component {
 		}
 	}
 
+	/**
+		Returns the selected items.
+	**/
 	public function getSelectedItems() {
 		return [for (item => _ in selection) (cast item:GalleryItemData<GalleryItem>).item];
 	}
 
+	/**
+		Selects an item.
+	**/
 	public function selectItem(item: GalleryItem) {
 		clearSelection();
 		var data = itemMap.get(cast item);
@@ -314,6 +399,9 @@ class FancyGallery<GalleryItem> extends hide.comp.Component {
 		queueRefresh();
 	}
 
+	/**
+		Starts renaming an item. `onFinished` is called with the new name.
+	**/
 	public function rename(item: GalleryItem, onFinished : (newName:String) -> Void) {
 		var data = itemMap.get(cast item);
 		var name = data.element.querySelector("fancy-name");
@@ -550,6 +638,9 @@ class FancyGallery<GalleryItem> extends hide.comp.Component {
 		return genElement;
 	}
 
+	/**
+		Refreshes the thumbnail of an item.
+	**/
 	public function refreshThumbnail(item: GalleryItem) {
 		var data = itemMap.get(cast item);
 		if (data?.element != null) {
