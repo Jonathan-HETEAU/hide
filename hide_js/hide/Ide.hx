@@ -3,30 +3,79 @@ package hide;
 #error "Non editor code shouldn't depend on hide"
 #end
 
+/**
+	The kind of a message shown by `Ide.globalMessage`.
+**/
 enum MessageKind {
+	/**
+		An information message.
+	**/
 	Info;
+	/**
+		An error message.
+	**/
 	Error;
 }
+/**
+	A cache of the IDE stored in the engine resource cache.
+**/
 class IdeCache {
+	/**
+		The textures loaded by `Ide.getTexture`, by full path.
+	**/
 	public var getTextureCache : Map<String, h3d.mat.Texture> = [];
 
+	/**
+		Creates an empty cache.
+	**/
 	public function new() {};
 }
+/**
+	The HIDE editor application: project, windows, views, layout, menus, dialogs and clipboard.
+	The running instance is `Ide.inst`.
+**/
 @:expose
 class Ide extends hide.tools.IdeData {
 
+	/**
+		True while the IDE initializes.
+	**/
 	public var initializing(default,null) : Bool;
 
+	/**
+		The last mouse X position in the window.
+	**/
 	public var mouseX : Int = 0;
+	/**
+		The last mouse Y position in the window.
+	**/
 	public var mouseY : Int = 0;
 
+	/**
+		Tells if the IDE runs on Windows.
+	**/
 	public var isWindows(get, never) : Bool;
+	/**
+		Tells if the IDE window has the focus.
+	**/
 	public var isFocused(get, never) : Bool;
 
+	/**
+		True when the IDE runs as CastleDB (env `HIDE_START_CDB=1` or app named `CDB`).
+	**/
 	public var isCDB = false;
+	/**
+		True when debugging (env `HIDE_DEBUG=1`): view errors are not caught.
+	**/
 	public var isDebugger = false;
 
+	/**
+		The game pad.
+	**/
 	public var gamePad(default,null) : hxd.Pad;
+	/**
+		The browser local storage.
+	**/
 	public var localStorage(get,never) : js.html.Storage;
 
 	var window : nw.Window;
@@ -45,6 +94,9 @@ class Ide extends hide.tools.IdeData {
 	var subView : { component : String, state : Dynamic, events : {} };
 	var scripts : Map<String,Array<Void->Void>> = new Map();
 	var hasReloaded = false;
+	/**
+		True when the IDE runs to render thumbnails (`thumbnail` in the window URL).
+	**/
 	public var thumbnailMode : Bool = false;
 
 	var dataTransfer : Map<String, Dynamic> = new Map();
@@ -56,7 +108,13 @@ class Ide extends hide.tools.IdeData {
 
 	var breakShortcut : Dynamic;
 
+	/**
+		Tells if the 3D editor icons are shown.
+	**/
 	public var show3DIcons = true;
+	/**
+		Tells for each icon category if its 3D icons are shown.
+	**/
 	public var show3DIconsCategory : Map<hrt.impl.EditorTools.IconCategory, Bool> = new Map();
 
 	static var firstInit = true;
@@ -307,6 +365,9 @@ class Ide extends hide.tools.IdeData {
 		refreshFont();
 	}
 
+	/**
+		Returns the open views of a class.
+	**/
 	public function getViews<K,T:hide.ui.View<K>>( cl : Class<T> ) {
 		return [for( v in views ) { var t = Std.downcast(v,cl); if( t != null ) t; }];
 	}
@@ -345,9 +406,15 @@ class Ide extends hide.tools.IdeData {
 	function get_isFocused() {
 		return js.Browser.document.hasFocus();
 	}
+	/**
+		Focuses the window.
+	**/
 	public function focus() {
 		window.focus();
 	}
+	/**
+		Removes the focus from the window.
+	**/
 	public function blur() {
 		window.blur();
 	}
@@ -370,6 +437,9 @@ class Ide extends hide.tools.IdeData {
 			v.onResize();
 	}
 
+	/**
+		Returns the layout item at a display position, creating it if needed.
+	**/
 	public function getOrInitTarget(position: hide.ui.View.DisplayPosition) : golden.ContentItem {
 		if (layout.root == null)
 			return null;
@@ -628,6 +698,9 @@ class Ide extends hide.tools.IdeData {
 			f();
 	}
 
+	/**
+		Enters or leaves the full screen mode.
+	**/
 	public function setFullscreen(b : Bool) {
 		if (b) {
 			fullscreen = true;
@@ -671,27 +744,45 @@ class Ide extends hide.tools.IdeData {
 	}
 
 
+	/**
+		Sets the clipboard content.
+	**/
 	public function setClipboard( data : String, type: nw.Clipboard.ClipboardType = Text ) {
 		nw.Clipboard.get().set([{data: data, type: type }]);
 	}
 
+	/**
+		Sets the clipboard content with several types.
+	**/
 	public function setClipboardMultiple( datas: Array<nw.Clipboard.ClipboardData> ) {
 		nw.Clipboard.get().set(datas);
 	}
 
+	/**
+		Returns the clipboard content of a type.
+	**/
 	public function getClipboard(type: nw.Clipboard.ClipboardType = Text) {
 		return nw.Clipboard.get().get(type);
 	}
 
 
+	/**
+		Stores data under a key, to transfer it between views.
+	**/
 	public function setData(key: String,  data: Dynamic) {
 		dataTransfer.set(key, data);
 	}
 
+	/**
+		Returns the data stored with `setData` (for example for drag and drop).
+	**/
 	public function getData(key: String) {
 		return dataTransfer.get(key);
 	}
 
+	/**
+		Returns and removes the data stored with `setData`.
+	**/
 	public function popData(key: String) {
 		var d = dataTransfer.get(key);
 		dataTransfer.remove(key);
@@ -699,10 +790,16 @@ class Ide extends hide.tools.IdeData {
 	}
 
 
+	/**
+		Adds a function called each frame.
+	**/
 	public function registerUpdate( updateFun ) {
 		updates.push(updateFun);
 	}
 
+	/**
+		Removes a function added by `registerUpdate`.
+	**/
 	public function unregisterUpdate( updateFun ) {
 		for( u in updates )
 			if( Reflect.compareMethods(u,updateFun) ) {
@@ -712,11 +809,17 @@ class Ide extends hide.tools.IdeData {
 		return false;
 	}
 
+	/**
+		Returns the MD5 of a content, in base 64.
+	**/
 	public function makeSignature( content : String ) {
 		var sign = js.node.Crypto.createHash(js.node.Crypto.CryptoAlgorithm.MD5);
 		return sign.update(content).digest("base64");
 	}
 
+	/**
+		Removes the null fields of an object.
+	**/
 	public function cleanObject( v : Dynamic ) {
 		for( f in Reflect.fields(v) )
 			if( Reflect.field(v, f) == null )
@@ -725,11 +828,17 @@ class Ide extends hide.tools.IdeData {
 
 	static var textureCacheKey = "TextureCache";
 
+	/**
+		Returns the full path of a file in the HIDE `res` directory.
+	**/
 	public function getHideResPath(basePath:String) {
 		return getPath("${HIDE}/res/" + basePath);
 	}
 
 	// Get a texture from a file on disk. Cache the results
+    /**
+    	Loads a texture from a full path on disk. The result is cached.
+    **/
     public function getTexture(fullPath:String) {
 		if (fullPath == null)
 			return null;
@@ -787,6 +896,9 @@ class Ide extends hide.tools.IdeData {
 		js.Browser.console.error(e);
 	}
 
+	/**
+		Logs an error and shows it as a temporary error message.
+	**/
 	public function quickError( msg : Dynamic, timeoutSeconds : Float = 5.0 ) {
 		js.Browser.console.error(msg);
 
@@ -877,6 +989,9 @@ class Ide extends hide.tools.IdeData {
 		return false;
 	}
 
+	/**
+		Adds a CSS style to the page.
+	**/
 	public function injectCss(data: String) {
 		var head = new Element("head");
 		var style = new Element("<style>").appendTo(head);
@@ -936,6 +1051,9 @@ class Ide extends hide.tools.IdeData {
 		loadPlugin(file, callb);
 	}
 
+	/**
+		Reloads the IDE.
+	**/
 	public function reload() {
 		hasReloaded = true;
 		fileWatcher.dispose();
@@ -945,6 +1063,9 @@ class Ide extends hide.tools.IdeData {
 		js.Browser.location.reload();
 	}
 
+	/**
+		Reloads the stylesheets, or only those whose URL contains `path`.
+	**/
 	public function reloadCss(path: String = null) {
 		var css = new js.jquery.JQuery('link[type="text/css"]');
 		css.each(function(i, e) : Void {
@@ -955,6 +1076,9 @@ class Ide extends hide.tools.IdeData {
 		});
 	}
 
+	/**
+		Returns a copy of the lines of a CDB sheet, with the indexes initialized.
+	**/
 	public function getCDBContent<T>( sheetName : String ) : Array<T> {
 		for( s in database.sheets )
 			if( s.name == sheetName ) {
@@ -966,15 +1090,27 @@ class Ide extends hide.tools.IdeData {
 		return null;
 	}
 
+	/**
+		Returns a `file://` URL of a file, with its version to bypass the browser cache.
+	**/
 	public function getUnCachedUrl( path : String ) {
 		return "file://" + getPath(path) + "?t=" + fileWatcher.getVersion(path);
 	}
 
+	/**
+		The image file extensions.
+	**/
 	public static var IMG_EXTS = ["jpg", "jpeg", "gif", "png", "raw", "dds", "hdr", "tga"];
+	/**
+		Opens a file chooser for images (`IMG_EXTS`).
+	**/
 	public function chooseImage( onSelect, allowNull=false ) {
 		chooseFile(IMG_EXTS, onSelect, allowNull);
 	}
 
+	/**
+		Opens a file chooser with options and calls `onSelect` with the chosen paths.
+	**/
 	public function chooseFileOptions(onSelect: Null<Array<String>> -> Void, options: {
 		?exts : Array<String>,
 		?workingDir: String,
@@ -1060,22 +1196,37 @@ class Ide extends hide.tools.IdeData {
 		wait();
 	}
 
+	/**
+		Opens a file chooser for several files with the extensions `exts`.
+	**/
 	public function chooseFiles( exts : Array<String>, onSelect : Array<String> -> Void, allowNull=false ) {
 		chooseFileOptions(onSelect, {exts: exts, allowNull: allowNull, multiple: true});
 	}
 
+	/**
+		Opens a file chooser for the extensions `exts` and calls `onSelect` with the chosen path.
+	**/
 	public function chooseFile( exts : Array<String>, onSelect : Null<String> -> Void, allowNull = false, workingdir:String = null) {
 		chooseFileOptions((files) -> onSelect(files != null ? files.pop() : null), {exts: exts, allowNull: allowNull, workingDir: workingdir});
 	}
 
+	/**
+		Opens a save file chooser starting at `defaultPath`.
+	**/
 	public function chooseFileSave( defaultPath : String, onSelect : String -> Void, allowNull=false ) {
 		chooseFileOptions((files) -> onSelect(files != null ? files.pop() : null),{saveAs: defaultPath,allowNull: allowNull,});
 	}
 
+	/**
+		Opens a directory chooser and calls `onSelect` with the chosen path (relative unless `isAbsolute`).
+	**/
 	public function chooseDirectory( onSelect : String -> Void, ?isAbsolute = false, allowNull=false ) {
 		chooseFileOptions((files) -> onSelect(files != null ? files.pop() : null),{isAbsolute: isAbsolute,onlyDirectory: true,allowNull: allowNull,});
 	}
 
+	/**
+		Searches a regular expression in the project files. `filesToInclude` and `filesToExclude` are extensions.
+	**/
 	public function search(text : String, ?filesToInclude : Array<String>, ?filesToExclude : Array<String>) : Array<hide.view.RefViewer.Reference> {
 		var refs : Array<hide.view.RefViewer.Reference> = [];
 
@@ -1360,8 +1511,14 @@ class Ide extends hide.tools.IdeData {
 		}
 	}
 
+	/**
+		Extra filters called by `filterPaths` after the built-in ones.
+	**/
 	public var customFilepathRefFilters : Array<(ctx : FilterPathContext) -> Void> = [];
 
+	/**
+		Applies the font setting (`useAlternateFont`).
+	**/
 	public function refreshFont() {
 		var font = ideConfig.useAlternateFont ? "Verdana" : "Inter";
 		var size = ideConfig.useAlternateFont ? "9pt" : "9.5pt";
@@ -1370,6 +1527,9 @@ class Ide extends hide.tools.IdeData {
 
 	}
 
+	/**
+		Calls `callb` on each prefab (and its children) of each prefab file of the project. The file is saved if `callb` returns true for one of them.
+	**/
 	public function filterPrefabs( callb : (hrt.prefab.Prefab, path: String) -> Bool) {
 		var exts = Lambda.array({iterator : @:privateAccess hrt.prefab.Prefab.extensionRegistry.keys });
 		exts.push("prefab");
@@ -1392,6 +1552,9 @@ class Ide extends hide.tools.IdeData {
 			t();
 	}
 
+	/**
+		Calls `callb` on the data of each props, json and prefab file of the project. The file is saved if `callb` returns true.
+	**/
 	public function filterProps( callb : (data: Dynamic, path: String) -> Bool ) {
 		var exts = ["props", "json", "prefab"];
 		var todo = [];
@@ -1426,6 +1589,9 @@ class Ide extends hide.tools.IdeData {
 		browseRec("");
 	}
 
+	/**
+		Sets the window title to a progress text, or back to the default title if null.
+	**/
 	public function setProgress( ?text : String ) {
 		if( text != null ) {
 			window.title = text;
@@ -1435,6 +1601,9 @@ class Ide extends hide.tools.IdeData {
 		window.title = title != null ? title : ((isCDB ? "CastleDB" : "HIDE") + " - " + projectDir);
 	}
 
+	/**
+		Runs a shell command (`%PROJECTDIR%` is replaced) and calls `callb` with the error message or null.
+	**/
 	public function runCommand(cmd, ?callb:String->Void) {
 		var c = cmd.split("%PROJECTDIR%").join(projectDir);
 		var slash = isWindows ? "\\" : "/";
@@ -1442,10 +1611,16 @@ class Ide extends hide.tools.IdeData {
 		js.node.ChildProcess.exec(c, function(e:js.node.ChildProcess.ChildProcessExecError,_,_) callb(e == null ? null : e.message));
 	}
 
+	/**
+		Adds an item to the main menu.
+	**/
 	public function addCustomMenu(item: nw.MenuItem) {
 		customMenus.push(item);
 	}
 
+	/**
+		Builds the main menu.
+	**/
 	public function initMenu() {
 
 		if( subView != null ) return;
@@ -1815,6 +1990,9 @@ class Ide extends hide.tools.IdeData {
 		window.menu = finalMenu;
 	}
 
+	/**
+		Reveals a file in the file browsers.
+	**/
 	public function showFileInResources(path: String) {
 		var filebrowsers = getViews(hide.view.FileBrowser);
 		for (filebrowser in filebrowsers) {
@@ -1825,6 +2003,9 @@ class Ide extends hide.tools.IdeData {
 		}
 	}
 
+	/**
+		Opens a file in the view of its extension, or focuses the view if it is already open.
+	**/
 	public function openFile( file : String, ?onCreate, ?onOpen) {
 		var ext = Extension.getExtension(file);
 		if( ext == null ) return;
@@ -1841,6 +2022,9 @@ class Ide extends hide.tools.IdeData {
 		open(ext.component, { path : path }, onCreate, onOpen);
 	}
 
+	/**
+		Opens a view in a new window. `events` are the callbacks the sub view can call with `callParentView`.
+	**/
 	public function openSubView<T>( component : Class<hide.ui.View<T>>, state : T, events : {} ) {
 		var sharedRefs : Map<Int,Dynamic> = untyped global.sharedRefs;
 		if( sharedRefs == null ) {
@@ -1854,10 +2038,16 @@ class Ide extends hide.tools.IdeData {
 		nw.Window.open("app.html?subView="+compName+"&sid="+id,{ id : compName });
 	}
 
+	/**
+		From a sub view window: calls the event `name` of its parent view.
+	**/
 	public function callParentView( name : String, param : Dynamic ) {
 		if( subView != null ) Reflect.callMethod(subView.events,Reflect.field(subView.events,name),[param]);
 	}
 
+	/**
+		Closes the inspector panel.
+	**/
 	public function closeInspector() {
 		var inspector = layout.root.getItemsById("inspector")[0];
 		if (inspector != null) {
@@ -1865,6 +2055,9 @@ class Ide extends hide.tools.IdeData {
 		}
 	}
 
+	/**
+		Opens a view of a registered component with a state.
+	**/
 	public function open( component : String, state : Dynamic, ?onCreate : hide.ui.View<Dynamic> -> Void, ?onOpen : hide.ui.View<Dynamic> -> Void, ?positionOverride: hide.ui.View.DisplayPosition ) {
 		if (layout.root == null)
 			return;
@@ -1921,6 +2114,9 @@ class Ide extends hide.tools.IdeData {
 		target.addChild(config);
 	}
 
+	/**
+		Opens the last closed tab again.
+	**/
 	public function reopenLastClosedTab() {
 		var state = lastClosedTabStates.pop();
 		if( state != null && state.componentName != null ) {
@@ -1930,6 +2126,9 @@ class Ide extends hide.tools.IdeData {
 
 	var deduplicateMessages : Map<String, {element: Element, timer: haxe.Timer}> = [];
 
+	/**
+		Shows a temporary message in the window for `timeoutSeconds`. Identical messages shown at the same time are merged.
+	**/
 	public function globalMessage(message: String, kind: MessageKind, timeoutSeconds : Float = 5.0) {
 		var str = StringTools.htmlEscape(Std.string(message));
 		str = StringTools.replace(str, "\n", "<br/>");
@@ -1989,20 +2188,32 @@ class Ide extends hide.tools.IdeData {
 		timeMessage(element);
 	}
 
+	/**
+		Logs a message and shows it as a temporary info message.
+	**/
 	public function quickMessage( text : String, timeoutSeconds : Float = 5.0 ) {
 		js.Browser.console.log(text);
 
 		globalMessage(text, Info, timeoutSeconds);
 	}
 
+	/**
+		Shows an alert box.
+	**/
 	public function message( text : String ) {
 		js.Browser.window.alert(text);
 	}
 
+	/**
+		Shows a confirm box. Returns true if accepted.
+	**/
 	public function confirm( text : String ) {
 		return js.Browser.window.confirm(text);
 	}
 
+	/**
+		Shows a prompt box. Returns the text, or null if cancelled.
+	**/
 	public function ask( text : String, ?defaultValue = "" ) {
 		return js.Browser.window.prompt(text, defaultValue);
 	}
@@ -2037,6 +2248,9 @@ class Ide extends hide.tools.IdeData {
 		js.node.ChildProcess.exec('svn status', { cwd: projectDir }, callback);
 	}
 
+	/**
+		Calls `callback` with the files modified in the SVN working copy. Throws if SVN is not available.
+	**/
 	public function getSVNModifiedFiles(callback: (files : Array<String>) -> Void) : Void{
 		if (!isSVNAvailable())
 			throw "SVN not available";
@@ -2049,14 +2263,23 @@ class Ide extends hide.tools.IdeData {
 		}
 	}
 
+	/**
+		Tells if SVN and TortoiseSVN are installed and the project is an SVN working copy.
+	**/
 	public function isSVNAvailable() {
 		return js.node.ChildProcess.spawnSync("svn",["--version"]).status == 0 &&
 		js.node.ChildProcess.spawnSync("where.exe", ["TortoiseProc.exe"]).status == 0 &&
 		js.node.ChildProcess.spawnSync("svn", ["info", getPath(projectDir)]).status == 0;
 	}
 
+	/**
+		Called with each error reported by the IDE.
+	**/
 	public static dynamic function onIdeError(e: Dynamic) {}
 
+	/**
+		The running IDE.
+	**/
 	public static var inst : Ide;
 
 	static function main() {
@@ -2065,6 +2288,9 @@ class Ide extends hide.tools.IdeData {
 	}
 
 
+	/**
+		Returns the last git commit as `hash(date)`, `dev` if there are local changes, or an empty string if git fails.
+	**/
 	public static function getGitCommitHashAndDate():String {
 
 		// Check if there is changes in git. If thats the case, we are certainly on a dev machine
@@ -2094,6 +2320,9 @@ class Ide extends hide.tools.IdeData {
 }
 
 
+/**
+	A resource loader caching the resources in the engine resource cache.
+**/
 class CustomLoader extends hxd.res.Loader {
 
 	var pathKeys = new Map<String,{}>();
@@ -2120,24 +2349,45 @@ class CustomLoader extends hxd.res.Loader {
 
 }
 
+/**
+	The context passed to the `Ide.filterPaths` callbacks, to change the file paths found in the project data.
+**/
 @:allow(hide.Ide)
 class FilterPathContext {
+	/**
+		The path being filtered.
+	**/
 	public var valueCurrent: String;
+	/**
+		The object holding the path.
+	**/
 	public var currentObject: Dynamic;
 	var valueChanged: String;
 
+	/**
+		The filter callback.
+	**/
 	public var filterFn: (FilterPathContext) -> Void;
 
 	var changed = false;
+	/**
+		Creates a context with a filter callback.
+	**/
 	public function new(filterFn: (FilterPathContext) -> Void) {
 		this.filterFn = filterFn;
 	};
 
+	/**
+		Replaces the current path with `newValue`.
+	**/
 	public function change(newValue) : Void {
 		changed = true;
 		valueChanged = newValue;
 	}
 
+	/**
+		Calls the filter on a path. Returns the new path, or `valueCurrent` if not changed.
+	**/
 	public function filter(valueCurrent: String, obj: Dynamic) {
 		this.valueCurrent = valueCurrent;
 		this.currentObject = obj;
@@ -2150,5 +2400,8 @@ class FilterPathContext {
 		return res;
 	}
 
+	/**
+		Returns a description of the place of the current path, with an optional function to open it.
+	**/
 	public var getRef : () -> {str: String, ?goto: () -> Void};
 }
