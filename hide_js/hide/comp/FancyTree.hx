@@ -1,78 +1,199 @@
 package hide.comp;
 
+/**
+	Where an item can be dropped on a target.
+**/
 enum DropFlag {
+	/**
+		Before or after the target.
+	**/
 	Reorder;
+	/**
+		Inside the target.
+	**/
 	Reparent;
 }
 
+/**
+	A set of `DropFlag`.
+**/
 typedef DropFlags = haxe.EnumFlags<DropFlag>;
 
+/**
+	What a tree refresh must update.
+**/
 enum RefreshFlag {
+	/**
+		Rebuilds the list of the shown items.
+	**/
 	Flat;
+	/**
+		Applies the search filter again (implies `Flat`).
+	**/
 	Search;
+	/**
+		Scrolls to the current item.
+	**/
 	FocusCurrent;
+	/**
+		Regenerates the name and icon of the items.
+	**/
 	RegenHeader;
 }
 
+/**
+	A set of `RefreshFlag`.
+**/
 typedef RefreshFlags = haxe.EnumFlags<RefreshFlag>;
 
+/**
+	The search state of a tree item.
+**/
 enum FilterFlag {
+	/**
+		The item is shown.
+	**/
 	Visible;
+	/**
+		The item name matches the search.
+	**/
 	MatchSearch;
+	/**
+		The item is opened by the search.
+	**/
 	Open;
 }
 
+/**
+	A set of `FilterFlag`.
+**/
 typedef FilterFlags = haxe.EnumFlags<FilterFlag>;
 
+/**
+	The internal data of a tree item.
+**/
 typedef TreeItemData<TreeItem> = {
-	element: js.html.Element,
-	?searchRanges: FancySearch.SearchRanges,
-	item: TreeItem,
-	name: String,
-	nameCache: String,
-	uniqueName: String,
-	?iconCache: String,
-	filterState: FilterFlags,
-	children: Array<TreeItemData<TreeItem>>,
-	parent: TreeItemData<TreeItem>,
-	depth: Int,
-	identifier: String,
-	?buttons: Array<{
+	/**
+		The element of the item.
+	**/
+	var element : js.html.Element;
+	/**
+		The ranges of the name matching the search.
+	**/
+	var ?searchRanges : FancySearch.SearchRanges;
+	/**
+		The item.
+	**/
+	var item : TreeItem;
+	/**
+		The item name.
+	**/
+	var name : String;
+	/**
+		The last displayed name.
+	**/
+	var nameCache : String;
+	/**
+		The unique name of the item, used to save the open state.
+	**/
+	var uniqueName : String;
+	/**
+		The last displayed icon.
+	**/
+	var ?iconCache : String;
+	/**
+		The search state.
+	**/
+	var filterState : FilterFlags;
+	/**
+		The child items, or null if not loaded.
+	**/
+	var children : Array<TreeItemData<TreeItem>>;
+	/**
+		The parent item, or null for a root.
+	**/
+	var parent : TreeItemData<TreeItem>;
+	/**
+		The depth in the tree.
+	**/
+	var depth : Int;
+	/**
+		The identifier of the item, see `FancyTree.getIdentifier`.
+	**/
+	var identifier : String;
+	/**
+		The buttons of the item.
+	**/
+	var ?buttons : Array<{
 		element: js.html.Element,
 		button: TreeButton<TreeItem>,
 		iconCache: String,
-	}>,
+	}>;
 };
 
+/**
+	Where an item is dropped relative to the target.
+**/
 enum DropOperation {
+	/**
+		Before the target.
+	**/
 	Before;
+	/**
+		After the target.
+	**/
 	After;
+	/**
+		Inside the target.
+	**/
 	Inside;
 }
 
+/**
+	A button shown on the tree items.
+**/
 typedef TreeButton<TreeItem> = {
-	click : (TreeItem) -> Void,
+	/**
+		Called when the button is clicked.
+	**/
+	var click : (TreeItem) -> Void;
 
 	/**
 		Return a html string of the icon content to display in the button.
 		Called each time the tree is refreshed.
 	**/
-	getIcon : (TreeItem) -> String,
+	var getIcon : (TreeItem) -> String;
 
 	/**
 		If set, the function is called to determine if the button should be visible
 		event when the item is not hovered
 	**/
-	?forceVisiblity : (TreeItem) -> Bool,
+	var ?forceVisiblity : (TreeItem) -> Bool;
 }
 
 typedef Params =  {
-	?saveDisplayKey : String,
-	?quickGoto : Bool,
-	?search : Bool,
-	?customScroll : js.html.Element
+	/**
+		The key to save the open state of the items.
+	**/
+	var ?saveDisplayKey : String;
+	/**
+		Typing a letter goes to the next item starting with it (default true).
+	**/
+	var ?quickGoto : Bool;
+	/**
+		Shows a search bar.
+	**/
+	var ?search : Bool;
+	/**
+		The element to scroll, instead of the tree own scroll.
+	**/
+	var ?customScroll : js.html.Element;
 }
 
+/**
+	A tree view component of items of any type, with lazy loading, search, multiple selection, renaming, buttons and drag and drop.
+	The items are given by the `getChildren`, `getName` and `getIcon` callbacks.
+**/
 class FancyTree<TreeItem> extends hide.comp.Component {
 	var rootData : Array<TreeItemData<TreeItem>> = [];
 	var itemMap : Map<{}, TreeItemData<TreeItem>> = [];
@@ -119,6 +240,9 @@ class FancyTree<TreeItem> extends hide.comp.Component {
 	var moveLastDragOverStart: Float = 0;
 
 
+	/**
+		Creates a tree in `parent`.
+	**/
 	public function new(parent: Element, ?params: Params) {
 		saveDisplayKey = params?.saveDisplayKey;
 		quickGoto = params?.quickGoto != null ? params.quickGoto : true;
@@ -223,16 +347,28 @@ class FancyTree<TreeItem> extends hide.comp.Component {
 
 	}
 
+	/**
+		Returns the buttons of an item. Default is none.
+	**/
 	public dynamic function getButtons(item: TreeItem) : Array<TreeButton<TreeItem>> {
 		return [];
 	}
 
+	/**
+		Called when the search changes.
+	**/
 	public dynamic function onSearch() {
 	}
 
+	/**
+		Called when the search is closed.
+	**/
 	public dynamic function onSearchEnd() {
 	}
 
+	/**
+		Called when the selection is cleared.
+	**/
 	public dynamic function onSelectionCleared() {}
 
 	/**
@@ -320,10 +456,16 @@ class FancyTree<TreeItem> extends hide.comp.Component {
 		return children.length > 0;
 	}
 
+	/**
+		Returns the selected items.
+	**/
 	public function getSelectedItems() : Array<TreeItem> {
 		return [for (item => _ in selection) (cast item:TreeItemData<TreeItem>).item];
 	}
 
+	/**
+		Updates an item and its children.
+	**/
 	public function refreshItem(item: TreeItem) {
 		var data = itemMap.get(cast item);
 		if (data != null) {
@@ -371,10 +513,16 @@ class FancyTree<TreeItem> extends hide.comp.Component {
 		return childrenData;
 	}
 
+	/**
+		Does nothing.
+	**/
 	public function ensureVisible(data) {
 
 	}
 
+	/**
+		Reloads all the items.
+	**/
 	public function rebuildTree() {
 		itemMap.clear();
 		rootData = generateChildren(null);
@@ -397,6 +545,9 @@ class FancyTree<TreeItem> extends hide.comp.Component {
 		flattenRec(rootData, flatData);
 	}
 
+	/**
+		Selects an item, opening its parents (and itself if `openSelf`).
+	**/
 	public function selectItem(item: TreeItem, openSelf: Bool = false, clearPrevSelection : Bool = true) {
 		if (clearPrevSelection)
 			clearSelection();
@@ -414,6 +565,9 @@ class FancyTree<TreeItem> extends hide.comp.Component {
 		saveState();
 	}
 
+	/**
+		Starts renaming an item. Does nothing if `onNameChange` is not set.
+	**/
 	public function rename(item: TreeItem) : Void {
 		if (onNameChange == null)
 			return;
@@ -590,6 +744,9 @@ class FancyTree<TreeItem> extends hide.comp.Component {
 		}
 	}
 
+	/**
+		Moves the current item by `delta` shown items.
+	**/
 	public function moveCurrent(delta: Int) {
 		if (delta == 0)
 			return;
@@ -696,6 +853,9 @@ class FancyTree<TreeItem> extends hide.comp.Component {
 		refreshQueued = false;
 	}
 
+	/**
+		Reloads the children of an item.
+	**/
 	public function invalidateChildren(item: TreeItem) {
 		var data = itemMap.get(cast item);
 		if (data == null)
@@ -704,6 +864,9 @@ class FancyTree<TreeItem> extends hide.comp.Component {
 		queueRefresh(Search);
 	}
 
+	/**
+		Applies the search to items. Returns true if one of them is visible.
+	**/
 	public function filterRec(children: Array<TreeItemData<TreeItem>>, parentMatch: Bool = false) : Bool {
 		var anyVisible = false;
 		var searchQuery = FancySearch.createSearchQuery(currentSearch);
@@ -948,6 +1111,9 @@ class FancyTree<TreeItem> extends hide.comp.Component {
 		}
 	}
 
+	/**
+		Clears the selection.
+	**/
 	public function clearSelection() {
 		selection.clear();
 		queueRefresh();
@@ -997,6 +1163,9 @@ class FancyTree<TreeItem> extends hide.comp.Component {
 		queueRefresh();
 	}
 
+	/**
+		Toggles an item open, or opens or closes it if `force` is set.
+	**/
 	public function openItem(item: TreeItem, ?force: Bool) {
 		var data = itemMap.get(cast item);
 		if (data != null) {
@@ -1005,6 +1174,9 @@ class FancyTree<TreeItem> extends hide.comp.Component {
 		}
 	}
 
+	/**
+		Closes an item and its children.
+	**/
 	public function collapseItem(item: TreeItem) {
 		var data = itemMap.get(cast item);
 		if (data == null)
@@ -1067,6 +1239,9 @@ class FancyTree<TreeItem> extends hide.comp.Component {
 	// TODO(ces) : The main release of haxe doesn't support type inference with `|` which make using
 	// queueRefresh with an EnumFlag as an argument cumbersome. Untill then, make multiple queueRefresh calls
 	// with each of the flags you want to set
+	/**
+		Refreshes the tree on the next frame, with a flag.
+	**/
 	public function queueRefresh(?flag: RefreshFlag = null) {
 		if (flag != null) {
 			currentRefreshFlags.set(flag);
@@ -1077,6 +1252,9 @@ class FancyTree<TreeItem> extends hide.comp.Component {
 		}
 	}
 
+	/**
+		Animates the height of an element to show or hide it.
+	**/
 	public static function animateReveal(element: js.html.Element, reveal: Bool, durationMs: Int = 75) {
 		function finish() {
 			if (reveal) {

@@ -2,26 +2,62 @@ package hide.comp;
 
 import hrt.prefab.Curve;
 
+/**
+	A key of a curve.
+**/
 typedef CurveKey = hrt.prefab.Curve.CurveKey;
 
+/**
+	A component drawn over the curve editor (events, overview).
+**/
 interface CurveEditorComponent {
+	/**
+		Redraws the component.
+	**/
 	function refresh(?anim: Bool = false): Void;
+	/**
+		Applies the pan of the curve editor.
+	**/
 	function setPan(): Void;
+	/**
+		Called at the end of a rectangle selection, with the selected time and value range.
+	**/
 	function onSelectionEnd(minT: Float, minV: Float, maxT: Float, MaxV: Float):Void;
+	/**
+		Called before the curves change, to save the undo state.
+	**/
 	function beforeChange(): Void;
+	/**
+		Called after the curves changed, to record the undo.
+	**/
 	function afterChange() : Void;
 }
 
+/**
+	Shows and edits the FX events in the curve editor.
+**/
 class EventsEditor extends Component implements CurveEditorComponent
 {
+	/**
+		The FX editor.
+	**/
 	public var fxEditor : hide.view.FXEditor;
+	/**
+		The curve editor.
+	**/
 	public var curveEditor : CurveEditor;
+	/**
+		The edited events.
+	**/
 	public var events : Array<hrt.prefab.fx.Event.IEvent> = [];
 
 	var lastValue : Array<Float>;
 	var svg : SVG;
 	var eventGroup: Element;
 
+	/**
+		Creates the events editor and adds it to the components of `curveEditor`.
+	**/
 	public function new(?parent, fxEditor: hide.view.FXEditor, curveEditor: CurveEditor) {
 		super(parent, null);
 
@@ -32,18 +68,27 @@ class EventsEditor extends Component implements CurveEditorComponent
 		svg = @:privateAccess this.curveEditor.svg;
 	}
 
+	/**
+		Applies the pan of the curve editor.
+	**/
 	public function setPan() {
 		for (cb in eventRefreshFunction) {
 			cb();
 		}
 	}
 
+	/**
+		Redraws the events.
+	**/
 	public function refreshOverview() {
 		refresh(false);
 	}
 
 	var eventRefreshFunction : Array<() -> Void> = [];
 
+	/**
+		Redraws the events.
+	**/
 	public function refresh(?anim:Bool = false) {
 		if (eventGroup != null)
 			eventGroup.empty();
@@ -258,6 +303,9 @@ class EventsEditor extends Component implements CurveEditorComponent
 
 
 
+	/**
+		Selects the events in the selected time range.
+	**/
 	public function onSelectionEnd(minT:Float, minV:Float, maxT:Float, maxV:Float) {
 		var yOrigin = -20;
 		var eventHeight = 18;
@@ -305,10 +353,16 @@ class EventsEditor extends Component implements CurveEditorComponent
 		}
 	}
 
+	/**
+		Saves the event times for the undo.
+	**/
 	public function beforeChange() {
 		lastValue = [for (e in events) e.time ];
 	}
 
+	/**
+		Records the event time change in the undo history.
+	**/
 	public function afterChange() {
 		var newVal = [for (e in events) e.time ];
 		var oldVal = lastValue;
@@ -329,8 +383,14 @@ class EventsEditor extends Component implements CurveEditorComponent
 	}
 }
 
+/**
+	The overview of the keys of all the curves, above the curve editor.
+**/
 class OverviewEditor extends Component implements CurveEditorComponent
 {
+	/**
+		The curve editor.
+	**/
 	public var curveEditor : CurveEditor;
 
 	var svg : SVG;
@@ -338,6 +398,9 @@ class OverviewEditor extends Component implements CurveEditorComponent
 	var overviewKeys: Element;
 	var overviewSelection: Element;
 
+	/**
+		Creates the overview and adds it to the components of `curveEditor`.
+	**/
 	public function new(?parent, curveEditor: CurveEditor) {
 		super(parent, null);
 
@@ -390,6 +453,9 @@ class OverviewEditor extends Component implements CurveEditorComponent
 		});
 	}
 
+	/**
+		Applies the pan of the curve editor.
+	**/
 	public function setPan() {
 		if (overviewKeys != null)
 			overviewKeys.attr({transform: 'translate(${@:privateAccess this.curveEditor.xt(0)}, 0)'});
@@ -398,6 +464,9 @@ class OverviewEditor extends Component implements CurveEditorComponent
 			overviewSelection.attr({transform: 'translate(${@:privateAccess this.curveEditor.xt(0)}, 0)'});
 	}
 
+	/**
+		Redraws the overview.
+	**/
 	public function refresh(?anim:Bool = false) {
 		var width = Math.round(svg.element.width());
 		var xScale = @:privateAccess this.curveEditor.xScale;
@@ -585,6 +654,9 @@ class OverviewEditor extends Component implements CurveEditorComponent
 		}
 	}
 
+	/**
+		Adds a key at a time on the selected curves (or the only curve).
+	**/
 	public function addKey(time: Float) {
 		@:privateAccess this.curveEditor.beforeChange();
 
@@ -597,15 +669,33 @@ class OverviewEditor extends Component implements CurveEditorComponent
 		@:privateAccess this.curveEditor.afterChange();
 	}
 
+	/**
+		Does nothing.
+	**/
 	public function onSelectionEnd(minT:Float, minV:Float, maxT:Float, MaxV:Float) {}
 
+	/**
+		Does nothing.
+	**/
 	public function beforeChange() {}
 
+	/**
+		Does nothing.
+	**/
 	public function afterChange() {}
 }
 
+/**
+	A popup with a curve editor.
+**/
 class CurvePopup extends hide.comp.Popup {
+	/**
+		The curve editor.
+	**/
 	public var editor : CurveEditor;
+	/**
+		Creates the popup and its curve editor.
+	**/
 	public function new(?parent : Element, undo: hide.ui.UndoHistory) {
 		super(parent);
 		element.addClass("curve-editor-popup");
@@ -615,8 +705,14 @@ class CurvePopup extends hide.comp.Popup {
 	}
 }
 
+/**
+	The curve editor component: edits the keys and handles of several curves in an SVG view.
+**/
 class CurveEditor extends hide.comp.Component {
 
+	/**
+		The colors of the curves.
+	**/
 	public static var CURVE_COLORS: Array<Int> = [
 		0xff3352,
 		0x8bdc00,
@@ -624,21 +720,60 @@ class CurveEditor extends hide.comp.Component {
 		0x4cccff
 	];
 
+	/**
+		The horizontal zoom, in pixels per time unit.
+	**/
 	public var xScale = 200.;
+	/**
+		The vertical zoom, in pixels per value unit.
+	**/
 	public var yScale = 30.;
+	/**
+		The time at the left of the view.
+	**/
 	public var xOffset = 0.;
+	/**
+		The value at the middle of the view.
+	**/
 	public var yOffset = 0.;
 
+	/**
+		The edited curves.
+	**/
 	public var curves(default, set) : Array<hrt.prefab.Curve>;
+	/**
+		The undo history.
+	**/
 	public var undo : hide.ui.UndoHistory;
 
+	/**
+		Prevents the horizontal pan and zoom.
+	**/
 	public var lockViewX = false;
+	/**
+		Prevents the vertical pan and zoom.
+	**/
 	public var lockViewY = false;
+	/**
+		Restricts the key moves: in the curve view the keys keep their value, in the overview they keep their time.
+	**/
 	public var lockKeyX = false;
+	/**
+		If above 0, the keys can't be moved after this time, and the area after it is darkened.
+	**/
 	public var maxLength = 0.0;
+	/**
+		The evaluator used to draw the curves.
+	**/
 	public var evaluator : hrt.prefab.fx.Evaluator;
 
+	/**
+		The components drawn over the editor.
+	**/
 	public var components : Array<CurveEditorComponent> = [];
+	/**
+		The element of the components.
+	**/
 	public var componentsGroup : Element;
 
 	var enableTimeMarker = true;
@@ -662,10 +797,16 @@ class CurveEditor extends hide.comp.Component {
 	var currentTime: Float = 0.;
 	var duration: Float = 2000.;
 
+	/**
+		Called when the properties of the curves must be refreshed.
+	**/
 	public dynamic function onRefreshProps() {
 
 	}
 
+	/**
+		Creates the editor. `enableTimeMarker` shows the current time marker.
+	**/
 	public function new(undo, ?parent, enableTimeMarker = true) {
 		super(parent,null);
 		this.undo = undo;
@@ -806,14 +947,23 @@ class CurveEditor extends hide.comp.Component {
 		this.curves = [];
 	}
 
+	/**
+		Called when the curves change. `anim` is true while dragging.
+	**/
 	public dynamic function onChange(anim: Bool) {
 
 	}
 
+	/**
+		Called when a key is moved, with its previous time and value.
+	**/
 	public dynamic function onKeyMove(key: CurveKey, prevTime: Float, prevVal: Float) {
 
 	}
 
+	/**
+		Called by `zoomAll` when `lockViewX` is set, to ask the owner to zoom on a time range.
+	**/
 	public dynamic function requestXZoom(xmin: Float, xmax: Float) {
 
 	}
@@ -1029,6 +1179,9 @@ class CurveEditor extends hide.comp.Component {
 		});
 	}
 
+	/**
+		Sets the view offsets.
+	**/
 	public function setPan(xoff, yoff) {
 		xOffset = xoff;
 		yOffset = yoff;
@@ -1036,6 +1189,9 @@ class CurveEditor extends hide.comp.Component {
 		graphGroup.attr({transform: 'translate(${xt(0)},${yt(0)})'});
 	}
 
+	/**
+		Zooms on a value range.
+	**/
 	public function setYZoom(yMin: Float, yMax: Float) {
 		// If there is some components attached to curve, it takes some place
 		// on svg, so we add bigger margin on Y axis.
@@ -1044,12 +1200,18 @@ class CurveEditor extends hide.comp.Component {
 		yOffset = (yMax + yMin) * 0.5;
 	}
 
+	/**
+		Zooms on a time range.
+	**/
 	public function setXZoom(xMin: Float, xMax: Float) {
 		var margin = 10.0;
 		xScale = (width - margin * 2.0) / (xMax - xMin);
 		xOffset = xMin;
 	}
 
+	/**
+		Zooms on the visible curves.
+	**/
 	public function zoomAll() {
 		if (curves.length == 0)
 			return;
@@ -1138,6 +1300,9 @@ class CurveEditor extends hide.comp.Component {
 		onChange(false);
 	}
 
+	/**
+		Redraws everything.
+	**/
 	public function refresh(?anim: Bool) {
 		applyView();
 		refreshGrid();
@@ -1146,6 +1311,9 @@ class CurveEditor extends hide.comp.Component {
 		refreshOverlay();
 	}
 
+	/**
+		Redraws the grid.
+	**/
 	public function refreshGrid() {
 		width = Math.round(svg.element.width());
 		height = Math.round(svg.element.height());
@@ -1226,6 +1394,9 @@ class CurveEditor extends hide.comp.Component {
 			svg.rect(gridGroup, xt(maxLength), 0, width - xt(maxLength), height, { opacity: 0.4});
 	}
 
+	/**
+		Redraws the time marker, at `currentTime` if set.
+	**/
 	public function refreshTimeline(?currentTime : Float) {
 		markersGroup.empty();
 
@@ -1261,6 +1432,9 @@ class CurveEditor extends hide.comp.Component {
 
 	}
 
+	/**
+		Redraws the overlay, with a new duration if set.
+	**/
 	public function refreshOverlay(?duration: Float) {
 		overlayGroup.empty();
 
@@ -1295,6 +1469,9 @@ class CurveEditor extends hide.comp.Component {
 		svg.rect(overlayGroup, maxX, 0, svg.element.width(), svg.element.height(), { 'fill':'#000000', opacity:0.3});
 	}
 
+	/**
+		Redraws the curves and keys.
+	**/
 	public function refreshGraph(?anim: Bool = false, ?animKey: CurveKey, lowQuality: Bool = false) {
 		if(curves == null)
 			return;
@@ -1648,6 +1825,9 @@ class CurveEditor extends hide.comp.Component {
 		refreshComponents(anim);
 	}
 
+	/**
+		Redraws the curve lines.
+	**/
 	public function redrawCurves(lowQuality: Bool = false) {
 		static var pointBuffer: Array<Float> = [];
 
@@ -1792,17 +1972,26 @@ class CurveEditor extends hide.comp.Component {
 		}
 	}
 
+	/**
+		Forwards the end of a rectangle selection to the components.
+	**/
 	public function onSelectionEnd(minT: Float, minV: Float, maxT: Float, maxV: Float) {
 		for (c in components)
 			c.onSelectionEnd(minT, minV, maxT, maxV);
 	}
 
+	/**
+		Applies the pan to the components.
+	**/
 	public function setComponentsPan() {
 		for (comp in this.components) {
 			comp.setPan();
 		}
 	}
 
+	/**
+		Redraws the components.
+	**/
 	public function refreshComponents(?anim:Bool = false) {
 		for (comp in this.components) {
 			comp.refresh(anim);
@@ -1810,12 +1999,30 @@ class CurveEditor extends hide.comp.Component {
 	}
 }
 
+/**
+	How the events are changed by a drag.
+**/
 enum EventMoveMode {
+	/**
+		Moves the events.
+	**/
 	Move;
+	/**
+		Moves the start of the events, keeping their end.
+	**/
 	ResizeLeft;
+	/**
+		Changes the duration of the events.
+	**/
 	ResizeRight;
+	/**
+		Not implemented.
+	**/
 	Scale;
 }
+/**
+	A drag of FX events in the curve editor.
+**/
 class EventMoving {
 	var startTime : Array<Float> = [];
 	var startDuration: Array<Float> = [];
@@ -1829,6 +2036,9 @@ class EventMoving {
 		return hxd.Math.round(v * 1000.0) / 1000.0;
 	}
 
+	/**
+		Starts a drag of events.
+	**/
 	public function new(selectedEvents: Array<hrt.prefab.fx.Event.IEvent>, refreshFns: Array<() -> Void>, startEvent: js.html.PointerEvent, mode: EventMoveMode, editor: EventsEditor) {
 		selection = selectedEvents.copy();
 		for (i => event in selection) {
@@ -1842,6 +2052,9 @@ class EventMoving {
 		this.eventRefresh = refreshFns;
 	}
 
+	/**
+		Updates the events from the pointer position.
+	**/
 	public function update(event: js.html.PointerEvent) {
 		var delta = event.clientX - startMouseX;
 		var deltaTime = snap(delta / editor.curveEditor.xScale);
@@ -1866,6 +2079,9 @@ class EventMoving {
 		@:privateAccess editor.fxEditor.forceTick = true;
 	}
 
+	/**
+		Ends the drag and records the change in the undo history.
+	**/
 	public function end(event: js.html.PointerEvent) {
 		var endTime : Array<Float> = [];
 		var endDuration : Array<Float> = [];
