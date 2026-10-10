@@ -2,19 +2,40 @@ package hide.comp;
 
 import js.Browser;
 
+/**
+	Where a popup opens relative to its anchor.
+**/
 enum PopupPosition {
+	/**
+		Over the anchor.
+	**/
 	Inside;
+	/**
+		Below the anchor.
+	**/
 	Bellow;
 }
-// Open a "popup" window that can be closed by
-// clicking outside of it. Usefull for medium size editors
-// that appears when clicking on an item
+/**
+	A popup that closes when clicking outside of it. Useful for medium size editors that appear when clicking on an item.
+**/
 class Popup extends Component {
 	var timer : haxe.Timer;
 	var isSearchable:Bool;
+	/**
+		The element the popup is placed at.
+	**/
 	public var anchor : Element;
+	/**
+		The horizontal offset from the anchor.
+	**/
 	public var offsetX(default, set) : Float = 0;
+	/**
+		The vertical offset from the anchor.
+	**/
 	public var offsetY(default, set) : Float = 0;
+	/**
+		Where the popup opens relative to the anchor.
+	**/
 	public var position(default, set): PopupPosition = Bellow;
 
 	/**
@@ -54,6 +75,9 @@ class Popup extends Component {
 
 	var originalTarget : js.html.EventTarget;
 
+	/**
+		Creates a popup, with a search bar if `isSearchable`.
+	**/
 	public function new(?parent:Element, isSearchable = false) {
       super(parent,new Element("<div>"));
 
@@ -93,6 +117,9 @@ class Popup extends Component {
 		element[0].focus();
 	}
 
+	/**
+		Shows the popup.
+	**/
 	public function open() {
 		untyped element.get(0).showPopover();
 		element.show();
@@ -101,6 +128,9 @@ class Popup extends Component {
         reflow();
 	}
 
+	/**
+		Places the popup again.
+	**/
 	public function onScroll(e: js.html.MouseScrollEvent) {
 		reflow();
 	}
@@ -175,20 +205,35 @@ class Popup extends Component {
 		reflowQueued = false;
 	}
 
+	/**
+		Called when the search changes.
+	**/
 	public function onSearchChanged(searchBar:Element):Void {}
 
+	/**
+		Closes the popup.
+	**/
 	public function close() {
 		untyped element.get(0).hidePopover();
 		onToggle({newState: "closed"});
 	}
 
+	/**
+		Called when the popup closes.
+	**/
 	public dynamic function onClose() {
 	}
 
+	/**
+		Tells if a click outside closes the popup (true by default).
+	**/
 	public function canCloseOnClickOutside() : Bool {
 		return true;
 	}
 
+	/**
+		Tells if a click outside closes the popup (true by default).
+	**/
 	public dynamic function onShouldCloseOnClick(clickEvent : js.html.Event) : Bool {
 		return true;
 	}

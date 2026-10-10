@@ -10,21 +10,51 @@ import hide.view.CameraController.CamController;
 
 import hrt.tools.MapUtils;
 
+/**
+	A property that can be animated with a curve track.
+**/
 typedef PropTrackDef = {
-	name: String,
-	?def: Float
+	/**
+		The property name.
+	**/
+	var name : String;
+	/**
+		The default value.
+	**/
+	var ?def : Float;
 };
 
+/**
+	A prefab and its curves and events, shown as a section of the curve editor.
+**/
 typedef Section = {
-	root: PrefabElement,
-	curves: Array<Curve>,
-	children: Array<Section>,
-	events: Array<IEvent>
+	/**
+		The prefab.
+	**/
+	var root : PrefabElement;
+	/**
+		The curves of the prefab.
+	**/
+	var curves : Array<Curve>;
+	/**
+		The sections of the children.
+	**/
+	var children : Array<Section>;
+	/**
+		The events of the prefab.
+	**/
+	var events : Array<IEvent>;
 };
 
+/**
+	The edit context of the FX editor.
+**/
 @:access(hide.view.FXEditor)
 class FXEditContext extends hide.prefab.EditContext {
 	var parent : FXEditor;
+	/**
+		Creates the context of an FX editor.
+	**/
 	public function new(undo, parent) {
 		super(undo);
 		this.parent = parent;
@@ -308,9 +338,15 @@ private class FXSceneEditor extends hide.comp.SceneEditor {
 	}
 }
 
+/**
+	The FX editor view (`.fx` files): scene, prefab tree, properties and timeline with curves and events.
+**/
 class FXEditor extends hide.view.FileView {
 
 	var sceneEditor : FXSceneEditor;
+	/**
+		The prefabs to select once loaded.
+	**/
 	public var selectOnLoad : Array<hrt.prefab.Prefab> = null;
 	var data : hrt.prefab.fx.BaseFX;
 	var is2D : Bool = false;
@@ -553,6 +589,9 @@ class FXEditor extends hide.view.FileView {
 
 		setRenderPropsEditionVisibility(Ide.inst.currentConfig.get("sceneeditor.renderprops.edit", false));
 	}
+	/**
+		Loads the FX once the scene is ready.
+	**/
 	public function onSceneReady() {
 		data = cast(hxd.res.Loader.currentInstance.load(state.path).toPrefab().load().clone(), hrt.prefab.fx.BaseFX);
 		if (data == null) {
@@ -1398,6 +1437,9 @@ class FXEditor extends hide.view.FileView {
 		return added;
 	}
 
+	/**
+		Returns the menu adding curve tracks to a prefab.
+	**/
 	public function getNewTrackMenu(elt: PrefabElement) : Array<hrt.ui.HuiMenu.MenuItem> {
 		var obj3dElt = Std.downcast(elt, hrt.prefab.Object3D);
 		var obj2dElt = Std.downcast(elt, hrt.prefab.Object2D);
@@ -1724,6 +1766,9 @@ class FXEditor extends hide.view.FileView {
 	var trailTime_smooth = 0.0;
 	var num_trail_tri_smooth = 0.0;
 
+	/**
+		Formats a number with `prec` decimals (with trailing zeros if `showZeros`).
+	**/
 	public static function floatToStringPrecision(n : Float, ?prec : Int = 2, ?showZeros : Bool = true) {
 		if(n == 0) { // quick return
 			if (showZeros)
@@ -1859,6 +1904,9 @@ class FXEditor extends hide.view.FileView {
 		return this.currentTime;
 	}
 
+	/**
+		Shows or hides the render props edition.
+	**/
 	public function setRenderPropsEditionVisibility(visible : Bool) {
 		var renderPropsEditionEl = this.element?.find('.render-props-edition');
 		// can appen on close
@@ -1875,6 +1923,9 @@ class FXEditor extends hide.view.FileView {
 }
 
 
+/**
+	The 2D FX editor view (`.fx2d` files).
+**/
 class FX2DEditor extends FXEditor {
 
 	override function getDefaultContent() {

@@ -2,8 +2,17 @@ package hide.comp;
 
 import domkit.Checker;
 
+/**
+	The language of a domkit editor.
+**/
 enum DomkitEditorKind {
+	/**
+		Domkit markup.
+	**/
 	DML;
+	/**
+		Domkit style sheet (less syntax).
+	**/
 	Less;
 }
 
@@ -24,6 +33,9 @@ private class DomkitCssParser extends domkit.CssParser {
 }
 
 
+/**
+	Checks domkit markup and style sheets against the components of the project.
+**/
 class DomkitChecker {
 
 	var ide : hide.Ide;
@@ -33,6 +45,9 @@ class DomkitChecker {
 	var lessVariables : Map<String, domkit.CssValue> = new Map();
 	var definedIdents : Map<String, Array<TypedComponent>> = new Map();
 
+	/**
+		Creates a checker with the script API types of a config.
+	**/
 	public function new(config) {
 		ide = hide.Ide.inst;
 		var api = hide.comp.ScriptEditor.ScriptCache.loadApiFiles(config);
@@ -61,6 +76,9 @@ class DomkitChecker {
 
 	static var R_PREFIX = ~/<([A-Za-z0-9-]+)/;
 
+	/**
+		Checks a markup. Throws a `domkit.Error`.
+	**/
 	public function checkDML( dmlCode : String, filePath : String, position = 0 ) {
 		try {
 			var locals = {};
@@ -88,6 +106,9 @@ class DomkitChecker {
 		}
 	}
 
+	/**
+		Returns a markup reformatted.
+	**/
 	public function formatDML( code : String ) : String {
 		code = StringTools.trim(code);
 		code = [for( l in code.split("\n") ) StringTools.rtrim(l)].join("\n");
@@ -97,6 +118,9 @@ class DomkitChecker {
 		return domkit.MarkupParser.markupToString(expr);
 	}
 
+	/**
+		Checks a style sheet (with the `less.includes` config files). Throws a `domkit.Error`.
+	**/
 	public function checkLess( cssCode : String ) {
 		var includes : Array<String> = config.get("less.includes", []);
 		var parser = new DomkitCssParser(this);
@@ -119,6 +143,9 @@ class DomkitChecker {
 		getChecker().checkCSS(rules);
 	}
 
+	/**
+		Returns a component by name, or null.
+	**/
 	public function resolveComp( name : String ) {
 		return checker.components.get(name);
 	}
@@ -126,11 +153,23 @@ class DomkitChecker {
 }
 
 
+/**
+	A code editor for domkit markup or style sheets, checking them as they are edited.
+**/
 class DomkitEditor extends CodeEditor {
 
+	/**
+		The language.
+	**/
 	public var kind : DomkitEditorKind;
+	/**
+		The checker.
+	**/
 	public var checker : DomkitChecker;
 
+	/**
+		Creates the editor of a code.
+	**/
 	public function new( kind, code : String, checker, ?parent : Element, ?root : Element ) {
 		this.kind = kind;
 		allowScrollBeyondLine = true;
@@ -172,11 +211,17 @@ class DomkitEditor extends CodeEditor {
 		}
 	}
 
+	/**
+		Shows a domkit error.
+	**/
 	public function setDomkitError( e : domkit.Error ) {
 		var lines = code.substr(0, e.pmin).split("\n");
 		setError(e.message, lines.length, e.pmin, e.pmax);
 	}
 
+	/**
+		Checks the code and shows the error.
+	**/
 	public function check() {
 		try {
 			switch( kind ) {
@@ -189,9 +234,15 @@ class DomkitEditor extends CodeEditor {
 		}
 	}
 
+	/**
+		Called to open the definition of a component.
+	**/
 	public dynamic function gotoComponent(name:String) {
 	}
 
+	/**
+		Returns the name of the last closed component of the markup, or null.
+	**/
 	public function getComponent() {
 		var compReg = ~/<\/([A-Za-z0-9_-]+)/;
 		var last = code.lastIndexOf("</");
