@@ -1,5 +1,8 @@
 package hide.comp;
 
+/**
+	A code editor component (Monaco), with completion and error display.
+**/
 class CodeEditor extends Component {
 
 	static var INIT_DONE = false;
@@ -9,11 +12,23 @@ class CodeEditor extends Component {
 	var editor : monaco.ScriptEditor;
 	var errorMessage : Element;
 	var currrentDecos : Array<String> = [];
+	/**
+		The code.
+	**/
 	public var code(get,never) : String;
+	/**
+		Lets the key events reach the parent elements.
+	**/
 	public var propagateKeys : Bool = false;
+	/**
+		Calls `onSave` when the editor loses the focus.
+	**/
 	public var saveOnBlur : Bool = true;
 	var allowScrollBeyondLine : Bool;
 
+	/**
+		Creates an editor of a code in a language.
+	**/
 	public function new( code : String, lang : String, ?parent : Element, ?root : Element ) {
 
 		if( !INIT_DONE ) {
@@ -77,6 +92,9 @@ class CodeEditor extends Component {
 		customCtrlSBehavior();
 	}
 
+	/**
+		Called on Ctrl+S, after `onSave`.
+	**/
 	public dynamic function customCtrlSBehavior() {
 	}
 
@@ -150,6 +168,9 @@ class CodeEditor extends Component {
 		return editor.getValue({preserveBOM:true});
 	}
 
+	/**
+		Replaces the code, keeping the undo history if `keepHistory`.
+	**/
 	public function setCode( code : String, keepHistory : Bool = false ) {
 		if ( keepHistory ) {
 			editor.executeEdits('set_code', [{ identifier: 'delete', range: new monaco.Range(1, 1, 10000, 1), text: '', forceMoveMarkers: true }]);
@@ -160,25 +181,43 @@ class CodeEditor extends Component {
 		editor.setValue(code);
 	}
 
+	/**
+		Focuses the editor.
+	**/
 	public function focus() {
 		editor.focus();
 	}
 
+	/**
+		Called when the code changes.
+	**/
 	public dynamic function onChanged() {
 	}
 
+	/**
+		Called on Ctrl+S, and when the editor loses the focus if `saveOnBlur`.
+	**/
 	public dynamic function onSave() {
 	}
 
+	/**
+		Called when Escape is pressed.
+	**/
 	public dynamic function onClose() {
 	}
 
+	/**
+		Removes the shown error.
+	**/
 	public function clearError() {
 		if( currrentDecos.length != 0 )
 			currrentDecos = editor.deltaDecorations(currrentDecos,[]);
 		errorMessage.toggle(false);
 	}
 
+	/**
+		Shows an error at a line and position range.
+	**/
 	public function setError( msg : String, line : Int, pmin : Int, pmax : Int ) {
 		var linePos = code.substr(0,pmin).lastIndexOf("\n");
 		if( linePos < 0 ) linePos = 0 else linePos++;
@@ -201,6 +240,9 @@ class CodeEditor extends Component {
 			errorMessage[0].scrollIntoView(false);
 	}
 
+	/**
+		Moves the cursor and scrolls to a line.
+	**/
 	public function setCursor( line : Int, ?column = 0 ) {
 		editor.setPosition({ lineNumber : line + 1, column: column + 1 });
 		var lineHeight = editor.getOption(67 /*lineHeight*/);

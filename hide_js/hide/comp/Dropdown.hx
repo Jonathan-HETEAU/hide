@@ -1,20 +1,53 @@
 package hide.comp;
 using hide.tools.Extensions;
 
+/**
+	A choice of a dropdown.
+**/
 typedef Choice = {
+	/**
+		The value.
+	**/
 	var id: String;
+	/**
+		The displayed text.
+	**/
 	var text: String;
+	/**
+		An icon. Not used by the dropdown: see the `buildIcon` argument.
+	**/
 	@:optional var ico: Dynamic;
+	/**
+		CSS classes of the choice.
+	**/
 	@:optional var classes: Array<String>;
+	/**
+		The tooltip.
+	**/
 	@:optional var doc: String;
+	/**
+		The index of the choice, set by the dropdown.
+	**/
 	@:optional var index: Int;
+	/**
+		Extra text matched by the search.
+	**/
 	@:optional var searchText: String;
 }
 
+/**
+	A dropdown list with a search filter.
+**/
 class Dropdown extends Component {
 	var highlightIndex : Null<Int> = null;
 	var optionsCont : Element;
-	public var ignoreIdInSearch : Bool = false; // Search won't filter based on id if this is true
+	/**
+		Search won't filter based on id if this is true.
+	**/
+	public var ignoreIdInSearch : Bool = false;
+	/**
+		The search input.
+	**/
 	public var filterInput : Element;
 	var options : Array<Choice>;
 	var orderedOptions : Array<Choice>;
@@ -22,6 +55,9 @@ class Dropdown extends Component {
 	var timer : haxe.Timer;
 
 
+	/**
+		Creates a dropdown of choices. `buildIcon` creates the icon of a choice. A `detached` dropdown is added to the view content and placed at `parent`.
+	**/
 	public function new( parent, options : Array<Choice>, currentValue: String, ?buildIcon : (Choice) -> Element, detached : Bool = false ) {
 		var root = new Element('<div class="hide-dropdown">
 			<div class="dropdown-cont">
@@ -270,6 +306,12 @@ class Dropdown extends Component {
 		remove();
 	}
 
+	/**
+		Called with the chosen value.
+	**/
 	public dynamic function onSelect(val: String) {}
+	/**
+		Called when the dropdown closes.
+	**/
 	public dynamic function onClose() {}
 }

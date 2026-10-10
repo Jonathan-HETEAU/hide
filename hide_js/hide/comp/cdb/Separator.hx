@@ -1,18 +1,42 @@
 package hide.comp.cdb;
 
+/**
+	A separator of a CDB table: a collapsible titled group of lines, which can be nested.
+**/
 @:access(hide.comp.cdb.Table)
 class Separator extends Component {
+	/**
+		The prefix of the keys of the saved expanded states.
+	**/
 	public static var SEPARATOR_KEY = "sep";
 
+	/**
+		The table.
+	**/
 	public var table : Table;
+	/**
+		The separator data of the sheet.
+	**/
 	public var data : cdb.Data.Separator;
+	/**
+		The parent separator, or null.
+	**/
 	public var parent : Separator;
+	/**
+		The child separators.
+	**/
 	public var subs : Array<Separator> = [];
 
-	var visible(get, null) : Bool; // Is the separator visible (i.e. parent separators aren't collapsed )
+	/**
+		Is the separator visible (i.e. parent separators aren't collapsed).
+	**/
+	var visible(get, null) : Bool;
 	var filtered : Bool = false;
 	var expanded : Bool = true;
 
+	/**
+		Creates a separator of a table.
+	**/
 	public function new(root : Element, table: Table, data : cdb.Data.Separator) {
 		this.table = table;
 		this.data = data;
@@ -206,6 +230,9 @@ class Separator extends Component {
 		toggleBtn.click((e) -> toggle());
 	}
 
+	/**
+		Redraws the separator (and its children if `refreshChildren`).
+	**/
 	public function refresh(refreshChildren : Bool = true) {
 		expanded = if (data.title == null) true else table.editor.separatorsState.get(getSeparatorKey()) ?? true;
 
@@ -249,6 +276,9 @@ class Separator extends Component {
 	}
 
 
+	/**
+		Expands or collapses the separator.
+	**/
 	public function toggle() {
 		if (this.expanded)
 			collapse();
@@ -256,14 +286,23 @@ class Separator extends Component {
 			expand();
 	}
 
+	/**
+		Expands the separator.
+	**/
 	public function expand() {
 		setState(true);
 	}
 
+	/**
+		Collapses the separator.
+	**/
 	public function collapse() {
 		setState(false);
 	}
 
+	/**
+		Expands the separator and its parents.
+	**/
 	public function reveal() {
 		var s = this;
 		while (s != null) {
@@ -285,6 +324,9 @@ class Separator extends Component {
 	}
 
 
+	/**
+		Returns the separators containing a line, from the root.
+	**/
 	public static function getParentSeparators(lineIdx : Int, separators : Array<Separator> ) : Array<Separator> {
 		var res = [];
 		var idx = separators.length - 1;
@@ -304,10 +346,16 @@ class Separator extends Component {
 		return res;
 	}
 
+	/**
+		Tells if the lines of the separator are shown.
+	**/
 	public function getLinesVisiblity() {
 		return visible && expanded && !filtered;
 	}
 
+	/**
+		Returns the lines of the separator.
+	**/
 	public function getLines() {
 		var sIdx = @:privateAccess table.separators.indexOf(this);
 		var startIdx = data.index;
