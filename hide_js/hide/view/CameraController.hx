@@ -3,21 +3,42 @@ package hide.view;
 import hxd.Math;
 import hxd.Key as K;
 
+/**
+	The base of the scene editor camera controllers, with their saved settings.
+**/
 class CameraControllerBase extends h3d.scene.CameraController {
 	var sceneEditor : hide.comp.SceneEditor;
 
+	/**
+		Creates the controller of a scene editor.
+	**/
 	public function new(parent, sceneEditor) {
 		this.sceneEditor = sceneEditor;
 		super(null, parent);
 	}
 
+	/**
+		The camera move speed.
+	**/
 	public var camSpeed = 1.0;
 
+	/**
+		The near plane distance.
+	**/
 	public var zNear = 0.1;
+	/**
+		The far plane distance.
+	**/
 	public var zFar = 10000.0;
 
+	/**
+		Pans along the terrain, not only the z=0 plane.
+	**/
 	public var snapToGround = true;
 
+	/**
+		Takes the field of view and planes from the camera.
+	**/
 	public function loadFOVFromCamera() {
 		var scene = if( scene == null ) getScene() else scene;
 		var cam = scene.camera;
@@ -34,6 +55,9 @@ class CameraControllerBase extends h3d.scene.CameraController {
 		wantedFOV = scene.camera.fovY;
 	}
 
+	/**
+		Loads the settings.
+	**/
 	public function loadSettings(data : Dynamic) : Void {
 		wantedFOV = data.fov != null ? data.fov : wantedFOV;
 		sceneEditor.scene.s3d.camera.fovY = wantedFOV;
@@ -44,6 +68,9 @@ class CameraControllerBase extends h3d.scene.CameraController {
 		snapToGround = data.snapToGround ?? snapToGround;
 	}
 
+	/**
+		Saves the settings.
+	**/
 	public function saveSettings(data : Dynamic) : Void {
 		data.fov = wantedFOV;
 		data.camSpeed = camSpeed;
@@ -70,11 +97,23 @@ class CameraControllerBase extends h3d.scene.CameraController {
 	}
 }
 
+/**
+	An orthographic camera controller.
+**/
 class OrthoController extends CameraControllerBase {
+	/**
+		Above this angle from the horizontal, without selection, the camera orbits around the ground point at the center of the view.
+	**/
 	public var groundSnapAngle = hxd.Math.degToRad(30);
 	var moveCount = 0;
 
+	/**
+		The depth range of the orthographic view.
+	**/
 	public var orthoZBounds : Float = 4.0;
+	/**
+		The zoom of the orthographic view.
+	**/
 	public var orthoZoom = 1.0;
 
 	override function loadSettings(data : Dynamic) : Void {
@@ -232,6 +271,9 @@ class OrthoController extends CameraControllerBase {
 	}
 }
 
+/**
+	A first person camera controller.
+**/
 class FPSController extends CameraControllerBase {
 	override function loadSettings(data : Dynamic) : Void {
 		super.loadSettings(data);
@@ -362,7 +404,13 @@ class FPSController extends CameraControllerBase {
 	}
 }
 
+/**
+	The default orbit camera controller.
+**/
 class CamController extends CameraControllerBase {
+	/**
+		Above this angle from the horizontal, without selection, the camera orbits around the ground point at the center of the view.
+	**/
 	public var groundSnapAngle = hxd.Math.degToRad(30);
 	var moveCount = 0;
 
@@ -511,6 +559,9 @@ class CamController extends CameraControllerBase {
 	}
 }
 
+/**
+	A flight camera controller, with smoothed moves.
+**/
 class FlightController extends CameraControllerBase {
 	var currentFlightPos : h3d.Vector = new h3d.Vector();
 	var currentFlightRot : h3d.Quat = new h3d.Quat();
@@ -520,6 +571,9 @@ class FlightController extends CameraControllerBase {
 
 	var mat : h3d.Matrix = new h3d.Matrix();
 
+	/**
+		Creates the controller of a scene editor.
+	**/
 	public function new(parent, sceneEditor) {
 		super(parent, sceneEditor);
 		targetFlightRot.identity();

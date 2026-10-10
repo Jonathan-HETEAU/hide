@@ -56,12 +56,27 @@ private class ImageViewerShader extends hxsl.Shader {
 
 }
 
+/**
+	What the image view shows.
+**/
 enum ViewMode {
+	/**
+		The texture with the compression settings.
+	**/
 	Compressed;
+	/**
+		The original texture.
+	**/
 	Uncompressed;
+	/**
+		Both, split by a slider.
+	**/
 	Comparison;
 }
 
+/**
+	The image view: shows a texture and edits its compression settings.
+**/
 class Image extends FileView {
 
 	var bmp : h2d.Bitmap;
@@ -453,6 +468,9 @@ class Image extends FileView {
 		updateSliderVisual();
 	}
 
+	/**
+		Called when the compressed and original textures are loaded.
+	**/
 	public function onTexturesLoaded(compressedTexture: Null<h3d.mat.Texture>, uncompressedTexture: Null<h3d.mat.Texture>) {
 		uncompressedTexture.filter = Nearest;
 
@@ -515,6 +533,9 @@ class Image extends FileView {
 		onResize();
 	}
 
+	/**
+		Applies the view mode and channel settings to the preview.
+	**/
 	public function applyShaderConfiguration() {
 		switch (this.viewMode) {
 			case  Compressed:
@@ -589,6 +610,9 @@ class Image extends FileView {
 		}
 	}
 
+	/**
+		Disposes the scene and the preview.
+	**/
 	public function cleanUp() {
 		if (scene != null)
 			scene.dispose();
@@ -603,6 +627,9 @@ class Image extends FileView {
 		shader = null;
 	}
 
+	/**
+		Updates the shown compression informations.
+	**/
 	public function updateImageCompressionInfos() {
 		var compressionInfo = element.find(".compression-infos");
 
@@ -683,6 +710,9 @@ class Image extends FileView {
 		nativeFormat.text(getTextureNativeFormat(state.path).getName());
 	}
 
+	/**
+		Shows the texture of a file.
+	**/
 	public function replaceImage(path : String) {
 		var bytes = sys.io.File.getBytes(path);
 		var res = hxd.res.Any.fromBytes(path, bytes);
@@ -741,6 +771,9 @@ class Image extends FileView {
 		onResize();
 	}
 
+	/**
+		Compresses the texture with the settings of the form into a temporary file, and shows it.
+	**/
 	public function createPreviewTexture(format: Element, useAlpha: Element, alpha: Element, mips: Element, size: Element, filter: Element) {
 		var dirPos = state.path.lastIndexOf("/");
 		var name = dirPos < 0 ? state.path : state.path.substr(dirPos + 1);
@@ -765,6 +798,9 @@ class Image extends FileView {
 		replaceImage(Ide.inst.getPath(tmpPath));
 	}
 
+	/**
+		Returns the width of the texture.
+	**/
 	public function getTextureMaxSize(): Int {
 		var path = ide.getPath(state.path);
 		var bytes = sys.io.File.getBytes(path);
@@ -774,8 +810,10 @@ class Image extends FileView {
 		return t.width;
 	}
 
+	/**
+		Returns the memory size of a texture, in MB.
+	**/
 	public function getTextureMemSize(path: String) {
-		// Return texture mem size in MB
 		var p = ide.getPath(path);
 		var bytes = sys.io.File.getBytes(p);
 		var res = hxd.res.Any.fromBytes(p, bytes);
@@ -784,6 +822,9 @@ class Image extends FileView {
 		return @:privateAccess floatToStringPrecision(t.mem.memSize(t) / (1024 * 1024));
 	}
 
+	/**
+		Returns the format of a texture file.
+	**/
 	public function getTextureNativeFormat(path: String) {
 		var p = ide.getPath(path);
 		var bytes = sys.io.File.getBytes(p);
@@ -793,11 +834,17 @@ class Image extends FileView {
 		return t.format;
 	}
 
+	/**
+		Rounds a number to `precision` decimals.
+	**/
 	public function floatToStringPrecision(number:Float, ?precision=2) {
 		number *= Math.pow(10, precision);
 		return Math.round(number) / Math.pow(10, precision);
 	}
 
+	/**
+		Updates the comparison slider to the zoom.
+	**/
 	public function updateSliderVisual() {
 		var cam2d = Std.downcast(cam, hide.view.l3d.CameraController2D);
 		if (cam2d != null && sliderBmp != null) {
@@ -810,6 +857,9 @@ class Image extends FileView {
 		// todo : handle slider zoom for cam 3d
 	}
 
+	/**
+		Draws the comparison slider.
+	**/
 	public function drawSlider() {
 		if (sliderBmp == null)
 			sliderBmp = new h2d.Graphics(scene.s2d);
@@ -822,6 +872,9 @@ class Image extends FileView {
 		updateSliderVisual();
 	}
 
+	/**
+		Shows an error when the texture can't be compressed with the settings.
+	**/
 	public function onError() {
 		Ide.inst.quickError('Can\'t load texture with this compression parameters, original texture is loaded instead!');
 	}

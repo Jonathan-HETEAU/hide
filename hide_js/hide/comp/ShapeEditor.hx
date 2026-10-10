@@ -1,25 +1,57 @@
 package hide.comp;
 
-// Shapes center and rotation are defined relative to parent
+/**
+	A collision shape edited by the `ShapeEditor`. The center and rotation are relative to the parent.
+**/
 enum Shape {
+	/**
+		A box.
+	**/
 	Box(center : h3d.col.Point, rotation : h3d.Vector, sizeX : Float, sizeY : Float, sizeZ : Float);
+	/**
+		A sphere.
+	**/
 	Sphere(center : h3d.col.Point, radius : Float);
+	/**
+		A capsule.
+	**/
 	Capsule(center: h3d.col.Point, rotation : h3d.Vector, radius : Float, height : Float);
+	/**
+		A cylinder.
+	**/
 	Cylinder(center: h3d.col.Point, rotation : h3d.Vector, radius : Float, height : Float);
 }
 
+/**
+	The options of a `ShapeEditor`.
+**/
 typedef ShapeEditorOptions = {
+	/**
+		The names of the shapes that can be created (all by default).
+	**/
 	@:optional var shapesAllowed : Array<String>;
+	/**
+		Prevents editing the shapes in the scene.
+	**/
 	@:optional var disableShapeEdition : Bool;
+	/**
+		Not used by the editor.
+	**/
 	@:optional var multipleShapes : Bool;
 }
 
+/**
+	Edits a list of shapes in the properties panel and the scene.
+**/
 class ShapeEditor extends Component {
 	static var DEFAULT_COLOR = 0x55FFFFFF;
 	static var SELECTED_COLOR = 0x553185CE;
 	static var INTERSECTION_COLOR = 0x55FF0000;
 	static var SELECTED_INTERSECTION_COLOR = 0x99FF0000;
 
+	/**
+		The object the shapes are drawn under.
+	**/
 	public var rootDebugObj(default, set) : h3d.scene.Object;
 	var shapes : Array<Shape> = [];
 
@@ -29,6 +61,9 @@ class ShapeEditor extends Component {
 	var gizmo : hrt.tools.Gizmo;
 	var scene : Scene;
 
+	/**
+		Creates the editor of shapes.
+	**/
 	public function new(scene : Scene, rootDebugObj : h3d.scene.Object, ?shapes : Array<Shape>, ?options : ShapeEditorOptions, ?parent: Element) {
 		this.scene = scene;
 		this.rootDebugObj = rootDebugObj;
@@ -106,6 +141,9 @@ class ShapeEditor extends Component {
 		createAllInteractives();
 	}
 
+	/**
+		Sets the shapes and rebuilds the editor.
+	**/
 	public function refresh(?shapes : Array<Shape>) {
 		this.shapes = shapes;
 		if (this.shapes == null)
@@ -134,10 +172,16 @@ class ShapeEditor extends Component {
 			i.remove();
 	}
 
+	/**
+		Returns the shapes.
+	**/
 	public function getValue() : Array<Shape> {
 		return this.shapes;
 	}
 
+	/**
+		Called when the shapes change.
+	**/
 	public dynamic function onChange() {}
 
 
@@ -384,6 +428,9 @@ class ShapeEditor extends Component {
 	}
 
 
+	/**
+		Returns a mesh drawing a shape, highlighted if `highlight`.
+	**/
 	public static function getInteractive(shape : Shape, highlight : Bool, parent : h3d.scene.Object) : h3d.scene.Mesh {
 		var offset = new h3d.Vector(0, 0, 0);
 		var offsetRotation = new h3d.Vector(0, 0, 0);
@@ -443,6 +490,9 @@ class ShapeEditor extends Component {
 		return mesh;
 	}
 
+	/**
+		Adds a box fitting the bounds of an object.
+	**/
 	public function createDefaultShape(obj : h3d.scene.Object) {
 		var bounds = obj.getBounds();
 		bounds.transform(obj.defaultTransform.getInverse());
@@ -454,12 +504,18 @@ class ShapeEditor extends Component {
 		createAllInteractives();
 	}
 
+	/**
+		Creates the scene meshes of the shapes.
+	**/
 	public function createAllInteractives() {
 		removeAllInteractives();
 		for (idx in 0...shapes.length)
 			this.interactives[idx] = getInteractive(this.shapes[idx], idx == selectedShapeIdx, rootDebugObj);
 	}
 
+	/**
+		Removes the scene meshes of the shapes.
+	**/
 	public function removeAllInteractives() {
 		for (i in this.interactives)
 			i.remove();
