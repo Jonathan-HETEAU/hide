@@ -2,8 +2,14 @@ package hrt.prefab.vlm;
 
 import hrt.prefab.vlm.LightProbe.LightProbeObject;
 
+/**
+	Captures the environment around a position and computes its spherical harmonics, for the volumetric lightmaps.
+**/
 class ProbeBaker {
 
+	/**
+		Computes the spherical harmonics on the GPU.
+	**/
 	public var useGPU = false;
 
 	// Tmp cube texture for rendring environment
@@ -36,6 +42,9 @@ class ProbeBaker {
 
 	var emissive : Float = 1.0;
 
+	/**
+		Creates the baker.
+	**/
 	public function new(){
 		customCamera = new h3d.Camera();
 		customCamera.screenRatio = 1.0;
@@ -44,6 +53,9 @@ class ProbeBaker {
 		customCamera.zFar = 4000;
 	}
 
+	/**
+		Disposes the textures.
+	**/
 	public function dispose() {
 		if( envMap != null ) {
 			envMap.dispose();
@@ -60,6 +72,9 @@ class ProbeBaker {
 		if(prim != null) prim.dispose();
 	}
 
+	/**
+		Renders the scene around `position` into the cube texture `output`.
+	**/
 	public function captureEnvironment( position : h3d.Vector, resolution : Int, scene : h3d.scene.Scene, output : h3d.mat.Texture ) {
 		var pbrRenderer = Std.downcast(scene.renderer, h3d.scene.pbr.Renderer);
 

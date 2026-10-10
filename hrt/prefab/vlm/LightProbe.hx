@@ -2,22 +2,55 @@ package hrt.prefab.vlm;
 
 import h3d.scene.pbr.Environment;
 
+/**
+	Where the environment of a `LightProbe` comes from.
+**/
 enum abstract ProbeMode(String) {
+	/**
+		A texture.
+	**/
 	var Texture;
+	/**
+		A capture of the scene at its position.
+	**/
 	var Capture;
 }
 
+/**
+	The fade of a `LightProbe` near its bounds.
+**/
 enum abstract ProbeFadeMode(String) {
+	/**
+		Linear.
+	**/
 	var Linear;
+	/**
+		Smooth.
+	**/
 	var Smoothstep;
+	/**
+		Squared.
+	**/
 	var Pow2;
 }
 
+/**
+	The shape of a `LightProbe`.
+**/
 enum abstract Shape(String) {
+	/**
+		A box.
+	**/
 	var Cube;
+	/**
+		A vertical cylinder.
+	**/
 	var Cylinder;
 }
 
+/**
+	Displays the environment of a probe on its preview spheres.
+**/
 class DebugView extends hxsl.Shader {
 
 	static var SRC = {
@@ -37,6 +70,9 @@ class DebugView extends hxsl.Shader {
 	}
 }
 
+/**
+	Fades the probe lighting near its bounds.
+**/
 class BoundsFade extends hxsl.Shader {
 
 	static var SRC = {
@@ -71,6 +107,9 @@ class BoundsFade extends hxsl.Shader {
 
 }
 
+/**
+	Clips the probe lighting to its bounds.
+**/
 class BoundsClipping extends hxsl.Shader {
 
 	static var SRC = {
@@ -91,16 +130,43 @@ class BoundsClipping extends hxsl.Shader {
 
 }
 
+/**
+	The mesh of a `LightProbe`: applies its indirect lighting to the pixels inside it.
+**/
 class LightProbeObject extends h3d.scene.Mesh {
 
+	/**
+		The environment.
+	**/
 	public var env : Environment;
+	/**
+		The indirect lighting shader.
+	**/
 	public var indirectShader : h3d.shader.pbr.Lighting.Indirect;
+	/**
+		The bounds clipping shader.
+	**/
 	public var boundClippingShader : BoundsClipping;
+	/**
+		The bounds fade shader.
+	**/
 	public var boundFadeShader : BoundsFade;
+	/**
+		The fade distance.
+	**/
 	public var fadeDist : Float;
+	/**
+		The fade mode.
+	**/
 	public var fadeMode : ProbeFadeMode;
+	/**
+		The shape.
+	**/
 	public var shape: Shape;
 
+	/**
+		Creates the mesh.
+	**/
 	public function new(?parent) {
 		var probeMaterial = h3d.mat.MaterialSetup.current.createMaterial();
 		super(h3d.prim.Cube.defaultUnitCube(), probeMaterial, parent);
@@ -123,6 +189,9 @@ class LightProbeObject extends h3d.scene.Mesh {
 		material.mainPass.addShader(boundFadeShader);
 	}
 
+	/**
+		Clears the environment textures.
+	**/
 	public function clear() {
 		if( env.env != null ) {
 			env.env.clear(0);
@@ -183,38 +252,89 @@ class LightProbeObject extends h3d.scene.Mesh {
 	}
 }
 
+/**
+	A local environment lighting in a volume (its unit box), from a texture or a capture of the scene.
+**/
 @:access(h3d.scene.pbr.Environment)
 @:prefabIcon(HuiRes.ui.icons.prefab.light_probe)
 @:prefabName("Light Probe")
 class LightProbe extends Object3D {
 
 	// Probe
+	/**
+		Where the environment comes from.
+	**/
 	@:s public var mode : ProbeMode = Texture;
 
 	// Fade
+	/**
+		The fade distance near the bounds.
+	**/
 	@:s public var fadeDist : Float = 0.0;
+	/**
+		The fade mode.
+	**/
 	@:s public var fadeMode : ProbeFadeMode = Linear;
+	/**
+		The shape.
+	**/
 	@:s public var shape : Shape = Cube;
 
 	// Texture Mode
+	/**
+		The path of the environment texture (`Texture` mode).
+	**/
 	@:s public var texturePath : String = null;
+	/**
+		The maximum value of the HDR colors (`Texture` mode).
+	**/
 	@:s public var hdrMax : Float = 10.0;
+	/**
+		The rotation of the environment, in degrees (`Texture` mode).
+	**/
 	@:s public var rotation : Float = 0.0;
 
 	// Capture Mode
+	/**
+		The number of light bounces captured (`Capture` mode).
+	**/
 	@:s public var bounce : Int = 1;
 
+	/**
+		The power of the emissive lighting in the capture (`Capture` mode).
+	**/
 	@:s public var emissive : Float = 1.0;
 
 	// Shared
+	/**
+		The power of the lighting.
+	**/
 	@:s public var power : Float = 1.0;
+	/**
+		The number of samples of the computation, as a power of 2.
+	**/
 	@:s public var sampleBits : Int = 12;
+	/**
+		The size of the diffuse map.
+	**/
 	@:s public var diffSize : Int = 16;
+	/**
+		The size of the specular map.
+	**/
 	@:s public var specSize : Int = 64;
+	/**
+		The number of lowest mip levels of the specular map not used.
+	**/
 	@:s public var ignoredSpecLevels : Int = 2;
 
 	// Debug
+	/**
+		Displays the preview spheres.
+	**/
 	@:s public var debugDisplay : Bool = true;
+	/**
+		The radius of the preview spheres.
+	**/
 	@:s public var sphereRadius : Float = 0.5;
 
 	override function makeInstance() : Void {

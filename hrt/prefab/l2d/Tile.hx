@@ -1,5 +1,8 @@
 package hrt.prefab.l2d;
 
+/**
+	A 2D bitmap of a tile of a texture, in a grid of cells of `size` pixels.
+**/
 class Tile extends Bitmap {
 
 	@:s var size : Int;

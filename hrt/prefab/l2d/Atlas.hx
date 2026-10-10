@@ -1,5 +1,8 @@
 package hrt.prefab.l2d;
 
+/**
+	A 2D animation from the frames of an atlas.
+**/
 @:prefabIcon(HuiRes.ui.icons.prefab.atlas)
 class Atlas extends Object2D {
 

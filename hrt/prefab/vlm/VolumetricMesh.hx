@@ -1,14 +1,38 @@
 package hrt.prefab.vlm;
 
+/**
+	The mesh of a `VolumetricLightmap`: applies the lighting of its probes to the pixels inside its unit box.
+**/
 class VolumetricMesh extends h3d.scene.Mesh {
 
+	/**
+		The spherical harmonics of the probes.
+	**/
 	public var lightProbeTexture : h3d.mat.Texture;
+	/**
+		The order of the spherical harmonics.
+	**/
 	public var shOrder : Int = 1;
+	/**
+		The distance between the probes.
+	**/
 	public var voxelSize (default, set) : h3d.Vector;
+	/**
+		The number of probes on each axis.
+	**/
 	public var probeCount : h3d.col.IPoint;
+	/**
+		Aligns the probes on a world grid.
+	**/
 	public var useAlignedProb : Bool = false;
+	/**
+		The strength of the lighting.
+	**/
 	public var strength : Float = 1.;
 
+	/**
+		The number of probes baked (`-1` before baking).
+	**/
 	public var lastBakedProbeIndex = -1;
 
 	var prim : h3d.prim.Cube;
@@ -21,6 +45,9 @@ class VolumetricMesh extends h3d.scene.Mesh {
 		return voxelSize;
 	}
 
+	/**
+		Creates the mesh.
+	**/
 	public function new(?parent) {
 		var prim = new h3d.prim.Cube(1,1,1,false);
 		prim.addNormals();
@@ -54,6 +81,9 @@ class VolumetricMesh extends h3d.scene.Mesh {
 		return vm;
 	}
 
+	/**
+		Returns the spherical harmonics of a probe (zero if not baked).
+	**/
 	public function getProbeSH(coords : h3d.col.IPoint, ?pixels : hxd.Pixels ) : SphericalHarmonic {
 
 		if(lightProbeTexture == null)
@@ -77,16 +107,25 @@ class VolumetricMesh extends h3d.scene.Mesh {
 		return sh;
 	}
 
+	/**
+		Returns the number of coefficients.
+	**/
 	public inline function getCoefCount() : Int{
 		return shOrder * shOrder;
 	}
 
+	/**
+		Returns the world position of a probe.
+	**/
 	public function getProbePosition(coords : h3d.col.IPoint){
 		var probePos = new h3d.col.Point( coords.x/(probeCount.x - 1),  coords.y/(probeCount.y - 1), coords.z/(probeCount.z - 1));
 		localToGlobal(probePos);
 		return probePos;
 	}
 
+	/**
+		Returns the grid coordinates of the probe `i`.
+	**/
 	public function getProbeCoords(i : Int) : h3d.col.IPoint {
 		var coords = new h3d.col.IPoint();
 		coords.z = Std.int(i / (probeCount.x * probeCount.y));
@@ -95,6 +134,9 @@ class VolumetricMesh extends h3d.scene.Mesh {
 		return coords;
 	}
 
+	/**
+		Returns the number of probes.
+	**/
 	public function getProbeCount() {
 		return probeCount.x * probeCount.y * probeCount.z;
 	}
@@ -107,6 +149,9 @@ class VolumetricMesh extends h3d.scene.Mesh {
 		}
 	}
 
+	/**
+		Computes the number of probes from the scale and the voxel size.
+	**/
 	public function updateProbeCount(){
 		syncPos();
 		var scale = absPos.getScale();
@@ -115,6 +160,9 @@ class VolumetricMesh extends h3d.scene.Mesh {
 						Std.int(Math.max(1,Math.floor(scale.z/voxelSize.z)) + 1));
 	}
 
+	/**
+		Loads the compressed probe data. Returns `false` if it does not match the probe count.
+	**/
 	public function load( bytes : haxe.io.Bytes ) {
 		if( bytes.length == 0 )
 			return false;
@@ -130,6 +178,9 @@ class VolumetricMesh extends h3d.scene.Mesh {
 		return true;
 	}
 
+	/**
+		Returns the compressed probe data.
+	**/
 	public function save() : haxe.io.Bytes {
 		var data;
 		if( lightProbeTexture == null )
@@ -157,6 +208,9 @@ class VolumetricMesh extends h3d.scene.Mesh {
 		shader.strength = strength;
 	}
 
+	/**
+		Returns the largest distance between probes of this mesh and the others, for the world alignment.
+	**/
 	public function getWorldAlignment(lightmaps : Array<VolumetricMesh>) : h3d.Vector {
 		var scale = absPos.getScale();
 		var result =  new h3d.Vector(scale.x/(probeCount.x - 1), scale.y/(probeCount.y - 1), scale.z/(probeCount.z - 1));
@@ -169,6 +223,9 @@ class VolumetricMesh extends h3d.scene.Mesh {
 		return result;
 	}
 
+	/**
+		Tells if a world position is inside the volume.
+	**/
 	public function isInsideVolume(worldPos: h3d.col.Point) : Bool {
 		var localPos = worldPos.clone();
 		globalToLocal(localPos);

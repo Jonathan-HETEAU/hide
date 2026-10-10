@@ -1,6 +1,12 @@
 package hrt.prefab.editor;
 
+/**
+	An interactive tool of the scene editor (`EditContext2`), like a brush or a gizmo. Override `onEnter`, `onQuit` and `update`.
+**/
 class Tool {
+	/**
+		Captures the mouse events with an interactive while the tool is enabled.
+	**/
 	public var mouseSupport(default, set): Bool = false;
 
 	/**
@@ -31,10 +37,16 @@ class Tool {
 		return mouseSupport;
 	}
 
+	/**
+		Creates the tool.
+	**/
 	public function new(ctx: EditContext2) {
 		this.ctx = ctx;
 	}
 
+	/**
+		Enables the tool, quitting the previous foreground tool if this one is in the foreground.
+	**/
 	final public function enter() {
 		if (foreground) {
 			if (ctx.foregroundEditorTool != null) {
@@ -65,6 +77,9 @@ class Tool {
 		debugText.text = Type.getClassName(Type.getClass(this));
 	}
 
+	/**
+		Disables the tool. Throws if a foreground tool is not the current one.
+	**/
 	final public function quit() {
 		onQuit();
 

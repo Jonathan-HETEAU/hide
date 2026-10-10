@@ -4,6 +4,9 @@ import hrt.prefab.fx.Evaluator;
 import hrt.prefab.fx.Value;
 import h2d.Particles.ParticleGroup;
 
+/**
+	The 2D particles of `Particle2D`, with values animated by FX curves.
+**/
 class Particles extends h2d.Particles {
 
 	var evaluator : Evaluator;
@@ -14,20 +17,53 @@ class Particles extends h2d.Particles {
 	var random: hxd.Rand;
 	var randomSeed = 0;
 
+	/**
+		The factor of the time step when catching up, to save computations.
+	**/
 	public var catchupSpeed = 4; // Use larger ticks when catching-up to save calculations
+	/**
+		The maximum time simulated when catching up, in seconds (not in the editor).
+	**/
 	public var maxCatchupWindow = 0.5; // How many seconds max to simulate when catching up
 
 	// param FX
+	/**
+		Enables the emission (above `0.5`).
+	**/
 	public var enable : Value;
+	/**
+		The speed of the particles.
+	**/
 	public var speed : Value;
+	/**
+		The speed increment of the particles.
+	**/
 	public var speedIncr : Value;
+	/**
+		The gravity.
+	**/
 	public var gravity : Value;
 
+	/**
+		Emits by bursts.
+	**/
 	public var isBurstEmit : Bool;
+	/**
+		The time between bursts, in seconds.
+	**/
 	public var burstDelay : Float;
+	/**
+		The time of the first burst, in seconds.
+	**/
 	public var initialBurstDelay : Float;
+	/**
+		The number of particles of a burst.
+	**/
 	public var burstParticleCount : Int;
 
+	/**
+		Creates the particles.
+	**/
 	public function new( ?parent ) {
 		super(parent);
 		randomSeed = Std.random(0xFFFFFF);
@@ -70,6 +106,9 @@ class Particles extends h2d.Particles {
 		curTime += dt;
 	}
 
+	/**
+		Restarts the particles.
+	**/
 	public function reset() {
 		for( g in groups ) {
 			@:privateAccess g.needRebuild = true;
@@ -79,6 +118,9 @@ class Particles extends h2d.Particles {
 		lastTime = 0.0;
 	}
 
+	/**
+		Sets the time, simulating the particles (restarting when the time goes back).
+	**/
 	public function setTime(time: Float) {
 		if(time < lastTime || lastTime < 0) {
 			reset();

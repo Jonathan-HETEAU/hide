@@ -1,5 +1,8 @@
 package hrt.prefab.vlm;
 
+/**
+	A volumetric lightmap: a grid of light probes, baked as spherical harmonics in the editor, giving the indirect lighting inside its volume.
+**/
 @:prefabIcon(HuiRes.ui.icons.prefab.volumetric_lightmap)
 @:prefabName("Volumetric Lightmap")
 class VolumetricLightmap extends Object3D {
@@ -10,6 +13,9 @@ class VolumetricLightmap extends Object3D {
 	@:s var strength :  Float = 1.0;
 	@:s var order : Int = 1;
 
+	/**
+		The mesh.
+	**/
 	public var volumetricLightmap : VolumetricMesh;
 	@:s var useWorldAlignedProbe = false;
 	@:s var displaySH = false;
@@ -97,6 +103,9 @@ class VolumetricLightmap extends Object3D {
 		}
 	}
 
+	/**
+		Displays a sphere per probe, if `displaySH`.
+	**/
 	public function createDebugPreview(){
 
 		if(!displaySH) return;
@@ -275,6 +284,9 @@ class VolumetricLightmap extends Object3D {
 
 	}
 
+	/**
+		Starts baking the probes (editor only).
+	**/
 	public function startBake(ctx : hide.prefab.EditContext, ?onEnd){
 		maxOrderBaked = order;
 		volumetricLightmap.lastBakedProbeIndex = -1;

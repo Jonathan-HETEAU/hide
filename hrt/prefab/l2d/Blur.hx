@@ -1,27 +1,54 @@
 package hrt.prefab.l2d;
 
+/**
+	A blur filter, usable on 2D objects (`makeFilter`) or textures (`apply`).
+**/
 @:prefabIcon(HuiRes.ui.icons.prefab.blur)
 class Blur extends Prefab {
 
+	/**
+		The blur radius.
+	**/
 	@:s public var radius : Float = 1.;
+	/**
+		The quality.
+	**/
 	@:s public var quality : Float = 1;
+	/**
+		The gain.
+	**/
 	@:s public var gain : Float = 1.;
+	/**
+		The linear part of the blur.
+	**/
 	@:s public var linear : Float = 0.;
 
 	// mostly testing
+	/**
+		The path of an image to test the blur in the editor.
+	**/
 	@:s public var image : String;
+	/**
+		The zoom of the test image.
+	**/
 	@:s public var zoom : Int = 1;
 
 	var pass : h3d.pass.Blur;
 
 	var bitmap : h2d.Bitmap;
 
+	/**
+		Returns a `h2d.filter.Blur` with these parameters.
+	**/
 	public function makeFilter() {
 		var f = new h2d.filter.Blur(radius, gain, quality);
 		f.linear = linear;
 		return f;
 	}
 
+	/**
+		Blurs the texture in place and returns it.
+	**/
 	public function apply( t : h3d.mat.Texture, ctx : h3d.impl.RenderContext ) {
 		if( radius == 0 )
 			return t;

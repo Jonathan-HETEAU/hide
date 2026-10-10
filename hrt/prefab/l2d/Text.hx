@@ -1,5 +1,8 @@
 package hrt.prefab.l2d;
 
+/**
+	A 2D HTML text, with a signed distance field font.
+**/
 @:prefabIcon(HuiRes.ui.icons.prefab.text)
 class Text extends Object2D {
 
@@ -119,6 +122,9 @@ class Text extends Object2D {
 		return h2dText;
 	}
 
+	/**
+		Returns the font: `defaultLoadFont`, or the font at `pathFont` converted to a SDF font.
+	**/
 	public dynamic function loadFont() : h2d.Font {
 		var f = defaultLoadFont(pathFont, size, cutoff, smoothing);
 		if (f == null) {
@@ -132,6 +138,9 @@ class Text extends Object2D {
 		else return f;
 	}
 
+	/**
+		Returns the font to use, or `null` to load `pathFont`. Returns `null` by default.
+	**/
 	public static dynamic function defaultLoadFont( pathFont : String, size : Int, cutoff : Float, smoothing : Float ) : h2d.Font {
 		return null;
 	}

@@ -2,32 +2,86 @@ package hrt.prefab.pbr;
 
 import hrt.shader.AnisotropicForward;
 
+/**
+	Where the anisotropy of an `Anisotropy` comes from.
+**/
 enum abstract AnisotropyMode(String) {
+	/**
+		A constant intensity and direction.
+	**/
 	var Flat;
+	/**
+		Intensity and direction textures.
+	**/
 	var NoiseTexture;
+	/**
+		The vertex data.
+	**/
 	var Vertex;
+	/**
+		A constant direction, with a noise on the intensity.
+	**/
 	var Frequency;
+	/**
+		A flow map texture giving the direction.
+	**/
 	var FlowMap;
 }
 
+/**
+	Adds anisotropic specular reflections to the materials of its parent `Material` (brushed metal, hair...).
+**/
 @:prefabIcon(HuiRes.ui.icons.prefab.anisotropy)
 class Anisotropy extends Prefab {
 
+	/**
+		Where the anisotropy comes from.
+	**/
 	@:s public var mode : AnisotropyMode = Flat;
 
+	/**
+		The intensity of the anisotropy.
+	**/
 	@:s public var intensity : Float = 0.0;
+	/**
+		The direction, in degrees.
+	**/
 	@:s public var direction : Float = 0.0;
 
+	/**
+		The frequency of the noise (`Frequency` mode).
+	**/
 	@:s public var noiseFrequency : Float = 0.0;
+	/**
+		The intensity of the noise (`Frequency` mode).
+	**/
 	@:s public var noiseIntensity : Float = 1.0;
 
+	/**
+		The factor of the intensity texture (`NoiseTexture` mode).
+	**/
 	@:s public var intensityFactor = 1.0;
+	/**
+		The path of the intensity texture (`NoiseTexture` mode).
+	**/
 	@:s public var noiseIntensityPath : String = null;
+	/**
+		The path of the direction texture (`NoiseTexture` mode).
+	**/
 	@:s public var noiseDirectionPath : String = null;
+	/**
+		The rotation added to the texture directions, in degrees.
+	**/
 	@:s public var rotationOffset : Float = 0.0;
 
+	/**
+		The path of the flow map (`FlowMap` mode).
+	**/
 	@:s public var flowMapPath : String = null;
 
+	/**
+		Displays the direction.
+	**/
 	@:s public var debugDirection : Bool = false;
 
 	public function new(parent, shared: ContextShared) {

@@ -1,5 +1,8 @@
 package hrt.prefab.l2d;
 
+/**
+	A 2D bitmap of a texture (or a magenta square if none).
+**/
 @:prefabIcon(HuiRes.ui.icons.prefab.bitmap)
 class Bitmap extends Object2D {
 
@@ -52,6 +55,9 @@ class Bitmap extends Object2D {
 		return bmp;
 	}
 
+	/**
+		Returns the center ratio of a tile for the pivot offsets `dx` and `dy` (from `-0.5` to `0.5`).
+	**/
 	static public function getCenterRatio(dx : Float, dy : Float) {
 		return [0.5 + hxd.Math.clamp(dx, -0.5, 0.5), 0.5 + hxd.Math.clamp(dy, -0.5, 0.5)];
 	}

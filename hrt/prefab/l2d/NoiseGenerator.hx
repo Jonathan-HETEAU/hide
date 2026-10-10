@@ -1,39 +1,117 @@
 package hrt.prefab.l2d;
 
+/**
+	The noise of a `NoiseGenerator`.
+**/
 enum abstract NoiseMode(String) {
+	/**
+		Perlin noise.
+	**/
 	var Perlin;
+	/**
+		Ridged noise.
+	**/
 	var Ridged;
 }
 
+/**
+	The tiling of a `NoiseGenerator` texture.
+**/
 enum abstract RepeatMode(String) {
+	/**
+		Tiles horizontally and vertically.
+	**/
 	var Both;
+	/**
+		Tiles horizontally.
+	**/
 	var X;
+	/**
+		Tiles vertically.
+	**/
 	var Y;
+	/**
+		Does not tile.
+	**/
 	var None;
 }
 
+/**
+	Generates a noise texture on the GPU, displayed as a bitmap.
+**/
 @:prefabIcon(HuiRes.ui.icons.prefab.noise_generator)
 class NoiseGenerator extends Object2D {
 
+	/**
+		The random seed.
+	**/
 	@:s public var seed : Int;
 
+	/**
+		The noise.
+	**/
 	@:s public var mode : NoiseMode = Perlin;
 
+	/**
+		The scale of the noise.
+	**/
 	@:s public var scale : Float = 1.;
+	/**
+		The number of independent channels.
+	**/
 	@:s public var channels : Int = 1;
+	/**
+		Generates a normal map of the noise.
+	**/
 	@:s public var normals : Bool = false;
+	/**
+		The contrast.
+	**/
 	@:s public var contrast : Float = 0.;
+	/**
+		The brightness.
+	**/
 	@:s public var brightness : Float = 0.;
+	/**
+		The tiling.
+	**/
 	@:s public var repeat : RepeatMode = Both;
 
+	/**
+		The size of the texture.
+	**/
 	@:s public var size : Int = 512;
+	/**
+		The number of octaves.
+	**/
 	@:s public var octaves : Int = 1;
+	/**
+		The amplitude factor between octaves.
+	**/
 	@:s public var persist : Float = 0.5;
+	/**
+		The frequency factor between octaves.
+	**/
 	@:s public var lacunarity : Float = 2.;
+	/**
+		The gain of the ridged noise.
+	**/
 	@:s public var gain : Float = 2.0;
+	/**
+		The offset of the ridged noise.
+	**/
 	@:s public var offset : Float = 0.5;
+	/**
+		The turbulence (domain distortion).
+	**/
 	@:s public var turbulence : Float = 0.;
+	/**
+		The scale of the turbulence.
+	**/
 	@:s public var turbulenceScale : Float = 1.;
+	/**
+		Inverts the noise.
+	**/
 	@:s public var inverse : Bool;
 
 	var tex : h3d.mat.Texture;
@@ -43,6 +121,9 @@ class NoiseGenerator extends Object2D {
 		seed = Std.random(100);
 	}
 
+	/**
+		Renders the noise into a texture.
+	**/
 	public function updateTexture( t : h3d.mat.Texture ) {
 		var e = h3d.Engine.getCurrent();
 		e.pushTarget(t);
@@ -83,6 +164,9 @@ class NoiseGenerator extends Object2D {
 		e.popTarget();
 	}
 
+	/**
+		Returns the noise texture (created once, rendered again when the context is lost).
+	**/
 	public function toTexture() {
 		if( tex != null )
 			return tex;
@@ -219,6 +303,9 @@ class NoiseGenerator extends Object2D {
 
 }
 
+/**
+	Renders the noise of a `NoiseGenerator`.
+**/
 class NoiseShader extends h3d.shader.ScreenShader {
 
 	static var SRC = {

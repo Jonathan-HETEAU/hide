@@ -2,10 +2,19 @@ package hrt.prefab.l2d;
 import hxd.Math;
 using Lambda;
 
+/**
+	A `h2d.Flow` container.
+**/
 @:prefabIcon(HuiRes.ui.icons.prefab.flow)
 class Flow extends Object2D {
 
+	/**
+		The fixed width (`0` for none).
+	**/
 	@:s public var width : Int = 0;
+	/**
+		The fixed height (`0` for none).
+	**/
 	@:s public var height : Int = 0;
 
 	@:s var vAlign : Int = 0;

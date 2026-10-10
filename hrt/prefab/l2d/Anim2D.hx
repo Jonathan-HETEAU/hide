@@ -1,5 +1,8 @@
 package hrt.prefab.l2d;
 
+/**
+	A 2D animation from a sprite sheet texture, with frames of a fixed size.
+**/
 @:prefabIcon(HuiRes.ui.icons.prefab.anim2d)
 class Anim2D extends Object2D {
 

@@ -1,11 +1,17 @@
 package hrt.prefab.editor;
 
+/**
+	A `Tool` defined by callbacks.
+**/
 class QuickTool extends Tool {
 
 	dynamic function customOnEnter(): Void {};
 	dynamic function customOnQuit(): Void {};
 	dynamic function customUpdate(dt: Float): Void{};
 
+	/**
+		Creates the tool with its enter, quit and update callbacks (each can be `null`).
+	**/
 	public function new(ctx, onEnter, onQuit, update) {
 		super(ctx);
 		if (onEnter != null)

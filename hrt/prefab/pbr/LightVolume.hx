@@ -1,5 +1,8 @@
 package hrt.prefab.pbr;
 
+/**
+	Ray marches the volume lit by a light.
+**/
 class LightVolumeShader extends hxsl.Shader {
 
 	static var SRC = {
@@ -66,6 +69,9 @@ class LightVolumeShader extends hxsl.Shader {
 	};
 }
 
+/**
+	Ray marches the volume lit by a point light, with its shadows.
+**/
 class PointLightVolumeShader extends LightVolumeShader {
 
 	static var SRC = {
@@ -90,6 +96,9 @@ class PointLightVolumeShader extends LightVolumeShader {
 	};
 }
 
+/**
+	Ray marches the volume lit by a spot light, with its shadows.
+**/
 class SpotLightVolumeShader extends LightVolumeShader {
 
 	static var SRC = {
@@ -124,8 +133,17 @@ class SpotLightVolumeShader extends LightVolumeShader {
 	};
 }
 
+/**
+	The mesh of a `LightVolume`, synced with its parent light.
+**/
 class LightVolumeObject extends h3d.scene.Mesh {
+	/**
+		Uses the shadow map of the light.
+	**/
 	public var USE_SHADOW_MAP : Bool;
+	/**
+		The shader.
+	**/
 	public var shader : LightVolumeShader;
 
 	override function sync(ctx : h3d.scene.RenderContext) {
@@ -162,6 +180,9 @@ class LightVolumeObject extends h3d.scene.Mesh {
 	}
 }
 
+/**
+	A volumetric light around its parent point or spot light, rendered by the `hrt.prefab.rfx.LightVolume` effect.
+**/
 @:prefabIcon(HuiRes.ui.icons.prefab.light_volume)
 @:prefabName("Light Volume")
 class LightVolume extends Object3D {

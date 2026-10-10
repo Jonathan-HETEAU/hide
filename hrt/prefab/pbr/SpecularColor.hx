@@ -5,27 +5,57 @@ import hrt.shader.SpecularColor.SpecularColorAlbedo;
 import hrt.shader.SpecularColor.SpecularColorFlat;
 import hrt.shader.SpecularColor.SpecularColorTexture;
 
+/**
+	Where the specular color of a `SpecularColor` comes from.
+**/
 enum abstract SpecularColorMode(String) {
+	/**
+		The albedo, tinted by `specularTint`.
+	**/
 	var Albedo;
+	/**
+		A constant color.
+	**/
 	var Flat;
+	/**
+		A texture.
+	**/
 	var Texture;
 }
 
+/**
+	Sets the specular color of the materials of its parent `Material`.
+**/
 @:prefabIcon(HuiRes.ui.icons.prefab.specular_color)
 @:prefabName("Specular Color")
 @:prefabCategory("Shader")
 class SpecularColor extends Prefab {
 
 	// Amount of dielectric specular reflection. Specifies facing (along normal) reflectivity in the most common 0 - 8% range.
+	/**
+		The amount of dielectric specular reflection: the facing reflectivity, in the common 0 to 8% range.
+	**/
 	@:s public var specular : Float = 0.5;
 
 	// Tints the facing specular reflection using the base color, while glancing reflection remains white.
 	// Normal dielectrics have colorless reflection, so this parameter is not technically physically correct
 	// and is provided for faking the appearance of materials with complex surface structure.
+	/**
+		Tints the facing specular reflection with the base color, while the glancing reflection stays white. Not physically correct: fakes materials with a complex surface structure.
+	**/
 	@:s public var specularTint : Float = 0.0;
 
+	/**
+		The path of the specular color texture (`Texture` mode).
+	**/
 	@:s public var specularColorPath : String;
+	/**
+		The specular color, as RGB (`Flat` mode).
+	**/
 	@:s public var specularColorCustomValue : Int;
+	/**
+		Where the specular color comes from.
+	**/
 	@:s public var mode : SpecularColorMode = Albedo;
 
 	function getMaterials() {
