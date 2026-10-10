@@ -1,28 +1,79 @@
 package hrt.texgraph;
 
+/**
+	A serialized connection between an output and an input.
+**/
 typedef Edge = {
-	?inputNodeId : Int,
-	?nameInput : String, // Fallback if name has changed
-	?inputId : Int,
-	?outputNodeId : Int,
-	?nameOutput : String, // Fallback if name has changed
-	?outputId : Int,
+	/**
+		The node of the input.
+	**/
+	var ?inputNodeId : Int;
+	/**
+		The name of the input, used if its id changed.
+	**/
+	var ?nameInput : String;
+	/**
+		The input.
+	**/
+	var ?inputId : Int;
+	/**
+		The node of the output.
+	**/
+	var ?outputNodeId : Int;
+	/**
+		The name of the output, used if its id changed.
+	**/
+	var ?nameOutput : String;
+	/**
+		The output.
+	**/
+	var ?outputId : Int;
 };
 
+/**
+	The connection of an input of a node.
+**/
 typedef Connection = {
-	from : TexNode,
-	outputId : Int,
+	/**
+		The node of the connected output.
+	**/
+	var from : TexNode;
+	/**
+		The connected output.
+	**/
+	var outputId : Int;
 };
+/**
+	A texture made with nodes in the editor (`.texgraph` file): generates textures on the GPU.
+**/
 @:prefabHideInAddMenu
 class TexGraph extends hrt.prefab.Prefab {
+	/**
+		The next node id.
+	**/
 	public static var CURRENT_NODE_ID = 0;
 
+	/**
+		The output textures of the nodes, by node id, from the last generation.
+	**/
 	public var cachedOutputs : Map<Int, Array<h3d.mat.Texture>> = [];
+	/**
+		The nodes, by id.
+	**/
 	public var nodes : Map<Int, TexNode> = [];
 
 	// Base parameters that can be overrided by nodes
+	/**
+		The default height of the textures.
+	**/
 	@:s public var outputHeight = 256;
+	/**
+		The default width of the textures.
+	**/
 	@:s public var outputWidth = 256;
+	/**
+		The default format of the textures.
+	**/
 	@:s public var outputFormat = hxd.PixelFormat.RGBA;
 
 	override function save() {
@@ -56,6 +107,9 @@ class TexGraph extends hrt.prefab.Prefab {
 		throw "Texture graph is not meant to be put in a prefab tree. Use a dynamic shader that references this shadergraph instead";
 	}
 
+	/**
+		Returns the serialized nodes and edges.
+	**/
 	public function saveToDynamic() : Dynamic {
 		var edgesJson : Array<Edge> = [];
 		for (n in nodes) {
@@ -76,6 +130,9 @@ class TexGraph extends hrt.prefab.Prefab {
 		return json;
 	}
 
+	/**
+		Returns the serialized graph, as JSON.
+	**/
 	public function saveToText() : String {
 		#if editor
 		return hide.Ide.inst.toJSON(save());
@@ -85,6 +142,9 @@ class TexGraph extends hrt.prefab.Prefab {
 	}
 
 
+	/**
+		Connects an output to an input, matching them by name if their ids changed. Returns `true`.
+	**/
 	public function addEdge(edge : Edge) {
 		var node = this.nodes.get(edge.inputNodeId);
 		var output = this.nodes.get(edge.outputNodeId);
@@ -126,6 +186,9 @@ class TexGraph extends hrt.prefab.Prefab {
 		return true;
 	}
 
+	/**
+		Disconnects an input.
+	**/
 	public function removeEdge(idNode : Int, inputId : Int, update : Bool = true) {
 		var node = this.nodes.get(idNode);
 		if (node.connections[inputId] == null) return;
@@ -133,6 +196,9 @@ class TexGraph extends hrt.prefab.Prefab {
 		node.connections[inputId] = null;
 	}
 
+	/**
+		Tells if the graph has a cycle.
+	**/
 	public function hasCycle() {
 		var visited : Array<Bool> = [for (n in nodes) false];
 		var recStack : Array<Bool> = [for (n in nodes) false];
@@ -171,6 +237,9 @@ class TexGraph extends hrt.prefab.Prefab {
 		return false;
 	}
 
+	/**
+		Tells if the edge can be added without creating a cycle.
+	**/
 	public function canAddEdge(edge : Edge) {
 		var node = this.nodes.get(edge.inputNodeId);
 		var output = this.nodes.get(edge.outputNodeId);
@@ -190,14 +259,23 @@ class TexGraph extends hrt.prefab.Prefab {
 		return true;
 	}
 
+	/**
+		Adds a node.
+	**/
 	public function addNode(texNode : TexNode) {
 		this.nodes.set(texNode.id, texNode);
 	}
 
+	/**
+		Removes a node.
+	**/
 	public function removeNode(idNode : Int) {
 		this.nodes.remove(idNode);
 	}
 
+	/**
+		Returns the output nodes.
+	**/
 	public function getOutputNodes() : Array<hrt.texgraph.nodes.TexOutput> {
 		var outputNodes : Array<hrt.texgraph.nodes.TexOutput> = [];
 		for (n in nodes) {
@@ -209,6 +287,9 @@ class TexGraph extends hrt.prefab.Prefab {
 	}
 
 
+	/**
+		Generates the textures, and returns the output textures by label.
+	**/
 	public function generate() : Map<String, h3d.mat.Texture> {
 		var engine = h3d.Engine.getCurrent();
 		if (engine == null)

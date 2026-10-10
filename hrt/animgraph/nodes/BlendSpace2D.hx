@@ -1,21 +1,57 @@
 package hrt.animgraph.nodes;
 import hrt.tools.MapUtils;
 
+/**
+	A point of a blend space node.
+**/
 typedef BlendSpaceInstancePoint = {
-	x: Float,
-	y: Float,
-	speed: Float,
-	?animInfo: AnimInfo, // can be null if no animation could be loaded
+	/**
+		The X position in the blend space.
+	**/
+	var x : Float;
+	/**
+		The Y position in the blend space.
+	**/
+	var y : Float;
+	/**
+		The speed of the animation.
+	**/
+	var speed : Float;
+	/**
+		The animation, or `null` if it could not be loaded.
+	**/
+	var ?animInfo : AnimInfo;
 }
 
+/**
+	An animation of a blend space node.
+**/
 typedef AnimInfo = {
-	anim: h3d.anim.Animation,
-	proxy: hrt.animgraph.nodes.Input.AnimProxy,
-	indexRemap: Array<Null<Int>>,
-	keepSync: Bool,
-	selfSpeed: Float,
+	/**
+		The animation.
+	**/
+	var anim : h3d.anim.Animation;
+	/**
+		The object the animation is bound to.
+	**/
+	var proxy : hrt.animgraph.nodes.Input.AnimProxy;
+	/**
+		The bone of the animation for each bone of the node.
+	**/
+	var indexRemap : Array<Null<Int>>;
+	/**
+		Keeps the animation in sync with the others.
+	**/
+	var keepSync : Bool;
+	/**
+		The speed of the animation.
+	**/
+	var selfSpeed : Float;
 }
 
+/**
+	Plays a blend space file (`path`) at the position `bsX`, `bsY`.
+**/
 @:access(hrt.animgraph.BlendSpace2D)
 class BlendSpace2D extends AnimNode {
 	@:input var bsX(default, set): Float = 0.5;

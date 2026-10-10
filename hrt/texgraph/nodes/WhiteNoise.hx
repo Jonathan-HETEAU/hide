@@ -1,5 +1,8 @@
 package hrt.texgraph.nodes;
 
+/**
+	Renders white noise.
+**/
 class WhiteNoiseShader extends h3d.shader.ScreenShader {
     static var SRC = {
 		@param var tex : Sampler2D;
@@ -16,6 +19,10 @@ class WhiteNoiseShader extends h3d.shader.ScreenShader {
     }
 }
 
+/**
+	The texture graph node "White Noise" (Texture generation): white noise texture.
+	Outputs: `output`.
+**/
 @name("White Noise")
 @description("White noise texture")
 @width(100)

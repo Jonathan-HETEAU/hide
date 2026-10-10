@@ -1,5 +1,9 @@
 package hrt.texgraph.nodes;
 
+/**
+	The texture graph node "Disc" (Texture generation): basic disc texture.
+	Outputs: `output`.
+**/
 @name("Disc")
 @description("Basic disc texture")
 @width(80)

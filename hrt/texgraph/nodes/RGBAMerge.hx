@@ -1,5 +1,8 @@
 package hrt.texgraph.nodes;
 
+/**
+	Merges four grayscale textures in the channels of a texture.
+**/
 class RGBAMergeShader extends h3d.shader.ScreenShader {
     static var SRC = {
 		@param var r : Sampler2D;
@@ -16,6 +19,11 @@ class RGBAMergeShader extends h3d.shader.ScreenShader {
     }
 }
 
+/**
+	The texture graph node "RGBA Merge" (Channel): merges 4 grayscale images into a RGBA image.
+	Inputs: `R`, `G`, `B`, `A`.
+	Outputs: `output`.
+**/
 @name("RGBA Merge")
 @description("Merge 4 grayscale images entry in a RGBA image")
 @width(100)

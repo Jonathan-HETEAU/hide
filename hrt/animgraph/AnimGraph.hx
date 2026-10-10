@@ -1,29 +1,71 @@
 package hrt.animgraph;
 
 
+/**
+	A float parameter of an animation graph, set at runtime with `AnimGraphInstance.setParam`.
+**/
 @:build(hrt.prefab.Macros.buildSerializable())
 class Parameter {
+	/**
+		Creates a parameter.
+	**/
 	public function new() {};
+	/**
+		The name.
+	**/
 	@:s public var name: String = null;
+	/**
+		The default value.
+	**/
 	@:s public var defaultValue: Float = 0.0;
+	/**
+		The current value.
+	**/
 	public var runtimeValue = 0.0;
 }
 
+/**
+	A serialized connection between nodes.
+**/
 typedef SerializedEdge = {
-	input: Int,
-	inputId : Int,
-	output: Int,
-	outputId: Int,
+	/**
+		The node of the input.
+	**/
+	var input : Int;
+	/**
+		The input.
+	**/
+	var inputId : Int;
+	/**
+		The node of the output.
+	**/
+	var output : Int;
+	/**
+		The output.
+	**/
+	var outputId : Int;
 };
 
 #if editor
+/**
+	The context of the animation preview of the editor.
+**/
 typedef EditorProviderContext = {
-	animDirectory: String,
-	assetPath: String,
+	/**
+		The folder of the animations.
+	**/
+	var animDirectory : String;
+	/**
+		The path of the asset previewed.
+	**/
+	var assetPath : String;
 }
 #end
 
 
+/**
+	An animation graph made with nodes in the editor (`.animgraph` file): blends animations depending on parameters. Play it with `getAnimation`.
+**/
 @:access(hrt.animgraph.AnimGraphInstance)
 @:prefabHideInAddMenu
 class AnimGraph extends hrt.prefab.Prefab {
@@ -174,6 +216,9 @@ class AnimGraph extends hrt.prefab.Prefab {
 	}
 
 	#if editor
+	/**
+		Returns the node of an editor id (editor only).
+	**/
 	public function getNodeByEditorId(id: Int) : Node {
 		return Lambda.find(nodes, (a) -> a.id == id);
 	}

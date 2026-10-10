@@ -1,5 +1,8 @@
 package hrt.animgraph;
 
+/**
+	An animation graph resource (`.animgraph` file).
+**/
 @:access(hrt.prefab.AnimGraph)
 class Resource extends hxd.res.Resource {
 
@@ -30,6 +33,9 @@ class Resource extends hxd.res.Resource {
 		});
 	}
 
+	/**
+		Returns the animation graph (cached, reloaded when the file changes).
+	**/
 	public function load() : hrt.animgraph.AnimGraph {
 		if( animGraph != null && cacheVersion == CACHE_VERSION )
 			return animGraph;
@@ -40,9 +46,15 @@ class Resource extends hxd.res.Resource {
 		return animGraph;
 	}
 
+	/**
+		Returns an instance of the animation graph.
+	**/
 	public function loadAnim(modelCache: h3d.prim.ModelCache = null, resolver: hrt.animgraph.AnimGraphInstance.AnimResolver = null) : AnimGraphInstance {
 		return load().getAnimation(modelCache, resolver);
 	}
 
+	/**
+		Increment to reload the cached graphs.
+	**/
 	public static var CACHE_VERSION = 0;
 }

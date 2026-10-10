@@ -6,6 +6,9 @@ import hxsl.Ast;
 using hxsl.Ast;
 using haxe.macro.Tools;
 
+/**
+	Registers the graph nodes.
+**/
 class Macros {
 	#if macro
 	static function autoRegisterNode() {

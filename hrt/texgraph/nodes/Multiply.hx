@@ -1,5 +1,8 @@
 package hrt.texgraph.nodes;
 
+/**
+	Multiplies two textures.
+**/
 class MultiplyShader extends h3d.shader.ScreenShader {
     static var SRC = {
 		@param var tex1 : Sampler2D;
@@ -11,6 +14,11 @@ class MultiplyShader extends h3d.shader.ScreenShader {
     }
 }
 
+/**
+	The texture graph node "Multiply" (Math): the output is the result of the inputs multiplied.
+	Inputs: `input1`, `input2`.
+	Outputs: `output`.
+**/
 @name("Multiply")
 @description("The output is the result of the inputs multiplied")
 @width(80)

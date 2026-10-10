@@ -1,5 +1,8 @@
 package hrt.texgraph.nodes;
 
+/**
+	Renders black and white spots noise.
+**/
 class BnWSpotsNoiseShader extends h3d.shader.ScreenShader {
     static var SRC = {
 		@param var tex : Sampler2D;
@@ -35,6 +38,10 @@ class BnWSpotsNoiseShader extends h3d.shader.ScreenShader {
     }
 }
 
+/**
+	The texture graph node "BnW Spots Noise" (Texture generation): black and white spots noise texture.
+	Outputs: `output`.
+**/
 @name("BnW Spots Noise")
 @description("Black and white spots noise texture")
 @width(120)

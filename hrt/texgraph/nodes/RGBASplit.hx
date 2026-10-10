@@ -1,5 +1,8 @@
 package hrt.texgraph.nodes;
 
+/**
+	Extracts a channel of a texture as a grayscale texture.
+**/
 class RGBASplitShader extends h3d.shader.ScreenShader {
     static var SRC = {
 		@param var tex : Sampler2D;
@@ -22,6 +25,11 @@ class RGBASplitShader extends h3d.shader.ScreenShader {
     }
 }
 
+/**
+	The texture graph node "RGBA Split" (Channel): separates a RGBA image into 4 grayscale images.
+	Inputs: `RGBA`.
+	Outputs: `R`, `G`, `B`, `A`.
+**/
 @name("RGBA Split")
 @description("Separate a RGBA image entry in 4 grayscale images")
 @width(100)

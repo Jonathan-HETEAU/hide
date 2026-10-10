@@ -1,10 +1,22 @@
 package hrt.animgraph;
 using Lambda;
 import hrt.tools.MapUtils;
+/**
+	An object animated by an `AnimGraphInstance`.
+**/
 class AnimGraphAnimatedObject extends h3d.anim.Animation.AnimatedObject {
+	/**
+		The bone id in the graph.
+	**/
 	public var id : Int;
+	/**
+		The current transform.
+	**/
 	public var matrix : h3d.Matrix;
 
+	/**
+		Creates the animated object.
+	**/
 	public function new (name, id) {
 		super(name);
 		this.id = id;
@@ -12,8 +24,14 @@ class AnimGraphAnimatedObject extends h3d.anim.Animation.AnimatedObject {
 	}
 }
 
+/**
+	Returns the path of the animation to load for a path of the graph and a target object, or `null` to skip it.
+**/
 typedef AnimResolver = (instance: AnimGraphInstance, target: h3d.scene.Object, path: String ) -> Null<String>;
 
+/**
+	A playing animation graph: a `h3d.anim.Animation` computing the bone transforms from the nodes.
+**/
 @:access(hrt.animgraph.AnimGraph)
 @:access(hrt.animgraph.Node)
 class AnimGraphInstance extends h3d.anim.Animation {
@@ -45,6 +63,9 @@ class AnimGraphInstance extends h3d.anim.Animation {
 		return inst;
 	}
 
+	/**
+		Creates an instance playing `rootNode`.
+	**/
 	public function new(rootNode: hrt.animgraph.nodes.AnimNode, modelCache: h3d.prim.ModelCache = null, resolver: AnimResolver = null, name: String, framesCount: Int, sampling: Float) {
 		// Todo : Define a true length for the animation OR make so animations can have an undefined length
 		super(name, framesCount, sampling);
@@ -58,6 +79,9 @@ class AnimGraphInstance extends h3d.anim.Animation {
 		return path;
 	}
 
+	/**
+		Sets the value of a parameter.
+	**/
 	public function setParam(name: String, value: Float) {
 		var param = parameterMap.get(name);
 		if (param != null) {
@@ -65,10 +89,16 @@ class AnimGraphInstance extends h3d.anim.Animation {
 		}
 	}
 
+	/**
+		Returns the value of a parameter, or `null` if missing.
+	**/
 	public function getParam(name: String) : Null<Float> {
 		return parameterMap.get(name)?.runtimeValue;
 	}
 
+	/**
+		Resets a parameter to its default value.
+	**/
 	public function resetParam(name: String) {
 		var param = parameterMap.get(name);
 		if (param != null) {
@@ -76,6 +106,9 @@ class AnimGraphInstance extends h3d.anim.Animation {
 		}
 	}
 
+	/**
+		Resets the parameters to their default values.
+	**/
 	public function resetParams() {
 		for (p in parameterMap) {
 			p.runtimeValue = p.defaultValue;
@@ -134,6 +167,9 @@ class AnimGraphInstance extends h3d.anim.Animation {
 		return cloned;
 	}
 
+	/**
+		Returns the bones animated by the graph, by name, and sets up the nodes.
+	**/
 	public function getBones(ctx : hrt.animgraph.nodes.AnimNode.GetBoneContext) : Map<String, Int> {
 		if (rootNode == null)
 			return null;

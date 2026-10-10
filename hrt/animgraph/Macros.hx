@@ -5,6 +5,9 @@ import haxe.macro.Expr;
 using haxe.macro.Tools;
 using Lambda;
 
+/**
+	Builds the animation graph nodes from their `@:input` and `@:output` fields.
+**/
 class Macros {
 
 	#if macro

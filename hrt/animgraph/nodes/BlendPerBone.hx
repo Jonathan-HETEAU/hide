@@ -1,5 +1,8 @@
 package hrt.animgraph.nodes;
 
+/**
+	Plays the animation `b` on the bones under `targetBone`, and `a` on the others.
+**/
 class BlendPerBone extends AnimNode {
 	@:input var a: AnimNode;
 	@:input var b: AnimNode;

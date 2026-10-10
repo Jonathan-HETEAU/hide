@@ -3,21 +3,45 @@ package hrt.animgraph.nodes;
 import hrt.tools.MapUtils;
 
 
+/**
+	The context of `AnimNode.getBones`.
+**/
 class GetBoneContext {
+	/**
+		Creates the context.
+	**/
 	public function new() {
 
 	}
 
+	/**
+		The animated object.
+	**/
 	public var targetObject:h3d.scene.Object;
+	/**
+		Returns the path of the animation to load for a path of the graph.
+	**/
 	public var resolver : (path: String) -> Null<String>;
+	/**
+		The model cache.
+	**/
 	public var modelCache : h3d.prim.ModelCache;
 }
 
+/**
+	The context of `AnimNode.getBoneTransform`.
+**/
 class GetBoneTransformContext {
+	/**
+		Creates the context.
+	**/
 	public function new() {
 
 	}
 
+	/**
+		Prepares the context for a bone.
+	**/
 	public function reset(target: hrt.animgraph.AnimGraphInstance.AnimGraphAnimatedObject) {
 		defMatrix = null;
 		targetObj = target;
@@ -59,6 +83,9 @@ abstract class AnimNode extends Node {
 		return boneId * numAnimInput + inputId;
 	}
 
+	/**
+		Returns the bones of the node, by name. By default, the union of the bones of the animation inputs.
+	**/
 	public function getBones(ctx: GetBoneContext) : Map<String, Int> {
 		// Default implementation for AnimNodes that takes multiple animation inputs and output one new animation
 		var inputs = getInputs();
@@ -102,6 +129,9 @@ abstract class AnimNode extends Node {
 		return boneMap;
 	}
 
+	/**
+		Sets `outMatrix` to the transform of a bone. Does nothing by default.
+	**/
 	public function getBoneTransform(boneId: Int, outMatrix: h3d.Matrix, ctx: GetBoneTransformContext) : Void {
 	}
 

@@ -8,8 +8,35 @@ import hide.view.GraphInterface;
 
 using Lambda;
 
-typedef AliasInfo = { ?nameSearch: String, ?nameOverride : String, ?description : String, ?args : Array<Dynamic>, ?group: String };
+/**
+	Another entry of a node in the node menu.
+**/
+typedef AliasInfo = {
+	/**
+		The name used by the search.
+	**/
+	var ?nameSearch : String;
+	/**
+		The name of the node.
+	**/
+	var ?nameOverride : String;
+	/**
+		The description.
+	**/
+	var ?description : String;
+	/**
+		The arguments of the node constructor.
+	**/
+	var ?args : Array<Dynamic>;
+	/**
+		The group.
+	**/
+	var ?group : String;
+};
 
+/**
+	A node of a texture graph. Subclasses are registered automatically, declare their `inputs` and `outputs` fields, and generate their textures in `apply`. The fields with `@prop` metadata are saved.
+**/
 @:autoBuild(hrt.texgraph.Macros.autoRegisterNode())
 @:keepSub
 @:keep
@@ -18,23 +45,59 @@ class TexNode
 implements hide.view.GraphInterface.IGraphNode
 #end
 {
+	/**
+		The node classes, by name.
+	**/
 	public static var registeredNodes = new Map<String, Class<TexNode>>();
 
+	/**
+		The id in the graph.
+	**/
 	public var id : Int;
+	/**
+		The connections of the inputs, by input id.
+	**/
 	public var connections : Array<TexGraph.Connection> = [];
+	/**
+		The default values of the inputs, by name.
+	**/
 	public var defaults : Dynamic = {};
 	#if editor
+	/**
+		The graph editor (editor only).
+	**/
 	public var editor : hide.view.GraphEditor;
 	#end
+	/**
+		The X position in the editor.
+	**/
 	public var x : Float;
+	/**
+		The Y position in the editor.
+	**/
 	public var y : Float;
+	/**
+		Shows the preview of the node in the editor.
+	**/
 	public var showPreview : Bool = true;
+	/**
+		The displayed name, or `null` for the name of the class.
+	**/
 	@prop public var nameOverride : String;
 
 	// Base parameters that are overriding graph's parameters
 	public var overrides = {};
+	/**
+		The height of the output textures.
+	**/
 	public var outputHeight = 256;
+	/**
+		The width of the output textures.
+	**/
 	public var outputWidth = 256;
+	/**
+		The format of the output textures.
+	**/
 	public var outputFormat = hxd.PixelFormat.RGBA;
 
 
@@ -48,12 +111,18 @@ implements hide.view.GraphInterface.IGraphNode
 		#end
 	}
 
+	/**
+		Registers a node class.
+	**/
 	static public function register(key : String, cl : Class<TexNode>) : Bool {
 		registeredNodes.set(key, cl);
 		return true;
 	}
 
 	#if editor
+	/**
+		Returns the display information of the node (editor only).
+	**/
 	public function getInfo() : GraphNodeInfo {
 		var metas = haxe.rtti.Meta.getType(HaxeType.getClass(this));
 		return {
@@ -84,20 +153,32 @@ implements hide.view.GraphInterface.IGraphNode
 		};
 	}
 
+	/**
+		Sets `p` to the position.
+	**/
 	public function getPos(p : h2d.col.Point) : Void {
 		p.set(x,y);
 	}
 
+	/**
+		Sets the position.
+	**/
 	public function setPos(p : h2d.col.Point) : Void {
 		x = p.x;
 		y = p.y;
 	}
 
+	/**
+		Returns the elements editing the properties of the node (editor only).
+	**/
 	public function getPropertiesHTML(width : Float) : Array<hide.Element> {
 		return [];
 	}
 	#end
 
+	/**
+		Creates a node from its serialized data.
+	**/
 	public static function createFromDynamic(data: Dynamic, graph: TexGraph) : TexNode {
 		var type = std.Type.resolveClass(data.type);
 		var inst = std.Type.createInstance(type, []);
@@ -118,6 +199,9 @@ implements hide.view.GraphInterface.IGraphNode
 		}
 	}
 
+	/**
+		Returns the serialized node.
+	**/
 	public function serializeToDynamic() : Dynamic {
 		return {
 			x: x,
@@ -128,6 +212,9 @@ implements hide.view.GraphInterface.IGraphNode
 		};
 	}
 
+	/**
+		Loads the saved properties.
+	**/
 	public function loadProperties(props : Dynamic) {
 		var fields = Reflect.fields(props);
 		showPreview = props.showPreview ?? true;
@@ -146,6 +233,9 @@ implements hide.view.GraphInterface.IGraphNode
 		}
 	}
 
+	/**
+		Returns the properties to save: the `@prop` fields and the default values.
+	**/
 	public function saveProperties() : Dynamic {
 		var parameters : Dynamic = {};
 
@@ -180,18 +270,30 @@ implements hide.view.GraphInterface.IGraphNode
 		return parameters;
 	}
 
+	/**
+		Returns the inputs: the `inputs` field.
+	**/
 	public function getInputs() : Array<Dynamic> {
 		return Reflect.field(this, "inputs")??[];
 	}
 
+	/**
+		Returns the outputs: the `outputs` field.
+	**/
 	public function getOutputs() : Array<Dynamic> {
 		return Reflect.field(this, "outputs")??[];
 	}
 
+	/**
+		Returns the output textures, from the outputs of the other nodes (`vars`, by node id). Returns none by default.
+	**/
 	public function apply(vars : Dynamic) : Array<h3d.mat.Texture> {
 		return [];
 	}
 
+	/**
+		Returns the data connected to an input, or its default value.
+	**/
 	public function getInputData(vars : Dynamic, inputIdx : Int) : Dynamic {
 		if (connections.length <= inputIdx || connections[inputIdx] == null)
 			return getDefaultInputData(inputIdx);
@@ -204,6 +306,9 @@ implements hide.view.GraphInterface.IGraphNode
 	}
 
 	#if editor
+	/**
+		Returns the elements editing the node specific parameters, or `null` (editor only).
+	**/
 	public function getSpecificParametersHTML() : hide.Element {
 		return null;
 	}

@@ -1,6 +1,9 @@
 package hrt.animgraph.nodes;
 
 import hrt.tools.MapUtils;
+/**
+	An object creating the children an animation asks for, to read an animation without its model.
+**/
 class AnimProxy extends h3d.scene.Object {
 	var map : Map<String, h3d.scene.Object> = [];
 
@@ -9,6 +12,9 @@ class AnimProxy extends h3d.scene.Object {
 	}
 }
 
+/**
+	Plays an animation file (`path`).
+**/
 class Input extends AnimNode {
 	var anim : h3d.anim.Animation;
 	var proxy : AnimProxy;

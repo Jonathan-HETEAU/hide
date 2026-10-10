@@ -1,5 +1,8 @@
 package hrt.animgraph.nodes;
 
+/**
+	The default pose of the objects and skin joints.
+**/
 class DefaultPose extends AnimNode {
 
 	var object = h3d.scene.Object;

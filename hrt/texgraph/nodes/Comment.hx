@@ -4,14 +4,29 @@ package hrt.texgraph.nodes;
 import hide.view.GraphInterface;
 #end
 
+/**
+	The texture graph node "Comment" (Comment): a box that allows you to comment your graph.
+**/
 @name("Comment")
 @description("A box that allows you to comment your graph")
 @group("Comment")
 class Comment extends TexNode {
+	/**
+		The text.
+	**/
 	@prop() public var comment : String = "Comment";
+	/**
+		The width of the box.
+	**/
 	@prop() public var width : Float = 200;
+	/**
+		The height of the box.
+	**/
 	@prop() public var height : Float = 200;
 
+	/**
+		Creates the node.
+	**/
 	public function new () {}
 
 	override function apply(vars : Dynamic) : Array<h3d.mat.Texture> {

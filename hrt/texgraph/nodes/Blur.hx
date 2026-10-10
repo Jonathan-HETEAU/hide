@@ -1,5 +1,10 @@
 package hrt.texgraph.nodes;
 
+/**
+	The texture graph node "Blur" (Math): blur texture.
+	Inputs: `input1`.
+	Outputs: `output`.
+**/
 @name("Blur")
 @description("Blur texture")
 @width(100)

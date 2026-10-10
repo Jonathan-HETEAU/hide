@@ -1,7 +1,13 @@
 package hrt.animgraph.nodes;
 
+/**
+	Outputs the value of a parameter of the graph.
+**/
 class FloatParameter extends Node {
 	@:output var value: Float;
+	/**
+		The parameter.
+	**/
 	public var parameter: hrt.animgraph.AnimGraph.Parameter;
 
 	#if editor

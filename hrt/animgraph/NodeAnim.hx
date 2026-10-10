@@ -1,7 +1,13 @@
 package hrt.animgraph;
 
+/**
+	Plays a single node of an animation graph, for the previews.
+**/
 @:access(AnimNode)
 class NodeAnim<T:hrt.animgraph.nodes.AnimNode> extends h3d.anim.Animation {
+	/**
+		The node.
+	**/
 	public var node: T;
 	var resolver: hrt.animgraph.AnimGraphInstance.AnimResolver;
 	var modelCache: h3d.prim.ModelCache;
@@ -9,6 +15,9 @@ class NodeAnim<T:hrt.animgraph.nodes.AnimNode> extends h3d.anim.Animation {
 	var tmpMatrix : h3d.Matrix = new h3d.Matrix();
 
 
+	/**
+		Creates the animation.
+	**/
 	public function new(resolver: hrt.animgraph.AnimGraphInstance.AnimResolver, modelCache: h3d.prim.ModelCache) {
 		super(null, 100, 1/60);
 		this.resolver = resolver;

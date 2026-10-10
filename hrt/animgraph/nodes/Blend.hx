@@ -1,5 +1,8 @@
 package hrt.animgraph.nodes;
 
+/**
+	Blends the animations `a` and `b` by `alpha`.
+**/
 class Blend extends AnimNode {
 	@:input var a : AnimNode;
 	@:input var b : AnimNode;

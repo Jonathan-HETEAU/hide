@@ -1,8 +1,14 @@
 package hrt.animgraph;
 
+/**
+	Animation helpers.
+**/
 class Tools {
 
 	// from https://theorangeduck.com/page/quaternion-weighted-average
+	/**
+		Sets `outRotation` to the weighted average of rotations, relative to `inReference`.
+	**/
 	@:haxe.warning("-WInlineOptimizedField")
 	static public function weightedBlend(inRotations: Array<h3d.Quat>, inReference: h3d.Quat, inWeights: Array<Float>, outRotation: h3d.Quat) {
 		outRotation.set(0,0,0,0);

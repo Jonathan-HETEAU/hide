@@ -1,11 +1,18 @@
 package hrt.texgraph.nodes;
 
+/**
+	The texture graph node "Outputs" (Output): parameters outputs.
+	Inputs: `input`.
+**/
 @name("Outputs")
 @description("Parameters outputs")
 @width(80)
 @group("Output")
 @color("#A90707")
 class TexOutput extends TexNode {
+	/**
+		The label of the output texture.
+	**/
 	@prop public var label : String = "base-color";
 
 	var inputs = [
