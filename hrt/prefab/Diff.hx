@@ -1,5 +1,8 @@
 package hrt.prefab;
 
+/**
+	The result of a diff between two values.
+**/
 enum DiffResult {
 	/**The two object are identical, don't save anything**/
 	Skip;
@@ -51,6 +54,9 @@ class Diff {
 		}
 	}
 
+	/**
+		Returns a deep copy of a dynamic value.
+	**/
 	public static function deepCopy(v:Dynamic) : Dynamic {
 		#if hl
 		return deepCopyHL(v);

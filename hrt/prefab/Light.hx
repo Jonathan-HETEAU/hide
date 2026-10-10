@@ -1,96 +1,268 @@
 package hrt.prefab;
 
+/**
+	The type of a light.
+**/
 enum abstract LightKind(String) {
+	/**
+		A point light.
+	**/
 	var Point;
+	/**
+		A directional light (sun).
+	**/
 	var Directional;
+	/**
+		A spot light.
+	**/
 	var Spot;
+	/**
+		A capsule light.
+	**/
 	var Capsule;
+	/**
+		A rectangle (area) light.
+	**/
 	var Rectangle;
 }
 
+/**
+	The shadows of a light.
+**/
 typedef LightShadows = {
+	/**
+		The rendering mode: none, dynamic, static (baked) or mixed.
+	**/
 	var mode : h3d.pass.Shadows.RenderMode;
+	/**
+		The size of the shadow map, in pixels.
+	**/
 	var size : Int;
+	/**
+		The depth bias.
+	**/
 	var bias : Float;
+	/**
+		The blur radius.
+	**/
 	var radius : Float;
+	/**
+		The blur quality.
+	**/
 	var quality : Float;
+	/**
+		How the shadow map is sampled.
+	**/
 	var samplingMode : ShadowSamplingMode;
 }
 
+/**
+	The sampling of a shadow map.
+**/
 enum abstract ShadowSamplingKind(String) {
+	/**
+		Hard shadows.
+	**/
 	var None;
+	/**
+		Percentage closer filtering.
+	**/
 	var PCF;
+	/**
+		Exponential shadow maps.
+	**/
 	var ESM;
 }
 
+/**
+	The sampling of a shadow map.
+**/
 typedef ShadowSamplingMode = {
+	/**
+		The kind of sampling.
+	**/
 	var kind : ShadowSamplingKind;
 }
 
+/**
+	Exponential shadow map sampling.
+**/
 typedef ShadowSamplingESM = {> ShadowSamplingMode,
+	/**
+		The exponent.
+	**/
 	var power : Float;
 }
 
+/**
+	Percentage closer filtering sampling.
+**/
 typedef ShadowSamplingPCF = {> ShadowSamplingMode,
+	/**
+		The scale of the filter.
+	**/
 	var scale : Float;
 }
 
+/**
+	The parameters of a shadow cascade.
+**/
 typedef CascadeParams = {
+	/**
+		The depth bias.
+	**/
 	var depthBias : Float;
+	/**
+		The slope bias.
+	**/
 	var slopeBias : Float;
 }
 
+/**
+	A PBR light (`h3d.scene.pbr.Light`): point, directional, spot, capsule or rectangle, with its shadows.
+**/
 @:prefabIcon(HuiRes.ui.icons.prefab.light)
 class Light extends Object3D {
 
+	/**
+		The type of light.
+	**/
 	@:s public var kind : LightKind = Point;
+	/**
+		The color (`0xRRGGBB`).
+	**/
 	@:s public var color : Int = 0xffffff;
+	/**
+		The intensity.
+	**/
 	@:s public var power : Float = 1.0;
+	/**
+		How much the ambient occlusion attenuates the light.
+	**/
 	@:s public var occlusionFactor = 1.0;
+	/**
+		Marks the main light of the scene (`h3d.scene.pbr.Light.isMainLight`).
+	**/
 	@:s public var isMainLight : Bool = false;
+	/**
+		The shadows.
+	**/
 	@:c public var shadows : LightShadows = getShadowsDefault();
 
-	// Point/Spot
+	/**
+		The range of the light: point, spot, capsule and rectangle lights.
+	**/
 	@:s public var range : Float;
 
-	// Point
+	/**
+		The size of the light source: radius of point lights, and of capsule lights.
+	**/
 	@:s public var size : Float = 1.0;
+	/**
+		The near distance of the shadow maps of point and capsule lights.
+	**/
 	@:s public var zNear : Float;
 
-	// Spot
+	/**
+		The angle of the cone of a spot light, in degrees.
+	**/
 	@:s public var angle : Float = 90;
+	/**
+		The angle where the light starts to fade, in degrees: spot and rectangle lights.
+	**/
 	@:s public var fallOff : Float = 80;
+	/**
+		The texture projected by a spot light, or `null`.
+	**/
 	@:s public var cookiePath : String = null;
+	/**
+		The texture projected by a spot light, loaded from `cookiePath`.
+	**/
 	public var cookieTex : h3d.mat.Texture = null;
 
-	// Dir
+	/**
+		The maximum distance of the shadows of a directional light (`-1` for the far plane of the camera).
+	**/
 	@:s public var maxDist : Float = -1;
+	/**
+		The minimum distance of the shadows of a directional light (`-1` for the near plane of the camera).
+	**/
 	@:s public var minDist : Float = -1;
+	/**
+		Shrinks the shadow map of a directional light to the bounds of the casters.
+	**/
 	@:s public var autoShrink : Bool = true;
+	/**
+		Computes the depth range of the shadow map of a directional light from the casters.
+	**/
 	@:s public var autoZPlanes : Bool = false;
 
-	// Capsule
+	/**
+		The length of a capsule light.
+	**/
 	@:s public var length : Float = 1.0;
 
-	// Rectangle
+	/**
+		The width of a rectangle light.
+	**/
 	@:s public var width : Float = 1.0;
+	/**
+		The height of a rectangle light.
+	**/
 	@:s public var height : Float = 1.0;
+	/**
+		The vertical spread of a rectangle light.
+	**/
 	@:s public var verticalAngle : Float = 1.0;
+	/**
+		The horizontal spread of a rectangle light.
+	**/
 	@:s public var horizontalAngle : Float = 1.0;
 
-	// Cascade
+	/**
+		Uses cascaded shadow maps for a directional light.
+	**/
 	@:s public var cascade : Bool = false;
+	/**
+		The number of shadow cascades.
+	**/
 	@:s public var cascadeNbr : Int = 1;
+	/**
+		The power of the distribution of the cascades.
+	**/
 	@:s public var cascadePow : Float = 2;
+	/**
+		The size of the first cascade.
+	**/
 	@:s public var firstCascadeSize : Float = 10;
+	/**
+		The minimum size of a caster, in pixels of the shadow map.
+	**/
 	@:s public var minPixelSize : Int = 1;
+	/**
+		The maximum distance of the casters of the cascades (`0` for no limit).
+	**/
 	@:s public var castingMaxDist : Float = 0.0;
+	/**
+		The fraction of a cascade used for the transition to the next one.
+	**/
 	@:s public var transitionFraction : Float = 0.15;
+	/**
+		The parameters of each cascade.
+	**/
 	@:s public var params : Array<CascadeParams> = [];
+	/**
+		Displays the cascades for debugging.
+	**/
 	@:s public var debugShader : Bool = false;
+	/**
+		Uses a high precision shadow map for the cascades.
+	**/
 	@:s public var highPrecision : Bool = false;
 
-	// Debug
+	/**
+		Displays the light in the editor.
+	**/
 	@:s public var debugDisplay : Bool = true;
 
 	#if editor
@@ -110,6 +282,9 @@ class Light extends Object3D {
 		};
 	}
 
+	/**
+		Creates the prefab.
+	**/
 	public function new(parent, shared: ContextShared) {
 		super(parent, shared);
 		range = 10;
@@ -155,6 +330,9 @@ class Light extends Object3D {
 			applyTransformToObject(local3d);
 	}
 
+	/**
+		Applies the transform of the prefab to a light object.
+	**/
 	public function applyTransformToObject( o : h3d.scene.Object ) {
 		o.x = x;
 		o.y = y;

@@ -1,23 +1,50 @@
 package hrt.prefab;
 import hxd.Math;
 
+/**
+	A prefab with a 2D transform, creating a 2D object (`local2d`). The base class of the 2D prefabs. The rotation is in degrees.
+**/
 @:prefabIcon(HuiRes.ui.icons.prefab.object2d)
 @:prefabName("Object 2D")
 @:prefabCategory("2D")
 class Object2D extends Prefab {
 
+	/**
+		The 2D object created by `make`, or `null` before.
+	**/
 	public var local2d : h2d.Object = null;
 
+	/**
+		The X position.
+	**/
 	@:s @:range(0,400) public var x : Float = 0.;
+	/**
+		The Y position.
+	**/
 	@:s @:range(0,400) public var y : Float = 0.;
+	/**
+		The X scale.
+	**/
 	@:s public var scaleX : Float = 1.;
+	/**
+		The Y scale.
+	**/
 	@:s public var scaleY : Float = 1.;
 
 	var scaleArray(get, set) : Array<Float>;
 
+	/**
+		The rotation, in degrees.
+	**/
 	@:s public var rotation : Float = 0.;
 
+	/**
+		Tells if the object is visible.
+	**/
 	@:s public var visible : Bool = true;
+	/**
+		The blend mode.
+	**/
 	@:s public var blendMode : h2d.BlendMode = None;
 
 	public inline function get_scaleArray() : Array<Float> {
@@ -30,6 +57,9 @@ class Object2D extends Prefab {
 		return array;
 	}
 
+	/**
+		Returns the 2D object of the prefab if it is an `Object2D`, or `null`.
+	**/
 	public static inline function getLocal2d(prefab: Prefab) : h2d.Object {
 		var obj2d = Std.downcast(prefab, Object2D);
 		if (obj2d != null)
@@ -64,6 +94,9 @@ class Object2D extends Prefab {
 		return this;
 	}
 
+	/**
+		Sets the position, scale and rotation from a structure returned by `saveTransform`.
+	**/
 	public function loadTransform(t) {
 		x = t.x;
 		y = t.y;
@@ -72,10 +105,16 @@ class Object2D extends Prefab {
 		rotation = t.rotation;
 	}
 
+	/**
+		Returns the position, scale and rotation, as a structure.
+	**/
 	public function saveTransform() {
 		return { x : x, y : y, scaleX : scaleX, scaleY : scaleY, rotation : rotation };
 	}
 
+	/**
+		Sets the position, scale and rotation from a structure.
+	**/
 	public function setTransform(t) {
 		x = t.x;
 		y = t.y;
@@ -84,6 +123,9 @@ class Object2D extends Prefab {
 		rotation = t.rotation;
 	}
 
+	/**
+		Applies the position, scale and rotation to the object.
+	**/
 	public function applyTransform( o : h2d.Object ) {
 		o.x = x;
 		o.y = y;
@@ -113,6 +155,9 @@ class Object2D extends Prefab {
 		return type == "object2D" ? "group2D" : super.getDefaultEditorName();
 	}
 
+	/**
+		Returns the local transform matrix (in `m` if given).
+	**/
 	public function getTransformMatrix(m : h2d.col.Matrix = null) : h2d.col.Matrix {
 		if (m == null)
 			m = new h2d.col.Matrix();
@@ -124,6 +169,9 @@ class Object2D extends Prefab {
 
 	static var tmpPoint = new h2d.col.Point();
 	static var tmpMat = new h2d.col.Matrix();
+	/**
+		Sets the position, scale and rotation from a matrix.
+	**/
 	public function setTransformMatrix(m: h2d.col.Matrix) : Void {
 
 		m.getScale(tmpPoint);

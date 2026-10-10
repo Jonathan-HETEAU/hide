@@ -7,21 +7,60 @@ import h3d.mat.PbrMaterial;
 #if editor
 import hide.prefab.HideProps;
 #end
+/**
+	A property of a referenced material library material overridden by a `Material` prefab.
+**/
 typedef OverrideProperty = {
+	/**
+		The name of the property (`<material setup>/<name>` for the material setup properties).
+	**/
 	var pname : String;
+	/**
+		The value.
+	**/
 	var value : Dynamic;
 };
+/**
+	Applies material properties to the materials of the parent object: the material of the same name (or `materialName`), or all of them. The properties can come from a material of a `MaterialLibrary` (`refMatLib`), with `overrides`.
+**/
 @:prefabIcon(HuiRes.ui.icons.prefab.material)
 class Material extends Prefab {
 
+	/**
+		Sets the texture wrap mode to repeat.
+	**/
 	@:s public var wrapRepeat = false;
+	/**
+		The path of the diffuse (albedo) texture, or `null`.
+	**/
 	@:s public var diffuseMap : String;
+	/**
+		The path of the normal map, or `null`.
+	**/
 	@:s public var normalMap : String;
+	/**
+		The path of the specular texture, or `null`.
+	**/
 	@:s public var specularMap : String;
+	/**
+		The name of the material of the model to change (the name of the prefab otherwise).
+	**/
 	@:s public var materialName : String;
+	/**
+		The color, as `[r, g, b, a]`.
+	**/
 	@:c public var color : Array<Float> = [1,1,1,1];
+	/**
+		The name of the main pass of the material, or `null`.
+	**/
 	@:s public var mainPassName : String;
+	/**
+		The material of a material library to use (`<library path>/<material name>`), or `null`.
+	**/
 	@:s public var refMatLib : String;
+	/**
+		The properties overriding the ones of the referenced material library material.
+	**/
 	@:s public var overrides : Array<OverrideProperty> = [];
 
 	var previewSphere : h3d.scene.Object;
@@ -30,6 +69,9 @@ class Material extends Prefab {
 	var gradientFollower : GradientFollower;
 	#end
 
+	/**
+		Creates the prefab.
+	**/
 	public function new(parent, shared: ContextShared) {
 		super(parent, shared);
 		props = {};
@@ -62,6 +104,9 @@ class Material extends Prefab {
 		return obj;
 	}
 
+	/**
+		Tells if the material should be changed. Returns `true` by default (currently not used by the prefab).
+	**/
 	public dynamic function filter(m : h3d.mat.Material) return true;
 
 	function renderProps() {
@@ -75,6 +120,9 @@ class Material extends Prefab {
 		return r;
 	}
 
+	/**
+		Returns the material of the object (the root object of the parent by default) matching the prefab, or all its materials. `filterObj` filters the objects searched.
+	**/
 	public function getMaterials(local3d: h3d.scene.Object = null, includePreviewMats : Bool = false, filterObj : (obj : h3d.scene.Object) -> Bool = null) {
 		if (local3d == null)
 			local3d = findFirstLocal3d();
@@ -491,6 +539,9 @@ class Material extends Prefab {
 
 
 	#if editor
+	/**
+		Returns the references to a material of a material library in the project (editor only).
+	**/
 	public static function findMaterialLibraryRefs(libPath : String, matName : String) : Array<hide.view.RefViewer.Reference> {
 		// Find every material.props file with ref of the material library that we're searching
 		var materialPropsFiles : Array<{ path: String, bindMatName : String, ?model : String }> = [];
@@ -975,12 +1026,18 @@ class Material extends Prefab {
 		updateHighlightOverrides(ctx);
 	}
 
+	/**
+		Adds an override of the property and updates the editor (editor only).
+	**/
 	public function addOverrideProperty(ctx : hide.prefab.EditContext, pname : String, isMatSetupProp : Bool) {
 		addOverrideProperty2(pname, isMatSetupProp);
 
 		updateHighlightOverrides(ctx);
 	}
 
+	/**
+		Highlights the overridden properties in the editor (editor only).
+	**/
 	public function updateHighlightOverrides(ctx : hide.prefab.EditContext) {
 		ctx.properties.element.find(".override").removeClass("override");
 		ctx.properties.element.find(".remove-override-btn").remove();
@@ -1046,6 +1103,9 @@ class Material extends Prefab {
 		return !Prefab.isOfType(cl, Material);
 	}
 
+	/**
+		Adds an override of the property, with its current value.
+	**/
 	public function addOverrideProperty2(pname : String, isMatSetupProp : Bool) {
 		// Remove previous value of this props name in overrides
 		var idx = 0;
@@ -1068,6 +1128,9 @@ class Material extends Prefab {
 		}
 	}
 
+	/**
+		Tells if the prefab (or its parent `Object3D` group) has an enabled `Material` child.
+	**/
 	public static function hasOverride(p: Prefab) {
 		if(Lambda.exists(p.children, c -> Std.isOfType(c, Material) && c.enabled))
 			return true;
@@ -1080,7 +1143,13 @@ class Material extends Prefab {
 }
 
 #if (editor || editor_hl)
+/**
+	An object following a 3D object, scaled by the perspective (editor only).
+**/
 class GradientFollower extends h2d.ObjectFollower {
+	/**
+		The scale applied with the perspective.
+	**/
 	public var perspectiveScale : Float = 1.0;
 
 	override function followObject() {

@@ -1,7 +1,16 @@
 package hrt.prefab;
 
+/**
+	An object hidden (with its children) when it is farther than a distance from the camera.
+**/
 class CullingContainerObject extends h3d.scene.Object {
+	/**
+		The squared distance from the camera beyond which the object is hidden.
+	**/
 	public var cullDistanceSq : Float;
+	/**
+		Keeps the object visible (used in the editor).
+	**/
 	public var forceVisible : Bool = false;
 
 	override function syncRec( ctx : h3d.scene.RenderContext  ) {
@@ -13,6 +22,9 @@ class CullingContainerObject extends h3d.scene.Object {
 	}
 }
 
+/**
+	A group of objects hidden when farther than `cullDistance` from the camera (always visible in the editor).
+**/
 @:prefabIcon(HuiRes.ui.icons.prefab.culling_container)
 class CullingContainer extends Object3D {
 	@:s var cullDistance : Float = 100;

@@ -1,28 +1,73 @@
 package hrt.prefab;
 
+/**
+	Whether a pass query includes or excludes the passes.
+**/
 enum Inclusion {
+	/**
+		Includes the passes.
+	**/
 	INCLUDE;
+	/**
+		Excludes the passes.
+	**/
 	EXCLUDE;
 }
 
+/**
+	A query of material passes, by name.
+**/
 typedef PassQuery = {
-	passName : String,
-	inclusion : Inclusion
+	/**
+		The name of the pass, or `all`.
+	**/
+	var passName : String;
+	/**
+		Whether the matching passes are included or excluded.
+	**/
+	var inclusion : Inclusion;
 }
 
+/**
+	A pass selected by a `MaterialSelector`.
+**/
 typedef SelectedPass = {
-	pass : h3d.mat.Pass,
-	all : Bool
+	/**
+		The pass.
+	**/
+	var pass : h3d.mat.Pass;
+	/**
+		Tells if all the passes of the material are selected.
+	**/
+	var all : Bool;
 }
 
+/**
+	Selects material passes of the parent object (by pass name or blend mode), for the prefabs applying changes to the materials.
+**/
 @:prefabIcon(HuiRes.ui.icons.prefab.material_selector)
 class MaterialSelector extends hrt.prefab.Prefab {
+	/**
+		The key of the project configuration of the selector.
+	**/
 	public static var CONFIG_KEY = "materialSelector";
 
+	/**
+		Selects the main passes by blend mode instead of by name.
+	**/
 	@:s public var blendModeEnabled : Bool = false;
+	/**
+		The blend modes selected (names of `h2d.BlendMode` constructors).
+	**/
 	@:s public var blendModesSelected : Array<String> = [];
+	/**
+		The queries of passes by name, applied in order.
+	**/
 	@:s public var selections : Array<PassQuery> = [ { passName : "all", inclusion : Inclusion.INCLUDE } ];
 
+	/**
+		Returns the selected passes of the materials of the object (the root object of the parent by default). `filterObj` filters the objects searched.
+	**/
 	public function getPasses(local3d: h3d.scene.Object = null, filterObj : (obj : h3d.scene.Object) -> Bool = null) : Array<SelectedPass> {
 		if (local3d == null)
 			local3d = findFirstLocal3d();

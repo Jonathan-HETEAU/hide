@@ -1,6 +1,9 @@
 package hrt.prefab;
 
 
+/**
+	How an editor setting is shared between the inspectors.
+**/
 enum SettingCategory {
 	/** saved for all the inspectors**/
 	Global;
@@ -9,28 +12,49 @@ enum SettingCategory {
 	SameKind;
 }
 
+/**
+	The context of the inspector of a prefab in the editor (`Prefab.edit2`): the scenes, the editor tools, and the editor services.
+**/
 @:allow(hide.kit.Element)
 @:allow(hrt.prefab.editor.Tool)
 @:allow(hide.kit.KitRoot)
 abstract class EditContext2 {
 	var parent : EditContext2 = null;
 
+	/**
+		Creates a context, child of `parent`.
+	**/
 	public function new(parent: EditContext2) {
 		this.parent = parent;
 	}
 
 	#if !macro
 	#if domkit
+	/**
+		The root of the inspector elements.
+	**/
 	public var root: hide.kit.KitRoot;
 	#end
 
+	/**
+		The 3D scene of the editor.
+	**/
 	public var s3d(get, never): h3d.scene.Scene;
+	/**
+		The 2D scene of the editor.
+	**/
 	public var s2d(get, never): h2d.Scene;
 
 	function get_s3d() {return getScene3d();}
 	function get_s2d() {return getScene2d();}
 
+	/**
+		The editor tool receiving the inputs first.
+	**/
 	public var foregroundEditorTool: hrt.prefab.editor.Tool;
+	/**
+		The other active editor tools.
+	**/
 	public var otherEditorTools: Array<hrt.prefab.editor.Tool> = [];
 
 	/** Tracks which prefabs have been rebuild during onValueChange calls**/
@@ -44,6 +68,9 @@ abstract class EditContext2 {
 		requestedTreeRebuild = false;
 	}
 
+	/**
+		Returns the display name of an animation file (without `Anim_` prefix, extension and `_loop` suffix).
+	**/
 	public function animName(path: String) : String {
 		var name = path.split("/").pop();
 		if( StringTools.startsWith(name, "Anim_") )
@@ -88,6 +115,9 @@ abstract class EditContext2 {
 		rebuildTreeImpl();
 	}
 
+	/**
+		Rebuilds the render props of the scene.
+	**/
 	public abstract function rebuildRenderProps() : Void;
 
 	/**
@@ -115,6 +145,9 @@ abstract class EditContext2 {
 	**/
 	public abstract function openFile(path: String) : Void;
 
+	/**
+		Opens a prefab file in the editor.
+	**/
 	public abstract function openPrefab(path: String, ?afterOpen : (ctx: SceneEditorAPI) -> Void) : Void;
 
 	/**
@@ -122,8 +155,14 @@ abstract class EditContext2 {
 	**/
 	public abstract function chooseFileSave(path: String, callback:(absPath: String) -> Void, allowNull: Bool = false) : Void;
 
+	/**
+		Returns the material libraries available.
+	**/
 	public abstract function listMaterialLibraries(path: String) : Array<{path: String, name: String}>;
 
+	/**
+		Returns the animations of a model.
+	**/
 	public abstract function listModelAnimations(path: String) : Array<String>;
 
 	/**
@@ -131,6 +170,9 @@ abstract class EditContext2 {
 	**/
 	public abstract function quickError(message: String) : Void;
 
+	/**
+		Returns the ground position under a screen position, or `null`.
+	**/
 	public abstract function screenToGround(sx: Float, sy: Float, ?paintOn : hrt.prefab.Prefab, ignoreTerrain: Bool = false) : h3d.Vector;
 
 	/** Undo steps recorded between beginMultiUndo/finishMultiUndo, only used on the top context **/
@@ -235,6 +277,9 @@ abstract class EditContext2 {
 	#end
 
 	#if domkit
+	/**
+		Builds inspector elements from a markup (`hide.kit`), bound to the fields of `contextObj`.
+	**/
 	public macro function build(ethis: haxe.macro.Expr, dml: haxe.macro.Expr, ?contextObj: haxe.macro.Expr, ?onAnyChange: haxe.macro.Expr.ExprOf<(isTemp:Bool) -> Void>) : haxe.macro.Expr {
 		return hide.kit.Macros.build(macro $ethis.root, dml, contextObj, onAnyChange);
 	}

@@ -8,10 +8,25 @@ package hrt.prefab;
 @:prefabIcon(HuiRes.ui.icons.prefab.crash_test)
 @:prefabHideInAddMenu
 class CrashTest extends hrt.prefab.Object3D {
+	/**
+		Throws when the prefab is loaded.
+	**/
 	@:s public var crashOnLoad: Bool = false;
+	/**
+		Throws when the inspector is opened.
+	**/
 	@:s public var crashOnInspector: Bool = false;
+	/**
+		Throws when the prefab is made.
+	**/
 	@:s public var crashOnMake: Bool = false;
+	/**
+		Throws when its object is synchronized.
+	**/
 	@:s public var crashOnSync: Bool = false;
+	/**
+		Throws when the instance is updated.
+	**/
 	@:s public var crashOnUpdateInstance: Bool = false;
 
 	override public function load(data: Dynamic) {
@@ -60,9 +75,15 @@ class CrashTest extends hrt.prefab.Object3D {
 	static var _ = Prefab.register("crashTest", CrashTest);
 }
 
+/**
+	The object of a `CrashTest` prefab.
+**/
 class CrashTestObject extends h3d.scene.Object {
 	var prefab : CrashTest;
 
+	/**
+		Creates the object of the prefab.
+	**/
 	public function new(prefab: CrashTest, ?parent: h3d.scene.Object) {
 		super(parent);
 		this.prefab = prefab;

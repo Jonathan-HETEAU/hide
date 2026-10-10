@@ -1,10 +1,16 @@
 package hrt.prefab;
 
+/**
+	Applies a shader given by its source path: a `.hx` shader class or a shader graph (`.shgraph`), with its parameters in `props`.
+**/
 class DynamicShader extends Shader {
 
 	@:c var shaderDef : {> hrt.prefab.Cache.ShaderDef, ?sclass : Class<hxsl.Shader>, ?isShaderGraph : Bool } = { shader : null, inits : null };
 	var template : DynamicShader;
 
+	/**
+		Creates the prefab.
+	**/
 	public function new(parent,  shared: ContextShared) {
 		super(parent, shared);
 	}
@@ -145,6 +151,9 @@ class DynamicShader extends Shader {
 		return loadShaderClass(true) != null;
 	}
 
+	/**
+		Loads the definition of the shader from the source.
+	**/
 	public function loadShaderDef() {
 		if(shaderDef.shader == null && source != null) {
 			fixSourcePath();
@@ -281,6 +290,9 @@ class DynamicShader extends Shader {
 	}
 	#end
 
+	/**
+		Evaluates a constant expression of a shader (constants and vector constructors).
+	**/
 	public static function evalConst( e : hxsl.Ast.TExpr ) : Dynamic {
 		return switch( e.e ) {
 		case TConst(c):
@@ -307,6 +319,9 @@ class DynamicShader extends Shader {
 		}
 	}
 
+	/**
+		Returns the default value of a shader parameter type (`0`, `false`, or a zero vector).
+	**/
 	public static function getDefault(type: hxsl.Ast.Type): Dynamic {
 		switch(type) {
 			case TBool:

@@ -1,24 +1,69 @@
 package hrt.prefab;
 
+/**
+	A serialized field of a prefab type (see `Prefab.getSerializableProps`).
+**/
 typedef PrefabField = {
+	/**
+		The name of the field.
+	**/
 	var name : String;
+	/**
+		Tells if the field has a setter.
+	**/
 	var hasSetter : Bool;
+	/**
+		The documentation and range of the field, from its metadata.
+	**/
 	var meta : PrefabMeta;
+	/**
+		The default value.
+	**/
 	var defaultValue : Dynamic;
+	/**
+		The type of the field.
+	**/
 	var type : Macros.PrefabFieldType;
 }
 
+/**
+	The metadata of a serialized prefab field.
+**/
 typedef PrefabMeta = {
+	/**
+		The documentation of the field.
+	**/
 	var ?doc : String;
+	/**
+		The minimum value (`@:range`).
+	**/
 	var ?range_min : Float;
+	/**
+		The maximum value (`@:range`).
+	**/
 	var ?range_max : Float;
+	/**
+		The step of the value (`@:range`).
+	**/
 	var ?range_step : Float;
 }
 
+/**
+	A registered prefab type.
+**/
 typedef PrefabInfo = {
+	/**
+		The class of the prefab.
+	**/
 	var prefabClass : Class<Prefab>;
+	/**
+		The file extension of the prefab type, if any.
+	**/
 	var ?extension: String;
 	#if editor
+	/**
+		The editor properties of the prefab type (editor only).
+	**/
 	var inf : hide.prefab.HideProps;
 	#end
 	#if editor_hl
@@ -27,6 +72,9 @@ typedef PrefabInfo = {
 	#end
 };
 
+/**
+	The context given to `Prefab.make`: a `ContextShared`, or the parent 2D or 3D object of the instance (converted to a new `ContextShared`).
+**/
 @:access(Prefab)
 abstract ContextMake(ContextShared) from ContextShared to ContextShared {
 
@@ -40,13 +88,26 @@ abstract ContextMake(ContextShared) from ContextShared to ContextShared {
 }
 
 #if (editor || editor_hl)
+/**
+	What a prefab does when a child changed in the editor (see `Prefab.onEditorTreeChanged`).
+**/
 enum TreeChangedResult {
-	Skip; /**Don't rebuild this prefab**/
-	Rebuild; /** Force rebuild this prefab **/
-	Notify(callback: Void -> Void); /**Call the callback once all the prefab that wanted rebuild have been rebuild. Call order betwteen multiple Notify are not guaranteed. Only one callback will be called by prefab in the tree**/
+	/** Don't rebuild this prefab. **/
+	Skip;
+	/** Force rebuild this prefab. **/
+	Rebuild;
+	/** Call the callback once all the prefabs that wanted a rebuild have been rebuilt. The call order between multiple Notify is not guaranteed. Only one callback is called by prefab in the tree. **/
+	Notify(callback: Void -> Void);
 }
 #end
 
+/**
+	The base class of the prefabs: the serializable nodes of the data edited in Hide (`.prefab`, `.fx`, `.l3d`... files).
+	A prefab is a tree of prefabs: `make()` instanciates it (creating its 2D/3D objects, see `Object3D` and `Object2D`).
+
+	The `@:s` fields are serialized (see `hrt.prefab.Macros`). A prefab type is registered with
+	`public static var _ = Prefab.register("name", MyPrefab);`. Load prefab files with `hxd.Res` (see `Resource`).
+**/
 @:allow(hide)
 @:keepSub
 @:autoBuild(hrt.prefab.Macros.buildPrefab())
@@ -65,6 +126,9 @@ class Prefab {
 		The name of the prefab in the tree view
 	**/
 	@:s public var name : String = "";
+	/**
+		The name used in the paths for the prefabs without name.
+	**/
 	public static var emptyNameReplacement = "$no_name";
 
 	#if editor_hl
@@ -98,6 +162,9 @@ class Prefab {
 		Tells if the prefab will create an instance when used in an other prefab or in game. Also apply to this prefab children.
 	**/
 	@:s public var editorOnly : Bool = false;
+	/**
+		Instanciates the `editorOnly` prefabs out of the editor too.
+	**/
 	public static var ignoreEditorOnly = false;
 
 	/**
@@ -128,6 +195,9 @@ class Prefab {
 
 	// Public API
 
+	/**
+		Creates a prefab, child of `parent`, or root with the given shared context (or a new one).
+	**/
 	public function new(parent:Prefab, contextShared: ContextShared) {
 		initParentShared(parent, contextShared);
 	}
@@ -334,18 +404,30 @@ class Prefab {
 		}
 	}
 
+	/**
+		Adds a child at the end.
+	**/
 	public function addChild(child: Prefab) : Void {
 		inline addChildAt(child, children.length);
 	}
 
+	/**
+		Adds a child at the index (removing it from its previous parent).
+	**/
 	public function addChildAt(child: Prefab, index: Int) : Void {
 		handleParenting(child, child.parent, this, index);
 	}
 
+	/**
+		Removes a child.
+	**/
 	public function removeChild(child: Prefab) : Void {
 		handleParenting(child, this, null, 0);
 	}
 
+	/**
+		Removes this prefab from its parent.
+	**/
 	public function remove() : Void {
 		if (parent != null) {
 			parent.removeChild(this);
@@ -524,6 +606,9 @@ class Prefab {
 		return null;
 	}
 
+	/**
+		Returns the tag of the prefab (`props.tag`), or `null`.
+	**/
 	public inline function getTag() : Null<String> {
 		return (props:Dynamic)?.tag;
 	}
@@ -600,6 +685,9 @@ class Prefab {
 	}
 
 	#if castle
+	/**
+		Returns the default props of a CastleDB sheet type for the prefab, with an id made from the file name and the prefab name.
+	**/
 	public static function makeCdbProps( e : hrt.prefab.Prefab, prefabFilePath: String, type : cdb.Sheet ) {
 		var props = type.getDefaults();
 		Reflect.setField(props, "$cdbtype", hide.comp.cdb.DataFiles.getTypeName(type));
@@ -615,6 +703,9 @@ class Prefab {
 	}
 	#end
 
+	/**
+		Returns the type and name of the prefab.
+	**/
 	public function toString() : String{
 		var str = type;
 		if ( name != "" ) str += '($name)';
@@ -633,6 +724,9 @@ class Prefab {
 		return false;
 	}
 
+	/**
+		Tells if the prefab or one of its parents is locked.
+	**/
 	public function isLocked() {
 		var p = this;
 		while( p != null ) {
@@ -757,6 +851,9 @@ class Prefab {
 
 
 
+	/**
+		Sets the scene editor and scene of the shared context (editor only).
+	**/
 	public function setEditor(sceneEditor: hide.comp.SceneEditor, scene: hide.comp.Scene) {
 		shared.editor = sceneEditor;
 		shared.scene = scene;

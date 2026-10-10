@@ -1,15 +1,35 @@
 package hrt.prefab;
 
 #if editor
+/**
+	The context shared by all the prefabs of a prefab hierarchy (but not by references): the root objects, the current parents during `make`, the source path, and the loading of the resources and baked data.
+	In the editor, `hide.prefab.ContextShared` extends it.
+**/
 typedef ContextShared = hide.prefab.ContextShared;
 #end
 
+/**
+	The context shared by all the prefabs of a prefab hierarchy (but not by references): the root objects, the current parents during `make`, the source path, and the loading of the resources and baked data.
+	In the editor, `hide.prefab.ContextShared` extends it.
+**/
 @:allow(hrt.prefab.Prefab)
 class #if editor ContextSharedBase #else ContextShared #end {
+	/**
+		The root 2D object of the instance.
+	**/
 	public var root2d(default, null) : h2d.Object;
+	/**
+		The root 3D object of the instance.
+	**/
 	public var root3d(default, null) : h3d.scene.Object;
 
+	/**
+		The path of the prefab file being made (the reference files change it).
+	**/
 	public var currentPath : String;
+	/**
+		The path of the root prefab file.
+	**/
 	public var prefabSource : String = "";
 
 	/**
@@ -18,18 +38,24 @@ class #if editor ContextSharedBase #else ContextShared #end {
 	 **/
 	 public var customMake : Prefab -> Void;
 
-	// When make/instanciate is called, this contains the 3d object that should be used as a parent for the newly created object
-	// Never modify this in the middle of a instanciate without restoring it after
+	/**
+		When make/instanciate is called, this contains the 3d object that should be used as a parent for the newly created object. Never modify this in the middle of a instanciate without restoring it after.
+	**/
 	public var current3d : h3d.scene.Object = null;
 
-	// When make/instanciate is called, this contains the 2d object that should be used as a parent for the newly created object
-	// Never modify this in the middle of a instanciate without restoring it after
+	/**
+		When make/instanciate is called, this contains the 2d object that should be used as a parent for the newly created object. Never modify this in the middle of a instanciate without restoring it after.
+	**/
 	public var current2d : h2d.Object = null;
 
-	// Parent prefab of the object if it was created as a reference
+	/**
+		Parent prefab of the object if it was created as a reference.
+	**/
 	public var parentPrefab : Prefab = null;
 
-	// Store result of non filtered Prefab.find during the make
+	/**
+		Store result of non filtered Prefab.find during the make.
+	**/
 	public var findCache : Map<{}, Prefab> = null;
 
 	/**
@@ -86,6 +112,9 @@ class #if editor ContextSharedBase #else ContextShared #end {
 
 	var bakedData : Map<String, haxe.io.Bytes>;
 
+	/**
+		Creates a context for the prefab file `path`, with its root objects.
+	**/
 	public function new( ?path : String, ?root2d: h2d.Object = null, ?root3d: h3d.scene.Object = null, isInstance: Bool = true) {
 		if( path != null ) prefabSource = currentPath = path;
 		this.isInstance = isInstance;
@@ -96,32 +125,50 @@ class #if editor ContextSharedBase #else ContextShared #end {
 		this.current3d = this.root3d;
 	}
 
+	/**
+		Called when an error happens while making a prefab. Throws it by default.
+	**/
 	public function onError( e : Dynamic ) {
 		throw e;
 	}
 
+	/**
+		Returns the folder of the data files of the prefab (`<prefab>.dat/`).
+	**/
 	public function getFolderDatPath() {
 		var datPath = new haxe.io.Path(currentPath);
 		datPath.ext = "dat";
 		return datPath.toString() + "/";
 	}
 
+	/**
+		Returns the resources of a folder of the data files, or `null`.
+	**/
 	public function loadDir(p : String, ?dir : String ) : Array<hxd.res.Any> {
 		var path = getFolderDatPath() + p;
 		if(dir != null) path += "/" + dir;
 		return try hxd.res.Loader.currentInstance.dir(path) catch( e : hxd.res.NotFound ) null;
 	}
 
+	/**
+		Returns a data file of a prefab (see `getPrefabDatPath`), or `null`.
+	**/
 	public function loadPrefabDat(file : String, ext : String, prefab : String) : hxd.res.Any {
 		return try hxd.res.Loader.currentInstance.load(getPrefabDatPath(file,ext,prefab)) catch( e : hxd.res.NotFound ) null;
 	}
 
+	/**
+		Returns the path of a data file of a prefab: `<prefab file>.dat/<prefab>/<file>.<ext>`.
+	**/
 	public function getPrefabDatPath(file : String, ext : String, prefab : String ) {
 		var path = new haxe.io.Path(getFolderDatPath() + prefab + "/" + file);
 		path.ext = ext;
 		return path.toString();
 	}
 
+	/**
+		Saves a data file of a prefab (or deletes it if `bytes` is `null`). Not available on JS.
+	**/
 	public function savePrefabDat(file : String, ext : String, prefab : String, bytes : haxe.io.Bytes ) {
 		#if js
 		throw "not implemented";
@@ -160,6 +207,9 @@ class #if editor ContextSharedBase #else ContextShared #end {
 		#end
 	}
 
+	/**
+		Returns the shader of the class path (`path/to/Shader`), or `null`. Cached.
+	**/
 	public function loadShader( path : String ) : Cache.ShaderDef {
 		var r = Cache.get().shaderDefCache.get(path);
 		if(r != null)
@@ -179,27 +229,45 @@ class #if editor ContextSharedBase #else ContextShared #end {
 		return r;
 	}
 
+	/**
+		Loads a model (cached).
+	**/
 	public function loadModel( path : String, opt = false ) {
 		return Cache.get().modelCache.loadModel(hxd.res.Loader.currentInstance.load(path).toModel());
 	}
 
+	/**
+		Loads the animation of a model (cached).
+	**/
 	public function loadAnimation( path : String ) {
 		return @:privateAccess Cache.get().modelCache.loadAnimation(hxd.res.Loader.currentInstance.load(path).toModel());
 	}
 
+	/**
+		Loads a texture (cached).
+	**/
 	public function loadTexture( path : String, async : Bool = false ) {
 		return Cache.get().modelCache.loadTexture(null, path, async);
 	}
 
+	/**
+		Returns the content of a resource file, or `null`.
+	**/
 	public function loadBytes( file : String) : haxe.io.Bytes {
 		return try hxd.res.Loader.currentInstance.load(file).entry.getBytes() catch( e : hxd.res.NotFound ) null;
 	}
 
+	/**
+		Returns baked data of the prefab file (from its `.bake` file), or `null`.
+	**/
 	public function loadBakedBytes( file : String ) {
 		if( bakedData == null ) loadBakedData();
 		return bakedData.get(file);
 	}
 
+	/**
+		Sets baked data of the prefab file (or removes it if `bytes` is `null`), and saves the `.bake` file.
+	**/
 	public function saveBakedBytes( file : String, bytes : haxe.io.Bytes ) {
 		if( bakedData == null ) loadBakedData();
 		if( bytes == null ) {
@@ -233,6 +301,9 @@ class #if editor ContextSharedBase #else ContextShared #end {
 		saveBakedFile(bytes.getBytes());
 	}
 
+	/**
+		Saves a texture. Not implemented at runtime: throws.
+	**/
 	public function saveTexture( file : String, bytes : haxe.io.Bytes , dir : String, ext : String) {
 		throw "Don't know how to save texture";
 	}
@@ -271,6 +342,9 @@ class #if editor ContextSharedBase #else ContextShared #end {
 		}
 	}
 
+	/**
+		Returns the 3D objects of the class in the tree of the local 3D object of the prefab. An object rejected by `filter` is skipped with its children.
+	**/
 	public function getObjects<T:h3d.scene.Object>( p : Prefab, c: Class<T>, ?filter : h3d.scene.Object -> Bool ) : Array<T> {
 		var root = p.to(Object3D)?.local3d;
 		if(root == null) return [];

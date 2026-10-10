@@ -1,20 +1,35 @@
 package hrt.prefab;
 
+/**
+	The 3D object of a `RenderProps` prefab.
+**/
 class RenderPropsObject extends h3d.scene.Object {
+	/**
+		The prefab.
+	**/
 	public var prefab : RenderProps;
 
+	/**
+		Creates the object of the prefab.
+	**/
 	public function new(prefab : RenderProps, ?parent : h3d.scene.Object) {
 		super(parent);
 		this.prefab = prefab;
 	}
 }
 
+/**
+	The properties of the renderer (`h3d.scene.Renderer.props`), by material setup, with the renderer effects (`hrt.prefab.rfx.RendererFX` children).
+**/
 @:prefabIcon(HuiRes.ui.icons.prefab.render_props)
 @:prefabName("Render Props")
 class RenderProps extends Object3D {
 
 	@:s var isDefault = false;
 
+	/**
+		Creates the prefab.
+	**/
 	public function new(parent, shared: ContextShared) {
 		super(parent, shared);
 		props = {};
@@ -33,6 +48,9 @@ class RenderProps extends Object3D {
 	}
 	#end
 
+	/**
+		Returns the renderer properties of the current material setup, completed with the default properties of the renderer, or `null`.
+	**/
 	public function getProps(renderer: h3d.scene.Renderer) {
 		var p = Reflect.field(this.props, h3d.mat.MaterialSetup.current.name);
 		var defaults = renderer.getDefaultProps();
@@ -63,6 +81,9 @@ class RenderProps extends Object3D {
 		return p;
 	}
 
+	/**
+		Sets the renderer properties of the current material setup (or removes them if `null`).
+	**/
 	public function setProps( props : Any ) {
 		var name = h3d.mat.MaterialSetup.current.name;
 		if( props == null )
@@ -71,6 +92,9 @@ class RenderProps extends Object3D {
 			Reflect.setField(this.props, name, props);
 	}
 
+	/**
+		Applies the properties and the effects to the renderer. Returns `false` if there are no properties.
+	**/
 	public function applyProps(renderer: h3d.scene.Renderer) {
 		var props = getProps(renderer);
 		if( props == null )

@@ -1,5 +1,8 @@
 package hrt.prefab;
 
+/**
+	A prefab file resource (`.prefab`, `.fx`, `.l3d`...): `load()` returns its prefab, cached and reloaded when the file changes. Accessed with `hxd.Res` (`hxd.res.Prefab`).
+**/
 @:access(hrt.prefab.Prefab)
 class Resource extends hxd.res.Resource {
 
@@ -43,12 +46,18 @@ class Resource extends hxd.res.Resource {
 		#end
 	}
 
+	/**
+		Loads the prefab from the file, without using the cache.
+	**/
 	public function loadBypassCache() : Prefab {
 		var data = loadData();
 		var prefab = Prefab.createFromDynamic(data, new ContextShared(entry.path, false));
 		return cast prefab;
 	}
 
+	/**
+		Returns the prefab of the file (cached, see `CACHE_VERSION`). The file is watched: the prefab is reloaded when it changes.
+	**/
 	public function load() : Prefab {
 		if(prefab != null && cacheVersion == CACHE_VERSION )
 			return prefab;
@@ -59,6 +68,9 @@ class Resource extends hxd.res.Resource {
 		return cast prefab;
 	}
 
+	/**
+		Returns a resource for an existing prefab.
+	**/
 	public static function make( p : Object3D ) {
 		if( p == null ) throw "assert";
 		var r = new Resource(null);
@@ -66,7 +78,13 @@ class Resource extends hxd.res.Resource {
 		return r;
 	}
 
+	/**
+		Increase it to invalidate the prefabs cached by `load`.
+	**/
 	public static var CACHE_VERSION = 0;
+	/**
+		Called when a prefab was loaded or reloaded.
+	**/
 	public static dynamic function onPrefabLoaded(p:Prefab) {
 	}
 

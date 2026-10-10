@@ -1,30 +1,69 @@
 package hrt.prefab;
 import hxd.Math;
 
+/**
+	A prefab with a 3D transform, creating a 3D object (`local3d`) in the scene. The base class of the 3D prefabs. Angles are in degrees.
+**/
 @:prefabName("Object 3D")
 @:prefabIcon(hrt.ui.HuiRes.ui.icons.prefab.object3d)
 @:prefabCategory("3D")
 class Object3D extends Prefab {
 
+	/**
+		The 3D object created by `make`, or `null` before.
+	**/
 	public var local3d : h3d.scene.Object = null;
 
+	/**
+		The X position.
+	**/
 	@:s @:range(0,400) public var x : Float = 0.0;
+	/**
+		The Y position.
+	**/
 	@:s @:range(0,400) public var y : Float = 0.0;
+	/**
+		The Z position.
+	**/
 	@:s @:range(0,400) public var z : Float = 0.0;
 
+	/**
+		The X scale.
+	**/
 	@:s public var scaleX : Float = 1.0;
+	/**
+		The Y scale.
+	**/
 	@:s public var scaleY : Float = 1.0;
+	/**
+		The Z scale.
+	**/
 	@:s public var scaleZ : Float = 1.0;
 
 	var scaleArray(get, set) : Array<Float>;
 
+	/**
+		The rotation around the X axis, in degrees.
+	**/
 	@:s public var rotationX : Float = 0.0;
+	/**
+		The rotation around the Y axis, in degrees.
+	**/
 	@:s public var rotationY : Float = 0.0;
+	/**
+		The rotation around the Z axis, in degrees.
+	**/
 	@:s public var rotationZ : Float = 0.0;
 
+	/**
+		Tells if the object is visible.
+	**/
 	@:s public var visible : Bool = true;
 
 	#if editor
+	/**
+		The icon of the object in the editor (editor only).
+	**/
 	public var editorIcon : h2d.ObjectFollower;
 	#end
 
@@ -39,6 +78,9 @@ class Object3D extends Prefab {
 		return newScale;
 	}
 
+	/**
+		Returns the 3D object of the prefab if it is an `Object3D`, or `null`.
+	**/
 	public static inline function getLocal3d(prefab: Prefab) : h3d.scene.Object {
 		var obj3d = Std.downcast(prefab, Object3D);
 		if (obj3d != null)
@@ -46,6 +88,9 @@ class Object3D extends Prefab {
 		return null;
 	}
 
+	/**
+		Sets the position, scale and rotation from a matrix.
+	**/
 	public function setTransform(mat : h3d.Matrix) {
 		var rot = mat.getEulerAngles();
 		x = mat.tx;
@@ -104,6 +149,9 @@ class Object3D extends Prefab {
 
 	public static var _ = Prefab.register("object", Object3D);
 
+	/**
+		Returns the position, scale and rotation, as a structure.
+	**/
 	public function saveTransform() {
 		return { x : x, y : y, z : z, scaleX : scaleX, scaleY : scaleY, scaleZ : scaleZ, rotationX : rotationX, rotationY : rotationY, rotationZ : rotationZ };
 	}
@@ -115,6 +163,9 @@ class Object3D extends Prefab {
 		return hxd.Math.abs(r-f) < 2.0 / num ? r : f;
 	}
 
+	/**
+		Returns the position, scale and rotation (in degrees) of a matrix, rounded, as a structure (see `loadTransform`).
+	**/
 	public static function makeTransform(mat: h3d.Matrix) {
 		var rot = mat.getEulerAngles();
 		var x = roundSmall(mat.tx);
@@ -130,6 +181,9 @@ class Object3D extends Prefab {
 		return { x : x, y : y, z : z, scaleX : scaleX, scaleY : scaleY, scaleZ : scaleZ, rotationX : rotationX, rotationY : rotationY, rotationZ : rotationZ };
 	}
 
+	/**
+		Applies the position, scale and rotation to `local3d`.
+	**/
 	public function applyTransform() {
 		var o = local3d;
 		if (o == null) return;
@@ -142,6 +196,9 @@ class Object3D extends Prefab {
 		o.setRotation(Math.degToRad(rotationX), Math.degToRad(rotationY), Math.degToRad(rotationZ));
 	}
 
+	/**
+		Returns the local transform matrix (in `m` if given).
+	**/
 	public function getTransform( ?m: h3d.Matrix ) {
 		if( m == null ) m = new h3d.Matrix();
 		m.initScale(scaleX, scaleY, scaleZ);
@@ -156,6 +213,9 @@ class Object3D extends Prefab {
 	var useAutoCollide = false;
 	#end
 
+    /**
+    	Returns the distance of the intersection of the ray (in local space) with the object, or `-1` (editor only, used for the selection).
+    **/
     public function localRayIntersection(ray : h3d.col.Ray ) : Float {
 		#if editor
 		// can happen if the mesh is inside an emitter
@@ -192,6 +252,9 @@ class Object3D extends Prefab {
 		#end
     }
 
+	/**
+		Sets the position, scale and rotation from a structure returned by `saveTransform`.
+	**/
 	public function loadTransform(t) {
 		x = t.x;
 		y = t.y;
@@ -204,6 +267,9 @@ class Object3D extends Prefab {
 		rotationZ = t.rotationZ;
 	}
 
+	/**
+		Returns the absolute transform matrix of the prefab.
+	**/
 	public function getAbsPos( followRefs : Bool = false ) {
 		return getRelativeTransform(null, followRefs);
 	}
@@ -263,6 +329,9 @@ class Object3D extends Prefab {
 		return ret;
 	}
 
+	/**
+		Returns the ids of the display filters of the editor that change how the object is displayed: it is updated when one of them is toggled.
+	**/
 	public function getDisplayFilters() : Array<String> {
 		return [];
 	}
@@ -419,6 +488,9 @@ class Object3D extends Prefab {
 	#end
 
 	#if editor
+	/**
+		Adds the editor helpers of the object (editor only).
+	**/
 	public function addEditorUI() {
 		if (local3d != null) {
 			var objs = local3d.findAll((o) -> Std.downcast(o, h3d.scene.Object));
@@ -521,6 +593,9 @@ class Object3D extends Prefab {
 		}
 	}
 
+	/**
+		Removes the editor helpers of the object (editor only).
+	**/
 	public function removeEditorUI() {
 		if (local3d != null) {
 			var objs = local3d.findAll((o) -> Std.downcast(o, h3d.scene.Object));

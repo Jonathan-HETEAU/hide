@@ -11,70 +11,199 @@ import hrt.prefab.fx.Evaluator;
 
 using Lambda;
 
+/**
+	A bezier handle of a curve key, relative to the key.
+**/
 @:build(hrt.prefab.Macros.buildSerializable())
 class CurveHandle {
-	@:s public var dv: Float = -1; // Force serialization of 0 values for retrocompat
-	@:s public var dt: Float = -1; // Force serialization of 0 values for retrocompat
+	/**
+		The value offset. Defaults to `-1` so that `0` values are serialized (retro-compatibility).
+	**/
+	@:s public var dv: Float = -1;
+	/**
+		The time offset. Defaults to `-1` so that `0` values are serialized (retro-compatibility).
+	**/
+	@:s public var dt: Float = -1;
+	/**
+		Creates a handle.
+	**/
 	public function new(t, v) {
 		this.dt = t;
 		this.dv = v;
 	}
 }
 
+/**
+	How a curve is interpolated around a key.
+**/
 enum abstract CurveKeyMode(Int) {
+	/**
+		Bezier interpolation, with aligned handles.
+	**/
 	var Aligned = 0;
+	/**
+		Bezier interpolation, with independent handles.
+	**/
 	var Free = 1;
+	/**
+		Linear interpolation.
+	**/
 	var Linear = 2;
+	/**
+		The value of the key until the next key.
+	**/
 	var Constant = 3;
 }
 
+/**
+	How a curve gets its values.
+**/
 enum abstract CurveBlendMode(Int) {
+	/**
+		The values of the keys.
+	**/
 	var None = 0;
+	/**
+		Blends the two children curves by the FX parameter `blendParam`.
+	**/
 	var Blend = 1;
+	/**
+		Blends the two children curves by a random factor (for each particle).
+	**/
 	var RandomBlend = 2;
+	/**
+		The values of the curve referenced by `blendParam`, scaled and offset.
+	**/
 	var Reference = 3;
 }
 
+/**
+	A key of a curve.
+**/
 @:build(hrt.prefab.Macros.buildSerializable())
 class CurveKey {
-	@:s public var time: Float = -1; // Force serialization of 0 values for retrocompat
-	@:s public var value: Float = -1; // Force serialization of 0 values for retrocompat
+	/**
+		The time. Defaults to `-1` so that `0` values are serialized (retro-compatibility).
+	**/
+	@:s public var time: Float = -1;
+	/**
+		The value. Defaults to `-1` so that `0` values are serialized (retro-compatibility).
+	**/
+	@:s public var value: Float = -1;
+	/**
+		The interpolation mode.
+	**/
 	@:s public var mode: CurveKeyMode = Aligned;
+	/**
+		The bezier handle before the key.
+	**/
 	@:s public var prevHandle: CurveHandle;
+	/**
+		The bezier handle after the key.
+	**/
 	@:s public var nextHandle: CurveHandle;
+	/**
+		Creates a key.
+	**/
 	public function new() {}
 }
 
+/**
+	The keys of a curve.
+**/
 typedef CurveKeys = Array<CurveKey>;
 
+/**
+	An animation curve: keys interpolated over time, used by the FX and the emitters (named `property:component`, such as `scale:x`).
+**/
 @:prefabIcon(HuiRes.ui.icons.prefab.curve)
 class Curve extends Prefab {
 	#if !editor
+	/**
+		Bakes the curves into samples for faster evaluation (runtime only).
+	**/
 	public static var BAKE_ENABLE = true;
+	/**
+		The maximum duration of the baked curves, in seconds.
+	**/
 	public static var BAKE_MAX_DURATION = 1.0;
+	/**
+		The number of samples per second of the baked curves.
+	**/
 	public static var BAKE_RESOLUTION = 128.0;
 	#end
 
+	/**
+		The default interpolation mode of the keys.
+	**/
 	@:s public var keyMode : CurveKeyMode = Linear;
+	/**
+		The keys, sorted by time.
+	**/
 	@:s public var keys : CurveKeys = [];
+	/**
+		Keys displayed in the editor, not used for the values.
+	**/
 	@:s public var previewKeys : CurveKeys = [];
 
+	/**
+		How the values are computed: from the keys, by blending the two children curves, or from a referenced curve.
+	**/
 	@:s public var blendMode : CurveBlendMode = None;
+	/**
+		Loops the curve after its last key.
+	**/
 	@:s public var loop : Bool = false;
+	/**
+		The FX parameter blending the two children curves (`Blend`), or the path of the referenced curve (`Reference`).
+	**/
 	@:s public var blendParam : String = null;
+	/**
+		The curve (path) or FX parameter (`$param.name`) remapping the values, or `null`.
+	**/
 	@:s public var remapPath : String = null;
 
+	/**
+		The offset added to the values of a referenced curve.
+	**/
 	@:s public var offset : Float = 0.0;
+	/**
+		The scale of the values of a referenced curve.
+	**/
 	@:s public var scale : Float = 1.0;
 
+	/**
+		The maximum time shown in the editor.
+	**/
 	public var maxTime : Float = 5000.;
+	/**
+		The time of the last key.
+	**/
 	public var duration(get, never): Float;
+	/**
+		The minimum value shown in the editor.
+	**/
 	public var minValue : Float = 0.;
+	/**
+		The maximum value shown in the editor.
+	**/
 	public var maxValue : Float = 0.;
 
+	/**
+		The color of the curve in the editor.
+	**/
 	public var color : Int;
+	/**
+		Hides the curve in the editor.
+	**/
 	public var hidden : Bool = false;
+	/**
+		Prevents the edition of the curve in the editor.
+	**/
 	public var lock : Bool = false;
+	/**
+		Tells if the curve is selected in the editor.
+	**/
 	public var selected : Bool = false;
 
 	var refCurve : Curve = null;
@@ -97,6 +226,9 @@ class Curve extends Prefab {
 		return keys[keys.length-1].time;
 	}
 
+	/**
+		Creates the prefab.
+	**/
 	public function new(parent, shared: ContextShared) {
 		super(parent, shared);
 	}
@@ -135,6 +267,9 @@ class Curve extends Prefab {
 		return u * u * u * c0 + c1 * 3 * t * u * u + c2 * 3 * t * t * u + t * t * t * c3;
 	}
 
+	/**
+		Returns the key closest to the time, within `tolerance`, or `null`.
+	**/
 	public function findKey(time: Float, tolerance: Float) {
 		var minDist = tolerance;
 		var closest = null;
@@ -148,6 +283,9 @@ class Curve extends Prefab {
 		return closest;
 	}
 
+	/**
+		Adds a key at the time, with the value (the current value by default) and mode, and returns it.
+	**/
 	public function addKey(time: Float, ?val: Float, ?mode=null) {
 		var index = 0;
 		for(ik in 0...keys.length) {
@@ -167,6 +305,9 @@ class Curve extends Prefab {
 		return key;
 	}
 
+	/**
+		Adds a preview key and returns it.
+	**/
 	public function addPreviewKey(time: Float, val: Float) {
 		var key = new hrt.prefab.Curve.CurveKey();
 		key.time = time;
@@ -175,6 +316,9 @@ class Curve extends Prefab {
 		return key;
 	}
 
+	/**
+		Returns the bounds of the keys and handles (time on X, value on Y).
+	**/
 	public function getBounds(bounds: h2d.col.Bounds = null) {
 		if (blendMode == Reference) {
 			return getRef()?.getBounds(bounds) ?? bounds ?? new h2d.col.Bounds();
@@ -206,6 +350,9 @@ class Curve extends Prefab {
 		return refCurve;
 	}
 
+	/**
+		Returns the FX parameter remapping the values (`remapPath` `$param.name`), or `null`.
+	**/
 	public function getRemapParameter() : Null<String> {
 		if (remapPath == null)
 			return null;
@@ -215,6 +362,9 @@ class Curve extends Prefab {
 		return null;
 	}
 
+	/**
+		Returns the value of the curve for the FX evaluator (see `hrt.prefab.fx.Value`), remapped unless `ignoreRemap` is set.
+	**/
 	public function makeVal(ignoreRemap: Bool = false) : Value {
 		if (!ignoreRemap) {
 			if (remapPath == null) {
@@ -298,6 +448,9 @@ class Curve extends Prefab {
 		return {minT: minT, maxT: maxT};
 	}
 
+	/**
+		Returns the value of the curve at the time.
+	**/
 	public function getVal(time: Float) : Float {
 		#if !editor
 		if (bake != null) {
@@ -374,6 +527,9 @@ class Curve extends Prefab {
 		return y;
 	}
 
+	/**
+		Returns the integral of the curve from `0` to the time.
+	**/
 	public function getSum(time: Float) : Float {
 		if (blendMode == Reference) {
 			return getRef()?.getSum(time) ?? 0.0;
@@ -417,6 +573,9 @@ class Curve extends Prefab {
 		return sum;
 	}
 
+	/**
+		Returns `numPts` values sampled over the duration.
+	**/
 	public function sample(numPts: Int) {
 		if (blendMode == Reference) {
 			return getRef()?.sample(numPts) ?? [];
@@ -608,7 +767,9 @@ class Curve extends Prefab {
 		return { icon : "paint-brush", name : "Curve" };
 	}
 
-	// Returns the visual representation of this curve as an svg path `d` data
+	/**
+		Returns the visual representation of this curve as an svg path `d` data.
+	**/
 	public function getSvgString() : String {
 		var data = "";
 		var bounds = this.getBounds();
@@ -763,6 +924,9 @@ class Curve extends Prefab {
 		return a == b || a.toLowerCase() == b.toLowerCase();
 	}
 
+	/**
+		Returns the child curve of `parent` with the given name (or `name:component`), or `null`.
+	**/
 	public static function getCurve(parent : Prefab, name: String, onlyEnabled=true) {
 		for(c in parent.children) {
 			if(onlyEnabled && !c.enabled) continue;
@@ -777,6 +941,9 @@ class Curve extends Prefab {
 		return null;
 	}
 
+	/**
+		Returns the children curves of `parent` whose name starts with the prefix (`prefix:component`), or `null`.
+	**/
 	public static function getCurves(parent: Prefab, prefix: String) {
 		var ret = null;
 		for(c in parent.children) {
@@ -796,6 +963,9 @@ class Curve extends Prefab {
 		return ret;
 	}
 
+	/**
+		Groups the curves by name prefix (before `:`).
+	**/
 	public static function getGroups(curves: Array<Curve>) {
 		var groups : Array<{name: String, items: Array<Curve>}> = [];
 		for(c in curves) {
@@ -815,6 +985,9 @@ class Curve extends Prefab {
 	}
 
 	#if castle
+	/**
+		Sets the keys from a CastleDB curve.
+	**/
 	public function initFromCDB(curve: cdb.Types.Curve) {
 		keys = [];
 		var nbPoints = Std.int(curve.data.length / 6);
@@ -850,6 +1023,9 @@ class Curve extends Prefab {
 		}
 	}
 
+	/**
+		Returns the keys as a CastleDB curve.
+	**/
 	public function toCDB() : cdb.Types.Curve {
 		var data : Array<Float>= [];
 		for (key in keys) {
@@ -877,6 +1053,9 @@ class Curve extends Prefab {
 		return curves.find(c -> StringTools.endsWith(c.name.toLowerCase(), suffix));
 	}
 
+	/**
+		Returns the vector value of the `:x`, `:y`, `:z` (and `:w`) curves (`defVal` for the missing ones), multiplied by `scale`.
+	**/
 	public static function getVectorValue(curves: Array<Curve>, defVal: Float=0.0, scale: Float=1.0, randomValue: Float = 0) : Value {
 		inline function find(s) {
 			return findCurve(curves, s);
@@ -904,6 +1083,9 @@ class Curve extends Prefab {
 			curveOrVal(w, 1.0));
 	}
 
+	/**
+		Returns the color value of the `:r`, `:g`, `:b`, `:a` curves, or `:h`, `:s`, `:l` (white by default).
+	**/
 	public static function getColorValue(curves: Array<Curve>) : Value {
 		inline function find(s) {
 			return findCurve(curves, s);

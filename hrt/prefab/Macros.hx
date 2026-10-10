@@ -7,19 +7,52 @@ import haxe.macro.ExprTools;
 
 using Lambda;
 
+/**
+	The type of a serialized prefab field.
+**/
 enum PrefabFieldType {
+	/**
+		An integer.
+	**/
 	PInt;
+	/**
+		A float.
+	**/
 	PFloat;
+	/**
+		A boolean.
+	**/
 	PBool;
+	/**
+		A string.
+	**/
 	PString;
+	/**
+		An enum.
+	**/
 	PEnum( name : String );
+	/**
+		An array.
+	**/
 	PArray( k : PrefabFieldType );
+	/**
+		Another type.
+	**/
 	PUnknown;
+	/**
+		A dynamic value.
+	**/
 	PDynamic;
 }
 
+/**
+	The macros of the prefabs: they generate the serialization (`@:s` fields), copy and clone code of the prefab classes (`buildPrefab`, `buildSerializable`).
+**/
 class Macros {
 
+	/**
+		Returns the serializable fields of the current class.
+	**/
 	public static macro function getSerializableProps() : Expr {
 
 		var serializableProps = [];
@@ -130,10 +163,16 @@ class Macros {
 		return macro $a{serArrayExprs};
 	}
 
+	/**
+		Casts the value to the type (`Std.downcast`).
+	**/
 	public static macro function Cast(e : Expr, typeToCast : String) : Expr {
 		return macro Std.downcast(${e}, $i{typeToCast});
 	}
 
+	/**
+		Returns the enum value of the constructor name, or `defValue` if invalid.
+	**/
 	public static function enumOrNullByName<T>(e:Enum<T>, constr:String, ?params:Array<Dynamic>, ?defValue:T):T {
 		var value = if (constr == null) null else try {
 			haxe.EnumTools.createByName(e, constr, params);
@@ -173,6 +212,9 @@ class Macros {
 		}
 	}
 
+	/**
+		Sets `target` to a deep copy of the dynamic value (or `defaultValue` if `null`), with code generated for its type.
+	**/
 	static macro public function deepCopyFromDynamic(target: Expr, sourceExpr: Expr, defaultValue: Expr) : Expr {
 		var type = Context.typeof(target);
 
@@ -205,6 +247,9 @@ class Macros {
 		return macro @:pos(pos) $e{target} = ${e};
 	};
 
+	/**
+		Sets `target` to a deep copy of a value of the same type (or `defaultValue` if `null`).
+	**/
 	static macro public function deepCopyFromOther(target: Expr, sourceExpr: Expr, defaultValue: Expr) : Expr {
 		var type = Context.typeof(target);
 
@@ -224,6 +269,9 @@ class Macros {
 		return macro @:pos(pos) $e{target} = ${e};
 	};
 
+	/**
+		Sets `target` to a dynamic deep copy of the value, for the serialization.
+	**/
 	static macro public function deepCopyToDynamic(target: Expr, sourceExpr: Expr, defaultValue: Expr) : Expr {
 		var type = Context.typeof(sourceExpr);
 
@@ -469,6 +517,7 @@ class Macros {
 
 		buildFields.push({
 			name: "make",
+			doc: "Instanciates this prefab. If `sh` is given or if `this.shared.isInstance` is false, this prefab is cloned and the clone is instanciated and returned. If `this.shared.isInstance` is true, this prefab is instanciated instead.",
 			access : access,
 			pos : Context.currentPos(),
 			kind: FFun(make)
@@ -508,9 +557,11 @@ class Macros {
 		var isRoot = localClass.superClass == null;
 
 		var newReplaced = false;
+		var newDoc : String = null;
 		for (f in fields) {
 			if (f.name == "new") {
 				newReplaced = true;
+				newDoc = f.doc;
 				f.name = newName;
 				if (!isRoot) {
 					f.access = f.access ?? [];
@@ -560,6 +611,7 @@ class Macros {
 
 			var newDecl : Field = {
 				name: "new",
+				doc: newDoc ?? "Creates the prefab, child of `parent`, or root with the shared context `contextShared` (or a new one).",
 				access: access,
 				kind: FFun({args:[
 					{name: "parent", type: {macro: hrt.prefab.Prefab;}},
@@ -797,7 +849,9 @@ class Macros {
 		}
 	}
 
-	// Custom allow overrides over the behavior of this function if it returns not null
+	/**
+		Custom allow overrides over the behavior of this function if it returns not null.
+	**/
 	static public function deepCopyRec(type:Type, source: Expr, sourceType: Type, ?defaultValue: Expr, custom:(Type, Expr, Type, Null<Expr>) -> Null<Expr>, parentIsArray: Bool = false) : Expr {
 		if (custom != null) {
 			var cus = custom(type, source, sourceType, defaultValue);

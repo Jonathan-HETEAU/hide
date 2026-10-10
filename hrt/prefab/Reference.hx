@@ -1,5 +1,8 @@
 package hrt.prefab;
 
+/**
+	How a reference can be edited in the editor.
+**/
 enum EditMode {
 	/** The reference can't be edited in the editor **/
 	None;

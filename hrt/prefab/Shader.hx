@@ -7,6 +7,9 @@ import hrt.impl.TextureType;
 import hide.prefab.HideProps;
 #end
 
+/**
+	Applies a shader to the materials of the parent object. The base class of the shader prefabs.
+**/
 @:prefabIcon(hrt.ui.HuiRes.ui.icons.prefab.shader)
 @:prefabCategory("Shader")
 @:prefabHideInAddMenu
@@ -17,6 +20,9 @@ class Shader extends Prefab {
 	@:s var targetMaterial : String;
 	@:s var recursiveApply = true;
 
+	/**
+		The shader, created by `makeShader`.
+	**/
 	public var shader : hxsl.Shader;
 
 	function new(parent, sh: ContextShared) {
@@ -24,10 +30,16 @@ class Shader extends Prefab {
 		props = {};
 	}
 
+	/**
+		Creates the shader. Returns `null` by default.
+	**/
 	public function makeShader() : hxsl.Shader {
 		return null;
 	}
 
+	/**
+		Returns the definition of the shader.
+	**/
 	public function getShaderDefinition() : hxsl.SharedShader {
 		var s = shader != null ? shader : makeShader();
 		this.shader = s;
@@ -210,6 +222,9 @@ class Shader extends Prefab {
 		super.dispose();
 	}
 
+	/**
+		Applies the shader to the materials of the current 3D object (see `ContextShared.current3d`), filtered by `filterObj`.
+	**/
 	public function apply3d(filterObj : (obj : h3d.scene.Object) -> Bool = null) {
 		if( shared.current3d != null )
 			iterMaterials(function(obj,mat) applyShader(obj, mat, shader), filterObj, true);

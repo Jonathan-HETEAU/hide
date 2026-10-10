@@ -1,15 +1,24 @@
 package hrt.prefab;
 
+/**
+	A 3D model (`source`), with an optional animation.
+**/
 @:prefabIcon(HuiRes.ui.icons.prefab.model)
 @:prefabHideInAddMenu
 class Model extends Object3D {
 
+	/**
+		The path of the animation played, or `null`.
+	**/
 	@:s public var animation : Null<String>;
 	@:s var lockAnimation : Bool = false;
 	@:s var retargetAnim : Bool = false;
 	@:s var randomStart : Bool = false;
 	@:s var retargetIgnore : String;
 
+	/**
+		Creates the prefab.
+	**/
 	public function new(parent, shared: ContextShared) {
 		super(parent, shared);
 		#if editor
