@@ -1,12 +1,27 @@
 package hide.comp;
 
+/**
+	A file selection input with a file chooser, a context menu and drag and drop.
+**/
 class FileSelect extends Component {
 
 	var extensions : Array<String>;
+	/**
+		The selected path, relative to the resources.
+	**/
 	public var path(default, set) : String;
+	/**
+		Disables the selection.
+	**/
 	public var disabled(default, set) = false;
+	/**
+		Selects a directory instead of a file.
+	**/
 	public var directory : Bool = false;
 
+	/**
+		Creates a file selection for file extensions, accepting dropped files if `handleDragAndDrop`.
+	**/
 	public function new(extensions,?parent,?root, handleDragAndDrop=true) {
 		if( root == null )
 			root = new Element("<input>");
@@ -96,6 +111,9 @@ class FileSelect extends Component {
 		});
 	}
 
+	/**
+		Called to open the selected file. Opens it in the IDE by default.
+	**/
 	public dynamic function onView() {
 		ide.openFile(getFullPath());
 	}
@@ -104,6 +122,9 @@ class FileSelect extends Component {
 		return pathIsValidStatic(path, extensions, directory);
 	}
 
+	/**
+		Tells if a path can be selected: a file with one of the extensions, or an existing directory.
+	**/
 	static public function pathIsValidStatic(path: String, extensions: Array<String>, directory: Bool) : Bool {
 		if (!directory) {
 			return (
@@ -121,6 +142,9 @@ class FileSelect extends Component {
 	}
 
 
+	/**
+		Returns the full path of the selected file if it exists, or null.
+	**/
 	public function getFullPath() {
 		if( path == null )
 			return null;
@@ -160,6 +184,9 @@ class FileSelect extends Component {
 		return this.disabled = disabled;
 	}
 
+	/**
+		Called when the path changes.
+	**/
 	public dynamic function onChange() {
 	}
 

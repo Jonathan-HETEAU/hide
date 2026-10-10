@@ -1,9 +1,15 @@
 package hide.comp;
 
+/**
+	A slider with a number input, reset, copy and paste.
+**/
 class Range extends Component {
 
 	var original : Null<Float>;
 
+	/**
+		The value.
+	**/
 	public var value(get, set) : Float;
 
 	var current : Float;
@@ -16,6 +22,9 @@ class Range extends Component {
 	var inputView : Element;
 	var scale : Float;
 
+	/**
+		Creates a slider, from a range input if set.
+	**/
 	public function new(?parent:Element,?root:Element, ?className : String) {
 		if( root == null )
 			root = new Element('<input type="range">');
@@ -103,10 +112,16 @@ class Range extends Component {
 		});
 	}
 
+	/**
+		Copies the value to the clipboard.
+	**/
 	public function copy() {
 		ide.setClipboard(Std.string(value));
 	}
 
+	/**
+		Sets the value from the clipboard.
+	**/
 	public function paste() {
 		var val = getClipboardValue();
 		if (val != null) {
@@ -115,15 +130,24 @@ class Range extends Component {
 		}
 	}
 
+	/**
+		Tells if the clipboard value is not null. `getClipboardValue` returns NaN rather than null, so this is always true.
+	**/
 	public function canPaste() : Bool {
 		return getClipboardValue() != null;
 	}
 
+	/**
+		Returns the number in the clipboard (NaN if none).
+	**/
 	public function getClipboardValue() : Null<Float> {
 		var str = ide.getClipboard();
 		return Std.parseFloat(str);
 	}
 
+	/**
+		Restores the initial value.
+	**/
 	public function reset() {
 		value = original;
 		onChange(false);
@@ -160,6 +184,9 @@ class Range extends Component {
 		}
 	}
 
+	/**
+		Called when the value changes. `tempChange` is true during a drag.
+	**/
 	public dynamic function onChange( tempChange : Bool ) {
 	}
 

@@ -1,13 +1,34 @@
 package hide.comp;
 
+/**
+	Selects a tile (or a rectangle of tiles) in a tileset image.
+**/
 class TileSelector extends Component {
 
+	/**
+		The path of the tileset image.
+	**/
 	public var file(default,set) : String;
+	/**
+		The tile size, in pixels.
+	**/
 	public var size(default,set) : {width: Int, height: Int};
+	/**
+		The selected tile position and size, in tiles, or null.
+	**/
 	public var value(default,set) : Null<{ x : Int, y : Int, width : Int, height : Int }>;
 
+	/**
+		Allows selecting a rectangle of tiles.
+	**/
 	public var allowRectSelect(default,set) : Bool;
+	/**
+		Allows changing the tile size.
+	**/
 	public var allowSizeSelect(default,set) : Bool;
+	/**
+		Allows changing the tileset image.
+	**/
 	public var allowFileChange(default,set) : Bool;
 
 	var cursorPos : { x : Int, y : Int, x2 : Int, y2 : Int, dragSelect : Bool };
@@ -60,6 +81,9 @@ class TileSelector extends Component {
 	}
 
 
+	/**
+		Creates a selector of a tileset image with a tile size.
+	**/
 	public function new(file,size,?parent,?el) {
 		super(parent,el);
 		element.addClass("hide-tileselect");
@@ -384,6 +408,9 @@ class TileSelector extends Component {
 		return sizeValue;
 	}
 
+	/**
+		Called when a tile is chosen, or with `cancel` true when Escape is pressed.
+	**/
 	public dynamic function onChange( cancel : Bool ) {
 	}
 

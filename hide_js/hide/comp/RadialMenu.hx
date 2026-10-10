@@ -1,14 +1,35 @@
 package hide.comp;
 
+/**
+	An item of a radial menu.
+**/
 typedef RadialMenuItem = {
-    ?label: String,
-    ?click: Void -> Void,
-    ?enabled: Bool,
-    ?icon: String,
-    ?tooltip: String,
+    /**
+    	The label.
+    **/
+    var ?label : String;
+    /**
+    	Called when the item is chosen.
+    **/
+    var ?click : Void -> Void;
+    /**
+    	False to disable the item.
+    **/
+    var ?enabled : Bool;
+    /**
+    	The icon name.
+    **/
+    var ?icon : String;
+    /**
+    	The tooltip.
+    **/
+    var ?tooltip : String;
 }
 
 
+/**
+	A circular menu opened around a point.
+**/
 class RadialMenu {
 	static var inst : RadialMenu;
 
@@ -18,6 +39,9 @@ class RadialMenu {
 	var radialButtons : Array<Element> = [];
 	var radialItems : Array<RadialMenuItem> = [];
 
+	/**
+		Creates the menu of items at a position (or the mouse position).
+	**/
 	public function new(items: Array<RadialMenuItem>, absPos: {x: Float, y: Float} = null) {
 		radialItems= items;
 
@@ -87,6 +111,9 @@ class RadialMenu {
 		});
 	}
 
+	/**
+		Opens a radial menu at a point, unless one is already open.
+	**/
 	public static function createFromPoint(x: Float, y: Float, items: Array<RadialMenuItem>) {
 		if (inst != null)
 			return;
