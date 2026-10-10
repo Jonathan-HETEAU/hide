@@ -1,5 +1,8 @@
 package hrt.prefab.fx.gpuemitter;
 
+/**
+	The base spawn of the GPU particles: life, random value and initial speed.
+**/
 class BaseSpawn extends ComputeUtils {
 	static var SRC = {
 		@param var batchBuffer : RWPartialBuffer<{

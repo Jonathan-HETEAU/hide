@@ -1,5 +1,8 @@
 package hrt.prefab.fx.gpuemitter;
 
+/**
+	Rotates the particles over their life.
+**/
 class LocalRotationShader extends ComputeUtils {
 
 	static var SRC = {
@@ -19,6 +22,9 @@ class LocalRotationShader extends ComputeUtils {
 	}
 }
 
+/**
+	Rotates the particles of a GPU emitter around random axes over their life.
+**/
 class LocalRotation extends SimulationShader {
 
 	@:s var speedRotation : Float = 1.0;

@@ -1,6 +1,9 @@
 package hrt.prefab.fx;
 using Lambda;
 
+/**
+	Gives a random value per object of a `Swarm`.
+**/
 class PerObjectRandom extends hxsl.Shader {
 	static var SRC = {
 		@perInstance @param var randomParam : Float;
@@ -12,41 +15,113 @@ class PerObjectRandom extends hxsl.Shader {
 	}
 }
 
+/**
+	An object of a `Swarm`.
+**/
 class SwarmElement {
+	/**
+		Creates the element.
+	**/
 	public function new() {};
 
+	/**
+		The X position.
+	**/
 	public var x: Float = 0.0;
+	/**
+		The Y position.
+	**/
 	public var y: Float = 0.0;
+	/**
+		The Z position.
+	**/
 	public var z: Float = 0.0;
 
+	/**
+		The X speed.
+	**/
 	public var vx: Float = 0.0;
+	/**
+		The Y speed.
+	**/
 	public var vy: Float = 0.0;
+	/**
+		The Z speed.
+	**/
 	public var vz: Float = 0.0;
 
 	// Interpolation
+	/**
+		The X position at the previous step, for the interpolation.
+	**/
 	public var prev_x: Float = 0.0;
+	/**
+		The Y position at the previous step, for the interpolation.
+	**/
 	public var prev_y: Float = 0.0;
+	/**
+		The Z position at the previous step, for the interpolation.
+	**/
 	public var prev_z: Float = 0.0;
 
+	/**
+		The X speed at the previous step, for the interpolation.
+	**/
 	public var prev_vx: Float = 0.0;
+	/**
+		The Y speed at the previous step, for the interpolation.
+	**/
 	public var prev_vy: Float = 0.0;
+	/**
+		The Z speed at the previous step, for the interpolation.
+	**/
 	public var prev_vz: Float = 0.0;
 }
 
+/**
+	The object of a `Swarm`: simulates the objects at 15 steps per second and renders them (with a `h3d.scene.MeshBatch`).
+**/
 @:access(hrt.prefab.Prefab)
 class SwarmObject extends h3d.scene.Object {
+	/**
+		The prefab.
+	**/
 	public var prefab : Swarm = null;
+	/**
+		The objects of the swarm.
+	**/
 	public var elements: Array<SwarmElement> = [];
+	/**
+		The position of the swarm at the previous step.
+	**/
 	public var lastPos :h3d.Vector = null;
+	/**
+		The current facing angle, in radians (`autoTrackRotation`).
+	**/
 	public var facingAngle: Float = 0.0;
+	/**
+		The facing angle toward the movement, in radians (`autoTrackRotation`).
+	**/
 	public var targetAngle: Float = 0.0;
 
+	/**
+		The mesh batch rendering the objects.
+	**/
 	public var batch : h3d.scene.MeshBatch = null;
 
+	/**
+		The prefab of the object mesh (a small box if `null`).
+	**/
 	public var swarmElementTemplate: Object3D = null;
 
+	/**
+		The shader animations.
+	**/
 	public var customAnims : Array<hrt.prefab.fx.BaseFX.CustomAnimation>;
 
+	/**
+		The shader giving the random value per object.
+	**/
 	public var shader : PerObjectRandom;
 
 	var relativeTo: h3d.scene.Object;
@@ -56,10 +131,16 @@ class SwarmObject extends h3d.scene.Object {
 	var stepTime = 0.0;
 
 	#if editor
+	/**
+		The display of the targets (editor only).
+	**/
 	public var debugViz : h3d.scene.Graphics = null;
 
 	#end
 
+	/**
+		Creates the object.
+	**/
 	public function new( ?parent : h3d.scene.Object, prefab : Swarm) {
 		super(parent);
 		this.prefab = prefab;
@@ -70,6 +151,9 @@ class SwarmObject extends h3d.scene.Object {
 		#end
 	}
 
+	/**
+		Creates the mesh batch from the template, with the materials and shaders of the prefab.
+	**/
 	public function init() {
 
 		var meshPrimitive : h3d.prim.MeshPrimitive = null;
@@ -461,38 +545,104 @@ class SwarmObject extends h3d.scene.Object {
 
 }
 
+/**
+	A swarm of objects (its first visible child, or small boxes) moving toward targets rotating on a sphere around it.
+**/
 @:prefabIcon(HuiRes.ui.icons.prefab.swarm)
 class Swarm extends Object3D {
+	/**
+		Simulates in the space of the FX instead of world space.
+	**/
 	@:s public var relativeToRoot : Bool = false;
+	/**
+		The number of objects.
+	**/
 	@:s public var numObjects : Int = 3;
+	/**
+		The random seed.
+	**/
 	@:s public var seed : Int = 0;
+	/**
+		The random variation of the scale of the objects (exponential).
+	**/
 	@:s public var randScale: Float = 0.0;
+	/**
+		The acceleration toward the targets, by distance.
+	**/
 	@:s public var acceleration : Float = 5.0;
+	/**
+		The random variation of the acceleration per object (exponential).
+	**/
 	@:s public var accelerationRandom : Float = 0.0;
+	/**
+		The variation of the acceleration over time (exponential).
+	**/
 	@:s public var accelerationNoise : Float = 0.0;
 
+	/**
+		The maximum speed.
+	**/
 	@:s public var maxSpeed : Float = 10.0;
+	/**
+		The random variation of the maximum speed per object (exponential).
+	**/
 	@:s public var maxSpeedRandom : Float = 0.0;
+	/**
+		The variation of the maximum speed over time (exponential).
+	**/
 	@:s public var maxSpeedNoise : Float = 0.0;
 
+	/**
+		The braking, proportional to the speed.
+	**/
 	@:s public var braking : Float = 5.0;
 
+	/**
+		The rotation speed of the targets around the swarm.
+	**/
 	@:s public var baseTargetRotationSpeed: Float = 1.0;
+	/**
+		Not used.
+	**/
 	@:s public var baseTargetRotationSpeedSpread : Float = 0.0;
 
+	/**
+		The amplitude of the sideway oscillation of the objects.
+	**/
 	@:s public var objectSelfSin : Float = 0.0;
+	/**
+		The frequency of the sideway oscillation of the objects.
+	**/
 	@:s public var objectSelfSinFreq : Float = 0.0;
 
+	/**
+		Rotates the targets toward the movement of the swarm.
+	**/
 	@:s public var autoTrackRotation : Bool = false;
+	/**
+		The speed of the rotation toward the movement (`autoTrackRotation`).
+	**/
 	@:s public var trackRotationSpeed : Float = 0.5;
 
+	/**
+		The speed of the noise variations over time.
+	**/
 	@:s public var noiseSpeed : Float = 1.0;
 
+	/**
+		The vertical spread of the targets on the sphere (`0` for a horizontal circle, `1` for the whole sphere).
+	**/
 	@:s public var sphereAngleRange : Float = 1.0;
+	/**
+		The random variation of the distance of the targets (exponential).
+	**/
 	@:s public var sphereDistanceScale : Float = 1.0;
 
 
 
+	/**
+		Displays the targets (editor).
+	**/
 	@:s public var debugTargets : Bool = false;
 
 	// Override child creation

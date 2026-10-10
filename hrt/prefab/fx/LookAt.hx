@@ -1,10 +1,16 @@
 package hrt.prefab.fx;
 
+/**
+	The object of a `LookAt`.
+**/
 @:access(hrt.prefab.fx.LookAt)
 class LookAtObject extends h3d.scene.Object {
 	var target: h3d.scene.Object;
 	var definition: LookAt;
 
+	/**
+		Creates the object.
+	**/
 	public function new(parent, def) {
 		super(parent);
 		this.definition = def;
@@ -133,6 +139,9 @@ class LookAtObject extends h3d.scene.Object {
 	}
 }
 
+/**
+	Makes its children face a target object, or the camera.
+**/
 @:allow(hrt.prefab.fx.LookAt.LookAtInstance)
 @:prefabIcon(HuiRes.ui.icons.prefab.look_at)
 class LookAt extends Object3D {

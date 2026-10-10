@@ -1,9 +1,18 @@
 package hrt.prefab.fx.gpuemitter;
 
+/**
+	The base of the compute shaders of the GPU emitter, with random and matrix helpers.
+**/
 class ComputeUtils extends hxsl.Shader {
 
+	/**
+		Called before the compute dispatch, to update parameters.
+	**/
 	public function onDispatch(emitter : GPUEmitterObject) {}
 
+	/**
+		Called when the emitter is removed, to dispose resources.
+	**/
 	public function onRemove(emitter : GPUEmitterObject) {}
 
 	static var SRC = {

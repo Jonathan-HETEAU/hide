@@ -6,31 +6,73 @@ import hrt.prefab.Curve;
 
 using Lambda;
 
+/**
+	A 2D point.
+**/
 typedef Vector = h2d.col.Point;
 
+/**
+	The shape in which the 2D particles are emitted.
+**/
 enum Emit2DShape {
+	/**
+		A circle of radius `emitRadius`, between the angles `emitAngle1` and `emitAngle2`.
+	**/
 	Circle;
+	/**
+		A rectangle of size `emitWidth` x `emitHeight`.
+	**/
 	Rectangle;
 }
 
+/**
+	The sprite of the 2D particles.
+**/
 enum SpriteType {
+	/**
+		A colored square.
+	**/
 	Color;
+	/**
+		A texture.
+	**/
 	Texture;
+	/**
+		An animated sprite sheet.
+	**/
 	SpriteSheet;
 }
 
+/**
+	A particle of an `Emitter2DObject`.
+**/
 @:access(hrt.prefab.fx.Emitter2DObject)
 class Particle2DInstance extends h2d.SpriteBatch.BatchElement {
+	/**
+		The emitter.
+	**/
 	public var emitter : Emitter2DObject;
 
+	/**
+		The index of the particle, for its random values.
+	**/
 	public var idx : Int;
+	/**
+		The lifetime, in seconds.
+	**/
 	public var lifeTime : Float;
+	/**
+		The age, in seconds.
+	**/
 	public var curLifeTime : Float;
 
 	var basisAbsPos = new h2d.col.Matrix();
 	var movementAbsPos = new h2d.col.Matrix();
 	var speed : Vector = new Vector();
 
+	/**
+		Creates a particle of the emitter `e`.
+	**/
 	public function new(t : h2d.Tile, e : Emitter2DObject) {
 		super(t);
 		this.emitter = e;
@@ -241,8 +283,17 @@ class Particle2DInstance extends h2d.SpriteBatch.BatchElement {
 	}
 }
 
+/**
+	The 2D object of an `Emitter2D`: simulates and renders the particles (with a `h2d.SpriteBatch`). Its fields are the evaluated parameters of the prefab.
+**/
 class Emitter2DObject extends h2d.Object {
+	/**
+		The particles.
+	**/
 	public var particles : Array<Particle2DInstance> = [];
+	/**
+		The sprite batch rendering the particles.
+	**/
 	public var batch : h2d.SpriteBatch;
 	var evaluator : Evaluator;
 	var rand : hxd.Rand;
@@ -257,52 +308,190 @@ class Emitter2DObject extends h2d.Object {
 	var animatedTexShader : h3d.shader.AnimatedTexture = null;
 
 	// Emitter parameters
+	/**
+		The values of the particle parameters.
+	**/
 	public var instDef : InstanceDef;
+	/**
+		The random seed.
+	**/
 	public var seed = 0;
+	/**
+		The lifetime of the particles, in seconds.
+	**/
 	public var lifeTime = 2.0;
+	/**
+		The random variation of the lifetime, in seconds: between `-lifeTimeRand` and `lifeTimeRand` is added.
+	**/
 	public var lifeTimeRand = 0.0;
+	/**
+		The speed of the time of the emitter.
+	**/
 	public var speedFactor = 1.0;
+	/**
+		The time simulated when the emitter starts, in seconds.
+	**/
 	public var warmUpTime = 0.0;
+	/**
+		The delay before the emitter starts, in seconds.
+	**/
 	public var delay = 0.0;
+	/**
+		The initial orientation of the particles.
+	**/
 	public var emitOrientation : Orientation = Forward;
+	/**
+		When the particles are emitted (`InfinityRandom` is not supported).
+	**/
 	public var emitType : EmitType = Infinity;
+	/**
+		The number of bursts (`Burst`).
+	**/
 	public var burstCount : Int = 1;
+	/**
+		The number of particles of a burst.
+	**/
 	public var burstParticleCount : Value;
+	/**
+		The time between bursts, in seconds.
+	**/
 	public var burstDelay : Float = 1.0;
+	/**
+		The duration of the emission, in seconds (`Duration` and `BurstDuration`).
+	**/
 	public var emitDuration : Float = 1.0;
+	/**
+		The number of particles emitted per second.
+	**/
 	public var emitRate : Value;
+	/**
+		The minimum emit rate (not used).
+	**/
 	public var emitRateMin : Value;
+	/**
+		The maximum emit rate (not used).
+	**/
 	public var emitRateMax : Value;
+	/**
+		The time between rate changes (not used).
+	**/
 	public var emitRateChangeDelay : Float = 1.0;
+	/**
+		The factor of the emit rate, between `0` and `1`.
+	**/
 	public var emitScale : Float = 1.0;
+	/**
+		The maximum number of particles alive.
+	**/
 	public var maxCount = 20;
+	/**
+		The initial speed, in the space of the emitter.
+	**/
 	public var startSpeed: Value;
+	/**
+		The initial speed, in world space.
+	**/
 	public var startWorldSpeed: Value;
+	/**
+		The shape in which the particles are emitted.
+	**/
 	public var emitShape : Emit2DShape = Circle;
+	/**
+		The radius of the circle shape.
+	**/
 	public var emitRadius : Value;
+	/**
+		The start angle of the circle shape, in degrees.
+	**/
 	public var emitAngle1 : Value;
+	/**
+		The end angle of the circle shape, in degrees.
+	**/
 	public var emitAngle2 : Value;
+	/**
+		The width of the rectangle shape.
+	**/
 	public var emitWidth : Value;
+	/**
+		The height of the rectangle shape.
+	**/
 	public var emitHeight : Value;
+	/**
+		Emits on the border of the shape only.
+	**/
 	public var emitSurface : Bool = false;
+	/**
+		The sprite of the particles.
+	**/
 	public var spriteType : SpriteType = Color;
+	/**
+		The color of the particles (`Color` sprite).
+	**/
 	public var color : h3d.Vector;
+	/**
+		The path of the texture (`Texture` sprite).
+	**/
 	public var texture : String;
+	/**
+		The path of the sprite sheet texture, or `null`.
+	**/
 	public var spriteSheet : String;
+	/**
+		The number of frames of the sprite sheet.
+	**/
 	public var frameCount : Int = 0;
+	/**
+		The number of columns of the sprite sheet.
+	**/
 	public var frameDivisionX : Int = 1;
+	/**
+		The number of rows of the sprite sheet.
+	**/
 	public var frameDivisionY : Int = 1;
+	/**
+		The speed of the sprite sheet animation.
+	**/
 	public var animationSpeed : Float = 1;
+	/**
+		Loops the sprite sheet animation.
+	**/
 	public var animationLoop : Bool = true;
+	/**
+		Uses the texture coordinates of the tile in each frame.
+	**/
 	public var animationUseSourceUVs : Bool = true;
+	/**
+		Blends the consecutive frames of the animation.
+	**/
 	public var animationBlendBetweenFrames : Bool = true;
+	/**
+		Gives the particles a random color between `randomColor1` and `randomColor2` (`Color` sprite).
+	**/
 	public var useRandomColor : Bool = false;
+	/**
+		Gives the particles a random color of `randomGradient` (`Color` sprite).
+	**/
 	public var useRandomGradient : Bool = false;
+	/**
+		The first random color.
+	**/
 	public var randomColor1 : h3d.Vector;
+	/**
+		The second random color.
+	**/
 	public var randomColor2 : h3d.Vector;
+	/**
+		The gradient of the random colors.
+	**/
 	public var randomGradient : GradientData;
+	/**
+		The inverse transform of the emitter.
+	**/
 	public var invTransform = new h2d.col.Matrix();
 
+	/**
+		Creates the object.
+	**/
 	public function new(?parent) {
 		super(parent);
 
@@ -312,6 +501,9 @@ class Emitter2DObject extends h2d.Object {
 		rand = new hxd.Rand(seed);
 	}
 
+	/**
+		Generates the random values (`randSlots` per particle) and sets up the sprite sheet.
+	**/
 	public function init(randSlots: Int, prefab: Emitter2D) {
 		var randomValues = [for(_ in 0...(maxCount * randSlots)) rand.srand()];
 		evaluator = new Evaluator(randomValues, randSlots);
@@ -331,6 +523,9 @@ class Emitter2DObject extends h2d.Object {
 		}
 	}
 
+	/**
+		Sets the time of the emitter, simulating the particles (restarting when the time goes back).
+	**/
 	public function setTime(time : Float, inCatchup : Bool = false) {
 		prevTime = curTime;
 		curTime = (time * speedFactor + warmUpTime) - delay;
@@ -458,11 +653,17 @@ class Emitter2DObject extends h2d.Object {
 	}
 }
 
+/**
+	A 2D particle emitter of an `FX2D`. Its parameters are stored in `props`, and can be animated by children curves named after them.
+**/
 @:access(hrt.prefab.fx.Emitter2DObject)
 @:prefabName("Emitter 2D")
 @:prefabIcon(hrt.ui.HuiRes.ui.icons.prefab.emitter2d)
 class Emitter2D extends Object2D {
 
+	/**
+		The parameters of the emitter.
+	**/
 	public static var emitterParams : Array<hrt.prefab.fx.EmitterHelper.ParamDef> = [
 		// PROPERTIES
 		{ name: "speedFactor", disp: "Speed Factor", t: PFloat(0, 1), def: 1.0, groupName : "Properties" },
@@ -513,6 +714,9 @@ class Emitter2D extends Object2D {
 		{ name: "animationBlendBetweenFrames", t: PBool, def: true, groupName : "Particle", disp: "Blend frames" },
 	];
 
+	/**
+		The parameters of the particles.
+	**/
 	public static var instanceParams : Array<hrt.prefab.fx.EmitterHelper.ParamDef> = [
 		// PARTICLE TRANSFORM
 		{ name: "instScale",      			t: PFloat(0, 2.0),    def: 1.,         disp: "Scale", groupName: "Particle Transform"},
@@ -537,6 +741,9 @@ class Emitter2D extends Object2D {
 		{ name: "instDampen",      			t: PFloat(0, 10.0),    def: 0.,         disp: "Dampen", groupName: "Particle Limit Velocity"},
 	];
 
+	/**
+		All the parameters, by name.
+	**/
 	public static var PARAMS : Map<String, hrt.prefab.fx.EmitterHelper.ParamDef> = {
 		var map = new Map();
 		for(e in emitterParams) {

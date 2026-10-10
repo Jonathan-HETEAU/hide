@@ -1,5 +1,8 @@
 package hrt.prefab.fx.gpuemitter;
 
+/**
+	Moves the particles around the emitter.
+**/
 class OrbitSpeedSimulationShader extends ComputeUtils {
 	override function onDispatch(emitter : GPUEmitterObject) {
 		super.onDispatch(emitter);
@@ -34,6 +37,9 @@ class OrbitSpeedSimulationShader extends ComputeUtils {
 	}
 }
 
+/**
+	Makes the particles of a GPU emitter orbit around an axis through the emitter.
+**/
 class OrbitSpeedSimulation extends SimulationShader {
 	@:s var axisX : Float = 0.0;
 	@:s var axisY : Float = 0.0;

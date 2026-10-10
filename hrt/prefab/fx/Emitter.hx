@@ -13,130 +13,403 @@ using hrt.tools.GraphicsTools;
 
 using Lambda;
 
+/**
+	The space in which the particles are simulated.
+**/
 enum SimulationSpace {
+	/**
+		In the space of the emitter: the particles move with it.
+	**/
 	Local;
+	/**
+		In world space: the particles stay where they were emitted.
+	**/
 	World;
 }
 
+/**
+	Whether the particles are scaled with the parents of the emitter.
+**/
 enum ParticleScaling {
+	/**
+		The particles are scaled with the parents.
+	**/
 	Parent;
+	/**
+		Not aligned: the particles keep their rotation.
+	**/
 	None;
 }
 
+/**
+	How the particles are sorted for rendering.
+**/
 enum SortMode {
+	/**
+		By distance to the camera.
+	**/
 	Depth;
+	/**
+		In emission order.
+	**/
 	Instance;
+	/**
+		The scale of the parents is not applied to the particles.
+	**/
 	None;
 }
 
+/**
+	How the particles are oriented.
+**/
 enum AlignMode {
+	/**
+		Not sorted.
+	**/
 	None;
+	/**
+		Facing the screen.
+	**/
 	Screen;
+	/**
+		Facing the screen, rotating around the locked axis (`alignLockAxis`).
+	**/
 	Axis;
+    /**
+    	Along their speed.
+    **/
     Speed;
+	/**
+		Facing the screen, oriented along their speed projected on the screen.
+	**/
 	ScreenSpeed;
+	/**
+		Along their speed, rotating around it to face the screen.
+	**/
 	AxisSpeed;
 }
 
+/**
+	The axis locked by the `Axis` align mode.
+**/
 enum AlignLockAxis {
+	/**
+		The X axis.
+	**/
 	X;
+	/**
+		The Y axis.
+	**/
 	Y;
+	/**
+		The Z axis.
+	**/
 	Z;
+	/**
+		Screen-facing flat polygons rotating around Z.
+	**/
 	ScreenZ;  // Screen-facing flat polygons rotating around Z
 }
 
+/**
+	The shape in which the particles are emitted.
+**/
 enum EmitShape {
+	/**
+		A cone of angle `emitAngle`.
+	**/
 	Cone;
+	/**
+		A sphere.
+	**/
 	Sphere;
+	/**
+		A box.
+	**/
 	Box;
+	/**
+		A cylinder of radius `emitRad1` to `emitRad2`.
+	**/
 	Cylinder;
 }
 
+/**
+	The initial orientation of the emitted particles.
+**/
 enum Orientation {
+	/**
+		The orientation of the emitter.
+	**/
 	Forward;
+	/**
+		The normal of the emit shape.
+	**/
 	Normal;
+	/**
+		The direction of the initial speed.
+	**/
 	Speed;
+	/**
+		A random orientation.
+	**/
 	Random;
 }
 
+/**
+	When the particles are emitted.
+**/
 enum EmitType {
+	/**
+		Continuously, at `emitRate` particles per second.
+	**/
 	Infinity;
+	/**
+		Continuously, at a rate changing randomly between `emitRateMin` and `emitRateMax` every `emitRateChangeDelay` seconds.
+	**/
 	InfinityRandom;
+	/**
+		At `emitRate` particles per second during `emitDuration` seconds.
+	**/
 	Duration;
+	/**
+		`burstCount` bursts of `burstParticleCount` particles, every `burstDelay` seconds.
+	**/
 	Burst;
+	/**
+		Bursts of `burstParticleCount` particles every `burstDelay` seconds, during `emitDuration` seconds.
+	**/
 	BurstDuration;
 }
 
+/**
+	When a sub emitter (child emitter) is spawned for a particle.
+**/
 enum SubEmitterKind {
+	/**
+		When the particle dies, at its position.
+	**/
 	SpawnOnDeath;
+	/**
+		When the particle is emitted, following it.
+	**/
 	Follow;
 }
 
+/**
+	The values of the particle parameters, evaluated for each particle.
+**/
 @:publicFields
 class InstanceDef {
+	/**
+		The speed, in the space of the emitter.
+	**/
 	var localSpeed: Value;
+	/**
+		The speed, in world space.
+	**/
 	var worldSpeed: Value;
+	/**
+		The rotation speed around the emitter.
+	**/
 	var orbitSpeed: Value;
+	/**
+		The factor of the orbit speed over the life of the particle.
+	**/
 	var orbitSpeedOverTime: Value;
+	/**
+		The acceleration, in the space of the emitter.
+	**/
 	var acceleration: Value;
+	/**
+		The acceleration, in world space.
+	**/
 	var worldAcceleration: Value;
+	/**
+		The position offset.
+	**/
 	var localOffset: Value;
+	/**
+		The pivot of the rotation and scale.
+	**/
 	var pivot: Value;
+	/**
+		The scale.
+	**/
 	var scale: Value;
+	/**
+		The factor of the scale over the life of the particle.
+	**/
 	var scaleOverTime: Value;
+	/**
+		The stretch along each axis.
+	**/
 	var stretch: Value;
+	/**
+		The stretch along the speed, by velocity.
+	**/
 	var stretchVelocity: Value;
+	/**
+		The rotation, in degrees.
+	**/
 	var rotation: Value;
+	/**
+		The damping of the speed.
+	**/
 	var dampen: Value;
+	/**
+		The maximum velocity.
+	**/
 	var maxVelocity : Value;
+	/**
+		Creates the definition.
+	**/
 	public function new() { }
 }
 
+/**
+	The storage of the particles.
+**/
 typedef PartArray = #if (hl_ver >= version("1.14.0")) hl.CArray<ParticleInstance> #else Array<ParticleInstance> #end;
+/**
+	A 32 bits float on HashLink, a `Float` otherwise.
+**/
 typedef Single = #if (hl_ver >= version("1.13.0")) hl.F32 #else Float #end;
 
+/**
+	A particle of an `EmitterObject` (internal state of the simulation).
+**/
 @:publicFields @:struct
 class ParticleInstance {
+	/**
+		The previous particle of the sorted list.
+	**/
 	var prev : ParticleInstance;
+	/**
+		The next particle of the sorted list.
+	**/
 	var next : ParticleInstance;
 
+	/**
+		The X position.
+	**/
 	var x : Single;
+	/**
+		The Y position.
+	**/
 	var y : Single;
+	/**
+		The Z position.
+	**/
 	var z : Single;
+	/**
+		The X scale.
+	**/
 	var scaleX : Single;
+	/**
+		The Y scale.
+	**/
 	var scaleY : Single;
+	/**
+		The Z scale.
+	**/
 	var scaleZ : Single;
 
+	/**
+		The trail of the particle, or `null`.
+	**/
 	var trail : hrt.prefab.l3d.Trails.TrailHead;
+	/**
+		The generation of the trail, to detect a reused trail.
+	**/
 	var trailGeneration : Int = 0;
 
+	/**
+		The sub emitters following the particle, or `null`.
+	**/
 	var subEmitters : Array<EmitterObject> = null;
 
 	#if (hl_ver >= version("1.13.0"))
+	/**
+		The accumulated speed.
+	**/
 	@:packed var speedAccumulation(default, never) : SVector3;
+	/**
+		The rotation, as a quaternion.
+	**/
 	@:packed var qRot(default, never) : SVector4;
-	@:packed var absPos(default, never) : SMatrix4;  // Needed for sortZ
+	/**
+		The absolute transform, used for the depth sorting.
+	**/
+	@:packed var absPos(default, never) : SMatrix4;
+	/**
+		The orientation of the emitter when the particle was emitted.
+	**/
 	@:packed var emitOrientation(default, never) : SMatrix3;
 	#else
+	/**
+		The accumulated speed.
+	**/
 	var speedAccumulation(default, never) = new SVector3();
+	/**
+		The rotation, as a quaternion.
+	**/
 	var qRot(default, never) = new SVector4();
+	/**
+		The absolute transform, used for the depth sorting.
+	**/
 	var absPos(default, never) = new SMatrix4();
+	/**
+		The orientation of the emitter when the particle was emitted.
+	**/
 	var emitOrientation(default, never) = new SMatrix3();
 	#end
 
+	/**
+		The color multiplier (random color).
+	**/
 	var colorMult : Int;
+	/**
+		The index of the particle, or `REMOVED_IDX`.
+	**/
 	var idx : Int;
+	/**
+		The first frame of the sprite sheet animation.
+	**/
 	var startFrame : hxd.impl.UInt16;
+	/**
+		The age of the particle, in seconds.
+	**/
 	var life : Single;
+	/**
+		The lifetime of the particle, in seconds.
+	**/
 	var lifeTime : Single;
+	/**
+		The random value of the particle, between `0` and `1`.
+	**/
 	var random : Single;
+	/**
+		The distance to the camera, for the sorting.
+	**/
 	var distToCam : Single;
+	/**
+		The time of emission.
+	**/
 	var startTime : Single;
 
+	/**
+		The index of a removed particle.
+	**/
 	inline static var REMOVED_IDX : Int = -1;
 
+	/**
+		Creates a particle.
+	**/
 	function new() { }
 
+	/**
+		Copies the state of another particle.
+	**/
 	function load(p: ParticleInstance) {
 		x = p.x;
 		y = p.y;
@@ -165,6 +438,9 @@ class ParticleInstance {
 		subEmitters = p.subEmitters;
 	}
 
+	/**
+		Releases the trail and sub emitters of the particle.
+	**/
 	function clear(emitter: EmitterObject = null) {
 		if (subEmitters != null) {
 			for (sub in subEmitters) {
@@ -185,6 +461,9 @@ class ParticleInstance {
 		idx = REMOVED_IDX;
 	}
 
+	/**
+		Initializes the particle emitted by the emitter.
+	**/
 	function init(idx: Int, emitter: EmitterObject) {
 		x = 0.0;
 		y = 0.0;
@@ -208,40 +487,67 @@ class ParticleInstance {
 		}
 	}
 
+	/**
+		A temporary matrix.
+	**/
 	static var tmpMat = new h3d.Matrix();
+	/**
+		A temporary matrix.
+	**/
 	static var tmpMat2 = new h3d.Matrix();
 
+	/**
+		Adds a vector to another.
+	**/
 	inline function add( v1 : h3d.Vector, v2 : h3d.Vector4 ) {
 		v1.x += v2.x;
 		v1.y += v2.y;
 		v1.z += v2.z;
 	}
 
+	/**
+		Subtracts a vector from another.
+	**/
 	inline function sub( v1 : h3d.Vector, v2 : h3d.Vector4 ) {
 		v1.x -= v2.x;
 		v1.y -= v2.y;
 		v1.z -= v2.z;
 	}
 
+	/**
+		Returns the cross product of two vectors.
+	**/
 	inline function cross( v1 : h3d.Vector, v2 : h3d.Vector ) {
 		v1.x -= v1.y * v2.z - v1.z * v2.y;
 		v1.y -= v1.z * v2.x - v1.x * v2.z;
 		v1.z -= v1.x * v2.y - v1.y * v2.x;
 	}
 
+	/**
+		Returns the position.
+	**/
 	inline function getPosition() { return new h3d.Vector(x,y,z); }
+	/**
+		Sets the position.
+	**/
 	inline function setPosition(x, y, z) {
 		this.x = x;
 		this.y = y;
 		this.z = z;
 	}
 
+	/**
+		Sets the scale.
+	**/
 	inline function setScale( x, y, z ) {
 		scaleX = x;
 		scaleY = y;
 		scaleZ = z;
 	}
 
+	/**
+		Updates the absolute transform from the position, rotation and scale.
+	**/
 	function updateAbsPos(emitter: EmitterObject) {
 		var v = new h3d.Vector4();
 		var absPos = tmpMat;
@@ -330,6 +636,9 @@ class ParticleInstance {
 		this.absPos.load(absPos);
 	}
 
+	/**
+		Updates the particle for the elapsed time `dt`.
+	**/
 	function update(emitter : EmitterObject, scene: h3d.scene.Scene, dt : Float) {
 		var v = new h3d.Vector4();
 
@@ -488,113 +797,353 @@ class ParticleInstance {
 	}
 }
 
+/**
+	The 3D object of an `Emitter`: simulates and renders the particles (with a `h3d.scene.MeshBatch`). Its fields are the evaluated parameters of the prefab.
+**/
 @:access(hrt.prefab.Prefab)
 @:allow(hrt.prefab.fx.ParticleInstance)
 @:allow(hrt.prefab.fx.Emitter)
 class EmitterObject extends h3d.scene.Object {
 
+	/**
+		The values of the particle parameters.
+	**/
 	public var instDef : InstanceDef;
 
+	/**
+		The particles.
+	**/
 	public var particles : PartArray;
+	/**
+		The capacity of `particles`.
+	**/
 	public var particlesCount : Int;
+	/**
+		The first particle of the sorted list.
+	**/
 	public var listHead : ParticleInstance;
+	/**
+		The mesh batch rendering the particles.
+	**/
 	public var batch : h3d.scene.MeshBatch;
+	/**
+		The animations of the particle template.
+	**/
 	public var customAnims : Array<BaseFX.CustomAnimation>;
 
+	/**
+		Tells if this is a sub emitter of another emitter.
+	**/
 	public var isSubEmitter : Bool = false;
+	/**
+		Tells if the emitter is positioned relative to the scene.
+	**/
 	public var relativeScenePosition : Bool = false;
+	/**
+		The emitter of the particle spawning this sub emitter, or `null`.
+	**/
 	public var parentEmitter : EmitterObject = null;
+	/**
+		Enables the emission.
+	**/
 	public var enable : Bool;
 
+	/**
+		The scene, while the emitter is in it.
+	**/
 	public var scene : h3d.scene.Scene;
 
+	/**
+		The factor of the time step when catching up, to save computations.
+	**/
 	public var catchupSpeed = 4; // Use larger ticks when catching-up to save calculations
+	/**
+		The number of bursts emitted.
+	**/
 	public var totalBurstCount : Int = 0; // Keep track of burst count
 	#if !editor
+	/**
+		The maximum time simulated when catching up, in seconds.
+	**/
 	public var maxCatchupWindow = 0.5; // How many seconds max to simulate when catching up
 	#end
 
 	#if editor
+	/**
+		The debug display of the emitter (editor only).
+	**/
 	public var debugGraphics: h3d.scene.Graphics;
 	#end
 
+	/**
+		The prefab of the emitter.
+	**/
 	public var emitterPrefab : Emitter;
+	/**
+		The first parent which is not an emitter.
+	**/
 	public var parentNonEmitter : h3d.scene.Object;
 
 	// RANDOM
+	/**
+		Combined with the random seed: emitters with the same group and seed get the same random values.
+	**/
 	public var seedGroup = 0;
 	// OBJECTS
+	/**
+		The prefab instanciated as the particle.
+	**/
 	public var particleTemplate : hrt.prefab.Object3D;
+	/**
+		The sub emitters (children emitters) of the particles.
+	**/
 	public var subEmitterTemplates : Array<Emitter>;
+	/**
+		The active sub emitters.
+	**/
 	public var subEmitters : Array<EmitterObject>;
+	/**
+		When this emitter is spawned, as a sub emitter of a parent emitter.
+	**/
 	public var subEmitterKind : SubEmitterKind;
+	/**
+		The trails of the particles, or `null`.
+	**/
 	public var trails : hrt.prefab.l3d.Trails.TrailObj;
+	/**
+		The trails prefab, or `null`.
+	**/
 	public var trailsTemplate : hrt.prefab.l3d.Trails;
 	// LIFE
+	/**
+		The lifetime of the particles, in seconds.
+	**/
 	public var lifeTime = 2.0;
+	/**
+		The random variation of the lifetime, in seconds: between `-lifeTimeRand` and `lifeTimeRand` is added.
+	**/
 	public var lifeTimeRand = 0.0;
+	/**
+		The speed of the time of the emitter.
+	**/
 	public var speedFactor = 1.0;
+	/**
+		The time simulated when the emitter starts, in seconds.
+	**/
 	public var warmUpTime = 0.0;
+	/**
+		The delay before the emitter starts, in seconds.
+	**/
 	public var delay = 0.0;
 	// EMIT PARAMS
+	/**
+		The initial orientation of the particles.
+	**/
 	public var emitOrientation : Orientation = Forward;
+	/**
+		The space in which the particles are simulated.
+	**/
 	public var simulationSpace : SimulationSpace = Local;
+	/**
+		Whether the particles are scaled with the parents of the emitter.
+	**/
 	public var particleScaling : ParticleScaling = Parent;
+	/**
+		When the particles are emitted.
+	**/
 	public var emitType : EmitType = Infinity;
+	/**
+		The number of bursts (`Burst`).
+	**/
 	public var burstCount : Int = 1;
+	/**
+		The number of particles of a burst.
+	**/
 	public var burstParticleCount : Value;
+	/**
+		The time between bursts, in seconds.
+	**/
 	public var burstDelay : Float = 1.0;
+	/**
+		The duration of the emission, in seconds (`Duration` and `BurstDuration`).
+	**/
 	public var emitDuration : Float = 1.0;
+	/**
+		The number of particles emitted per second.
+	**/
 	public var emitRate : Value;
+	/**
+		The minimum emit rate (`InfinityRandom`).
+	**/
 	public var emitRateMin : Value;
+	/**
+		The maximum emit rate (`InfinityRandom`).
+	**/
 	public var emitRateMax : Value;
+	/**
+		The time between rate changes (`InfinityRandom`), in seconds.
+	**/
 	public var emitRateChangeDelay : Float = 1.0;
+	/**
+		The time of the last rate change (`InfinityRandom`).
+	**/
 	public var emitRateChangeDelayStart : Float = 0.0;
+	/**
+		The current emit rate (`InfinityRandom`).
+	**/
 	public var emitRateCurrent : Float = Math.NaN;
+	/**
+		The previous emit rate (`InfinityRandom`).
+	**/
 	public var emitRatePrevious : Float = Math.NaN;
+	/**
+		The target emit rate (`InfinityRandom`).
+	**/
 	public var emitRateTarget : Float = Math.NaN;
+	/**
+		The factor of the emit rate.
+	**/
 	public var emitScale : Float = 1.0;
+	/**
+		The maximum number of particles alive.
+	**/
 	public var maxCount = 20;
+	/**
+		How the particles are sorted.
+	**/
 	public var sortMode : SortMode = None;
+	/**
+		The particles follow the rotation of the emitter.
+	**/
 	public var followRotation = false;
+	/**
+		Applies the transform of the particle template mesh.
+	**/
 	public var applyMeshTransform = false;
+	/**
+		The initial speed, in the space of the emitter.
+	**/
 	public var startSpeed: Value;
+	/**
+		The initial speed, in world space.
+	**/
 	public var startWorldSpeed: Value;
 
 	// EMIT SHAPE
+	/**
+		The shape in which the particles are emitted.
+	**/
 	public var emitShape : EmitShape = Cylinder;
+	/**
+		The angle of the cone shape, in degrees.
+	**/
 	public var emitAngle : Value;
+	/**
+		The first radius of the shape.
+	**/
 	public var emitRad1 : Float = 1.0;
+	/**
+		The second radius of the shape.
+	**/
 	public var emitRad2 : Float = 1.0;
+	/**
+		Emits on the surface of the shape only.
+	**/
 	public var emitSurface : Bool = false;
 	// ANIMATION
+	/**
+		The sprite sheet texture of the particles animation, or `null`.
+	**/
 	public var spriteSheet : String;
+	/**
+		The number of frames of the sprite sheet (`0` for all).
+	**/
 	public var frameCount : Int = 0;
+	/**
+		The number of columns of the sprite sheet.
+	**/
 	public var frameDivisionX : Int = 1;
+	/**
+		The number of rows of the sprite sheet.
+	**/
 	public var frameDivisionY : Int = 1;
+	/**
+		The speed of the sprite sheet animation.
+	**/
 	public var animationSpeed : Float = 1;
+	/**
+		Loops the sprite sheet animation, starting at a random frame.
+	**/
 	public var animationLoop : Bool = true;
+	/**
+		Uses the texture coordinates of the particle mesh in each frame.
+	**/
 	public var animationUseSourceUVs : Bool = true;
+	/**
+		Blends the consecutive frames of the animation.
+	**/
 	public var animationBlendBetweenFrames : Bool = true;
 
 	// ALIGNMENT
+	/**
+		How the particles are oriented.
+	**/
 	public var alignMode : AlignMode;
+	/**
+		The axis locked by the `Axis` align mode.
+	**/
 	public var alignLockAxis : AlignLockAxis;
 	// COLLISION
+	/**
+		The elasticity of the ground collisions (not used by the simulation).
+	**/
 	public var elasticity : Float = 1.0;
+	/**
+		The probability for a particle to die when it collides with the ground (not used by the simulation).
+	**/
 	public var killOnCollision : Float = 0.0;
+	/**
+		Enables the ground collisions (not used by the simulation).
+	**/
 	public var useCollision : Bool = false;
 	// RANDOM COLOR
+	/**
+		Gives the particles a random color between `randomColor1` and `randomColor2`.
+	**/
 	public var useRandomColor : Bool = false;
+	/**
+		Gives the particles a random color of `randomGradient`.
+	**/
 	public var useRandomGradient : Bool = false;
+	/**
+		The first random color, as `[r, g, b, a]`.
+	**/
 	public var randomColor1 : h3d.Vector;
+	/**
+		The second random color, as `[r, g, b, a]`.
+	**/
 	public var randomColor2 : h3d.Vector;
+	/**
+		The gradient of the random colors.
+	**/
 	public var randomGradient : GradientData;
 
+	/**
+		The inverse transform of the emitter.
+	**/
 	public var invTransform = new h3d.Matrix();
+	/**
+		The rotation facing the screen.
+	**/
 	public var screenRot = new h3d.Matrix();
+	/**
+		The world scale of the emitter.
+	**/
 	public var worldScale = new h3d.Vector(1,1,1);
 
+	/**
+		Called after each particle update. Does nothing by default.
+	**/
 	public dynamic function postParticleUpdate(particle: ParticleInstance, dt: Float) {
 
 	}
@@ -620,6 +1169,9 @@ class EmitterObject extends h3d.scene.Object {
 	var randomValues : Array<Float>;
 	var randSlots : Int;
 
+	/**
+		Creates the object.
+	**/
 	public function new(?parent) {
 		super(parent);
 		randomSeed = Std.random(0xFFFFFF);
@@ -804,6 +1356,9 @@ class EmitterObject extends h3d.scene.Object {
 		reset();
 	}
 
+	/**
+		Tells if the prefab is enabled (and not hidden in the editor).
+	**/
 	public static function checkEnabled(prefab: Prefab) {
 		#if editor
 		if (prefab.shared.editor?.isHidden(prefab) == true)
@@ -835,11 +1390,17 @@ class EmitterObject extends h3d.scene.Object {
 	}
 
 
+	/**
+		Restarts the emission, keeping the alive particles.
+	**/
 	public function softReset() {
 		totalBurstCount = 0;
 		enable = true;
 	}
 
+	/**
+		Removes the particles and restarts the emission.
+	**/
 	public function reset() {
 		softReset();
 		random.init(randomSeed);
@@ -1540,6 +2101,9 @@ class EmitterObject extends h3d.scene.Object {
 		checkList();
 	}
 
+	/**
+		Tells if particles are alive.
+	**/
 	public function hasActiveParts() : Bool {
 		if(particles == null)
 			return false;
@@ -1557,17 +2121,26 @@ class EmitterObject extends h3d.scene.Object {
 		return false;
 	}
 
+	/**
+		Sets the random seed (combined with `seedGroup`) and resets the emitter.
+	**/
 	public function setRandSeed(seed: Int) {
 		randomSeed = seed ^ seedGroup;
 		reset();
 	}
 
 	#if editor
+	/**
+		The time spent in the last update (editor only).
+	**/
 	public var tickTime : Float = 0;
 	#end
 
 
 	var lastParentTime = 0.0;
+	/**
+		Sets the time of the emitter from the time of its FX (`delay` and `speedFactor` applied), simulating the particles if `full` is set. `seek` restarts the emitter when the time goes back.
+	**/
 	public function setTime(parentTime: Float, dt: Float, seek: Bool, full: Bool) {
 		var localTime = (parentTime-delay) * speedFactor;
 		if (!full) {
@@ -1673,157 +2246,355 @@ class EmitterObject extends h3d.scene.Object {
 	}
 }
 
+/**
+	A particle emitter of an FX: emits instances of its child prefab (the particle template) with curves for the parameters (children curves named after the parameters).
+**/
 @:prefabName("Emitter")
 @:prefabIcon(hrt.ui.HuiRes.ui.icons.prefab.emitter)
 @:build(hrt.prefab.fx.EmitterMacros.build())
 class Emitter extends Object3D {
 
 	// PROPERTIES
+	/**
+		The lifetime of the particles, in seconds.
+	**/
 	@:param({ t: PFloat(0, 10), group: "Properties" })
 	public var lifeTime : Float = 1.0;
+	/**
+		The random variation of the lifetime, in seconds: between `-lifeTimeRand` and `lifeTimeRand` is added.
+	**/
 	@:param({ t: PFloat(0, 1), group: "Properties" })
 	public var lifeTimeRand : Float = 0.0;
+	/**
+		When this emitter is spawned, as a sub emitter of a parent emitter.
+	**/
 	@:param({ t: PEnum(SubEmitterKind), disp: "Sub Kind", group: "Properties" })
 	public var subEmitterKind : SubEmitterKind = SubEmitterKind.SpawnOnDeath;
+	/**
+		The speed of the time of the emitter.
+	**/
 	@:param({ t: PFloat(0, 1), disp: "Speed Factor", group: "Properties" })
 	public var speedFactor : Float = 1.0;
+	/**
+		The time simulated when the emitter starts, in seconds.
+	**/
 	@:param({ t: PFloat(0, 1), disp: "Warm Up", group: "Properties" })
 	public var warmUpTime : Float = 0.0;
+	/**
+		The delay before the emitter starts, in seconds.
+	**/
 	@:param({ t: PFloat(0, 10), disp: "Delay", group: "Properties" })
 	public var delay : Float = 0.0;
+	/**
+		Combined with the random seed: emitters with the same group and seed get the same random values.
+	**/
 	@:param({ t: PInt(0, 100), disp: "Seed", group: "Properties" })
 	public var seedGroup : Int = 0;
+	/**
+		How the particles are oriented.
+	**/
 	@:param({ t: PEnum(AlignMode), disp: "Mode", group: "Properties" })
 	public var alignMode : AlignMode = AlignMode.None;
+	/**
+		The axis locked by the `Axis` align mode.
+	**/
 	@:param({ t: PEnum(AlignLockAxis), disp: "Lock Axis", group: "Properties" })
 	public var alignLockAxis : AlignLockAxis = AlignLockAxis.ScreenZ;
+	/**
+		The space in which the particles are simulated.
+	**/
 	@:param({ t: PEnum(SimulationSpace), disp: "Simulation Space", group: "Properties" })
 	public var simulationSpace : SimulationSpace = SimulationSpace.Local;
+	/**
+		Whether the particles are scaled with the parents of the emitter.
+	**/
 	@:param({ t: PEnum(ParticleScaling), disp: "Scaling", group: "Properties" })
 	public var particleScaling : ParticleScaling = ParticleScaling.Parent;
+	/**
+		The particles follow the rotation of the emitter.
+	**/
 	@:param({ t: PBool, disp: "Follow rotation", group: "Properties" })
 	public var followRotation : Bool = false;
+	/**
+		Applies the transform of the particle template mesh.
+	**/
 	@:param({ t: PBool, disp: "Apply mesh transform", group: "Properties" })
 	public var applyMeshTransform : Bool = false;
+	/**
+		Sorts the particles.
+	**/
 	@:param({ t: PBool, disp: "Enable Sort", group: "Properties" })
 	public var enableSort : Bool = true;
+	/**
+		How the particles are sorted.
+	**/
 	@:param({ t: PEnum(SortMode), disp: "Sort mode", group: "Properties" })
 	public var sortMode : SortMode = SortMode.Depth;
 
 	// EMIT PARAMS
+	/**
+		When the particles are emitted.
+	**/
 	@:param({ t: PEnum(EmitType), disp: "Type", group: "Emit Params" })
 	public var emitType : EmitType = EmitType.Infinity;
+	/**
+		The duration of the emission, in seconds (`Duration` and `BurstDuration`).
+	**/
 	@:param({ t: PFloat(0, 10.0), disp: "Duration", group: "Emit Params" })
 	public var emitDuration : Float = 1.0;
+	/**
+		The number of particles emitted per second.
+	**/
 	@:param({ t: PInt(0, 100), disp: "Rate", animate: true, group: "Emit Params" })
 	public var emitRate : Float = 5;
+	/**
+		The minimum emit rate (`InfinityRandom`).
+	**/
 	@:param({ t: PInt(0, 100), disp: "Rate Min", animate: true, group: "Emit Params" })
 	public var emitRateMin : Float = 5;
+	/**
+		The maximum emit rate (`InfinityRandom`).
+	**/
 	@:param({ t: PInt(0, 100), disp: "Rate Max", animate: true, group: "Emit Params" })
 	public var emitRateMax : Float = 5;
+	/**
+		The time between rate changes (`InfinityRandom`), in seconds.
+	**/
 	@:param({ t: PFloat(0.01, 5.0), disp: "Rate Change Time", group: "Emit Params" })
 	public var emitRateChangeDelay : Float = 1.0;
+	/**
+		The number of bursts (`Burst`).
+	**/
 	@:param({ t: PInt(1, 10), disp: "Count", group: "Emit Params" })
 	public var burstCount : Float = 1;
+	/**
+		The time between bursts, in seconds.
+	**/
 	@:param({ t: PFloat(0, 1.0), disp: "Delay", group: "Emit Params" })
 	public var burstDelay : Float = 1.0;
+	/**
+		The number of particles of a burst.
+	**/
 	@:param({ t: PInt(1, 10), disp: "Particle Count", animate: true, group: "Emit Params" })
 	public var burstParticleCount : Float = 1;
+	/**
+		The maximum number of particles alive.
+	**/
 	@:param({ t: PInt(0, 100), group: "Emit Params" })
 	public var maxCount : Int = 20;
 
 	// EMIT SHAPE
+	/**
+		The shape in which the particles are emitted.
+	**/
 	@:param({ t: PEnum(EmitShape), disp: "Shape", group: "Emit Shape" })
 	public var emitShape : EmitShape = EmitShape.Sphere;
+	/**
+		The angle of the cone shape, in degrees.
+	**/
 	@:param({ t: PFloat(0, 360.0), disp: "Angle", animate: true, group: "Emit Shape" })
 	public var emitAngle : Float = 30.0;
+	/**
+		The first radius of the shape.
+	**/
 	@:param({ t: PFloat(0, 1.0), disp: "Radius 1", group: "Emit Shape" })
 	public var emitRad1 : Float = 1.0;
+	/**
+		The second radius of the shape.
+	**/
 	@:param({ t: PFloat(0, 1.0), disp: "Radius 2", group: "Emit Shape" })
 	public var emitRad2 : Float = 1.0;
+	/**
+		Emits on the surface of the shape only.
+	**/
 	@:param({ t: PBool, disp: "Surface", group: "Emit Shape" })
 	public var emitSurface : Bool = false;
+	/**
+		The initial orientation of the particles.
+	**/
 	@:param({ t: PEnum(Orientation), disp: "Orientation", group: "Emit Params" })
 	public var emitOrientation : Orientation = Orientation.Forward;
 
 	// COLOR
+	/**
+		Gives the particles a random color between `randomColor1` and `randomColor2`.
+	**/
 	@:param({ t: PBool, disp: "Random Color", group: "Color" })
 	public var useRandomColor : Bool = false;
+	/**
+		Gives the particles a random color of `randomGradient`.
+	**/
 	@:param({ t: PBool, disp: "Random Gradient", group: "Color" })
 	public var useRandomGradient : Bool = false;
+	/**
+		The first random color, as `[r, g, b, a]`.
+	**/
 	@:param({ t: PVec(4), disp: "Color 1", group: "Color" })
 	public var randomColor1 : Array<Float> = [0., 0., 0., 1.];
+	/**
+		The second random color, as `[r, g, b, a]`.
+	**/
 	@:param({ t: PVec(4), disp: "Color 2", group: "Color" })
 	public var randomColor2 : Array<Float> = [1., 1., 1., 1.];
+	/**
+		The gradient of the random colors.
+	**/
 	@:param({ t: PGradient, disp: "Gradient", group: "Color" })
 	public var randomGradient : GradientData;
 
 	// ANIMATION
+	/**
+		The sprite sheet texture of the particles animation, or `null`.
+	**/
 	@:param({ t: PFile(["jpg", "png"]), disp: "Sheet", group: "Sprite Sheet Animation" })
 	public var spriteSheet : String;
+	/**
+		The number of frames of the sprite sheet (`0` for all).
+	**/
 	@:param({ t: PInt(0), disp: "Frames", group: "Sprite Sheet Animation" })
 	public var frameCount : Int = 0;
+	/**
+		The number of columns of the sprite sheet.
+	**/
 	@:param({ t: PInt(1), disp: "Divisions X", group: "Sprite Sheet Animation" })
 	public var frameDivisionX : Int = 1;
+	/**
+		The number of rows of the sprite sheet.
+	**/
 	@:param({ t: PInt(1), disp: "Divisions Y", group: "Sprite Sheet Animation" })
 	public var frameDivisionY : Int = 1;
+	/**
+		The speed of the sprite sheet animation.
+	**/
 	@:param({ t: PFloat(0, 2.0), disp: "Speed", group: "Sprite Sheet Animation" })
 	public var animationSpeed : Float = 1.0;
+	/**
+		Loops the sprite sheet animation, starting at a random frame.
+	**/
 	@:param({ t: PBool, disp: "Loop", group: "Sprite Sheet Animation" })
 	public var animationLoop : Bool = true;
+	/**
+		Uses the texture coordinates of the particle mesh in each frame.
+	**/
 	@:param({ t: PBool, disp: "Use Source UV", group: "Sprite Sheet Animation" })
 	public var animationUseSourceUVs : Bool = true;
+	/**
+		Blends the consecutive frames of the animation.
+	**/
 	@:param({ t: PBool, disp: "Blend frames", group: "Sprite Sheet Animation" })
 	public var animationBlendBetweenFrames : Bool = true;
 
 	// COLLISION
+	/**
+		Enables the ground collisions (not used by the simulation).
+	**/
 	@:param({ t: PBool, group: "Ground Collision" })
 	public var useCollision : Bool = false;
+	/**
+		The elasticity of the ground collisions (not used by the simulation).
+	**/
 	@:param({ t: PFloat(0, 1.0), disp: "Elasticity", group: "Ground Collision" })
 	public var elasticity : Float = 1.0;
+	/**
+		The probability for a particle to die when it collides with the ground (not used by the simulation).
+	**/
 	@:param({ t: PFloat(0, 1.0), disp: "Kill On Collision", group: "Ground Collision" })
 	public var killOnCollision : Float = 0.0;
 
 	// DEBUG
+	/**
+		Shows the emitter shape (editor).
+	**/
 	@:param({ t: PBool, disp: "Show Debug", group: "Debug" })
 	public var viewDebug : Bool = false;
 
 	// INSTANCES
+	/**
+		The acceleration of the particles, in world space.
+	**/
 	@:instParam({ t: PVec(3, -10, 10), def: [0., 0., 0.], disp: "World Acceleration", group: "Particle Movement" })
 	public var instWorldAcceleration : Array<Float>;
+	/**
+		The speed of the particles, in the space of the emitter.
+	**/
 	@:instParam({ t: PVec(3, -10, 10), def: [0., 0., 0.], disp: "Fixed Speed", group: "Particle Movement" })
 	public var instSpeed : Array<Float>;
+	/**
+		The speed of the particles, in world space.
+	**/
 	@:instParam({ t: PVec(3, -10, 10), def: [0., 0., 0.], disp: "Fixed World Speed", group: "Particle Movement" })
 	public var instWorldSpeed : Array<Float>;
 
 	// In instance param to avoid refactoring the param editor more, but this is no longer linked to the instances (hence the instance: false in the declaration)
+	/**
+		The initial speed of the particles, in the space of the emitter.
+	**/
 	@:instParam({ t: PVec(3, -10, 10), def: [0., 0., 0.], disp: "Start Speed", group: "Particle Movement", instance: false })
 	public var instStartSpeed : Array<Float>;
+	/**
+		The initial speed of the particles, in world space.
+	**/
 	@:instParam({ t: PVec(3, -10, 10), def: [0., 0., 0.], disp: "Start World Speed", group: "Particle Movement", instance: false })
 	public var instStartWorldSpeed : Array<Float>;
 
+	/**
+		The rotation speed of the particles around the emitter.
+	**/
 	@:instParam({ t: PVec(3, -10, 10), def: [0., 0., 0.], disp: "Orbit Speed", group: "Particle Movement" })
 	public var instOrbitSpeed : Array<Float>;
+	/**
+		The factor of the orbit speed over the life of the particles.
+	**/
 	@:instParam({ t: PFloat(0, 2.0), def: 1., disp: "Orbit Speed over time", group: "Particle Movement" })
 	public var instOrbitSpeedOverTime : Null<Float>;
+	/**
+		The acceleration of the particles, in the space of the emitter.
+	**/
 	@:instParam({ t: PVec(3, -10, 10), def: [0., 0., 0.], disp: "Acceleration", group: "Particle Movement" })
 	public var instAcceleration : Array<Float>;
+	/**
+		The maximum velocity of the particles (`null` for no limit).
+	**/
 	@:instParam({ t: PFloat(0, 10.0), def: 0., disp: "Max Velocity", group: "Limit Velocity" })
 	public var instMaxVelocity : Null<Float>;
+	/**
+		The damping of the speed of the particles.
+	**/
 	@:instParam({ t: PFloat(0, 10.0), def: 0., disp: "Dampen", group: "Limit Velocity" })
 	public var instDampen : Null<Float>;
+	/**
+		The scale of the particles.
+	**/
 	@:instParam({ t: PFloat(0, 2.0), def: 1., disp: "Scale", group: "Particle Transform" })
 	public var instScale : Null<Float>;
+	/**
+		The factor of the scale over the life of the particles.
+	**/
 	@:instParam({ t: PFloat(0, 2.0), def: 1., disp: "Scale over time", group: "Particle Transform" })
 	public var instScaleOverTime : Null<Float>;
+	/**
+		The stretch of the particles along each axis.
+	**/
 	@:instParam({ t: PVec(3, 0.0, 2.0), def: [1., 1., 1.], disp: "Stretch", group: "Particle Transform" })
 	public var instStretch : Array<Float>;
+	/**
+		The stretch of the particles along their speed, by velocity.
+	**/
 	@:instParam({ t: PFloat(0.0, 2.0), def: 0.0, disp: "Stretch Vel.", group: "Particle Transform" })
 	public var instStretchVelocity : Null<Float>;
+	/**
+		The rotation of the particles, in degrees.
+	**/
 	@:instParam({ t: PVec(3, 0, 360), def: [0., 0., 0.], disp: "Rotation", group: "Particle Transform" })
 	public var instRotation : Array<Float>;
+	/**
+		The pivot of the rotation and scale of the particles.
+	**/
 	@:instParam({ t: PVec(3, -1, 1), def: [0., 0., 0.], disp: "Pivot", group: "Particle Transform" })
 	public var instPivot : Array<Float>;
+	/**
+		The position offset of the particles.
+	**/
 	@:instParam({ t: PVec(3, -10, 10), def: [0., 0., 0.], disp: "Offset", group: "Particle Transform" })
 	public var instOffset : Array<Float>;
 
@@ -2395,16 +3166,37 @@ class Emitter extends Object3D {
 
 }
 
+/**
+	A vector of 3 single precision floats.
+**/
 @:publicFields @:struct
 class SVector3 {
+	/**
+		X.
+	**/
 	var x : Single;
+	/**
+		Y.
+	**/
 	var y : Single;
+	/**
+		Z.
+	**/
 	var z : Single;
+	/**
+		Creates the matrix.
+	**/
 	public function new() { }
 
+	/**
+		Returns the vector.
+	**/
 	inline function toVector() {
 		return new h3d.Vector(x, y, z);
 	}
+	/**
+		Sets the components from a vector.
+	**/
 	inline function load(v: h3d.Vector) {
 		this.x = v.x;
 		this.y = v.y;
@@ -2412,20 +3204,44 @@ class SVector3 {
 	}
 }
 
+/**
+	A vector of 4 single precision floats.
+**/
 @:publicFields @:struct
 class SVector4 {
+	/**
+		X.
+	**/
 	var x : Single;
+	/**
+		Y.
+	**/
 	var y : Single;
+	/**
+		Z.
+	**/
 	var z : Single;
+	/**
+		W.
+	**/
 	var w : Single;
 
+	/**
+		Creates the matrix.
+	**/
 	public function new() { }
 
 
+	/**
+		Returns the components as a quaternion.
+	**/
 	inline function toQuat() {
 		return new h3d.Quat(x, y, z, w);
 	}
 
+	/**
+		Sets the components from a vector.
+	**/
 	inline function load(v: h3d.Vector4) {
 		this.x = v.x;
 		this.y = v.y;
@@ -2433,6 +3249,9 @@ class SVector4 {
 		this.w = v.w;
 	}
 
+	/**
+		Sets the components from a quaternion.
+	**/
 	inline function loadQuat(q: h3d.Quat) {
 		this.x = q.x;
 		this.y = q.y;
@@ -2440,20 +3259,32 @@ class SVector4 {
 		this.w = q.w;
 	}
 
+	/**
+		Returns the vector.
+	**/
 	inline function toVector() {
 		return new h3d.Vector4(x, y, z, w);
 	}
 }
 
 
+/**
+	A 3x3 matrix of single precision floats.
+**/
 @:publicFields @:struct
 class SMatrix3 {
 	var _11 : Single; var _12 : Single; var _13 : Single;
 	var _21 : Single; var _22 : Single; var _23 : Single;
 	var _31 : Single; var _32 : Single; var _33 : Single;
 
+	/**
+		Creates a zero vector.
+	**/
 	public function new() { }
 
+	/**
+		Returns the matrix.
+	**/
 	inline function toMatrix() {
 		var m = new h3d.Matrix();
 		m._11 = _11; m._12 = _12; m._13 = _13;
@@ -2462,6 +3293,9 @@ class SMatrix3 {
 		return m;
 	}
 
+	/**
+		Sets the components from the rotation part of a matrix.
+	**/
 	inline function load(m : h3d.Matrix) {
 		_11 = m._11; _12 = m._12; _13 = m._13;
 		_21 = m._21; _22 = m._22; _23 = m._23;
@@ -2470,6 +3304,9 @@ class SMatrix3 {
 }
 
 
+/**
+	A 4x3 transform matrix of single precision floats.
+**/
 @:publicFields @:struct
 class SMatrix4 {
 	var _11 : Single; var _12 : Single; var _13 : Single; var _14 : Single;
@@ -2477,14 +3314,23 @@ class SMatrix4 {
 	var _31 : Single; var _32 : Single; var _33 : Single; var _34 : Single;
 	var _41 : Single; var _42 : Single; var _43 : Single; var _44 : Single;
 
+	/**
+		Creates a zero vector.
+	**/
 	public function new() { }
 
+	/**
+		Returns the translation.
+	**/
 	public inline function getPosition() {
 		var v = new h3d.Vector();
 		v.set(_41,_42,_43);
 		return v;
 	}
 
+	/**
+		Returns the matrix.
+	**/
 	inline function toMatrix() {
 		var m = new h3d.Matrix();
 		m._11 = _11; m._12 = _12; m._13 = _13; m._14 = _14;
@@ -2494,6 +3340,9 @@ class SMatrix4 {
 		return m;
 	}
 
+	/**
+		Sets the components from a matrix.
+	**/
 	inline function load(m : h3d.Matrix) {
 		_11 = m._11; _12 = m._12; _13 = m._13; _14 = m._14;
 		_21 = m._21; _22 = m._22; _23 = m._23; _24 = m._24;

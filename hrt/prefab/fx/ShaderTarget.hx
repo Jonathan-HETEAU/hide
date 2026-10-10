@@ -1,11 +1,26 @@
 package hrt.prefab.fx;
 
+/**
+	The object of a `ShaderTarget`, child of its target.
+**/
 class ShaderTargetObj extends h3d.scene.Object {
+	/**
+		The tag, or `null` to always apply.
+	**/
 	public var tag : String;
+	/**
+		The priority among the targets of the same tag.
+	**/
 	public var priority : Int = 1;
+	/**
+		The prefab of the shader target.
+	**/
 	public var shadersRoot : ShaderTarget;
 	var guard = 0;
 
+	/**
+		Moves the shaders of the prefab and registers in the FX.
+	**/
 	public function apply(fx : hrt.prefab.fx.FX) {
 		function reparentChildren(obj : hrt.prefab.Object3D) {
 			var i = 0;
@@ -39,6 +54,9 @@ class ShaderTargetObj extends h3d.scene.Object {
 		fxAnim.shaderTargets.push(this);
 	}
 
+	/**
+		Applies the shaders to the target.
+	**/
 	public function applyShaders() {
 		for ( s in shadersRoot.findAll(Shader) ) {
 			if (!s.enabled || s.editorOnly)
@@ -51,12 +69,18 @@ class ShaderTargetObj extends h3d.scene.Object {
 		}
 	}
 
+	/**
+		Removes the shaders from the target.
+	**/
 	public function removeShaders() {
 		for (s in shadersRoot.findAll(Shader))
 			s.dispose();
 		guard = Std.int(hxd.Math.max(0, guard - 1));
 	}
 
+	/**
+		Tells if the shaders are applied.
+	**/
 	public function isApplied() {
 		return guard > 0;
 	}
@@ -74,18 +98,33 @@ class ShaderTargetObj extends h3d.scene.Object {
 	}
 }
 
+/**
+	Applies its children shaders and materials to a target object of the FX (set by `FX.setTarget`). Among the targets of the same tag, only the one with the highest priority is applied.
+**/
 @:prefabIcon(HuiRes.ui.icons.prefab.shader_target)
 @:prefabName("Shader Target")
 class ShaderTarget extends Object3D {
+	/**
+		The tag, or `null` to always apply.
+	**/
 	@:s public var tag : String;
+	/**
+		The priority among the targets of the same tag.
+	**/
 	@:s public var priority : Int = 1;
 
+	/**
+		The target object.
+	**/
 	public var target : h3d.scene.Object;
 
 	public function new(parent:Prefab, contextShared: ContextShared) {
 		super(parent, contextShared);
 	}
 
+	/**
+		Applies the shader targets of the object with the highest priority for each tag.
+	**/
 	public static function updateShaderTargets(o : h3d.scene.Object) {
 		var sts : Array<ShaderTargetObj> = [];
 		for (idx in 0...o.numChildren) {
@@ -137,6 +176,9 @@ class ShaderTarget extends Object3D {
 		return new hrt.prefab.fx.ShaderTarget.ShaderTargetObj(target);
 	}
 
+	/**
+		Applies the shaders to `target`.
+	**/
 	public function applyShaderTarget(fx : hrt.prefab.fx.FX, target : h3d.scene.Object) {
 		if (target == null)
 			return;

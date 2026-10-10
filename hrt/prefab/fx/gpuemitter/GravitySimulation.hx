@@ -1,5 +1,8 @@
 package hrt.prefab.fx.gpuemitter;
 
+/**
+	Applies the gravity to the particles.
+**/
 class GravitySimulationShader extends ComputeUtils {
 	static var SRC = {
 		@param var gravity : Vec3;
@@ -12,6 +15,9 @@ class GravitySimulationShader extends ComputeUtils {
 	}
 }
 
+/**
+	Applies a gravity to the particles of a GPU emitter.
+**/
 class GravitySimulation extends SimulationShader {
 	@:s var gravityX : Float = 0.0;
 	@:s var gravityY : Float = 0.0;

@@ -1,5 +1,8 @@
 package hrt.prefab.fx.gpuemitter;
 
+/**
+	Spawns the particles in a box.
+**/
 class CubeSpawnShader extends ComputeUtils {
 
 	static var SRC = {
@@ -15,6 +18,9 @@ class CubeSpawnShader extends ComputeUtils {
 	}
 }
 
+/**
+	Spawns the particles of a GPU emitter in a cube.
+**/
 class CubeSpawn extends SpawnShader {
 	@:s var cubeEdge : Float = 1.0;
 

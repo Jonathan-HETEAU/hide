@@ -1,5 +1,8 @@
 package hrt.prefab.fx.gpuemitter;
 
+/**
+	Applies a noise turbulence to the speed of the particles.
+**/
 class TurbulenceSimulationShader extends ComputeUtils {
 
 	static var SRC = {
@@ -64,6 +67,9 @@ class TurbulenceSimulationShader extends ComputeUtils {
 	}
 }
 
+/**
+	Applies a noise turbulence to the particles of a GPU emitter.
+**/
 class TurbulenceSimulation extends SimulationShader {
 	static var noiseTex : h3d.mat.Texture;
 

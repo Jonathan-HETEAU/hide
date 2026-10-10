@@ -3,6 +3,9 @@ package hrt.prefab.fx.gpuemitter;
 import hrt.prefab.fx.gpuemitter.GPUEmitter.Data;
 import hrt.prefab.fx.gpuemitter.CubeSpawn.CubeSpawnShader;
 
+/**
+	Reads the particle data (life, random value, color) in the rendering of a GPU particle.
+**/
 class ParticleShader extends hxsl.Shader {
 	static var SRC = {
 		@param var absPos : Mat4;
@@ -47,12 +50,30 @@ class ParticleShader extends hxsl.Shader {
 	}
 }
 
+/**
+	The object of a `GPUEmitter` for a particle mesh: a `h3d.scene.MeshBatch` updated on the GPU.
+**/
 @:allow(hrt.prefab.fx.GPUEmitter)
 class GPUEmitterObject extends h3d.scene.MeshBatch {
+	/**
+		The compute pass of the simulation.
+	**/
 	public var simulationPass : h3d.mat.Pass;
+	/**
+		The compute pass of the spawn.
+	**/
 	public var spawnPass : h3d.mat.Pass;
+	/**
+		The compute pass updating the animated shader parameters.
+	**/
 	public var updateParamPass : h3d.mat.Pass;
+	/**
+		The parameters.
+	**/
 	public var data : Data;
+	/**
+		The FX of the emitter, or `null`.
+	**/
 	public var fxAnim : hrt.prefab.fx.FX.FXAnimation;
 
 	var customAnimations : Array<hrt.prefab.fx.BaseFX.CustomAnimation> = [];
@@ -69,11 +90,17 @@ class GPUEmitterObject extends h3d.scene.MeshBatch {
 	var rateAccumulation : Float = 0.0;
 	var firstDispatch : Bool = true;
 
+	/**
+		The fraction of the particles simulated, between `0` and `1`.
+	**/
 	public var gameplayRate(default, set) : Float = 1.0;
 	public function set_gameplayRate(v : Float) {
 		return gameplayRate = hxd.Math.clamp(v);
 	}
 
+	/**
+		Creates the object.
+	**/
 	public function new(data, primitive, materials, ?parent) {
 		super(primitive, null, parent);
 		fxAnim = null;
@@ -115,6 +142,9 @@ class GPUEmitterObject extends h3d.scene.MeshBatch {
 		simulationPass.addShader(new BaseSimulation());
 	}
 
+	/**
+		Bakes the shader animations over the life of the particles in a texture.
+	**/
 	public function bakeAnimations() {
 		if ( paramTexture != null )
 			paramTexture.dispose();

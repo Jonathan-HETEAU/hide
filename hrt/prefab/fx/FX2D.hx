@@ -5,27 +5,66 @@ import hrt.prefab.fx.BaseFX.ObjectAnimation;
 import hrt.prefab.fx.BaseFX.ShaderAnimation;
 import hrt.prefab.fx.Event;
 
+/**
+	The 2D object of an `FX2D`: plays its animations, emitters and events.
+**/
 @:allow(hrt.prefab.fx.FX2D)
 class FX2DAnimation extends h2d.Object {
 
+	/**
+		The prefab of the FX.
+	**/
 	public var prefab : hrt.prefab.Prefab;
+	/**
+		Called when the FX finishes.
+	**/
 	public var onEnd : Void -> Void;
 
+	/**
+		The speed of the FX.
+	**/
 	public var playSpeed : Float;
+	/**
+		The current time of the FX, in seconds.
+	**/
 	public var localTime : Float = 0.0;
 	var prevTime = -1.0;
+	/**
+		The start of the loop, in seconds.
+	**/
 	public var startLoop : Float = 0.0;
+	/**
+		The duration of the FX, in seconds.
+	**/
 	public var duration : Float;
 
+	/**
+		Loops from `startLoop` to the end.
+	**/
 	public var loop : Bool;
+	/**
+		The animated objects.
+	**/
 	public var objects: Array<ObjectAnimation> = [];
+	/**
+		The shader and renderer effect animations.
+	**/
 	public var customAnims : Array<BaseFX.CustomAnimation> = [];
+	/**
+		The particle emitters.
+	**/
 	public var emitters : Array<hrt.prefab.fx.Emitter2D.Emitter2DObject>;
+	/**
+		The events.
+	**/
 	public var events: Array<hrt.prefab.fx.Event.EventInstance>;
 
 	var evaluator : Evaluator;
 	var random : hxd.Rand;
 
+	/**
+		Creates the object.
+	**/
 	public function new(?parent) {
 		super(parent);
 		random = new hxd.Rand(Std.random(0xFFFFFF));
@@ -34,6 +73,9 @@ class FX2DAnimation extends h2d.Object {
 		setTime(0);
 	}
 
+	/**
+		Sets the random seed.
+	**/
 	public function setRandSeed(seed: Int) {
 		random.init(seed);
 	}
@@ -105,6 +147,9 @@ class FX2DAnimation extends h2d.Object {
 
 
 	static var tmpPt = new h3d.Vector4();
+	/**
+		Sets the time of the FX and applies the animations.
+	**/
 	public function setTime( time : Float ) {
 
 		this.localTime = time;
@@ -197,13 +242,31 @@ class FX2DAnimation extends h2d.Object {
 	}
 }
 
+/**
+	A 2D FX: a timeline of animations, particles and events.
+**/
 @:prefabHideInAddMenu
 class FX2D extends Object2D implements BaseFX {
 
+	/**
+		The duration of the FX, in seconds.
+	**/
 	@:s public var duration : Float;
+	/**
+		The delay before the FX starts, in seconds.
+	**/
 	@:s public var startDelay : Float;
+	/**
+		The script of the FX.
+	**/
 	@:c public var scriptCode : String;
+	/**
+		Not used.
+	**/
 	@:c public var cullingRadius : Float;
+	/**
+		The time markers, in seconds.
+	**/
 	@:c public var markers : Array<{t: Float}> = [];
 
 
@@ -305,6 +368,9 @@ class FX2D extends Object2D implements BaseFX {
 		return fxanim;
 	}
 
+	/**
+		Returns the object of the FX.
+	**/
 	public function getTargetShader2D(name : String ) {
 		return local2d;
 	}
@@ -332,6 +398,9 @@ class FX2D extends Object2D implements BaseFX {
 
 	#if editor
 
+	/**
+		Rebuilds the object animations (editor only).
+	**/
 	public function refreshObjectAnims() {
 		var fxanim = Std.downcast(local2d, FX2DAnimation);
 		fxanim.objects = [];

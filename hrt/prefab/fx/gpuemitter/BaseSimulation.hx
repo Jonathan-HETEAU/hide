@@ -1,5 +1,8 @@
 package hrt.prefab.fx.gpuemitter;
 
+/**
+	The base simulation of the GPU particles: life, speed, size and orientation.
+**/
 class BaseSimulation extends ComputeUtils {
 	static var SRC = {
 		@param var batchBuffer : RWPartialBuffer<{

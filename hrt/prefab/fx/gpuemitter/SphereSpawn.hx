@@ -1,5 +1,8 @@
 package hrt.prefab.fx.gpuemitter;
 
+/**
+	Spawns the particles in a sphere.
+**/
 class SphereSpawnShader extends ComputeUtils {
 
 	static var SRC = {
@@ -20,6 +23,9 @@ class SphereSpawnShader extends ComputeUtils {
 	}
 }
 
+/**
+	Spawns the particles of a GPU emitter in a sphere shell, between two radiuses.
+**/
 class SphereSpawn extends SpawnShader {
 	@:s var minRadius : Float = 0.2;
 	@:s var maxRadius : Float = 1.0;

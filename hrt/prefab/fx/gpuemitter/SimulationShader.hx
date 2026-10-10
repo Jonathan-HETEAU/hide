@@ -1,5 +1,8 @@
 package hrt.prefab.fx.gpuemitter;
 
+/**
+	A shader prefab added to the simulation of its parent `GPUEmitter`.
+**/
 @:prefabHideInAddMenu
 @:prefabCategory("Simulation")
 class SimulationShader extends hrt.prefab.Shader {

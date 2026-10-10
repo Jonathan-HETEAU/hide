@@ -1,18 +1,42 @@
 package hrt.prefab.fx;
 
+/**
+	Plays a referenced FX as an event of an FX.
+**/
 @:prefabIcon(HuiRes.ui.icons.prefab.sub_fx)
 @:prefabName("Sub FX")
 class SubFX extends Reference implements hrt.prefab.fx.Event.IEvent{
 
+	/**
+		The start time, in seconds.
+	**/
 	@:s public var time(default, set) : Float;
+	/**
+		Loops the sub FX.
+	**/
 	@:s public var loop(default, set) : Bool;
+	/**
+		The speed of the sub FX.
+	**/
 	@:s public var speed(default, set) : Float = 1.0;
+	/**
+		Not used: the duration is the one of the FX, divided by `speed`.
+	**/
 	@:s public var duration : Float;
 
 	var instance : hrt.prefab.fx.FX.FXAnimation;
 
+	/**
+		Hidden in the editor timeline.
+	**/
 	public var hidden:Bool = false;
+	/**
+		Locked in the editor timeline.
+	**/
 	public var lock:Bool = false;
+	/**
+		Selected in the editor timeline.
+	**/
 	public var selected:Bool = false;
 
 
@@ -44,6 +68,9 @@ class SubFX extends Reference implements hrt.prefab.fx.Event.IEvent{
 		return speed = v;
 	}
 
+	/**
+		Returns the duration of the FX divided by `speed`.
+	**/
 	public function getDuration() {
 		if (instance != null)
 			return instance.duration / speed;
@@ -52,6 +79,9 @@ class SubFX extends Reference implements hrt.prefab.fx.Event.IEvent{
 
 	#if editor
 	// stretching the strip changes the playback speed
+	/**
+		Sets `speed` so that the FX lasts `v` seconds (editor only).
+	**/
 	public function setDuration(v : Float) : Void {
 		if (instance != null && instance.duration > 0 && v > 0)
 			speed = instance.duration / v;
@@ -66,8 +96,14 @@ class SubFX extends Reference implements hrt.prefab.fx.Event.IEvent{
 		return loop = v;
 	}
 
+	/**
+		Returns this prefab.
+	**/
 	public function getEventPrefab() { return this; }
 
+	/**
+		Returns the event instance.
+	**/
 	public function prepare() : Event.EventInstance {
 		return {
 			evt: this
@@ -95,6 +131,9 @@ class SubFX extends Reference implements hrt.prefab.fx.Event.IEvent{
 
 	#if editor
 
+	/**
+		Returns the label, length and loop of the event in the editor timeline.
+	**/
 	public function getDisplayInfo(ctx:hide.prefab.EditContext) {
 		var ref = Std.downcast(resolve(), FX);
 		return {

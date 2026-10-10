@@ -1,15 +1,27 @@
 package hrt.prefab.fx;
 
+/**
+	Evaluates `Value`s, with random values per particle and the FX parameters.
+**/
 class Evaluator {
 	var randValues : Array<Float>;
+	/**
+		The values of the FX parameters, by name.
+	**/
 	public var parameters: Map<String, Float> = [];
 	var stride : Int;
 
+	/**
+		Creates an evaluator. `randValues` are the random values, `stride` random values per particle.
+	**/
 	public function new(?randValues: Array<Float>, stride: Int=0) {
 		this.randValues = randValues;
 		this.stride = stride;
 	}
 
+	/**
+		Returns `VZero` for `0`, a `VConst` otherwise.
+	**/
 	public static function vVal(f: Float) : Value {
 		return switch(f) {
 			case 0.0: VZero;
@@ -29,6 +41,9 @@ class Evaluator {
 		return r != null ? r : fn(b, a);
 	}
 
+	/**
+		Returns the product of two values, simplified when possible.
+	**/
 	public static function vMult(a: Value, b: Value) : Value {
 		if(a == VZero || b == VZero) return VZero;
 		var r = commute(a, b, (a, b) -> switch [a, b] {
@@ -51,6 +66,9 @@ class Evaluator {
 		return r != null ? r : VMult(a, b);
 	}
 
+	/**
+		Returns the sum of two values, simplified when possible.
+	**/
 	public static function vAdd(a: Value, b: Value) : Value {
 		if(a == VZero) return b;
 		if(b == VZero) return a;
@@ -74,6 +92,9 @@ class Evaluator {
 		return randValues[i];
 	}
 
+	/**
+		Sets the parameters to the default values of `params`.
+	**/
 	public function setAllParameters(params: Array<hrt.prefab.fx.FX.Parameter>) {
 		parameters.clear();
 		if (params == null)
@@ -83,6 +104,9 @@ class Evaluator {
 		}
 	}
 
+	/**
+		Returns the value of particle `pidx` at `time`. Throws for `VAdd`, `VMult`, `VVector` and `VHsl`.
+	**/
 	public function getFast(pidx: Int, val: Value, time: Float) : Float {
 		return switch(val) {
 			case null: 0.0;
@@ -117,6 +141,9 @@ class Evaluator {
 		}
 	}
 
+	/**
+		Returns the value of particle `pidx` at `time`.
+	**/
 	public function getFloat(pidx: Int=0, val: Value, time: Float) : Float {
 		switch(val) {
 			case VParamRemap(a, param):
@@ -134,6 +161,9 @@ class Evaluator {
 		}
 	}
 
+	/**
+		Returns the integral of the value from `0` to `time`.
+	**/
 	public function getSum(val: Value, time: Float) : Float {
 		switch(val) {
 			case VZero: return 0;
@@ -157,6 +187,9 @@ class Evaluator {
 		return 0.0;
 	}
 
+	/**
+		Sets `vec` to the vector value of particle `pidx` at `time` (a float value is repeated), and returns it.
+	**/
 	public function getVector(pidx: Int=0, v: Value, time: Float, vec: h3d.Vector4) {
 		switch(v) {
 			case VMult(a, b):
@@ -177,6 +210,9 @@ class Evaluator {
 		return vec;
 	}
 
+	/**
+		Like `getVector`, with `getFast` for the components.
+	**/
 	public inline function getFastVec(pidx: Int, v: Value, time: Float, vec: h3d.Vector4) {
 		switch(v) {
 			case VVector(x, y, z, null):
@@ -192,6 +228,9 @@ class Evaluator {
 		return vec;
 	}
 
+	/**
+		Sets `vec` to the 2D vector value of particle `pidx` at `time` (a float value is repeated), and returns it.
+	**/
 	public function getVector2(pidx: Int=0, v: Value, time: Float, vec: h2d.col.Point) {
 		switch(v) {
 			case VMult(a, b):

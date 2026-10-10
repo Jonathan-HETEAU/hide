@@ -10,21 +10,42 @@ import hrt.prefab.fx.Event;
 	What part of the FXAnimation loop is currently playing
 **/
 enum FXPlayState {
+	/**
+		Before the loop.
+	**/
 	Start;
+	/**
+		In the loop.
+	**/
 	Loop;
+	/**
+		After the loop, or stopped.
+	**/
 	End;
 
 	/**localTime reached duration **/
 	Finished;
 }
+/**
+	The 3D object of an `FX`: plays its animations, emitters, events and sub FX.
+**/
 @:allow(hrt.prefab.fx.FX)
 class FXAnimation extends h3d.scene.Object {
+	/**
+		The culling distance of the FX without one (`0` for none).
+	**/
 	public static var defaultCullingDistance = 0.0;
 
+	/**
+		Tells if the FX debug display is enabled.
+	**/
 	public static var debugFX(default, null) = false;
 	static var debugRFX : DesaturateRFX;
 
 	// Note : to work, the renderer need to have a Debug pass enabled
+	/**
+		Enables (or toggles if `enabled` is `null`) the FX debug display: the scene is desaturated and the FX drawn in color. The renderer needs a `debug` pass.
+	**/
 	public static function setDebugFX(?enabled: Bool, renderer: h3d.scene.Renderer) {
 		if (enabled == null)
 			enabled = !debugFX;
@@ -42,21 +63,57 @@ class FXAnimation extends h3d.scene.Object {
 		}
 	}
 
+	/**
+		Called when the FX finishes.
+	**/
 	public var onEnd : Void -> Void;
+	/**
+		Pauses the FX.
+	**/
 	public var paused : Bool = false;
+	/**
+		The speed of the FX (`1` once made, except in the editor). For a sub FX, relative to its parent.
+	**/
 	public var playSpeed : Float = 0;
+	/**
+		The current time of the FX, in seconds.
+	**/
 	public var localTime : Float = 0.0;
+	/**
+		The delay before the FX starts, in the time of its parent.
+	**/
 	public var startDelay : Float = 0.0;
+	/**
+		Loops between `loopStart` and `loopEnd`.
+	**/
 	public var loop(default, set) : Bool = false;
+	/**
+		The start of the loop: the time of the `loop` event, or `0`.
+	**/
 	public var loopStart: Float = -1;
+	/**
+		The end of the loop: the end of the `loop` event, the time of the `end` event, or the duration.
+	**/
 	public var loopEnd: Float = -1;
+	/**
+		Tells if the FX has a `loop` or `end` event.
+	**/
 	public var hasLoopPoints(default, null): Bool = false;
+	/**
+		The duration of the FX, in seconds.
+	**/
 	public var duration : Float;
+	/**
+		The prefab of the FX.
+	**/
 	public var prefab : FX;
 
 	var fxId = fxCount ++;
 	static var fxCount = 0;
 
+	/**
+		The shader of the debug display, while enabled.
+	**/
 	public var debugShader : DebugFXShader;
 
 	function set_loop(v: Bool) {
@@ -72,20 +129,56 @@ class FXAnimation extends h3d.scene.Object {
 
 	/** Enable automatic culling based on `cullingRadius` and `cullingDistance`. Will override `culled` on every sync. **/
 	public var autoCull(default, set) = true;
+	/**
+		The radius of the culling sphere.
+	**/
 	public var cullingRadius : Float;
+	/**
+		The distance to the camera from which the FX is culled (`0` for none).
+	**/
 	public var cullingDistance : Float;
 
+	/**
+		The animated objects.
+	**/
 	public var objAnims: Array<ObjectAnimation>;
+	/**
+		The events.
+	**/
 	public var events: Array<hrt.prefab.fx.Event.EventInstance>;
+	/**
+		The particle emitters.
+	**/
 	public var emitters : Array<hrt.prefab.fx.Emitter.EmitterObject>;
+	/**
+		The trails.
+	**/
 	public var trails : Array<hrt.prefab.l3d.Trails.TrailObj>;
+	/**
+		The shader and renderer effect animations.
+	**/
 	public var customAnims : Array<BaseFX.CustomAnimation> = [];
+	/**
+		The constraints, resolved by `resolveConstraints`.
+	**/
 	public var constraints : Array<hrt.prefab.l3d.Constraint>;
+	/**
+		The renderer effects, added to the renderer at the first sync.
+	**/
 	public var effects : Array<hrt.prefab.rfx.RendererFX>;
+	/**
+		The shader targets.
+	**/
 	public var shaderTargets : Array<hrt.prefab.fx.ShaderTarget.ShaderTargetObj>;
 
+	/**
+		The sub FX.
+	**/
 	public var subFXs : Array<FXAnimation> = [];
 
+	/**
+		Called when `playState` changes.
+	**/
 	public dynamic function onPlayStateChange(newPlayState: FXPlayState) : Void {
 
 	}
@@ -95,9 +188,15 @@ class FXAnimation extends h3d.scene.Object {
 	var random : hxd.Rand;
 	var randSeed : Int;
 	var firstSync = true;
+	/**
+		The part of the FX playing.
+	**/
 	public var playState(default, set) : FXPlayState = End;
 	var stopTime : Float = -1;
 
+	/**
+		Creates the object, with a random seed (`0` in the editor).
+	**/
 	public function new(?parent) {
 		super(parent);
 		randSeed = #if editor 0 #else Std.random(0xFFFFFF) #end;
@@ -145,6 +244,9 @@ class FXAnimation extends h3d.scene.Object {
 		resetSelf();
 	}
 
+	/**
+		Finds the sub FX of the prefab.
+	**/
 	public function initSubFXs(root: PrefabElement) {
 		subFXs = [];
 		for (fx in root.findAll(SubFX)) {
@@ -155,6 +257,9 @@ class FXAnimation extends h3d.scene.Object {
 		}
 	}
 
+	/**
+		Sets the loop points from the `loop` and `end` events.
+	**/
 	public function initLoop() {
 		loopStart = 0;
 		loopEnd = duration;
@@ -180,10 +285,16 @@ class FXAnimation extends h3d.scene.Object {
 		}
 	}
 
+	/**
+		Tells if the FX has a part after the loop.
+	**/
 	public function hasEnd() {
 		return loopEnd < duration && loopEnd >= 0;
 	}
 
+	/**
+		Restarts the FX and its children FX.
+	**/
 	public function reset() {
 		resetSelf();
 
@@ -208,6 +319,9 @@ class FXAnimation extends h3d.scene.Object {
 		playState = Start;
 	}
 
+	/**
+		Adds the custom animations of the prefab and its children.
+	**/
 	public function updateCustomAnims(root : Prefab) {
 		if (customAnims == null)
 			customAnims = [];
@@ -221,18 +335,30 @@ class FXAnimation extends h3d.scene.Object {
 		}
 	}
 
+	/**
+		Sets the value of an FX parameter.
+	**/
 	public function setParameter(name: String, value: Dynamic) {
 		evaluator.parameters[name] = value;
 	}
 
+	/**
+		Returns the value of an FX parameter.
+	**/
 	public function getParameter(name: String) {
 		return evaluator.parameters[name];
 	}
 
+	/**
+		Returns the names of the FX parameters.
+	**/
 	public function getParameters() {
 		return evaluator.parameters.keys();
 	}
 
+	/**
+		Sets the parameters to the default values of `params`.
+	**/
 	public function setParameters(params: Array<Parameter>) {
 		evaluator.parameters.clear();
 		if (params == null)
@@ -242,6 +368,9 @@ class FXAnimation extends h3d.scene.Object {
 		}
 	}
 
+	/**
+		Sets the random seed of the FX and its emitters.
+	**/
 	public function setRandSeed(seed: Int) {
 		randSeed = seed;
 		random.init(seed);
@@ -256,6 +385,9 @@ class FXAnimation extends h3d.scene.Object {
 		return autoCull = b;
 	}
 
+	/**
+		Culls the FX if its culling sphere is out of the camera frustum, or if it is farther than `cullingDistance`.
+	**/
 	public function updateCulling(camera : h3d.Camera) {
 		culled = false;
 		var scale = getAbsPos().getScale();
@@ -698,6 +830,9 @@ class FXAnimation extends h3d.scene.Object {
 	}
 
 
+	/**
+		Stops the FX: plays the part after the loop, or jumps to the end if `instant` or without one. `onEnd` replaces `onEnd`.
+	**/
 	public function stop(instant: Bool = false, onEnd: () -> Void = null) {
 		this.onEnd = onEnd;
 		playState = End;
@@ -852,6 +987,9 @@ class FXAnimation extends h3d.scene.Object {
 		}
 	}
 
+	/**
+		Makes the objects of the constraints follow their targets, found in `caster`.
+	**/
 	public function resolveConstraints( caster : h3d.scene.Object ) {
 		if( constraints == null ) return;
 		for( co in constraints ) {
@@ -891,26 +1029,71 @@ class FXAnimation extends h3d.scene.Object {
 	}
 }
 
+/**
+	The type of an FX parameter.
+**/
 enum abstract ParameterType(String) {
+	/**
+		A blend factor between `0` and `1`, used by blended curves.
+	**/
 	var TBlend;
 }
+/**
+	A parameter of an FX, used to blend curves.
+**/
 typedef Parameter = {
+	/**
+		The type.
+	**/
 	var type: ParameterType;
+	/**
+		The name.
+	**/
 	var name: String;
+	/**
+		The color in the editor.
+	**/
 	var color: Int;
+	/**
+		The default value.
+	**/
 	var def: Dynamic;
 };
 
+/**
+	A 3D FX: a timeline of animations, particles and events. Its children under a prefab named `FXRoot` are made at runtime.
+**/
 @:prefabHideInAddMenu
 class FX extends Object3D implements BaseFX {
 
+	/**
+		The duration of the FX, in seconds.
+	**/
 	@:s public var duration : Float;
+	/**
+		The delay before the FX starts, in seconds.
+	**/
 	@:s public var startDelay : Float = 0.0;
+	/**
+		The script of the FX.
+	**/
 	@:c public var scriptCode : String;
+	/**
+		The radius of the culling sphere.
+	**/
 	@:s public var cullingRadius : Float;
+	/**
+		The distance to the camera from which the FX is culled (`0` for `FXAnimation.defaultCullingDistance`).
+	**/
 	@:s public var cullingDistance : Float;
+	/**
+		The time markers, in seconds.
+	**/
 	@:s public var markers : Array<{t: Float}> = [];
 
+	/**
+		The parameters, used to blend curves.
+	**/
 	@:s public var parameters : Array<Parameter> = [];
 
 	#if editor
@@ -983,6 +1166,9 @@ class FX extends Object3D implements BaseFX {
 		fxAnim.init(this, root);
 	}
 
+	/**
+		Sets the target of the shader targets of the FX.
+	**/
 	public function setTarget(target : h3d.scene.Object) {
 		for (shaderTarget in this.findAll(hrt.prefab.fx.ShaderTarget))
 			shaderTarget.target = target;
@@ -1002,6 +1188,9 @@ class FX extends Object3D implements BaseFX {
 
 	#if editor
 
+	/**
+		Rebuilds the object animations (editor only).
+	**/
 	public function refreshObjectAnims() : Void {
 		var fxanim = Std.downcast(local3d, FXAnimation);
 		fxanim.objAnims = null;
@@ -1192,6 +1381,9 @@ class FX extends Object3D implements BaseFX {
 	static var _ = Prefab.register("fx", FX, "fx");
 }
 
+/**
+	Draws the FX in a flat color (HSV) for the debug display.
+**/
 class DebugFXShader extends hxsl.Shader {
 	static var SRC = {
 		@param var color : Vec4;
@@ -1211,6 +1403,9 @@ class DebugFXShader extends hxsl.Shader {
 		}
 	}
 }
+/**
+	Desaturates the screen.
+**/
 class Desaturate extends h3d.shader.ScreenShader {
 	static var SRC = {
 		@param var texture: Sampler2D;
@@ -1222,17 +1417,32 @@ class Desaturate extends h3d.shader.ScreenShader {
 	}
 }
 
+/**
+	Desaturates the scene for the FX debug display (with a PBR renderer).
+**/
 class DesaturateRFX implements h3d.impl.RendererFX {
 	var desaturatePass = new h3d.pass.ScreenFx(new Desaturate());
+	/**
+		Enables the effect.
+	**/
 	public var enabled: Bool = true;
 
+	/**
+		Creates the effect.
+	**/
 	public function new() {
 
 	}
 
+	/**
+		Does nothing.
+	**/
 	public function start(r : h3d.scene.Renderer) {
 	}
 
+	/**
+		Desaturates the screen at the `Overlay` step.
+	**/
 	public function begin(r : h3d.scene.Renderer, step: h3d.impl.RendererFX.Step) {
 		if (step == Overlay) {
 			var pbr = Std.downcast(r, h3d.scene.pbr.Renderer);
@@ -1241,17 +1451,29 @@ class DesaturateRFX implements h3d.impl.RendererFX {
 		}
 	}
 
+	/**
+		Does nothing.
+	**/
 	public function end(r : h3d.scene.Renderer, step: h3d.impl.RendererFX.Step) {
 
 	}
 
+	/**
+		Does nothing.
+	**/
 	public function dispose() : Void {};
 
 	// Volumetric RFX
+	/**
+		Returns the effect.
+	**/
 	public function modulate( t : Float ) : h3d.impl.RendererFX {
 		return this;
 	};
 
+	/**
+		Returns the effect, without transition.
+	**/
 	public function transition( r1 : h3d.impl.RendererFX, r2 : h3d.impl.RendererFX ) : h3d.impl.RendererFX.RFXTransition {
 		return {effect: this, setFactor : (f: Float) -> {}}
 	};

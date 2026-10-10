@@ -1,5 +1,8 @@
 package hrt.prefab.fx.gpuemitter;
 
+/**
+	Wraps the particles in the cube around the camera (`Camera` mode).
+**/
 class CameraWrap extends ComputeUtils {
 	static var SRC = {
 

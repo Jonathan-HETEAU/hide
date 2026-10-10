@@ -1,9 +1,15 @@
 package hrt.prefab.fx.gpuemitter;
 
+/**
+	Spawns the particles on the vertices of a mesh.
+**/
 class MeshSpawnShader extends ComputeUtils {
 
 	public var mesh(default, null) : h3d.scene.Mesh;
 
+	/**
+		Sets the mesh, skinned or not.
+	**/
 	public function attachTo(m : h3d.scene.Mesh) {
 		if ( vbuf != null )
 			vbuf.dispose();
@@ -112,6 +118,9 @@ class MeshSpawnShader extends ComputeUtils {
 	}
 }
 
+/**
+	Spawns the particles of a GPU emitter on the vertices of its child skinned mesh (a sphere if none).
+**/
 class MeshSpawn extends SpawnShader {
 
 	override function makeShader() {

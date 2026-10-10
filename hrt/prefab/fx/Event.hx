@@ -1,34 +1,103 @@
 package hrt.prefab.fx;
 
+/**
+	A playing event.
+**/
 typedef EventInstance = {
-	evt: IEvent,
-	?play: Void->Void,
-	?stop: Void->Void,
-	?setTime: Float->Void,
-	?playing: Bool,
+	/**
+		The event.
+	**/
+	var evt : IEvent;
+	/**
+		Called when the event starts, or `null`.
+	**/
+	var ?play : Void->Void;
+	/**
+		Called when the event ends, or `null`.
+	**/
+	var ?stop : Void->Void;
+	/**
+		Called at each update with the time since the start of the event, or `null`.
+	**/
+	var ?setTime : Float->Void;
+	/**
+		Tells if the event is playing.
+	**/
+	var ?playing : Bool;
 };
 
+/**
+	An event of an FX timeline.
+**/
 interface IEvent {
+	/**
+		The name.
+	**/
 	var name : String;
+	/**
+		The start time, in seconds.
+	**/
 	var time(default, set) : Float;
+	/**
+		Hidden in the editor timeline.
+	**/
 	var hidden : Bool;
+	/**
+		Locked in the editor timeline.
+	**/
 	var lock : Bool;
+	/**
+		Selected in the editor timeline.
+	**/
 	var selected : Bool;
+	/**
+		Returns the prefab of the event.
+	**/
 	function getEventPrefab() : hrt.prefab.Prefab;
+	/**
+		Returns the duration, in seconds.
+	**/
 	function getDuration() : Float;
+	/**
+		Returns the event instance, or `null`.
+	**/
 	function prepare() : EventInstance;
 	#if editor
+	/**
+		Sets the duration (editor only).
+	**/
 	function setDuration(duration: Float) : Void;
+	/**
+		Returns the label of the event in the editor timeline (editor only).
+	**/
 	function getDisplayInfo(ctx: hide.prefab.EditContext) : { label: String, ?loop: Bool };
 	#end
 }
 
+/**
+	An event of an FX timeline, played between `time` and `time + duration`. Events named `loop` and `end` set the loop of the FX.
+**/
 @:prefabIcon(HuiRes.ui.icons.prefab.event)
 class Event extends hrt.prefab.Prefab implements IEvent {
+	/**
+		The start time, in seconds.
+	**/
 	@:s public var time(default, set): Float = 0.0;
+	/**
+		The duration, in seconds (`0` for none).
+	**/
 	@:s public var duration: Float = 0.0;
+	/**
+		Hidden in the editor timeline.
+	**/
 	public var hidden:Bool = false;
+	/**
+		Locked in the editor timeline.
+	**/
 	public var lock:Bool = false;
+	/**
+		Selected in the editor timeline.
+	**/
 	public var selected:Bool = false;
 
 	public function new(parent, shared: ContextShared) {
@@ -49,16 +118,25 @@ class Event extends hrt.prefab.Prefab implements IEvent {
 		return time;
 	}
 
+	/**
+		Returns `duration`.
+	**/
 	public function getDuration() {
 		return duration;
 	}
 
+	/**
+		Returns the event instance.
+	**/
 	public function prepare() : EventInstance {
 		return {
 			evt: this
 		};
 	}
 
+	/**
+		Plays and stops the events for the time going from `prevTime` to `time`, and sets their time. A time going back loops with `duration`.
+	**/
 	public static function updateEvents(evts: Array<EventInstance>, time: Float, prevTime: Float, duration: Float) {
 		if(evts == null) return;
 
@@ -94,6 +172,9 @@ class Event extends hrt.prefab.Prefab implements IEvent {
 		}
 	}
 
+	/**
+		Stops the playing events.
+	**/
 	public static function stopAllEvents(evts: Array<EventInstance>) {
 		if (evts == null)
 			return;
@@ -117,6 +198,9 @@ class Event extends hrt.prefab.Prefab implements IEvent {
 		);
 	}
 
+	/**
+		Returns this prefab.
+	**/
 	public function getEventPrefab() { return this; }
 
 	#if editor
@@ -141,6 +225,9 @@ class Event extends hrt.prefab.Prefab implements IEvent {
 		};
 	}
 
+	/**
+		Returns the label of the event in the editor timeline.
+	**/
 	public function getDisplayInfo(ctx: hide.prefab.EditContext) {
 		return {
 			label: name,
@@ -148,10 +235,16 @@ class Event extends hrt.prefab.Prefab implements IEvent {
 		};
 	}
 
+	/**
+		Returns `true`.
+	**/
 	public function canEditDuration() : Bool {
 		return true;
 	};
 
+	/**
+		Sets the duration (editor only).
+	**/
 	public function setDuration(duration: Float) {
 		this.duration = duration;
 
@@ -168,12 +261,30 @@ class Event extends hrt.prefab.Prefab implements IEvent {
 	static var _ = Prefab.register("event", Event);
 }
 
+/**
+	A 3D object event of an FX timeline.
+**/
 @:prefabIcon(HuiRes.ui.icons.prefab.event3d)
 class Event3D extends hrt.prefab.Object3D implements IEvent {
+	/**
+		The start time, in seconds.
+	**/
 	@:s public var time(default, set): Float = 0.0;
+	/**
+		The duration, in seconds (`0` for none).
+	**/
 	@:s public var duration: Float = 0.0;
+	/**
+		Hidden in the editor timeline.
+	**/
 	public var hidden:Bool = false;
+	/**
+		Locked in the editor timeline.
+	**/
 	public var lock:Bool = false;
+	/**
+		Selected in the editor timeline.
+	**/
 	public var selected:Bool = false;
 
 	public function new(parent, shared: ContextShared) {
@@ -184,16 +295,25 @@ class Event3D extends hrt.prefab.Object3D implements IEvent {
 		return time = v;
 	}
 
+	/**
+		Returns `duration`.
+	**/
 	public function getDuration() {
 		return duration;
 	}
 
+	/**
+		Returns the event instance.
+	**/
 	public function prepare() : EventInstance {
 		return {
 			evt: this
 		};
 	}
 
+	/**
+		Returns this prefab.
+	**/
 	public function getEventPrefab() { return this; }
 
 	#if editor
@@ -218,6 +338,9 @@ class Event3D extends hrt.prefab.Object3D implements IEvent {
 		};
 	}
 
+	/**
+		Returns the label of the event in the editor timeline.
+	**/
 	public function getDisplayInfo(ctx: hide.prefab.EditContext) {
 		return {
 			label: name,
@@ -225,10 +348,16 @@ class Event3D extends hrt.prefab.Object3D implements IEvent {
 		};
 	}
 
+	/**
+		Returns `true`.
+	**/
 	public function canEditDuration() : Bool {
 		return true;
 	};
 
+	/**
+		Sets the duration (editor only).
+	**/
 	public function setDuration(duration: Float) {
 		this.duration = duration;
 	};

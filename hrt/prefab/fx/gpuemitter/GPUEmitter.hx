@@ -1,46 +1,142 @@
 package hrt.prefab.fx.gpuemitter;
 
+/**
+	The space of the particles of a `GPUEmitter`.
+**/
 enum Mode {
+	/**
+		World space: the particles stay where they were emitted.
+	**/
 	World;
+	/**
+		The space of the emitter: the particles move with it.
+	**/
 	Local;
+	/**
+		A cube of size `cameraModeDistance` around the camera: the particles are spawned in it and wrap around it (rain, snow...).
+	**/
 	Camera;
 }
 
+/**
+	The orientation of the particles of a `GPUEmitter`.
+**/
 enum Align {
+	/**
+		Facing the camera.
+	**/
 	FaceCam;
+	/**
+		Along their speed.
+	**/
 	Speed;
 }
 
+/**
+	The initial speed of the particles of a `GPUEmitter`.
+**/
 enum SpeedMode {
+	/**
+		Along the normal of the spawn shape.
+	**/
 	Normal;
+	/**
+		No initial speed.
+	**/
 	None;
 }
 
+/**
+	The parameters of a `GPUEmitterObject`.
+**/
 typedef Data = {
+	/**
+		The maximum number of particles.
+	**/
 	var maxCount : Int;
+	/**
+		The number of particles emitted per second (`0` to emit all at once).
+	**/
 	var rate : Int;
+	/**
+		Respawns the particles when they die.
+	**/
 	var infinite : Bool;
+	/**
+		The maximum lifetime, in seconds.
+	**/
 	var maxLifeTime : Float;
+	/**
+		The minimum lifetime, in seconds.
+	**/
 	var minLifeTime : Float;
+	/**
+		The maximum size.
+	**/
 	var maxSize : Float;
+	/**
+		The minimum size.
+	**/
 	var minSize : Float;
+	/**
+		The initial speed (not used: see `minStartSpeed` and `maxStartSpeed`).
+	**/
 	var startSpeed : Float;
+	/**
+		The absolute transform of the particle mesh.
+	**/
 	var trs : h3d.Matrix;
+	/**
+		The transform of the particle mesh, without the template transform.
+	**/
 	var meshTransform : h3d.Matrix; // trs without the template transform
+	/**
+		The space of the particles.
+	**/
 	var mode : Mode;
+	/**
+		The size of the cube around the camera (`Camera` mode).
+	**/
 	var cameraModeDistance : Float;
+	/**
+		The orientation of the particles.
+	**/
 	var align : Align;
+	/**
+		The initial speed mode.
+	**/
 	var speedMode : SpeedMode;
+	/**
+		The maximum initial speed.
+	**/
 	var maxStartSpeed : Float;
+	/**
+		The minimum initial speed.
+	**/
 	var minStartSpeed : Float;
 }
 
+/**
+	A child of a `GPUEmitter` used as particle.
+**/
 typedef Template = {
+	/**
+		The meshes of the particle.
+	**/
 	var meshes : Array<h3d.scene.Mesh>;
+	/**
+		The made prefab.
+	**/
 	var prefab : hrt.prefab.Prefab;
+	/**
+		The emitters, one per mesh.
+	**/
 	var emitters : Array<GPUEmitterObject>;
 }
 
+/**
+	A particle emitter simulated on the GPU with compute shaders. Its children are the particles (one `GPUEmitterObject` per mesh), and its `SpawnShader` and `SimulationShader` children customize the spawn and the simulation.
+**/
 @:access(hrt.prefab.fx.gpuemitter.GPUEmitterObject)
 @:prefabIcon(HuiRes.ui.icons.prefab.gpu_emitter)
 @:prefabName("GPU Emitter")

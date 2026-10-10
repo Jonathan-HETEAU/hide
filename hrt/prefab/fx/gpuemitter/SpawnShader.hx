@@ -1,5 +1,8 @@
 package hrt.prefab.fx.gpuemitter;
 
+/**
+	A shader prefab added to the spawn of its parent `GPUEmitter`.
+**/
 @:prefabCategory("Spawn")
 @:prefabHideInAddMenu
 class SpawnShader extends hrt.prefab.Shader {

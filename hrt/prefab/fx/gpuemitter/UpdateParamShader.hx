@@ -1,5 +1,8 @@
 package hrt.prefab.fx.gpuemitter;
 
+/**
+	Updates an animated shader parameter of the particles from the baked animation texture.
+**/
 class UpdateParamShader extends hxsl.Shader {
 	static var SRC = {
 

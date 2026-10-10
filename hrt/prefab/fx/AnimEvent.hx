@@ -1,10 +1,25 @@
 package hrt.prefab.fx;
 
+/**
+	An FX event playing an animation on the first object of the event.
+**/
 class AnimEvent extends hrt.prefab.fx.Event {
 
+	/**
+		The path of the animation.
+	**/
 	@:s public var animation: String;
+	/**
+		Loops the animation.
+	**/
 	@:s public var loop: Bool = false;
+	/**
+		The speed of the animation.
+	**/
 	@:s public var speed : Float = 1.0;
+	/**
+		The time offset of the animation, in seconds.
+	**/
 	@:s public var offset : Float = 0.0;
 
 	var animTemplate : h3d.anim.Animation;

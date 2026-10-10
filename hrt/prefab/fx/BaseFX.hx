@@ -5,37 +5,85 @@ import hrt.prefab.fx.Value as Value;
 
 import hrt.prefab.fx.Evaluator;
 
+/**
+	An animated shader parameter.
+**/
 typedef ShaderParam = {
-	idx: Int,
-	def: hxsl.Ast.TVar,
-	value: Value
+	/**
+		The index of the parameter in the shader.
+	**/
+	var idx : Int;
+	/**
+		The variable of the parameter.
+	**/
+	var def : hxsl.Ast.TVar;
+	/**
+		The animated value.
+	**/
+	var value : Value;
 };
 
+/**
+	The animated properties of a light, by kind of light.
+**/
 enum AdditionalProperies {
+	/**
+		No animated property.
+	**/
 	None;
+	/**
+		The animated properties of a point light.
+	**/
 	PointLight(color : Value, power : Value, size : Value, range : Value );
+	/**
+		The animated properties of a spot light.
+	**/
 	SpotLight(color : Value, power : Value, range : Value, angle : Value, fallOff : Value );
+	/**
+		The animated properties of a directional light.
+	**/
 	DirLight(color : Value, power : Value);
 }
 
+/**
+	The animated parameters of a shader.
+**/
 typedef ShaderParams = Array<ShaderParam>;
 
 /*
 	Basic class used to animate custom properties with curves
 	in FX.
 */
+/**
+	Animates custom properties with curves in an FX.
+**/
 class CustomAnimation extends Evaluator {
 	/** This animation will need to keep being updated if setTime was called once **/
 	public var finishSync : Bool = false;
+	/**
+		Tells if `setTime` was called since the last reset.
+	**/
 	public var startedPlaying : Bool = false;
 
+	/**
+		Applies the values at `time`. Must be overridden.
+	**/
 	public function setTime(time: Float) {
 		throw "This method should overrided!";
 	}
 }
 
+/**
+	Animates the float properties of a renderer effect with their curves.
+**/
 class RendererFXAnimation extends CustomAnimation {
+	/**
+		The animated properties.
+	**/
 	public var params : Array<{field : hrt.prefab.Prefab.PrefabField, value : Value}>;
+	/**
+		The animated effect.
+	**/
 	public var rfx : hrt.prefab.rfx.RendererFX;
 
 	override public function setTime(time: Float) {
@@ -45,8 +93,17 @@ class RendererFXAnimation extends CustomAnimation {
 	}
 }
 
+/**
+	Animates the parameters of a `ScreenShaderGraph` with their curves.
+**/
 class ScreenShaderGraphFXAnimation extends CustomAnimation {
+	/**
+		The animated parameters.
+	**/
 	public var params : Array<{name : String, type: hxsl.Ast.Type, value : Value}>;
+	/**
+		The animated effect.
+	**/
 	public var rfx : hrt.prefab.rfx.ScreenShaderGraph;
 
 	static var vector4 = new h3d.Vector4();
@@ -82,8 +139,17 @@ class ScreenShaderGraphFXAnimation extends CustomAnimation {
 	}
 }
 
+/**
+	Animates the parameters of a shader with their curves.
+**/
 class ShaderAnimation extends CustomAnimation {
+	/**
+		The animated parameters.
+	**/
 	public var params : ShaderParams;
+	/**
+		The animated shader.
+	**/
 	public var shader : hxsl.Shader;
 	var vector4 = new h3d.Vector4();
 	var vector = new h3d.Vector();
@@ -114,6 +180,9 @@ class ShaderAnimation extends CustomAnimation {
 	}
 }
 
+/**
+	Animates the parameters of a `hxsl.DynamicShader` with their curves.
+**/
 class ShaderDynAnimation extends ShaderAnimation {
 	var tmpVector4 = new h3d.Vector4();
 	override function setTime(time: Float) {
@@ -153,37 +222,106 @@ class ShaderDynAnimation extends ShaderAnimation {
 	}
 }
 
+/**
+	The animated transform, color and visibility of an object of an FX, from the curves of its prefab.
+**/
 typedef ObjectAnimation = {
-	?elt: hrt.prefab.Object3D,
-	?obj: h3d.scene.Object,
-	?elt2d: hrt.prefab.Object2D,
-	?obj2d: h2d.Object,
-	?position: Value,
-	?localPosition: Value,
-	?scale: Value,
-	?rotation: Value,
-	?localRotation: Value,
-	?color: Value,
-	?visibility: Value,
-	?additionalProperies : AdditionalProperies
+	/**
+		The 3D prefab animated.
+	**/
+	var ?elt : hrt.prefab.Object3D;
+	/**
+		The 3D object animated.
+	**/
+	var ?obj : h3d.scene.Object;
+	/**
+		The 2D prefab animated.
+	**/
+	var ?elt2d : hrt.prefab.Object2D;
+	/**
+		The 2D object animated.
+	**/
+	var ?obj2d : h2d.Object;
+	/**
+		The position, added to the transform of the prefab.
+	**/
+	var ?position : Value;
+	/**
+		The position offset of the leaf objects of the prefab, in their local space.
+	**/
+	var ?localPosition : Value;
+	/**
+		The scale, applied before the transform of the prefab.
+	**/
+	var ?scale : Value;
+	/**
+		The rotation in degrees, applied before the transform of the prefab.
+	**/
+	var ?rotation : Value;
+	/**
+		The rotation in degrees of the leaf objects of the prefab, in their local space.
+	**/
+	var ?localRotation : Value;
+	/**
+		The color of the materials (only the alpha for a single curve).
+	**/
+	var ?color : Value;
+	/**
+		The visibility: visible above `0.5`.
+	**/
+	var ?visibility : Value;
+	/**
+		The animated properties of a light.
+	**/
+	var ?additionalProperies : AdditionalProperies;
 };
 
+/**
+	The common properties of the 3D and 2D FX prefabs.
+**/
 interface BaseFX {
 
+	/**
+		The duration of the FX, in seconds.
+	**/
 	@:s public var duration : Float;
+	/**
+		The delay before the FX starts, in seconds.
+	**/
 	@:s public var startDelay : Float;
+	/**
+		The script of the FX.
+	**/
 	@:c public var scriptCode : String;
+	/**
+		The radius of the culling sphere.
+	**/
 	@:c public var cullingRadius : Float;
+	/**
+		The time markers, in seconds.
+	**/
 	@:s public var markers : Array<{t: Float}>;
 
 	#if editor
+	/**
+		Rebuilds the object animations (editor only).
+	**/
 	public function refreshObjectAnims() : Void;
 	#end
 }
 
+/**
+	Helpers to build the animations of an FX.
+**/
 class BaseFXTools {
+	/**
+		Makes the animated shader parameters of the particles per instance in their `h3d.scene.MeshBatch`.
+	**/
 	public static var useAutoPerInstance = true;
 
+	/**
+		Returns the parameters of the shader prefab animated by curves (named after the parameters), or `null`.
+	**/
 	public static function makeShaderParams(basePrefab: hrt.prefab.Prefab, shaderDef: hxsl.SharedShader) {
 		if(shaderDef == null)
 			return null;
@@ -238,6 +376,9 @@ class BaseFXTools {
 		return ret;
 	}
 
+	/**
+		Returns the float properties of the renderer effect animated by curves (named after the properties), or `null`.
+	**/
 	public static function makeRendererFXParams(rfxElt: hrt.prefab.rfx.RendererFX) {
 		var classRfx = Type.getClass(cast rfxElt);
 		var originalProps : Array<Dynamic> = @:privateAccess Prefab.getSerializablePropsForClass(classRfx);
@@ -267,6 +408,9 @@ class BaseFXTools {
 	}
 
 	static var emptyParams : Array<String> = [];
+	/**
+		Adds the shader and renderer effect animations of the prefab and its children (except under emitters) to `anims`. The shaders are applied to `batch` if set.
+	**/
 	public static function getCustomAnimations(elt: PrefabElement, anims: Array<CustomAnimation>, ?batch: h3d.scene.MeshBatch) {
 		// Init all animations recursively except Emitter ones (called in Emitter)
 		if(Std.downcast(elt, hrt.prefab.fx.Emitter) == null) {
@@ -333,6 +477,9 @@ class BaseFXTools {
 		}
 	}
 
+	/**
+		Returns the first prefab named `FXRoot` in the tree, or `null`.
+	**/
 	public static function getFXRoot(elt : PrefabElement ) : PrefabElement {
 		if( elt.name == "FXRoot" )
 			return elt;
@@ -346,6 +493,9 @@ class BaseFXTools {
 	}
 
 	#if editor
+	/**
+		Does nothing (editor only).
+	**/
 	public function refreshObjectAnims() { }
 	#end
 }

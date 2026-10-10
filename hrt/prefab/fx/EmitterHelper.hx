@@ -2,14 +2,32 @@ package hrt.prefab.fx;
 
 import hrt.prefab.Curve;
 
+/**
+	The definition of an emitter parameter.
+**/
 typedef ParamDef = {
 	> hrt.prefab.Props.PropDef,
-	?animate: Bool,
-	?instance: Bool,
-	?groupName: String
+	/**
+		Can be animated by curves.
+	**/
+	var ?animate : Bool;
+	/**
+		Evaluated per particle.
+	**/
+	var ?instance : Bool;
+	/**
+		The group in the editor.
+	**/
+	var ?groupName : String;
 }
 
+/**
+	Helpers for the emitter parameters.
+**/
 class EmitterHelper {
+	/**
+		Returns the color value of the curves named `name` in `scope`, or `null`.
+	**/
 	public static function makeColor(scope: Prefab, name: String) {
 		var curves = hrt.prefab.Curve.getCurves(scope, name);
 		if(curves == null || curves.length == 0)
@@ -17,10 +35,16 @@ class EmitterHelper {
 		return hrt.prefab.Curve.getColorValue(curves);
 	}
 
+	/**
+		Returns the name of the random variation property of a parameter.
+	**/
 	public static function randProp(name: String) {
 		return name + "_rand";
 	}
 
+	/**
+		Sets the property of the parameter to its default value (copied for an array).
+	**/
 	public static function resetParam(props : Dynamic, param: ParamDef) {
 		if(param.def is Array)
 			Reflect.setProperty(props, param.name, cast(param.def, Array<Dynamic>).copy());
@@ -28,6 +52,9 @@ class EmitterHelper {
 			Reflect.setProperty(props, param.name, param.def);
 	}
 
+	/**
+		Returns the array as an `Array<Float>`, or `null`.
+	**/
 	public static function toArray( v : Dynamic ) : Array<Float> {
 		if( v == null )
 			return null;
@@ -35,6 +62,9 @@ class EmitterHelper {
 		return [for( x in a ) (x : Float)];
 	}
 
+	/**
+		Tells if the two arrays have the same values.
+	**/
 	public static function sameArray( a : Array<Float>, b : Array<Float> ) {
 		if( a == null || b == null )
 			return a == b;
@@ -46,6 +76,9 @@ class EmitterHelper {
 		return true;
 	}
 
+	/**
+		Returns the value of the parameter `name` in `props` (or its random variation if `rand`), or its default value. Vectors are returned as `h3d.Vector`.
+	**/
 	public static function getParamVal(params: Map<String, ParamDef>, props: Dynamic, name: String, rand: Bool=false) : Dynamic {
 		var param = params.get(name);
 		if(param == null)
@@ -66,6 +99,9 @@ class EmitterHelper {
 	}
 
 	#if editor
+	/**
+		Builds the editor properties of the parameters (editor only).
+	**/
 	public static function generateEdit(params : Array<ParamDef>, instanceParams : Array<ParamDef>, props : Dynamic, properties : hide.comp.PropsEditor, onChange : (?pname : String) -> Void, refresh : Void -> Void, typed = false) {
 		inline function isSet(name: String) return typed ? Reflect.getProperty(props, name) != null : Reflect.hasField(props, name);
 		inline function unset(name: String) if( typed ) Reflect.setProperty(props, name, null) else Reflect.deleteField(props, name);

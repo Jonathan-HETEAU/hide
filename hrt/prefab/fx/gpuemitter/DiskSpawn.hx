@@ -1,5 +1,8 @@
 package hrt.prefab.fx.gpuemitter;
 
+/**
+	Spawns the particles on a disk.
+**/
 class DiskSpawnShader extends ComputeUtils {
 
 	static var SRC = {
@@ -18,6 +21,9 @@ class DiskSpawnShader extends ComputeUtils {
 	}
 }
 
+/**
+	Spawns the particles of a GPU emitter on a horizontal disk.
+**/
 class DiskSpawn extends SpawnShader {
 	@:s var minRadius : Float = 0.2;
 	@:s var maxRadius : Float = 1.0;

@@ -1,5 +1,8 @@
 package hrt.prefab.fx.gpuemitter;
 
+/**
+	Gives the particles a random color.
+**/
 class RandomColorSpawnShader extends ComputeUtils {
 	static var SRC = {
 
@@ -19,6 +22,9 @@ class RandomColorSpawnShader extends ComputeUtils {
 	}
 }
 
+/**
+	Gives the particles of a GPU emitter a random color between two colors.
+**/
 class RandomColorSpawn extends SpawnShader {
 
 	@:s var color1 : Int = 0xFFFFFFFF;

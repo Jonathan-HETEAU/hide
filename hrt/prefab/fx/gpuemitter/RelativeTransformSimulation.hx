@@ -1,5 +1,8 @@
 package hrt.prefab.fx.gpuemitter;
 
+/**
+	Applies a transform to the particles.
+**/
 class RelativeTransformSimulationShader extends ComputeUtils {
 
 	override function onRemove(emitter : GPUEmitterObject) {
@@ -88,6 +91,9 @@ class RelativeTransformSimulationShader extends ComputeUtils {
 	}
 }
 
+/**
+	Applies a transform (position, scale, rotation, speed) to the particles of a GPU emitter.
+**/
 class RelativeTransformSimulation extends SimulationShader {
 
 	@:s var x : Float = 0.0;

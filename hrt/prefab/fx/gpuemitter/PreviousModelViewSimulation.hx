@@ -1,5 +1,8 @@
 package hrt.prefab.fx.gpuemitter;
 
+/**
+	Stores the previous transform of the particles, for the motion vectors.
+**/
 class PreviousModelViewSimulation extends hxsl.Shader {
 	static var SRC = {
 		@param var batchBuffer : RWPartialBuffer<{
