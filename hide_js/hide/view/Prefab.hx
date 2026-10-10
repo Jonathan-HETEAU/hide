@@ -178,7 +178,7 @@ class PrefabSceneEditor extends hide.comp.SceneEditor {
 }
 
 /**
-	The prefab view (`.prefab` and `.l3d` files): scene, prefab tree and properties.
+	The prefab view (`.prefab`, `.l3d`, `.matlib` and `.rp` files): scene, prefab tree and properties.
 **/
 @:keep
 class Prefab extends hide.view.FileView {

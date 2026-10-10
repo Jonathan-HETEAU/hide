@@ -1,17 +1,41 @@
 package hide.comp;
 
+/**
+	The direction a panel is resized in.
+**/
 enum LayoutDirection {
+	/**
+		The width.
+	**/
 	Horizontal;
+	/**
+		The height.
+	**/
 	Vertical;
 }
 
+/**
+	Where the splitter of a resizable panel is.
+**/
 enum SplitterPosition {
+	/**
+		Before the panel.
+	**/
 	Before;
+	/**
+		After the panel.
+	**/
 	After;
 }
 
+/**
+	A panel resized with a splitter. Its size is saved in the display state.
+**/
 class ResizablePanel extends hide.comp.Component {
 
+	/**
+		The direction the panel is resized in.
+	**/
 	public var layoutDirection(default, set) : LayoutDirection;
 	var splitter : Element;
 
@@ -24,6 +48,9 @@ class ResizablePanel extends hide.comp.Component {
 
 	var splitterPosition : SplitterPosition;
 
+	/**
+		Makes an element a resizable panel.
+	**/
 	public function new(direction : LayoutDirection, element : Element, splitterPosition : SplitterPosition = Before) {
 		super(null, element);
 		splitter = new Element('<div class="splitter"><div class="drag-handle"></div></div>');
@@ -68,6 +95,9 @@ class ResizablePanel extends hide.comp.Component {
 		});
 	}
 
+	/**
+		Sets the size (by default the saved one), clamped to the CSS min and max sizes.
+	**/
 	public function setSize(?newSize : Int) {
 		onBeforeResize();
 
@@ -89,6 +119,12 @@ class ResizablePanel extends hide.comp.Component {
 		onResize(); //@:privateAccess if( scene.window != null) scene.window.checkResize();
 	}
 
+    /**
+    	Called before a resize.
+    **/
     public dynamic function onBeforeResize() {}
+    /**
+    	Called after a resize.
+    **/
     public dynamic function onResize() {}
 }

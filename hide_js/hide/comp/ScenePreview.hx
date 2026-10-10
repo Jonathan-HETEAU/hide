@@ -1,27 +1,48 @@
 package hide.comp;
 
+/**
+	The saved settings of a `ScenePreview`.
+**/
 class ScenePreviewSettings {
+    /**
+    	The path of the previewed model or prefab.
+    **/
     public var modelPath: String = null;
+	/**
+		The path of the render props.
+	**/
 	public var renderPropsPath: String = null;
 
+    /**
+    	Creates the default settings.
+    **/
     public function new() {};
 }
 
 /**
 	A Scene that is specialised to load one prefab or mesh for preview.
-	Stores
+	Stores its settings (model and render props) in the display state.
 **/
 class ScenePreview extends Scene {
 	var cameraController : hide.comp.Scene.PreviewCamController;
 	var previewSettings : ScenePreviewSettings;
 
-	public var prefab(default, null) : hrt.prefab.Prefab; // The root prefab of the preview.
+	/**
+		The root prefab of the preview.
+	**/
+	public var prefab(default, null) : hrt.prefab.Prefab;
 
+	/**
+		Creates the preview. `save` is the display state key of the settings.
+	**/
 	public function new(config, parent, el, save: String) {
 		this.saveDisplayKey = save;
 		super(config, parent, el);
 	}
 
+	/**
+		Adds the toolbar choosing the model and render props.
+	**/
 	public function addToolbar() {
 		var toolbar = new Element('
 		<div class="hide-toolbar2">
@@ -75,6 +96,9 @@ class ScenePreview extends Scene {
 
 	}
 
+	/**
+		Returns the meshes that can be previewed. Default is none.
+	**/
 	public dynamic function listLoadableMeshes() : Array<{label: String, path: String}> {
 		return [];
 	}
@@ -117,6 +141,9 @@ class ScenePreview extends Scene {
 		return listRenderPropsStatic(config);
 	}
 
+	/**
+		Returns the render props of the `scene.renderProps` config.
+	**/
 	static public function listRenderPropsStatic(config: hide.Config) : Array<{name: String, value: String}> {
 		var renderProps = config.getLocal("scene.renderProps");
 		var ret : Array<{name: String, value: String}> = [];
@@ -146,6 +173,9 @@ class ScenePreview extends Scene {
 		saveSettings();
 	}
 
+	/**
+		Frames the previewed object.
+	**/
 	public function resetPreviewCamera() {
 		if (prefab == null)
 			return;
@@ -166,10 +196,16 @@ class ScenePreview extends Scene {
 		reloadObject();
 	}
 
+	/**
+		Returns the path of the previewed object.
+	**/
 	public function getObjectPath() : String {
 		return previewSettings.modelPath;
 	}
 
+	/**
+		Reloads the previewed object.
+	**/
 	public function reloadObject() {
 		if (prefab != null) {
 			prefab.dispose();
