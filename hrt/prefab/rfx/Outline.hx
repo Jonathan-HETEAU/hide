@@ -1,9 +1,8 @@
 package hrt.prefab.rfx;
-@:access(h3d.scene.Renderer)
-
 /**
 	Draws an outline around the objects drawn in the `highlight` passes.
 **/
+@:access(h3d.scene.Renderer)
 class Outline extends RendererFX {
 	/**
 		The color of the outline, as RGB.
