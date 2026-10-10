@@ -1,26 +1,65 @@
 package hide.view.l3d;
 
+/**
+	A transformation of the 2D gizmo.
+**/
 enum Transform2D {
+	/**
+		Moves.
+	**/
 	Pan;
+	/**
+		Scales on both axes.
+	**/
 	Scale;
+	/**
+		Scales on the X axis.
+	**/
 	ScaleX;
+	/**
+		Scales on the Y axis.
+	**/
 	ScaleY;
+	/**
+		Rotates.
+	**/
 	Rotation;
 }
 
+/**
+	The 2D transform gizmo: moves, scales and rotates the selected 2D objects.
+**/
 class Gizmo2D extends h2d.Object {
 
 	var int : h2d.Interactive;
 	var gr : h2d.Graphics;
 	var scaleSign = 1;
 
+	/**
+		Not used by the gizmo.
+	**/
 	public var scaleAmount = 1.01;
 
+	/**
+		Called when a transformation starts.
+	**/
 	public var onStartMove : Transform2D -> Void;
+	/**
+		Called with the transformation during a move.
+	**/
 	public var onMove: { x : Float, y : Float, scaleX : Float, scaleY : Float, rotation : Float } -> Void;
+	/**
+		Called when the transformation ends.
+	**/
 	public var onFinishMove: Void -> Void;
+	/**
+		True during a transformation.
+	**/
 	public var moving(default, null): Bool;
 
+	/**
+		Creates the gizmo.
+	**/
 	public function new(?parent) {
 		super(parent);
 		int = new h2d.Interactive(0,0,this);
@@ -61,6 +100,9 @@ class Gizmo2D extends h2d.Object {
 		gr = new h2d.Graphics(this);
 	}
 
+	/**
+		Starts a transformation with the mouse.
+	**/
 	public function startMove( t : Transform2D ) {
 		var scene = getScene();
 		var dragStartX = scene.mouseX;
@@ -132,6 +174,9 @@ class Gizmo2D extends h2d.Object {
 		return Pan;
 	}
 
+	/**
+		Sets the size of the gizmo frame.
+	**/
 	public function setSize(w : Float, h : Float) {
 		w = Math.ceil(w/2)*2;
 		h = Math.ceil(h/2)*2;

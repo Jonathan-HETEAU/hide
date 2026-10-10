@@ -3,23 +3,59 @@ package hide.view;
 import hide.tools.FileManager;
 import hide.tools.FileManager.FileEntry;
 
+/**
+	A favorite of the file browser.
+**/
 typedef FavoriteEntry = {
-	parent : FavoriteEntry,
-	children : Array<FavoriteEntry>,
-	?ref : FileEntry,
+	/**
+		The parent entry.
+	**/
+	var parent : FavoriteEntry;
+	/**
+		The child entries.
+	**/
+	var children : Array<FavoriteEntry>;
+	/**
+		The file of the favorite.
+	**/
+	var ?ref : FileEntry;
 }
 
+/**
+	The saved state of the file browser.
+**/
 typedef FileBrowserState = {
-	savedLayout: Layout,
+	/**
+		The layout.
+	**/
+	var savedLayout : Layout;
 }
 
+/**
+	The layout of the file browser.
+**/
 enum abstract Layout(String) {
+	/**
+		Only the tree.
+	**/
 	var SingleTree;
+	/**
+		Only the thumbnails.
+	**/
 	var SingleMiniature;
+	/**
+		The tree above the thumbnails.
+	**/
 	var Vertical;
+	/**
+		The tree left of the thumbnails.
+	**/
 	var Horizontal;
 }
 
+/**
+	The file browser view: tree and thumbnails of the resources, with favorites, search and version control status.
+**/
 class FileBrowser extends hide.ui.View<FileBrowserState> {
 	static var FAVORITES_KEY = "filebrowser_favorites";
 
@@ -344,6 +380,9 @@ class FileBrowser extends hide.ui.View<FileBrowserState> {
 		return !entry.ignored;
 	}
 
+	/**
+		Refreshes the version control status.
+	**/
 	public function refreshVCS() {
 		fancyTree.queueRefresh();
 		fancyGallery.queueRefresh();
@@ -367,6 +406,9 @@ class FileBrowser extends hide.ui.View<FileBrowserState> {
 		return '<div class="ico ico-file ${vcsClass}" title="Unknown"></div>';
 	}
 
+	/**
+		Returns the HTML of the thumbnail of a file.
+	**/
 	static public function getThumbnail(item : FileEntry) {
 			if (item.kind == Dir) {
 				return '<fancy-image style="background-image:url(\'res/icons/svg/big_folder.svg\')"></fancy-image>';
@@ -1115,6 +1157,9 @@ class FileBrowser extends hide.ui.View<FileBrowserState> {
 		return roots;
 	}
 
+	/**
+		Shows and selects a file.
+	**/
 	public function reveal(path: String) {
 		var item = FileManager.inst.getFileEntry(path);
 		if (item == null)

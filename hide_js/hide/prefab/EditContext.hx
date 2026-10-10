@@ -4,15 +4,24 @@ package hide.prefab;
 import hrt.prefab.Prefab;
 #end
 
+/**
+	The context of the prefab edition: scene, properties panel, undo and updates.
+**/
 class EditContext {
 	#if !macro
 
 	#if editor
 
+	/**
+		The root prefab.
+	**/
 	public var rootPrefab : hrt.prefab.Prefab;
 
 	var undo : hide.ui.UndoHistory;
 
+	/**
+		Creates a context with an undo history.
+	**/
 	public function new(undo: hide.ui.UndoHistory) {
 		this.undo = undo;
 	}
@@ -22,13 +31,28 @@ class EditContext {
 	**/
 	var updates : Array<Float->Void> = [];
 
+	/**
+		The IDE.
+	**/
 	public var ide(get,never) : hide.Ide;
+	/**
+		The scene.
+	**/
 	public var scene : hide.comp.Scene;
+	/**
+		The properties panel.
+	**/
 	public var properties : hide.comp.PropsEditor;
+	/**
+		The functions called by `SceneEditor.cleanup` (when the edition is rebuilt).
+	**/
 	public var cleanups : Array<Void->Void>;
 
 	function get_ide() return hide.Ide.inst;
 
+	/**
+		Called when a property of a prefab changes: updates the instance and notifies the parents.
+	**/
 	public function onChange(p : Prefab, propName : String) {
 		p.updateInstance(propName);
 
@@ -40,15 +64,24 @@ class EditContext {
 		}
 	}
 
+	/**
+		Returns the properties of a prefab. Throws: to override.
+	**/
 	public function getCurrentProps( p : Prefab ) : Element {
 		throw "Not implemented";
 		return null;
 	}
 
+	/**
+		Adds a function called each frame.
+	**/
 	public function addUpdate( f : (dt:Float) -> Void ) {
 		updates.push(f);
 	}
 
+	/**
+		Removes a function added by `addUpdate`.
+	**/
 	public function removeUpdate( f : (dt:Float) -> Void ) {
 		for( f2 in updates )
 			if( Reflect.compareMethods(f,f2) ) {
@@ -57,6 +90,9 @@ class EditContext {
 			}
 	}
 
+	/**
+		Applies changes to a prefab as an undoable step (saving its data before).
+	**/
 	public function makeChanges( p : Prefab, f : Void -> Void ) @:privateAccess {
 		var current = p.save();
 
@@ -171,6 +207,9 @@ class EditContext {
 	function refreshTreeImpl() {
 	}
 
+	/**
+		Returns the paths of the named objects and joints of the scene.
+	**/
 	public function getNamedObjects( ?exclude : h3d.scene.Object ) {
 		var out = [];
 
@@ -207,11 +246,17 @@ class EditContext {
 
 #if domkit
 
+/**
+	The `EditContext2` of the HIDE editor, wrapping an `EditContext`.
+**/
 @:access(hide.prefab.EditContext)
 class HideJsEditContext2 extends hrt.prefab.EditContext2 {
 	var ctx : EditContext;
 	var saveKey: String;
 
+	/**
+		Creates the context.
+	**/
 	public function new(parent: hrt.prefab.EditContext2, ctx: EditContext) {
 		super(parent);
 		this.ctx = ctx;

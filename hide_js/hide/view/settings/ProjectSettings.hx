@@ -1,29 +1,74 @@
 package hide.view.settings;
 
+/**
+	A `props.json` file of the project.
+**/
 typedef LocalSetting = {
+	/**
+		The folder of the file.
+	**/
 	var folder : String;
+	/**
+		The path of the file.
+	**/
 	var file : String;
+	/**
+		The content of the file.
+	**/
 	var content : Dynamic;
 }
 
+/**
+	Shows only the settings files with an entry.
+**/
 enum Filter {
+	/**
+		All the files.
+	**/
 	NONE;
+	/**
+		The files with material libraries.
+	**/
 	MATLIB;
+	/**
+		The files with render props.
+	**/
 	RENDERPROPS;
+	/**
+		The files with conversion settings.
+	**/
 	CONVERT;
 }
 
+/**
+	The project settings view: lists the `props.json` files of the project and edits their material libraries, render props and conversion settings.
+**/
 class ProjectSettings extends hide.ui.View<{}> {
+	/**
+		The name of the settings files.
+	**/
 	public static var SETTINGS_FILE = "props.json";
 
+	/**
+		The entry of the material libraries.
+	**/
 	public static var MATLIB_ENTRY = "materialLibraries";
+	/**
+		The entry of the render props.
+	**/
 	public static var RENDERPROPS_ENTRY = "scene.renderProps";
+	/**
+		The entry of the conversion settings.
+	**/
 	public static var CONVERT_ENTRY = "fs.convert";
 
 	var settings : Array<LocalSetting>;
 	var currentFilter = Filter.NONE;
 	var loading = false;
 
+	/**
+		Creates the view.
+	**/
 	public function new( ?state ) {
 		super(state);
 		settings = null;
