@@ -12,8 +12,14 @@ import hide.comp.cdb.DataFiles;
 
 
 
+/**
+	The popup choosing the shown kinds of objects in the prefab view.
+**/
 class FiltersPopup extends hide.comp.Popup {
 	var editor:Prefab;
+	/**
+		Creates the popup of a set of filters.
+	**/
 	public function new(?parent:Element, editor:Prefab, filters:Map<String, Bool>, type:String) {
 		super(parent);
 		this.editor = editor;
@@ -48,10 +54,16 @@ class FiltersPopup extends hide.comp.Popup {
 		}
 	}
 }
+/**
+	The scene editor of the prefab view.
+**/
 @:access(hide.view.Prefab)
 class PrefabSceneEditor extends hide.comp.SceneEditor {
 	var parent : Prefab;
 
+	/**
+		Creates the scene editor of a view.
+	**/
 	public function new(view) {
 		super(view);
 		parent = cast view;
@@ -165,9 +177,15 @@ class PrefabSceneEditor extends hide.comp.SceneEditor {
 	}
 }
 
+/**
+	The prefab view (`.prefab` and `.l3d` files): scene, prefab tree and properties.
+**/
 @:keep
 class Prefab extends hide.view.FileView {
 
+	/**
+		The scene editor.
+	**/
 	public var sceneEditor : PrefabSceneEditor;
 	var data : hrt.prefab.Prefab;
 
@@ -191,6 +209,9 @@ class Prefab extends hide.view.FileView {
 
 	var scene(get, null):  hide.comp.Scene;
 	function get_scene() return sceneEditor.scene;
+	/**
+		The properties panel.
+	**/
 	public var properties(get, null):  hide.comp.PropsEditor;
 	function get_properties() return sceneEditor.properties;
 
@@ -412,6 +433,9 @@ class Prefab extends hide.view.FileView {
 		setRenderPropsEditionVisibility(Ide.inst.currentConfig.get("sceneeditor.renderprops.edit", false));
 	}
 
+	/**
+		Hides the tree and properties columns.
+	**/
 	public function hideColumns(?_) {
 		element.find(".tree-column").first().hide();
 		element.find(".props-column").first().hide();
@@ -422,6 +446,9 @@ class Prefab extends hide.view.FileView {
 		@:privateAccess if( scene.window != null) scene.window.checkResize();
 	}
 
+	/**
+		Shows the tree and properties columns.
+	**/
 	public function showColumns(?_) {
 		element.find(".tree-column").first().show();
 		element.find(".props-column").first().show();
@@ -451,6 +478,9 @@ class Prefab extends hide.view.FileView {
 		@:privateAccess if( scene.window != null) scene.window.checkResize();
 	}
 
+	/**
+		Loads the prefab once the scene is ready.
+	**/
 	public function onSceneReady() {
 		if (state.path != null) {
 			data = hxd.res.Loader.currentInstance.load(state.path).toPrefab().loadBypassCache();
@@ -587,6 +617,9 @@ class Prefab extends hide.view.FileView {
 		return data != null;
 	}
 
+	/**
+		Removes the empty optional CDB values of a prefab and its children, keeping them in `optionalBackup`.
+	**/
 	public static function cleanupPrefabCdb(prefab: hrt.prefab.Prefab, optionalBackup: hide.comp.cdb.Editor.OptionalBackup) {
 		var cdbType = prefab.getCdbType();
 
@@ -814,6 +847,9 @@ class Prefab extends hide.view.FileView {
 		}
 	}
 
+	/**
+		Returns the prefab view editing a prefab of a connected game, or null.
+	**/
 	public static function getRemoteView(remoteId: String) : hide.view.Prefab {
 		var ide = hide.Ide.inst;
 		return ide.getViews(hide.view.Prefab).find((v) -> (v.state:Dynamic).remoteId == remoteId);
@@ -971,6 +1007,9 @@ class Prefab extends hide.view.FileView {
 		}
 	}
 
+	/**
+		Shows or hides the render props edition.
+	**/
 	public function setRenderPropsEditionVisibility(visible : Bool) {
 		var renderPropsEditionEl = this.element.find('.render-props-edition');
 

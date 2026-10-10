@@ -1,15 +1,27 @@
 package hide.comp;
 
+/**
+	The saved state of a `FancyArray` item.
+**/
 typedef FancyItemState = {
-	?open: Bool,
+	/**
+		The item is expanded.
+	**/
+	var ?open : Bool;
 }
 
+/**
+	A list component of collapsible items that can be added, removed, renamed and reordered by drag and drop.
+**/
 class FancyArray<T> extends hide.comp.Component {
 	var itemState : Array<FancyItemState>;
 	var name : String;
 	var fancyItems: Element;
 	var itemsElements : Array<Element> = [];
 
+	/**
+		Creates a list. `displayKey` saves the expanded states.
+	**/
 	public function new(parent: Element = null, e: Element = null, name: String, displayKey: String) {
 		if (e == null)
 			e = new Element("<fancy-array></fancy-array>");
@@ -28,6 +40,9 @@ class FancyArray<T> extends hide.comp.Component {
 	}
 
 	var dragKeyName : String;
+	/**
+		Returns the drag data key of the list items.
+	**/
 	public function getDragKeyName() {
 		if (dragKeyName == null)
 			dragKeyName = '$name:index'.toLowerCase();
@@ -49,12 +64,18 @@ class FancyArray<T> extends hide.comp.Component {
 		saveDisplayState("state", haxe.Json.stringify(itemState));
 	}
 
+	/**
+		Expands or collapses an item.
+	**/
 	public function toggleItem(index:Int, ?forceState: Bool) {
 		itemState[index].open = forceState ?? !itemState[index].open;
 		saveState();
 		fancyItems.children()[index].classList.toggle("open", itemState[index].open);
 	}
 
+	/**
+		Rebuilds the list.
+	**/
 	public function refresh() : Void {
 		fancyItems.empty();
 		var items = getItems();
@@ -203,6 +224,9 @@ class FancyArray<T> extends hide.comp.Component {
 		}
 	}
 
+	/**
+		Returns the menu of an item.
+	**/
 	public function getDropdownMenu(index: Int) : Array<hrt.ui.HuiMenu.MenuItem> {
 		var menu : Array<hrt.ui.HuiMenu.MenuItem> = [];
 
@@ -214,6 +238,9 @@ class FancyArray<T> extends hide.comp.Component {
 	}
 
 	// Open target item index, and make it flash briefly
+	/**
+		Expands an item and collapses the others.
+	**/
 	public function reveal(index: Int) {
 		for (i => param in itemsElements) {
 			toggleItem(i, i == index);
@@ -227,12 +254,18 @@ class FancyArray<T> extends hide.comp.Component {
 	}
 
 	// Focus the title bar of the given index for editing
+	/**
+		Starts editing the name of an item.
+	**/
 	public function editTitle(index: Int) {
 		var a = itemsElements[index].find(".title-text");
 		a.focus();
 		a.select();
 	}
 
+	/**
+		Moves an item. If left null, the items can't be reordered.
+	**/
 	public var reorderItem : (oldIndex: Int, newIndex: Int) -> Void = null;
 
 	/**
@@ -261,10 +294,16 @@ class FancyArray<T> extends hide.comp.Component {
 	**/
 	public var customizeHeader: (item: T, header: Element) -> Void;
 
+	/**
+		Returns the items. Default is none.
+	**/
 	public dynamic function getItems() : Array<T> {
 		return [];
 	}
 
+	/**
+		Returns the name of an item.
+	**/
 	public dynamic function getItemName(item: T) : String {
 		return null;
 	}

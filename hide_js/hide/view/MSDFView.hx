@@ -19,12 +19,27 @@ private class MSDFViewerShader extends h3d.shader.AlphaMSDF {
 	}
 }
 
+/**
+	What the MSDF view shows.
+**/
 enum MSDFViewMode {
+	/**
+		The text rendered from the distance field.
+	**/
 	MSDF;
+	/**
+		The distance field texture.
+	**/
 	Raw;
+	/**
+		Both, split by a slider.
+	**/
 	Comparison;
 }
 
+/**
+	The view of SVG files as multi-channel signed distance fields.
+**/
 class MSDFView extends FileView {
 
 	var bmp : h2d.Bitmap;
@@ -231,6 +246,9 @@ class MSDFView extends FileView {
 		updateSliderVisual();
 	}
 
+	/**
+		Called when the texture is loaded.
+	**/
 	public function onTextureLoaded(texture: Null<h3d.mat.Texture>) {
 		scene.element.on("wheel", function(_) {
 			updateSliderVisual();
@@ -258,6 +276,9 @@ class MSDFView extends FileView {
 		onResize();
 	}
 
+	/**
+		Applies the view mode to the preview.
+	**/
 	public function applyShaderConfiguration() {
 		switch (this.viewMode) {
 			case  MSDF:
@@ -329,6 +350,9 @@ class MSDFView extends FileView {
 		}
 	}
 
+	/**
+		Disposes the scene and the preview.
+	**/
 	public function cleanUp() {
 		if (scene != null)
 			scene.dispose();
@@ -343,11 +367,17 @@ class MSDFView extends FileView {
 		shader = null;
 	}
 
+	/**
+		Rounds a number to `precision` decimals.
+	**/
 	public function floatToStringPrecision(number:Float, ?precision=2) {
 		number *= Math.pow(10, precision);
 		return Math.round(number) / Math.pow(10, precision);
 	}
 
+	/**
+		Updates the comparison slider to the zoom.
+	**/
 	public function updateSliderVisual() {
 		var cam2d = Std.downcast(cam, hide.view.l3d.CameraController2D);
 		if (cam2d != null && sliderBmp != null) {
@@ -360,6 +390,9 @@ class MSDFView extends FileView {
 		// todo : handle slider zoom for cam 3d
 	}
 
+	/**
+		Draws the comparison slider.
+	**/
 	public function drawSlider() {
 		if (sliderBmp == null)
 			sliderBmp = new h2d.Graphics(scene.s2d);
@@ -372,6 +405,9 @@ class MSDFView extends FileView {
 		updateSliderVisual();
 	}
 
+	/**
+		Shows the texture of a file.
+	**/
 	public function replaceTexture(path : String) {
 		var bytes = sys.io.File.getBytes(path);
 		var res = hxd.res.Any.fromBytes(path, bytes);

@@ -1,17 +1,41 @@
 package hide.comp;
 
+/**
+	The side a detachable panel is resized from.
+**/
 enum Side {
+	/**
+		Not resizing.
+	**/
 	None;
+	/**
+		The left side.
+	**/
 	Left;
+	/**
+		The right side.
+	**/
 	Right;
+	/**
+		The top side.
+	**/
 	Top;
+	/**
+		The bottom side.
+	**/
 	Bottom;
 }
 
+/**
+	A panel that can be detached from the layout and floated over the view, then moved and resized.
+**/
 class DetachablePanel extends hide.comp.Component {
 	// don't touch the width ? on resize check the new height to not go beyond min bottom
 
 	var currentSide = Side.None;
+	/**
+		The CSS position of the detached panel by default.
+	**/
 	public var defaultState = {
 		left : "20%",
 		right : "620px",
@@ -19,9 +43,18 @@ class DetachablePanel extends hide.comp.Component {
 		top : "unset",
 		width : "unset",
 	};
+	/**
+		The minimum width of the detached panel.
+	**/
 	public var minWidth = 300;
+	/**
+		Not used by the panel.
+	**/
 	public var minBottom = 20;
 
+	/**
+		Creates the panel.
+	**/
 	public function new(?parent : Element, ?el : Element) {
 		super(parent, el);
 		element.addClass("detachable-panel");
@@ -123,11 +156,17 @@ class DetachablePanel extends hide.comp.Component {
 			saveDisplayState("detachedOffsets", toSave);
 	}
 
+	/**
+		Restores the default position of the detached panel.
+	**/
 	public function resetLayout() {
 		element.css(defaultState);
 		saveDisplayState("detachedOffsets", {});
 	}
 
+	/**
+		Detaches the panel, or puts it back in the layout.
+	**/
 	public function setDetached(val) {
 		element.toggleClass("detached", val);
 		if( val ) {
