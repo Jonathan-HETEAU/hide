@@ -1,43 +1,105 @@
 package hide.comp.cdb;
 
+/**
+	A rectangle of selected cells. `x1` is -1 when whole lines are selected.
+**/
 typedef Selection = {
+	/**
+		The first column index, or -1 for whole lines.
+	**/
 	var x1 : Int;
+	/**
+		The first line index.
+	**/
 	var y1 : Int;
+	/**
+		The last column index.
+	**/
 	var x2 : Int;
+	/**
+		The last line index.
+	**/
 	var y2 : Int;
+	/**
+		The cell where the selection started.
+	**/
 	var ?origin : { x: Int, y: Int };
 }
 
+/**
+	A saved cursor position.
+**/
 typedef CursorState = {
+	/**
+		The path of the sheet.
+	**/
 	var sheet : String;
+	/**
+		The column index, or -1 for the whole line.
+	**/
 	var x : Int;
+	/**
+		The line index.
+	**/
 	var y : Int;
+	/**
+		The selection.
+	**/
 	var selection : Array<Selection>;
 }
 
+/**
+	The cursor and selection of a CDB editor, with the history of the positions.
+**/
 class Cursor {
 	var editor : Editor;
+	/**
+		The table of the cursor.
+	**/
 	public var table : Table;
+	/**
+		The column index, or -1 for the whole line.
+	**/
 	public var x : Int;
+	/**
+		The line index.
+	**/
 	public var y : Int;
+	/**
+		The selection, or null.
+	**/
 	public var selection : Array<Selection>;
 
-	// Jump to last / next cursor position with alt keys
+	/**
+		The current index in `states`.
+	**/
 	public var stateIdx : Int = -1;
+	/**
+		The history of the cursor positions, to jump back and forth with the alt keys.
+	**/
 	public var states : Array<CursorState> = [];
 
 	var marked : Array<{ el : js.html.Element, cls : String }> = [];
 
+	/**
+		Creates the cursor of an editor.
+	**/
 	public function new(editor) {
 		this.editor = editor;
 		set();
 	}
 
 
+	/**
+		Moves the cursor (in the first table if `table` is null), scrolls to it and saves the state.
+	**/
 	public function setDefault(table : Table, x : Int, y : Int) {
 		set(table == null ? editor.tables[0] : table, x, y, null, true, true, true);
 	}
 
+	/**
+		Moves the cursor to a table, column and line with a selection.
+	**/
 	public function set( ?t : Table, ?x : Int = 0, ?y : Int = 0, ?sel : Array<Selection>, update : Bool = true, scrollIntoView : Bool = false, saveCursorState : Bool = false ) {
 		if( t != null ) {
 			for( t2 in editor.tables ) {
@@ -74,6 +136,9 @@ class Cursor {
 			this.scrollIntoView();
 	}
 
+	/**
+		Moves the cursor by `dx` and `dy`, skipping the filtered lines. Shift extends the selection, alt moves the selected lines, and vertical moves can enter or leave the sub tables. With `overflow`, horizontal moves wrap to the previous or next line.
+	**/
 	public function move( dx : Int, dy : Int, shift : Bool, ctrl : Bool, alt : Bool, ?overflow : Bool = false ) {
 		if( table == null )
 			table = editor.tables[0];
@@ -171,6 +236,9 @@ class Cursor {
 		update();
 	}
 
+	/**
+		Moves to the previous (or next) position of the history, opening the sub tables.
+	**/
 	public function jump(backward : Bool = true) {
 		stateIdx = Std.int(hxd.Math.clamp(backward ? stateIdx - 1 : stateIdx + 1, 0, states.length - 1));
 		var state = states[stateIdx];
@@ -217,6 +285,9 @@ class Cursor {
 	}
 
 
+	/**
+		Updates the cursor and selection marks.
+	**/
 	public function update() {
 		hide();
 
@@ -274,6 +345,9 @@ class Cursor {
 	}
 
 
+	/**
+		Moves the cursor to a saved state (or to the start of `table` if null).
+	**/
 	public function setState(state : CursorState, ?table : Table) {
 		if( state == null )
 			set(table);
@@ -281,6 +355,9 @@ class Cursor {
 			set(table, state.x, state.y, state.selection);
 	}
 
+	/**
+		Returns the cursor state, or null without table.
+	**/
 	public function getState() : CursorState {
 		return table == null ? null : {
 			sheet : table.sheet.getPath(),
@@ -290,6 +367,9 @@ class Cursor {
 		};
 	}
 
+	/**
+		Adds the cursor position to the history if it changed.
+	**/
 	public function saveState() {
 		var state = getState();
 		if (state == null)
@@ -307,11 +387,17 @@ class Cursor {
 	}
 
 
+	/**
+		Returns the cursor table, position and selection, or null.
+	**/
 	public function save() {
 		if( table == null ) return null;
 		return { sheet : table.sheet, x : x, y : y, selection : selection };
 	}
 
+	/**
+		Restores a position returned by `save`. Returns false if its table is not shown.
+	**/
 	public function load( s ) {
 		if( s == null )
 			return false;
@@ -339,10 +425,16 @@ class Cursor {
 			markNode(e.get(i), cls);
 	}
 
+	/**
+		Forgets the marked elements without changing them.
+	**/
 	public function clearMarks() {
 		marked.resize(0);
 	}
 
+	/**
+		Removes the cursor and selection marks.
+	**/
 	public function hide() {
 		for( m in marked )
 			m.el.classList.remove(m.cls);
@@ -351,6 +443,9 @@ class Cursor {
 
 
 	// Get selected area with line in it. Otherwise return null
+	/**
+		Returns the selection containing a line, or null.
+	**/
 	public function getSelectedAreaIncludingLine(line : Line) {
 		if (selection == null)
 			return null;
@@ -363,6 +458,9 @@ class Cursor {
 	}
 
 	// Get selected area with cell in it. Otherwise return null
+	/**
+		Returns the selection containing a cell, or null.
+	**/
 	public function getSelectedAreaIncludingCell(cell : Cell) {
 		if (selection == null)
 			return null;
@@ -375,6 +473,9 @@ class Cursor {
 		return null;
 	}
 
+	/**
+		Returns the lines of a selection of whole lines, or null.
+	**/
 	public function getLinesFromSelection(sel : Selection) {
 		if (sel == null || sel.x1 >= 0)
 			return null;
@@ -387,6 +488,9 @@ class Cursor {
 		return array;
 	}
 
+	/**
+		Returns the cells of a selection, or null if out of the table.
+	**/
 	public function getCellsFromSelection(sel : Selection) {
 		if (sel == null || sel.y1 >= table.lines.length || sel.y2 >= table.lines.length)
 			return null;
@@ -416,6 +520,9 @@ class Cursor {
 		return cells;
 	}
 
+	/**
+		Returns the lines of the selection.
+	**/
 	public function getSelectedLines() {
 		var lines = [];
 		if (selection == null)
@@ -432,6 +539,9 @@ class Cursor {
 		return lines;
 	}
 
+	/**
+		Returns the cells of the selection.
+	**/
 	public function getSelectedCells() {
 		var cells = [];
 		if (selection == null)
@@ -448,17 +558,26 @@ class Cursor {
 		return cells;
 	}
 
+	/**
+		Returns the line of the cursor, or null.
+	**/
 	public function getLine() {
 		if( table == null ) return null;
 		return table.lines[y];
 	}
 
+	/**
+		Returns the cell of the cursor, or null.
+	**/
 	public function getCell() {
 		var line = getLine();
 		if( line == null ) return null;
 		return line.cells[x];
 	}
 
+	/**
+		Scrolls to the cursor.
+	**/
 	public function scrollIntoView() {
 		var c = getCell();
 		var l = getLine();
@@ -469,12 +588,18 @@ class Cursor {
 	}
 
 
+	/**
+		Handles a click on a line.
+	**/
 	public function clickLine( line : Line, shiftKey = false, ctrlKey = false ) {
 		this.table = line.table;
 		addElementToSelection(line.table, line, -1, line.index, shiftKey, ctrlKey);
 		set(line.table, -1, line.index, this.selection, true, false, true);
 	}
 
+	/**
+		Handles a click on a cell.
+	**/
 	public function clickCell( cell : Cell, shiftKey = false, ctrlKey = false ) {
 		this.table = cell.table;
 		var xIndex = cell.table.displayMode == Table ? cell.columnIndex : 0;
@@ -482,6 +607,9 @@ class Cursor {
 		set(cell.table, xIndex, cell.line.index, this.selection, true, false, true);
 	}
 
+	/**
+		Updates the selection for a click on a cell (`xIndex` -1 for a line): shift extends it, ctrl adds to it.
+	**/
 	public function addElementToSelection(table: Table, line: Line, xIndex : Int, yIndex: Int, shift: Bool = false, ctrl: Bool = false) {
 		var p1 = new h3d.Vector(x, y, 0);
 		var p2 = new h3d.Vector(xIndex, yIndex, 0);
@@ -532,6 +660,9 @@ class Cursor {
 	}
 
 	// Ensure each cell in selection is here only once
+	/**
+		Removes the selections contained in others and merges the adjacent ones.
+	**/
 	public function updateSelection() {
 		// Is s1 containing s2
 		function isContaining(s1 : Selection, s2: Selection) {

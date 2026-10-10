@@ -9,21 +9,35 @@ import js.html.PointerEvent;
 import h3d.Vector4;
 import js.Browser;
 
-// Displays a color with its alpha component. Can open a color picker on click
+/**
+	Displays a color with its alpha component. Can open a color picker on click.
+**/
 class ColorBox extends Component {
 
+	/**
+		The open color picker, or null.
+	**/
 	public var picker : ColorPicker;
 
 	var preview : Element;
 	var previewWithAlpha : Element;
 	var canEditAlpha : Bool = false;
+	/**
+		Opens a color picker on click.
+	**/
 	public var isPickerEnabled : Bool = false;
 
+	/**
+		The color, as RGB or ARGB if the alpha can be edited.
+	**/
 	public var value(get, set) : Int;
 	var workValue : Int;
 
 	var startValue : Int;
 
+	/**
+		Tells if the color picker is open.
+	**/
 	public function isPickerOpen() : Bool {
 		return picker != null;
 	}
@@ -39,14 +53,23 @@ class ColorBox extends Component {
 		return workValue;
 	}
 
+	/**
+		Called when the color changes. `isDragging` is true during a drag.
+	**/
 	public dynamic function onChange(isDragging : Bool) {
 
 	}
 
+	/**
+		Called when the color picker opens.
+	**/
 	public dynamic function onPickerOpen() {
 
 	}
 
+	/**
+		Creates a color box. `root` gives the attributes of the element.
+	**/
 	public function new(?parent : Element, ?root : Element, inIsPickerEnabled:Bool, canEditAlpha:Bool = false, ?fieldName : String) {
 		var e = new Element("<div>").addClass("color-box").width("32px").height("24px").addClass("checkerboard-bg");
 		if (root != null)
@@ -109,12 +132,26 @@ class ColorBox extends Component {
 	}
 }
 
-typedef ColorSliderComponent = {label:Element};
+/**
+	A row of the color picker sliders.
+**/
+typedef ColorSliderComponent = {
+	/**
+		The label of the row.
+	**/
+	var label : Element;
+};
 
 
+/**
+	A color picker popup, with a saturation and value area, a hue slider, component sliders in several color modes and a hex code.
+**/
 class ColorPicker extends Popup {
 
 	var startValue: Int;
+	/**
+		The color, as RGB or ARGB if the alpha can be edited.
+	**/
 	public var value(get, set) : Int;
 	var workValue : Int;
 	var mask : Int;
@@ -135,9 +172,18 @@ class ColorPicker extends Popup {
 
 	var valueChangeGuard : Int = 0;
 
+	/**
+		Converts a value to a color (HSV by default). Not used by the picker.
+	**/
 	public var valueToARGB : (value : Vector4,  outColor : Color) -> Color;
+	/**
+		Converts a color to a value (HSV by default). Not used by the picker.
+	**/
 	public var ARGBToValue : (color : Color, outVector: Vector4) -> Vector4;
 
+	/**
+		Redraws the sliders and the color code.
+	**/
 	public function repaint() {
 
 		primarySliders.value = workValue;
@@ -146,6 +192,9 @@ class ColorPicker extends Popup {
 		preview.value = workValue;
 	}
 
+	/**
+		Redraws the picker and calls `onChange`.
+	**/
 	public function change(isDragging:Bool) {
 		repaint();
 		valueChangeGuard += 1;
@@ -153,6 +202,9 @@ class ColorPicker extends Popup {
 		valueChangeGuard -= 1;
 	}
 
+	/**
+		Checks that the HSV and RGB conversions give back the same colors.
+	**/
 	public function test() {
 		// Test that HSVtoiRGB -> iRGBToHSV produces the same color in input as output
 		var colorCol = new Color();
@@ -176,6 +228,9 @@ class ColorPicker extends Popup {
 
 	}
 
+	/**
+		Creates a color picker popup.
+	**/
 	public function new( ?canEditAlpha : Bool = false, ?parent : Element) {
 		//if( root == null ) root = new Element("<div>").addClass("input-color");
 		super(parent);
@@ -444,6 +499,9 @@ class ColorPicker extends Popup {
 		}
 	}
 
+	/**
+		Called when the color changes. `isDragging` is true during a drag.
+	**/
 	public dynamic function onChange(isDragging) {
 	}
 
@@ -470,7 +528,13 @@ class ColorPicker extends Popup {
 	}
 }
 
+/**
+	A 1D or 2D color slider drawn on a canvas.
+**/
 class ColorSlider extends Component {
+	/**
+		The value of the slider, in its color mode.
+	**/
 	public var value(get,set) : Vector4;
 
 	function set_value(v : Vector4) {
@@ -498,22 +562,37 @@ class ColorSlider extends Component {
 
 	var valueChangeLock : Int = 0;
 
+	/**
+		The color mode of the slider.
+	**/
 	public var colorMode : ColorMode;
 
 	var getColorAtPixelDisplay : (x : Int, y : Int, outVector : Vector4) -> Void;
 	var getColorAtPixel : (x : Int, y : Int, outVector : Vector4) -> Void;
+	/**
+		Returns the cursor position for the current value.
+	**/
 	public var getCursorPos : () -> {x : Int, y : Int};
 
 	var canvasDownsample = 8;
 
+	/**
+		Called when the value changes. `isDragging` is true during a drag.
+	**/
 	public dynamic function onChange(isDragging : Bool) {
 
 	}
 
+	/**
+		Called after the slider is redrawn.
+	**/
 	public dynamic function onRepaint() {
 
 	}
 
+	/**
+		Creates a slider. `getColorAtPixelDisplay` gives the displayed color of a pixel, and `getColorAtPixel` the picked one (by default the displayed one).
+	**/
 	public function new(
 		?parent : Element,
 		width : Int,
@@ -570,6 +649,9 @@ class ColorSlider extends Component {
 		element.append(svg.element);
 	}
 
+	/**
+		Redraws the slider.
+	**/
 	public function repaint() : Void {
 		var c2d = canvas.getContext("2d", { willReadFrequently: true });
 
@@ -601,6 +683,9 @@ class ColorSlider extends Component {
 		onRepaint();
 	}
 
+	/**
+		Picks the value at a pixel.
+	**/
 	public function pickColorAtPixel(x: Int, y : Int) {
 		x = Std.int(Math.min(Math.max(0, x), width-1));
 		y = Std.int(Math.min(Math.max(0, y), height-1));
@@ -608,6 +693,9 @@ class ColorSlider extends Component {
 		change(isDragging);
 	}
 
+	/**
+		Calls `onChange`.
+	**/
 	public function change(isDragging : Bool) {
 		valueChangeLock += 1;
 		onChange(isDragging);
@@ -616,17 +704,35 @@ class ColorSlider extends Component {
 
 }
 
+/**
+	A group of color sliders sharing a value.
+**/
 class SliderGroup extends Component {
 
+	/**
+		The sliders.
+	**/
 	public var sliders : Array<ColorSlider> = new Array<ColorSlider>();
 
+	/**
+		The value has an alpha.
+	**/
 	public var canEditAlpha : Bool = true;
+	/**
+		The color, as RGB or ARGB if the alpha can be edited.
+	**/
 	public var value(get,set) : Int;
+	/**
+		The value in the color mode of the group.
+	**/
 	public var workValue : Vector4 = new Vector4();
 	var valueChangeLock : Int = 0;
 
 	var colorMode : ColorMode;
 
+	/**
+		Changes the color mode, keeping the color.
+	**/
 	public function setColorMode(colorMode : ColorMode, value : Int) {
 		this.colorMode = colorMode;
 		for (slider in sliders) {
@@ -635,6 +741,9 @@ class SliderGroup extends Component {
 		this.value = value;
 	}
 
+	/**
+		Creates a group in a color mode.
+	**/
 	public function new(parent : Element, canEditAlpha : Bool, colorMode : ColorMode) {
 		var root = new Element("<div>").addClass("slider-container");
 		super(parent, root);
@@ -644,6 +753,9 @@ class SliderGroup extends Component {
 		this.canEditAlpha = canEditAlpha;
 	}
 
+	/**
+		Called when the value changes. `isDragging` is true during a drag.
+	**/
 	public dynamic function onChange(isDragging : Bool) {
 
 	}
@@ -675,6 +787,9 @@ class SliderGroup extends Component {
 		return color.toInt(canEditAlpha);
 	};
 
+	/**
+		Adds a slider to the group.
+	**/
 	public function addSlider(slider : ColorSlider) : ColorSlider {
 		sliders.push(slider);
 		slider.onChange = function(isDragging : Bool) {
@@ -686,12 +801,18 @@ class SliderGroup extends Component {
 		return slider;
 	}
 
+	/**
+		Updates the sliders with the value.
+	**/
 	public function repaint() {
 		for (slider in sliders) {
 			slider.value = workValue;
 		}
 	}
 
+	/**
+		Redraws the sliders and calls `onChange`.
+	**/
 	public function change(isDragging : Bool) {
 		repaint();
 		valueChangeLock += 1;
