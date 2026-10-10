@@ -32,6 +32,9 @@ import hide.view.CameraController;
 using hide.tools.Extensions.ArrayExtensions;
 import hide.comp.CameraControllerEditor;
 
+/**
+	How a selection updates the tree and the undo history.
+**/
 enum SelectMode {
 	/**
 		Update tree, add undo command
@@ -51,6 +54,9 @@ enum SelectMode {
 	Nothing;
 }
 
+/**
+	A tool measuring the distance between two points of the scene.
+**/
 @:access(hide.comp.SceneEditor)
 class RulerTool {
 	var editor : SceneEditor;
@@ -63,6 +69,9 @@ class RulerTool {
 	var start : h3d.Vector;
 	var end : h3d.Vector;
 
+	/**
+		Starts the tool.
+	**/
 	public function new(editor: SceneEditor) {
 		this.editor = editor;
 
@@ -110,6 +119,9 @@ class RulerTool {
 		};
 	}
 
+	/**
+		Updates the display.
+	**/
 	public function update(dt: Float) {
 		graphics.clear();
 		text.visible = false;
@@ -137,6 +149,9 @@ class RulerTool {
 
 	}
 
+	/**
+		Stops the tool.
+	**/
 	public function dispose() {
 		interactive.remove();
 		graphics.remove();
@@ -145,10 +160,16 @@ class RulerTool {
 
 }
 
+/**
+	The popup choosing the overlays displayed in the viewport.
+**/
 @:access(hide.comp.SceneEditor)
 class ViewportOverlaysPopup extends hide.comp.Popup {
 	var editor:SceneEditor;
 
+	/**
+		Creates the popup.
+	**/
 	public function new(?parent : Element, editor: SceneEditor) {
 		super(parent);
 		this.editor = editor;
@@ -285,9 +306,15 @@ class ViewportOverlaysPopup extends hide.comp.Popup {
 	}
 }
 
+/**
+	The popup editing the snap settings.
+**/
 class SnapSettingsPopup extends hide.comp.Popup {
 	var editor : SceneEditor;
 
+	/**
+		Creates the popup.
+	**/
 	public function new(?parent : Element, editor: SceneEditor) {
 		super(parent);
 		this.editor = editor;
@@ -362,15 +389,36 @@ class SnapSettingsPopup extends hide.comp.Popup {
 	}
 }
 
+/**
+	The edit context of the selected prefabs in a `SceneEditor`.
+**/
 @:access(hide.comp.SceneEditor)
 class SceneEditorContext extends hide.prefab.EditContext {
 
+	/**
+		The scene editor.
+	**/
 	public var editor(default, null) : SceneEditor;
+	/**
+		The edited prefabs.
+	**/
 	public var elements : Array<PrefabElement>;
+	/**
+		The parent 3D objects of the edited prefabs not under another edited prefab.
+	**/
 	public var rootObjects(default, null): Array<Object>;
+	/**
+		The parent 2D objects of the edited prefabs not under another edited prefab.
+	**/
 	public var rootObjects2D(default, null): Array<h2d.Object>;
+	/**
+		The edited prefabs not under another edited prefab.
+	**/
 	public var rootElements(default, null): Array<PrefabElement>;
 
+	/**
+		Creates the context.
+	**/
 	public function new(undo, elts, editor) {
 		super(undo);
 		this.editor = editor;
@@ -438,6 +486,9 @@ class SceneEditorContext extends hide.prefab.EditContext {
 		editor.refreshTree(All);
 	}
 
+	/**
+		Runs the cleanup functions of the edition.
+	**/
 	public function cleanup() {
 		for( c in cleanups.copy() )
 			c();
@@ -450,14 +501,54 @@ class SceneEditorContext extends hide.prefab.EditContext {
 	}
 }
 
+/**
+	How the scene is refreshed.
+**/
 enum RefreshMode {
+	/**
+		Only what changed.
+	**/
 	Partial;
+	/**
+		Everything.
+	**/
 	Full;
 }
 
-typedef CustomPivot = { elt : PrefabElement, mesh : Mesh, locPos : Vector };
-typedef TagInfo = {id: String, color: String};
+/**
+	A custom pivot of the gizmo.
+**/
+typedef CustomPivot = {
+	/**
+		The prefab used as pivot.
+	**/
+	var elt : PrefabElement;
+	/**
+		The mesh of the prefab.
+	**/
+	var mesh : Mesh;
+	/**
+		The pivot position, in the space of the mesh.
+	**/
+	var locPos : Vector;
+};
+/**
+	A tag of the prefabs, colored in the tree.
+**/
+typedef TagInfo = {
+	/**
+		The id.
+	**/
+	var id : String;
+	/**
+		The color, as a CSS color.
+	**/
+	var color : String;
+};
 
+/**
+	The popup choosing the debug view mode of the renderer (albedo, normals, UV checker...).
+**/
 class ViewModePopup extends hide.comp.Popup {
 	static var viewFilter : Array<{name: String, inf: {display: DisplayMode, debug: DebugMode}}> = [
 		{
@@ -562,6 +653,9 @@ class ViewModePopup extends hide.comp.Popup {
 	var renderer:h3d.scene.pbr.Renderer;
 	var editor : SceneEditor;
 
+	/**
+		Creates the popup.
+	**/
 	public function new(?parent:Element, engineRenderer:h3d.scene.pbr.Renderer, editor: SceneEditor) {
 		super(parent);
 		this.renderer = engineRenderer;
@@ -604,6 +698,9 @@ class ViewModePopup extends hide.comp.Popup {
 		}
 	}
 
+	/**
+		Applies the view mode of an input.
+	**/
 	public function applyViewMode(input: Element, v: Dynamic) {
 		var slides = @:privateAccess renderer.slides;
 			if (slides == null)
@@ -662,6 +759,9 @@ class ViewModePopup extends hide.comp.Popup {
 			}
 	}
 
+	/**
+		Tells if the UV checker view is enabled.
+	**/
 	public function isUvChecker() {
 		function hasCheckUV(obj: Object) {
 				var mesh = Std.downcast(obj, Mesh);
@@ -685,6 +785,9 @@ class ViewModePopup extends hide.comp.Popup {
 		@:privateAccess return hasCheckUV(editor.scene.s3d);
 	}
 
+	/**
+		Tells if the displacement view is enabled.
+	**/
 	public function isDisplacementDisplay() {
 		var hasShader = false;
 		for ( m in editor.scene.s3d.getMaterials() ) {
@@ -697,9 +800,15 @@ class ViewModePopup extends hide.comp.Popup {
 	}
 }
 
+/**
+	The popup choosing the categories of editor icons displayed.
+**/
 class IconVisibilityPopup extends hide.comp.Popup {
 	 var editor : SceneEditor;
 
+	 /**
+	 	Creates the popup.
+	 **/
 	 public function new(?parent : Element, editor: SceneEditor) {
 		  super(parent);
 		  this.editor = editor;
@@ -726,9 +835,15 @@ class IconVisibilityPopup extends hide.comp.Popup {
 	 }
 }
 
+/**
+	The popup listing the shortcuts of the editor.
+**/
 class HelpPopup extends hide.comp.Popup {
 	var editor : SceneEditor;
 
+	/**
+		Creates the popup.
+	**/
 	public function new(?parent : Element, editor: SceneEditor, ?shortcuts: Array<{name:String, shortcut:String}>) {
 		  super(parent);
 		  this.editor = editor;
@@ -759,10 +874,16 @@ class HelpPopup extends hide.comp.Popup {
 	}
 }
 
+/**
+	The popup choosing the render props of the scene.
+**/
 class RenderPropsPopup extends Popup {
 	var editor:SceneEditor;
 	var view: hide.view.FileView;
 
+	/**
+		Creates the popup.
+	**/
 	public function new(?parent:Element, view:hide.view.FileView, editor:SceneEditor, isSearchable = false, canChangeCurrRp = false) {
 		super(parent, isSearchable);
 		this.editor = editor;
@@ -892,6 +1013,9 @@ class RenderPropsPopup extends Popup {
 	}
 }
 
+/**
+	A custom editor displayed over the scene, for a kind of prefab.
+**/
 @:access(hide.comp.SceneEditor)
 class CustomEditor {
 
@@ -901,14 +1025,23 @@ class CustomEditor {
 
 	var element : hide.Element;
 
+	/**
+		Creates the editor.
+	**/
 	public function new( editor : SceneEditor ) {
 		this.editor = editor;
 	}
 
+	 /**
+	 	Called when a prefab is selected. Returns `true` by default.
+	 **/
 	 public function setElementSelected( p : hrt.prefab.Prefab, b : Bool ) {
 		return true;
 	 }
 
+	/**
+		Called each frame.
+	**/
 	public function update( dt : Float ) {
 
 	}
@@ -957,38 +1090,116 @@ class CustomEditor {
 
 }
 
+/**
+	A tree of the scene editor.
+**/
 enum Tree {
+	/**
+		The scene tree.
+	**/
 	SceneTree;
+	/**
+		The render props tree.
+	**/
 	RenderPropsTree;
+	/**
+		Both trees.
+	**/
 	All;
 }
 
+/**
+	The editor of a prefab scene: the 3D/2D view with its camera and gizmo, the prefab tree, the properties panel, selection, undo, snapping and drag and drop.
+**/
 class SceneEditor {
 
+	/**
+		The tree of the prefabs.
+	**/
 	public var sceneTree : FancyTree<PrefabElement>;
+	/**
+		The tree of the render props.
+	**/
 	public var renderPropsTree : FancyTree<PrefabElement>; // Used to display render props edition.
 
+	/**
+		The 3D/2D scene.
+	**/
 	public var scene : hide.comp.Scene;
+	/**
+		The properties panel.
+	**/
 	public var properties : hide.comp.PropsEditor;
 
+	/**
+		The edit context of the selection.
+	**/
 	public var curEdit(default, null) : SceneEditorContext;
+	/**
+		The `EditContext2` of the selection.
+	**/
 	public var curEdit2(default, null) : hide.prefab.EditContext.HideJsEditContext2;
+	/**
+		Places the moved objects on the ground.
+	**/
 	public var snapToGround = false;
 
+	/**
+		Enables the snapping.
+	**/
 	public var snapToggle = false;
+	/**
+		The step of the translation snapping.
+	**/
 	public var snapMoveStep = 1.0;
+	/**
+		The step of the rotation snapping, in degrees.
+	**/
 	public var snapRotateStep = 15.0;
+	/**
+		The step of the scale snapping.
+	**/
 	public var snapScaleStep = 1.0;
+	/**
+		Snaps the positions to the grid instead of the offsets.
+	**/
 	public var snapForceOnGrid = false;
 
+	/**
+		Moves in the local space of the objects.
+	**/
 	public var localTransform = true;
+	/**
+		Moves the selected objects without their children.
+	**/
 	public var selfOnlyTransform = false;
+	/**
+		The 3D camera controller.
+	**/
 	public var cameraController : CameraControllerBase;
+	/**
+		The 2D camera controller.
+	**/
 	public var cameraController2D : hide.view.l3d.CameraController2D;
+	/**
+		Displays the editor helpers (icons, gizmos...).
+	**/
 	public var editorDisplay(default,set) : Bool;
+	/**
+		Uses the 2D camera.
+	**/
 	public var camera2D(default,set) : Bool = false;
+	/**
+		Allows selecting objects by clicking in the view.
+	**/
 	public var objectAreSelectable = true;
+	/**
+		The reference to the render props of the scene.
+	**/
 	public var renderPropsRoot : Reference;
+	/**
+		The render props before the last change.
+	**/
 	public var previousSceneRenderProps : hrt.prefab.RenderProps;
 	var updates : Array<Float -> Void> = [];
 
@@ -998,17 +1209,44 @@ class SceneEditor {
 	static var customPivot : CustomPivot;
 	var interactives : Map<PrefabElement, h3d.scene.Interactive> = [];
 	var interactives2d : Map<PrefabElement, h2d.Interactive> = [];
+	/**
+		The editor.
+	**/
 	public var ide : hide.Ide;
+	/**
+		Delayed events.
+	**/
 	public var event(default, null) : hxd.WaitEvent;
 	var hideList : Map<PrefabElement, Bool> = new Map();
+	/**
+		The selected prefabs.
+	**/
 	public var selectedPrefabs : Array<PrefabElement> = [];
 
+	/**
+		The root 2D object of the prefab.
+	**/
 	public var root2d : h2d.Object = null;
+	/**
+		The root 3D object of the prefab.
+	**/
 	public var root3d : h3d.scene.Object = null;
 
+	/**
+		Shows the viewport overlays.
+	**/
 	public var showOverlays : Bool = true;
+	/**
+		The step of the grid.
+	**/
 	public var gridStep : Float = 0.;
+	/**
+		The size of the grid.
+	**/
 	public var gridSize : Int;
+	/**
+		Shows the grid.
+	**/
 	public var showGrid = false;
 
 	var outlineRfx : hrt.prefab.rfx.Outline;
@@ -1048,6 +1286,9 @@ class SceneEditor {
 	var undo(get, null):hide.ui.UndoHistory;
 	function get_undo() { return view.undo; }
 
+	/**
+		The view of the edited file.
+	**/
 	public var view(default, null) : hide.view.FileView;
 	var sceneData : PrefabElement;
 
@@ -1055,15 +1296,24 @@ class SceneEditor {
 
 	var ruler : RulerTool;
 
+	/**
+		The objects last focused by the camera.
+	**/
 	public var lastFocusObjects : Array<Object> = [];
 
 
 	// Called when the sceneEditor scene has finished loading
 	// Use it to call setPrefab() to set the content of the scene
+	/**
+		Called when the scene is ready.
+	**/
 	dynamic public function onSceneReady() {
 
 	}
 
+	/**
+		Creates the editor of a view.
+	**/
 	public function new(view) {
 		ready = false;
 		ide = hide.Ide.inst;
@@ -1167,6 +1417,9 @@ class SceneEditor {
 		}
 	}
 
+	/**
+		Starts or stops the ruler (toggles if `force` is `null`).
+	**/
 	public function toggleRuler(?force: Bool) {
 		var enable : Bool = force ?? (ruler == null);
 		if (scene.s3d != null) {
@@ -1182,6 +1435,9 @@ class SceneEditor {
 		}
 	}
 
+	/**
+		Shows or hides the viewport overlays.
+	**/
 	public function setViewportOverlaysVisibility(visible: Bool) {
 		ide.currentConfig.set("sceneeditor.showViewportOverlays", visible);
 		updateViewportOverlays();
@@ -1196,6 +1452,9 @@ class SceneEditor {
 		return v;
 	}
 
+	/**
+		Applies the visibility of the overlays.
+	**/
 	public function updateViewportOverlays() {
 		showOverlays = getOrInitConfig("sceneeditor.showViewportOverlays", true);
 
@@ -1212,31 +1471,49 @@ class SceneEditor {
 		updateBackgroundColor();
 	}
 
+	/**
+		Applies the background color setting.
+	**/
 	public function updateBackgroundColor() {
 		var color = getOrInitConfig("sceneeditor.backgroundColor", 0x333333);
 		scene.engine.backgroundColor = color;
 		updateGrid();
 	}
 
+	/**
+		Applies the visibility of the status text.
+	**/
 	public function updateStatusTextVisibility() {
 		statusText.visible = getOrInitConfig("sceneeditor.sceneInformationToggle", false) && showOverlays;
 	}
 
+	/**
+		Applies the wireframe setting.
+	**/
 	public function updateWireframe() {
 		var visible = getOrInitConfig("sceneeditor.wireframeToggle", false) && showOverlays;
 		setWireframe(visible);
 	}
 
+	/**
+		Applies the visibility of the joints.
+	**/
 	public function updateJointsVisibility() {
 		var visible = getOrInitConfig("sceneeditor.jointsToggle", false) && showOverlays;
 		setJointsDebugVisibility(visible, null);
 	}
 
+	/**
+		Applies the visibility of the colliders.
+	**/
 	public function updateCollidersVisibility() {
 		var visible = getOrInitConfig("sceneeditor.colliderToggle", false) && showOverlays;
 		setColliderDebugVisiblity(visible);
 	}
 
+	/**
+		Applies the visibility of the gizmo.
+	**/
 	public function updateGizmoVisibility() {
 		if (gizmo == null)
 			return;
@@ -1244,11 +1521,17 @@ class SceneEditor {
 		moveGizmoToSelection();
 	}
 
+	/**
+		Applies the visibility of the icons.
+	**/
 	public function updateIconsVisibility() {
 		var visible = getOrInitConfig("sceneeditor.iconVisibility", true) && showOverlays;
 		ide.show3DIcons = visible;
 	}
 
+	/**
+		Applies the visibility of the other guides.
+	**/
 	public function updateOtherGuidesVisibility() {
 		if (scene?.s3d?.renderer == null)
 			return;
@@ -1257,6 +1540,9 @@ class SceneEditor {
 		scene.s3d.renderer.showEditorGuides = show;
 	}
 
+	/**
+		Applies the visibility of the selection outline.
+	**/
 	public function updateOutlineVisibility() {
 		if (scene?.s3d?.renderer == null)
 			return;
@@ -1267,6 +1553,9 @@ class SceneEditor {
 				e.enabled = show;
 	}
 
+	/**
+		Calls `callback` now if the scene is ready, or when it becomes ready.
+	**/
 	public function delayReady(callback: () -> Void) {
 		if (ready) {
 			callback();
@@ -1276,6 +1565,9 @@ class SceneEditor {
 		}
 	}
 
+	/**
+		Rebuilds the grid.
+	**/
 	public function updateGrid() {
 		if(grid != null) {
 			grid.remove();
@@ -1324,6 +1616,9 @@ class SceneEditor {
 		grid.setPosition(-1 * gridSize / 2, -1 * gridSize / 2, 0);
 	}
 
+	/**
+		Creates a grid object.
+	**/
 	public function createGrid(origin : Vector, normal : h3d.Vector, gridSize : Float, gridStep : Float, color : Vector) : h3d.scene.Object {
 		var grid = new h3d.scene.Graphics(scene.s3d);
 		grid.scale(1);
@@ -1360,6 +1655,9 @@ class SceneEditor {
 		return grid;
 	}
 
+	/**
+		Returns a float with `precision` decimals, its digits grouped by three.
+	**/
 	static public function splitCentainesFloat(v: Float, precision: Int) {
 		var str = Std.string(hxd.Math.round(v * hxd.Math.pow(10, precision)));
 		var endStr = "";
@@ -1378,6 +1676,9 @@ class SceneEditor {
 		return endStr;
 	}
 
+	/**
+		Returns an integer with its digits grouped by three.
+	**/
 	static public function splitCentaines(v: Int) {
 		var str = Std.string(v);
 		var endStr = "";
@@ -1412,17 +1713,26 @@ class SceneEditor {
 		haxe.Timer.delay(function() event.wait(0.5, updateStats), 0);
 	}
 
+	/**
+		Tells if the snapping is active (toggled, or inverted while Ctrl is held).
+	**/
 	public function getSnapStatus() : Bool {
 		var ctrl = K.isDown(K.CTRL);
 		return (snapToggle && !ctrl) || (!snapToggle && ctrl);
 	};
 
+	/**
+		Returns the value snapped to a step.
+	**/
 	public function snap(value: Float, step: Float) : Float {
 		if (step > 0.0 && getSnapStatus())
 			value = hxd.Math.round(value / step) * step;
 		return value;
 	}
 
+	/**
+		Returns the value snapped for a gizmo mode.
+	**/
 	public function gizmoSnap(value: Float, mode: hrt.tools.Gizmo.EditMode) : Float {
 		switch(mode) {
 			case Translation:
@@ -1437,6 +1747,9 @@ class SceneEditor {
 		return value;
 	}
 
+	/**
+		Disposes the editor.
+	**/
 	public function dispose() {
 		scene.dispose();
 		ruler?.dispose();
@@ -1450,6 +1763,9 @@ class SceneEditor {
 		return camera2D = b;
 	}
 
+	/**
+		Reloads the models using a changed library.
+	**/
 	public function onResourceChanged(lib : hxd.fmt.hmd.Library) {
 
 		var models = sceneData.findAll(PrefabElement);
@@ -1468,6 +1784,9 @@ class SceneEditor {
 		}
 	}
 
+	/**
+		Called when the view is resized.
+	**/
 	public dynamic function onResize() {
 	}
 
@@ -1475,6 +1794,9 @@ class SceneEditor {
 		return editorDisplay = v;
 	}
 
+	/**
+		Returns the selected prefabs.
+	**/
 	public function getSelection() {
 		return selectedPrefabs != null ? selectedPrefabs : [];
 	}
@@ -1484,6 +1806,9 @@ class SceneEditor {
 		return c;
 	}
 
+	/**
+		Shows the scene in full screen.
+	**/
 	public function setFullScreen( b : Bool ) {
 		view.fullScreen = b;
 		if( b ) {
@@ -1535,6 +1860,9 @@ class SceneEditor {
 		focusObjects(arr);
 	}
 
+	/**
+		Moves the camera to show the objects.
+	**/
 	public function focusObjects(objs : Array<Object>) {
 		var focusChanged = false;
 		for (o in objs) {
@@ -1568,6 +1896,9 @@ class SceneEditor {
 		return null;
 	}
 
+	/**
+		Returns the tag of a prefab, or `null`.
+	**/
 	public function getTag(p: PrefabElement) : TagInfo {
 		if(p.props != null) {
 			var tagId = Reflect.field(p.props, "tag");
@@ -1580,6 +1911,9 @@ class SceneEditor {
 		return null;
 	}
 
+	/**
+		Sets the tag of prefabs, with undo.
+	**/
 	public function setTags(prefabs: Array<PrefabElement>, tag: String) {
 		var oldValues = [for (prefab in prefabs) (prefab.props:Dynamic)?.tag];
 
@@ -1662,6 +1996,9 @@ class SceneEditor {
 		return ret;
 	}
 
+	/**
+		Switches to another camera controller.
+	**/
 	public function switchCamController(camClass : Class<CameraControllerBase>) {
 		// Temp save all cam parameters before re-applying them on the new instance
 		var settings = getCameraControllerSettings();
@@ -1739,6 +2076,9 @@ class SceneEditor {
 		cameraController.loadFromCamera();
 	}
 
+	/**
+		Loads the saved camera.
+	**/
 	public function loadCam3D() {
 		if (cameraController == null)
 			cameraController = Type.createInstance(CamController, [scene.s3d, this]);
@@ -1893,6 +2233,9 @@ class SceneEditor {
 		cameraController.onCustomEvent = customEventHandler;
 	}
 
+	/**
+		Saves the camera.
+	**/
 	public function saveCam3D() {
 		var cam = scene.s3d.camera;
 		if (cam == null)
@@ -1922,6 +2265,9 @@ class SceneEditor {
 		@:privateAccess snapForceOnGrid = view.getDisplayState("snapForceOnGrid");
 	}
 
+	/**
+		Saves the snap settings.
+	**/
 	public function saveSnapSettings() {
 		@:privateAccess view.saveDisplayState("snapMoveStep", snapMoveStep);
 		@:privateAccess view.saveDisplayState("snapRotateStep", snapRotateStep);
@@ -1943,6 +2289,9 @@ class SceneEditor {
 		updateGrid();
 	}
 
+	/**
+		Sets the edited prefab and rebuilds the scene.
+	**/
 	public function setPrefab(prefab: hrt.prefab.Prefab) {
 		sceneData = prefab;
 		refreshScene();
@@ -2545,6 +2894,9 @@ class SceneEditor {
 		}
 	}
 
+	/**
+		Applies the style of a prefab in a tree (hidden, locked, tag...).
+	**/
 	public function applyTreeStyle(p: PrefabElement, tree : Tree) {
 		var tree = tree == SceneTree ? sceneTree : renderPropsTree;
 		var el = @:privateAccess tree.itemMap.get(p)?.element;
@@ -2664,6 +3016,9 @@ class SceneEditor {
 		}));
 	}
 
+	/**
+		Collapses the scene tree.
+	**/
 	public function collapseTree() {
 		function collapse(p : hrt.prefab.Prefab) {
 			sceneTree.collapseItem(p);
@@ -2681,12 +3036,18 @@ class SceneEditor {
 
 	var refWatches : Map<String,{ callb : Void -> Void, ignoreCount : Int }> = [];
 
+	/**
+		Ignores the next change of a watched reference file.
+	**/
 	public function watchIgnoreChanges( source : String ) {
 		var w = refWatches.get(source);
 		if( w == null ) return;
 		w.ignoreCount++;
 	}
 
+	/**
+		Reloads the scene when a referenced file changes.
+	**/
 	public function watch( source : String ) {
 		var w = refWatches.get(source);
 		if( w != null ) return;
@@ -2885,6 +3246,9 @@ class SceneEditor {
 		}
 	}
 
+	/**
+		Rebuilds the scene.
+	**/
 	public function refreshScene() {
 
 		clearWatches();
@@ -3059,6 +3423,9 @@ class SceneEditor {
 		return arr;
 	}
 
+	/**
+		Called after the scene is refreshed.
+	**/
 	public dynamic function onRefresh() {
 	}
 
@@ -3237,6 +3604,9 @@ class SceneEditor {
 		hide.comp.ContextMenu.createFromPoint(ide.mouseX, ide.mouseY, cast menuItems);
 	}
 
+	/**
+		Recreates the interactive of a prefab.
+	**/
 	public function refreshInteractive(elt : PrefabElement) {
 		for (p in elt.flatten(null, null)) {
 			removeInteractive(p);
@@ -3244,6 +3614,9 @@ class SceneEditor {
 		}
 	}
 
+	/**
+		Removes the interactive of a prefab.
+	**/
 	public function removeInteractive(elt: PrefabElement) {
 		var int = interactives.get(elt);
 		if(int != null) {
@@ -3538,6 +3911,9 @@ class SceneEditor {
 		});
 	}
 
+	/**
+		Shows the scene in wireframe.
+	**/
 	public function setWireframe(val = true) {
 		var engine = h3d.Engine.getCurrent();
 		if( engine.driver.hasFeature(Wireframe) ) {
@@ -3549,6 +3925,9 @@ class SceneEditor {
 		}
 	}
 
+	/**
+		Shows the joints of the skinned meshes (highlighting `selectedJoints`).
+	**/
 	@:access(h3d.scene.Skin)
 	public function setJointsDebugVisibility(visible = true, selectedJoints : Array<String>) {
 		if( visible ) {
@@ -3598,6 +3977,9 @@ class SceneEditor {
 		}
 	}
 
+	/**
+		Shows the colliders of the scene.
+	**/
 	public function setColliderDebugVisiblity(visible = true) {
 		if (visible) {
 			if (rootDebugCollider == null) {
@@ -3631,6 +4013,9 @@ class SceneEditor {
 		}
 	}
 
+	/**
+		Called when a property of a prefab changes: updates its instance and the tree.
+	**/
 	public function onPrefabChange(p: PrefabElement, ?pname: String) {
 		if(p != sceneData) {
 			for (p in p.all())
@@ -3657,6 +4042,9 @@ class SceneEditor {
 		applySceneStyle(p);
 	}
 
+	/**
+		Applies the visibility of a prefab in the scene.
+	**/
 	public function applySceneStyle(p: PrefabElement) {
 		var wasHandled = false;
 		var obj3d = p.to(Object3D);
@@ -3685,6 +4073,9 @@ class SceneEditor {
 		}
 	}
 
+	/**
+		Returns the interactives of a prefab and its children.
+	**/
 	public function getInteractives(elt : PrefabElement) : Array<hxd.SceneEvents.Interactive> {
 		var r : Array<hxd.SceneEvents.Interactive> = [];
 		var i3d = interactives.get(elt);
@@ -3699,14 +4090,23 @@ class SceneEditor {
 		return r;
 	}
 
+	/**
+		Returns the 3D object of a prefab.
+	**/
 	public function getObject(elt: PrefabElement) {
 		return elt.getLocal3d() ?? root3d;
 	}
 
+	/**
+		Returns the 2D object of a prefab.
+	**/
 	public function getObject2d(elt: PrefabElement) {
 		return elt.getLocal2d() ?? root2d;
 	}
 
+	/**
+		Returns the 3D object of a prefab.
+	**/
 	public function getSelfObject(elt: PrefabElement) {
 		return getObject(elt);
 	}
@@ -3740,6 +4140,9 @@ class SceneEditor {
 		queueRebuild(elt);
 	}
 
+	/**
+		Adds prefabs to the scene (selecting them if `selectObj`), with undo.
+	**/
 	public function addElements(elts : Array<PrefabElement>, selectObj : Bool = true, doRefresh : Bool = true, enableUndo = true) {
 		beginRebuild();
 
@@ -4018,6 +4421,9 @@ class SceneEditor {
 		return edit;
 	}
 
+	/**
+		Shows the properties of a prefab.
+	**/
 	public function showProps(e: PrefabElement) {
 		scene.setCurrent();
 		var edit = makeEditContext([e]);
@@ -4031,8 +4437,14 @@ class SceneEditor {
 		return p.setSelected(b);
 	}
 
+	/**
+		Called when the selection changes.
+	**/
 	public dynamic function onSelectionChanged(elts : Array<PrefabElement>, ?mode : SelectMode = Default) {};
 
+	/**
+		Selects prefabs.
+	**/
 	public function selectElements( elts : Array<PrefabElement>, ?mode : SelectMode = Default ) {
 		function impl(elts,mode:SelectMode) {
 			scene.setCurrent();
@@ -4274,6 +4686,9 @@ class SceneEditor {
 		return e != root;
 	}
 
+	/**
+		Moves the camera to show the whole scene.
+	**/
 	public function resetCamera(distanceFactor = 1.5) {
 		if( camera2D ) {
 			cameraController2D.initFromScene();
@@ -4287,6 +4702,9 @@ class SceneEditor {
 	}
 
 	var previewDraggedObj : h3d.scene.Object;
+	/**
+		Handles a drag and drop event on the scene (resource files dropped).
+	**/
 	public function onDropEvent(event: hide.tools.DragAndDrop.DropEvent, dragData : hide.tools.DragAndDrop.DragData) : Void {
 		switch(event) {
 			case Move:
@@ -4568,6 +4986,9 @@ class SceneEditor {
 
 
 
+	/**
+		Returns the transform of the ground point under the mouse, relative to `parent`.
+	**/
 	public function getPickTransform(parent: PrefabElement) {
 		var proj = screenToGround(scene.s2d.mouseX, scene.s2d.mouseY);
 		if(proj == null) return null;
@@ -4893,6 +5314,9 @@ class SceneEditor {
 		addElements(createdPrefabs);
 	}
 
+	/**
+		Tells if a prefab is visible in the editor.
+	**/
 	public function isVisible(elt: PrefabElement) {
 		if(elt == sceneData)
 			return true;
@@ -4900,6 +5324,9 @@ class SceneEditor {
 		return visible && !isHidden(elt) && (elt.parent != null ? isVisible(elt.parent) : true);
 	}
 
+	/**
+		Returns the visible prefabs that can be selected.
+	**/
 	public function getAllSelectable(include3d: Bool, include2d: Bool) : Array<PrefabElement> {
 		var ret = [];
 
@@ -4938,24 +5365,39 @@ class SceneEditor {
 		return ret;
 	}
 
+	/**
+		Selects all the prefabs.
+	**/
 	public function selectAll() {
 		selectElements(getAllSelectable(true, false));
 	}
 
+	/**
+		Inverts the selection.
+	**/
 	public function selectInvert() {
 		var all = sceneData.flatten();
 		all = all.filter((prefab) -> !selectedPrefabs.contains(prefab));
 		selectElements(all);
 	}
 
+	/**
+		Clears the selection.
+	**/
 	public function deselect() {
 		selectElements([]);
 	}
 
+	/**
+		Tells if a prefab is selected.
+	**/
 	public function isSelected( p : PrefabElement ) {
 		return selectedPrefabs != null && selectedPrefabs.indexOf(p) >= 0;
 	}
 
+	/**
+		Enables or disables prefabs, with undo.
+	**/
 	public function setEnabled(elements : Array<PrefabElement>, enable: Bool) {
 		var old = [for(e in elements) e.enabled];
 		function apply(on) {
@@ -4976,6 +5418,9 @@ class SceneEditor {
 		}));
 	}
 
+	/**
+		Sets prefabs as editor only, with undo.
+	**/
 	public function setEditorOnly(elements : Array<PrefabElement>, enable: Bool) {
 		var old = [for(e in elements) e.editorOnly];
 		function apply(on) {
@@ -4996,6 +5441,9 @@ class SceneEditor {
 		}));
 	}
 
+	/**
+		Sets prefabs as in game only, with undo.
+	**/
 	public function setInGameOnly(elements : Array<PrefabElement>, enable: Bool) {
 		var old = [for(e in elements) e.inGameOnly];
 		function apply(on) {
@@ -5016,6 +5464,9 @@ class SceneEditor {
 		}));
 	}
 
+	/**
+		Tells if a prefab is hidden in the editor.
+	**/
 	public function isHidden(e: PrefabElement) {
 		if(e == null)
 			return false;
@@ -5027,6 +5478,9 @@ class SceneEditor {
 		@:privateAccess view.saveDisplayState("hideList", state);
 	}
 
+	/**
+		Shows or hides prefabs in the editor.
+	**/
 	public function setVisible(elements : Array<PrefabElement>, visible: Bool) {
 		var prefabHidden : Map<hrt.prefab.Prefab, Bool> = [];
 		for(o in elements) {
@@ -5055,6 +5509,9 @@ class SceneEditor {
 		undo.change(Custom(exec), null, true);
 	}
 
+	/**
+		Locks or unlocks prefabs (not selectable in the view), with undo.
+	**/
 	public function setLock(elements : Array<PrefabElement>, locked: Bool, enableUndo : Bool = true) {
 		var elements = elements.copy();
 		var prev = [for( o in elements ) o.locked];
@@ -5196,6 +5653,9 @@ class SceneEditor {
 		obj3d.updateInstance();
 	}
 
+	/**
+		Deletes prefabs, with undo.
+	**/
 	public function deleteElements(elts : Array<PrefabElement>, ?then: Void->Void, doRefresh : Bool = true, enableUndo : Bool = true) {
 		var undoes = [];
 		beginRebuild();
@@ -5448,6 +5908,9 @@ class SceneEditor {
 	var queuedRefreshRenderProps = false;
 	var queuedRenderProps : hrt.prefab.RenderProps = null;
 	var refreshRenderPropsStack = 0;
+	/**
+		Applies the render props, after the pending rebuild.
+	**/
 	public function queueRefreshRenderProps(?rp: hrt.prefab.RenderProps) {
 		if (refreshRenderPropsStack > 0)
 			return;
@@ -5727,9 +6190,15 @@ class SceneEditor {
 		onUpdate(dt);
 	}
 
+	/**
+		Called each frame.
+	**/
 	public dynamic function onUpdate(dt:Float) {
 	}
 
+	/**
+		Returns the configuration key of the recently added prefab types.
+	**/
 	public function getRecentMenuKey() : String {
 		return "sceneeditor.newrecents";
 	}
@@ -5994,6 +6463,9 @@ class SceneEditor {
 		};
 	}
 
+	/**
+		Returns the height of the ground (or of `paintOn`) at a position.
+	**/
 	public function getZ(x: Float, y: Float, ?paintOn : hrt.prefab.Prefab) {
 		var offset = 1000000;
 		var ray = h3d.col.Ray.fromValues(x, y, offset, 0, 0, -1);
@@ -6042,6 +6514,9 @@ class SceneEditor {
 		return groundPrefabsCache.copy();
 	}
 
+	/**
+		Returns the distance of the intersection of a ray with the ground (or `paintOn`), or `-1`.
+	**/
 	public function projectToGround(ray: h3d.col.Ray, ?paintOn : hrt.prefab.Prefab, ignoreTerrain: Bool = false) {
 		var minDist = -1.;
 		if (!ignoreTerrain) {
@@ -6084,6 +6559,9 @@ class SceneEditor {
 		return minDist;
 	}
 
+	/**
+		Returns the distance to the ground under a screen position, or `null`.
+	**/
 	public function screenDistToGround(sx : Float, sy : Float, ?paintOn : hrt.prefab.Prefab, ignoreTerrain: Bool = false) : Null<Float> {
 		var camera = scene.s3d.camera;
 		var ray = camera.rayFromScreen(sx, sy);
@@ -6093,6 +6571,9 @@ class SceneEditor {
 		return null;
 	}
 
+	/**
+		Returns the ground point under a screen position, or `null`.
+	**/
 	public function screenToGround(sx: Float, sy: Float, ?paintOn : hrt.prefab.Prefab, ignoreTerrain: Bool = false) {
 		var camera = scene.s3d.camera;
 		var ray = camera.rayFromScreen(sx, sy);
@@ -6103,12 +6584,18 @@ class SceneEditor {
 		return null;
 	}
 
+	/**
+		Returns the screen position of a world position.
+	**/
 	public function worldToScreen(wx: Float, wy: Float, wz: Float) {
 		var camera = scene.s3d.camera;
 		var pt = camera.project(wx, wy, wz, scene.s2d.width, scene.s2d.height);
 		return new h2d.col.Point(pt.x, pt.y);
 	}
 
+	/**
+		Returns the world transform of an object (or the object of a prefab), without its default transform.
+	**/
 	public function worldMat(?obj: Object, ?elt: PrefabElement) {
 		var obj = obj ?? elt?.findFirstLocal3d(true);
 		if(obj != null) {
@@ -6125,6 +6612,9 @@ class SceneEditor {
 		return h3d.Matrix.I();
 	}
 
+	/**
+		Returns the world transform of a 2D prefab.
+	**/
 	public function worldMat2d(elt: PrefabElement) : h2d.col.Matrix {
 		var mat = new h2d.col.Matrix();
 		mat.identity();
@@ -6264,6 +6754,9 @@ class SceneEditor {
 		return b;
 	}
 
+	/**
+		Tells if a parent of the prefab is in the list.
+	**/
 	public static function hasParent(elt: PrefabElement, list: Array<PrefabElement>) {
 		for(p in list) {
 			if(isParent(elt, p))
@@ -6272,6 +6765,9 @@ class SceneEditor {
 		return false;
 	}
 
+	/**
+		Tells if a child of the prefab is in the list.
+	**/
 	public static function hasChild(elt: PrefabElement, list: Array<PrefabElement>) {
 		for(p in list) {
 			if(isParent(p, elt))
@@ -6280,6 +6776,9 @@ class SceneEditor {
 		return false;
 	}
 
+	/**
+		Tells if `parent` is a parent of the prefab.
+	**/
 	public static function isParent(elt: PrefabElement, parent: PrefabElement) {
 		var p = elt.parent;
 		while(p != null) {
@@ -6299,28 +6798,46 @@ class SceneEditor {
 	}
 
 	static var contextMenuExtRegistry : Map<{}, (elements: Array<hrt.prefab.Prefab>) -> Array<hrt.ui.HuiMenu.MenuItem>> = [];
+	/**
+		Adds entries to the context menu of the prefabs of a class.
+	**/
 	static public function registerContextMenuExtension(cl: Class<hrt.prefab.Prefab>, callback: (elements: Array<hrt.prefab.Prefab>) -> Array<hrt.ui.HuiMenu.MenuItem>) : Int {
 		contextMenuExtRegistry.set(cast cl, callback);
 		return 0;
 	}
 }
 
+/**
+	The `hrt.prefab.SceneEditorAPI` of a `SceneEditor`.
+**/
 @:access(hide.comp.SceneEditor)
 class HideSceneEditorAPI implements hrt.prefab.SceneEditorAPI {
 	var parent: SceneEditor;
 
+	/**
+		Creates the API.
+	**/
 	public function new(parent: SceneEditor) {
 		this.parent = parent;
 	}
 
+	/**
+		Returns the edited prefab.
+	**/
 	public function getRootPrefab() : hrt.prefab.Prefab {
 		return parent.sceneData;
 	}
 
+	/**
+		Selects prefabs.
+	**/
 	public function selectPrefabs(prefabs: Array<hrt.prefab.Prefab>) : Void {
 		parent.selectElements(prefabs);
 	}
 
+	/**
+		Moves the camera to show the objects.
+	**/
 	public function focusObjects(objects: Array<h3d.scene.Object>) : Void {
 		parent.focusObjects(objects);
 	}
