@@ -19,10 +19,22 @@ private class GraphShader extends h3d.shader.ScreenShader {
 	}
 }
 
+/**
+	When a `ScreenShaderGraph` is rendered.
+**/
 enum abstract ScreenShaderGraphMode(String) {
+	/**
+		Before the tonemapping.
+	**/
 	var BeforeTonemapping;
+	/**
+		After the tonemapping.
+	**/
 	var AfterTonemapping;
 }
+/**
+	A screen effect made with a shader graph (`source`). Its parameters are stored in `props`.
+**/
 @:access(h3d.scene.Renderer)
 class ScreenShaderGraph extends RendererFX {
 
@@ -31,9 +43,21 @@ class ScreenShaderGraph extends RendererFX {
 	var shaderDef : hrt.prefab.Cache.ShaderDef;
 	var shader : hxsl.DynamicShader;
 
+	/**
+		When the effect is rendered.
+	**/
 	@:s public var renderMode : ScreenShaderGraphMode;
+	/**
+		How the effect is blended.
+	**/
 	@:s public var blend : h3d.mat.PbrMaterial.PbrBlend = None;
+	/**
+		Renders into a new target, with the screen as the input of the graph.
+	**/
 	@:s public var usePrevTarget : Bool = false;
+	/**
+		Renders at the beginning of the step instead of the end.
+	**/
 	@:s public var passBegin : Bool = false;
 
 	function new(parent, shared: ContextShared) {
@@ -109,6 +133,9 @@ class ScreenShaderGraph extends RendererFX {
 			execute(r, step);
 	}
 
+	/**
+		Compiles the shader graph.
+	**/
 	public function loadShaderDef() {
 		if (shaderGraph == null)
 			resolve();
@@ -132,6 +159,9 @@ class ScreenShaderGraph extends RendererFX {
 		updateInstance();
 	}
 
+	/**
+		Returns the compiled shader, or `null`.
+	**/
 	public function getShaderDefinition(): hxsl.SharedShader {
 		if( shaderDef == null )
 			loadShaderDef();
@@ -214,6 +244,9 @@ class ScreenShaderGraph extends RendererFX {
 			syncShaderVars();
 	}
 
+	/**
+		Returns the shader graph, loaded from `source`.
+	**/
 	public function resolve() {
 		if(shaderGraph != null)
 			return shaderGraph;

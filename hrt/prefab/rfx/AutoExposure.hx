@@ -1,5 +1,8 @@
 package hrt.prefab.rfx;
 
+/**
+	Adapts the exposure of the PBR renderer to the direction of the camera relative to the main directional light.
+**/
 @:access(h3d.scene.Renderer)
 class AutoExposure extends RendererFX {
 

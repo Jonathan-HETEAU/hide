@@ -1,5 +1,8 @@
 package hrt.prefab.rfx;
 
+/**
+	Sharpens the screen.
+**/
 class SharpenShader extends h3d.shader.ScreenShader {
 	static var SRC = {
 
@@ -23,10 +26,16 @@ class SharpenShader extends h3d.shader.ScreenShader {
 	}
 }
 
+/**
+	Sharpens the screen.
+**/
 @:access(h3d.scene.Renderer)
 class Sharpen extends RendererFX {
 
 	var sharpenPass = new h3d.pass.ScreenFx(new SharpenShader());
+	/**
+		The intensity of the effect.
+	**/
 	@:s public var intensity : Float;
 
 	override function end( r:h3d.scene.Renderer, step:h3d.impl.RendererFX.Step ) {

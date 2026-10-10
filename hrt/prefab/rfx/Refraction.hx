@@ -1,5 +1,8 @@
 package hrt.prefab.rfx;
 
+/**
+	Renders the refracting surfaces, sampling the screen displaced by their normal.
+**/
 class RefractionShader extends hxsl.Shader {
 
 	static var SRC = {
@@ -27,6 +30,9 @@ class RefractionShader extends hxsl.Shader {
 	}
 }
 
+/**
+	Renders the objects drawn in the `refraction` pass with a refraction of the scene behind them.
+**/
 @:access(h3d.pass.PassList)
 @:access(h3d.scene.Renderer)
 @:access(h3d.pass.PassObject)

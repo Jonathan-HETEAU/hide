@@ -1,6 +1,11 @@
 package hrt.prefab.rfx;
+/**
+	Combines the screen space occlusion with the material occlusion.
+**/
+/**
+	Combines the screen space occlusion with the material occlusion.
+**/
 @:access(h3d.scene.Renderer)
-
 class SaoMerge extends h3d.shader.ScreenShader {
 
 	static var SRC = {
@@ -21,31 +26,100 @@ class SaoMerge extends h3d.shader.ScreenShader {
 	}
 }
 
+/**
+	How the screen space occlusion is combined with the material occlusion.
+**/
 enum abstract SaoBlendMode(String) {
+	/**
+		Multiplied.
+	**/
 	var Mult;
+	/**
+		The minimum.
+	**/
 	var Min;
 }
 
+/**
+	Scalable ambient occlusion: a screen space ambient occlusion, combined with the material occlusion.
+**/
 class Sao extends RendererFX {
 
+	/**
+		The size of the occlusion texture, relative to the screen.
+	**/
 	@:s public var size : Float = 1;
+	/**
+		The blur radius.
+	**/
 	@:s public var blur : Float;
+	/**
+		The blur quality.
+	**/
 	@:s public var blurQuality : Float = 1;
+	/**
+		The scale of the noise texture.
+	**/
 	@:s public var noiseScale : Float = 1;
+	/**
+		The number of samples.
+	**/
 	@:s public var samples : Int;
+	/**
+		The radius of the occlusion.
+	**/
 	@:s public var radius : Float;
+	/**
+		The intensity of the occlusion.
+	**/
 	@:s public var intensity : Float = 1;
+	/**
+		The bias against self occlusion.
+	**/
 	@:s public var bias : Float;
+	/**
+		The intensity of the material occlusion.
+	**/
 	@:s public var microIntensity : Float = 1;
+	/**
+		How the occlusion is combined with the material occlusion.
+	**/
 	@:s public var blendMode : SaoBlendMode = Mult;
+	/**
+		Samples the noise in world space.
+	**/
 	@:s public var useWorldUV : Bool;
+	/**
+		The path of the noise texture, or `null`.
+	**/
 	@:s public var noiseTexturePath: String;
+	/**
+		Fades the occlusion in near the camera.
+	**/
 	@:s public var USE_START_FADE : Bool = false;
+	/**
+		The distance at which the near fade starts.
+	**/
 	@:s public var startFadeStart : Float = 0.0;
+	/**
+		The distance at which the near fade ends.
+	**/
 	@:s public var startFadeEnd : Float = 50.0;
+	/**
+		Fades the occlusion out with the distance.
+	**/
 	@:s public var USE_FADE : Bool = false;
+	/**
+		The distance at which the fade starts.
+	**/
 	@:s public var fadeStart: Float = 100.0;
+	/**
+		The distance at which the occlusion disappears.
+	**/
 	@:s public var fadeEnd: Float = 200.0;
+	/**
+		Scales the bias with the distance.
+	**/
 	@:s public var useScalableBias : Bool;
 
 	var sao : h3d.pass.ScalableAO;

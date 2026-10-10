@@ -1,36 +1,102 @@
 package hrt.prefab.rfx;
 
+/**
+	A pattern of sub-pixel offsets of the camera, for temporal anti-aliasing.
+**/
 enum abstract Pattern(String) {
+	/**
+		No jitter.
+	**/
 	var Still;
+	/**
+		2 samples on a diagonal.
+	**/
 	var Uniform2;
+	/**
+		4 samples on a square.
+	**/
 	var Uniform4;
+	/**
+		4 samples on a square, in helix order.
+	**/
 	var Uniform4_Helix;
+	/**
+		8 samples: the square in helix order, then in a Z order.
+	**/
 	var Uniform4_DoubleHelix;
+	/**
+		4 samples on two skewed diagonals.
+	**/
 	var SkewButterfly;
+	/**
+		4 samples on a rotated square.
+	**/
 	var Rotated4;
+	/**
+		4 samples on a rotated square, in helix order.
+	**/
 	var Rotated4_Helix;
+	/**
+		4 samples on a rotated square, in another helix order.
+	**/
 	var Rotated4_Helix2;
+	/**
+		10 samples of a Poisson disc distribution.
+	**/
 	var Poisson10;
+	/**
+		5 samples on a pentagram.
+	**/
 	var Pentagram;
+	/**
+		8 samples of the Halton (2, 3) sequence.
+	**/
 	var Halton_2_3_x8;
+	/**
+		16 samples of the Halton (2, 3) sequence.
+	**/
 	var Halton_2_3_x16;
+	/**
+		32 samples of the Halton (2, 3) sequence.
+	**/
 	var Halton_2_3_x32;
+	/**
+		256 samples of the Halton (2, 3) sequence.
+	**/
 	var Halton_2_3_x256;
+	/**
+		2 samples on the vertical axis.
+	**/
 	var MotionPerp2;
+	/**
+		2 samples on the horizontal axis.
+	**/
 	var MotionVPerp2;
 }
 
+/**
+	Cycles through the sub-pixel offsets of a pattern, to jitter the camera frustum each frame (temporal anti-aliasing).
+**/
 class FrustumJitter {
 
+	/**
+		The offsets of the `Still` pattern, as `x, y` pairs.
+	**/
 	public var points_Still : Array<Float> = [
 		0.0, 0.0,
 	];
 
+   	/**
+   		The offsets of the `Uniform2` pattern, as `x, y` pairs.
+   	**/
    	public var points_Uniform2 : Array<Float> = [
 		-0.2, -0.2,//ll
 		0.2,  0.2,//ur
 	];
 
+	/**
+		The offsets of the `Uniform4` pattern, as `x, y` pairs.
+	**/
 	public var points_Uniform4 : Array<Float> = [
 		-0.2, -0.2,//ll
 		0.2, -0.2,//lr
@@ -38,6 +104,9 @@ class FrustumJitter {
 		-0.2,  0.2,//ul
 	];
 
+	/**
+		The offsets of the `Uniform4_Helix` pattern, as `x, y` pairs.
+	**/
 	public var points_Uniform4_Helix : Array<Float> = [
 		-0.2, -0.2,//ll  3  1
 		0.2,  0.2,//ur   \/|
@@ -45,6 +114,9 @@ class FrustumJitter {
 		-0.2,  0.2,//ul  0  2
 	];
 
+	/**
+		The offsets of the `Uniform4_DoubleHelix` pattern, as `x, y` pairs.
+	**/
 	public var points_Uniform4_DoubleHelix : Array<Float> = [
 		-0.2, -0.2,//ll  3  1
 		0.2,  0.2,//ur   \/|
@@ -56,6 +128,9 @@ class FrustumJitter {
 		0.2,  0.2,//ur  4--5
 	];
 
+	/**
+		The offsets of the `SkewButterfly` pattern, as `x, y` pairs.
+	**/
 	public var points_SkewButterfly : Array<Float> = [
 		-0.250, -0.250,
 		0.250,  0.250,
@@ -63,6 +138,9 @@ class FrustumJitter {
 		-0.12,  0.12,
 	];
 
+	/**
+		The offsets of the `Rotated4` pattern, as `x, y` pairs.
+	**/
 	public var points_Rotated4 : Array<Float> = [
 		-0.12, -0.37,//ll
 		0.37, -0.12,//lr
@@ -70,6 +148,9 @@ class FrustumJitter {
 		-0.37,  0.12,//ul
 	];
 
+	/**
+		The offsets of the `Rotated4_Helix` pattern, as `x, y` pairs.
+	**/
 	public var points_Rotated4_Helix : Array<Float> = [
 		-0.12, -0.37,//ll  3  1
 		0.12,  0.37,//ur   \/|
@@ -77,6 +158,9 @@ class FrustumJitter {
 		-0.37,  0.12,//ul  0  2
 	];
 
+	/**
+		The offsets of the `Rotated4_Helix2` pattern, as `x, y` pairs.
+	**/
 	public var points_Rotated4_Helix2 : Array<Float> = [
 		-0.12, -0.37,//ll  2--1
 		0.12,  0.37,//ur   \/
@@ -84,6 +168,9 @@ class FrustumJitter {
 		0.37, -0.12,//lr  0  3
 	];
 
+	/**
+		The offsets of the `Poisson10` pattern, as `x, y` pairs.
+	**/
 	public var points_Poisson10 : Array<Float> = [
 		-0.16795960*0.2,  0.65544910*0.2,
 		-0.69096030*0.2,  0.59015970*0.2,
@@ -97,6 +184,9 @@ class FrustumJitter {
 		-0.12388120*0.2, -0.96633990*0.2,
 	];
 
+	/**
+		The offsets of the `Pentagram` pattern, as `x, y` pairs.
+	**/
 	public var points_Pentagram : Array<Float> = [
 		0.000000,  0.525731,// head
 		-0.309017, -0.42532,// lleg
@@ -105,15 +195,33 @@ class FrustumJitter {
 		0.309017, -0.42532,// rleg
 	];
 
+	/**
+		The offsets of the `Halton_2_3_x8` pattern, as `x, y` pairs.
+	**/
 	public var points_Halton_2_3_x8 : Array<Float> = [];
+	/**
+		The offsets of the `Halton_2_3_x16` pattern, as `x, y` pairs.
+	**/
 	public var points_Halton_2_3_x16 : Array<Float> = [];
+	/**
+		The offsets of the `Halton_2_3_x32` pattern, as `x, y` pairs.
+	**/
 	public var points_Halton_2_3_x32 : Array<Float> = [];
+	/**
+		The offsets of the `Halton_2_3_x256` pattern, as `x, y` pairs.
+	**/
 	public var points_Halton_2_3_x256 : Array<Float> = [];
+	/**
+		The offsets of the `MotionPerp2` pattern, as `x, y` pairs.
+	**/
 	public var points_MotionPerp2 : Array<Float> = [
 		0.00, -0.2,
 		0.00,  0.2,
 	];
 
+	/**
+		The offsets of the `MotionVPerp2` pattern, as `x, y` pairs.
+	**/
 	public var points_MotionVPerp2 : Array<Float> = [
 		-0.20, -0.0,
 		0.20,  0.0,
@@ -144,12 +252,30 @@ class FrustumJitter {
 		}
     }
 
+	/**
+		The scale of the offsets.
+	**/
 	public var patternScale = 1.0;
+	/**
+		The index of the current sample.
+	**/
 	public var activeIndex = 0;
+	/**
+		The current offset.
+	**/
 	public var curSample = new h2d.col.Point(0,0);
+	/**
+		The offset of the previous frame.
+	**/
 	public var prevSample = new h2d.col.Point(0,0);
+	/**
+		The pattern.
+	**/
 	public var curPattern : Pattern = Still;
 
+	/**
+		Creates the jitter, computing the Halton sequences.
+	**/
 	public function new() {
 		points_Halton_2_3_x8.resize(8);
 		initializeHalton_2_3(points_Halton_2_3_x8);
@@ -161,6 +287,9 @@ class FrustumJitter {
 		initializeHalton_2_3(points_Halton_2_3_x256);
 	}
 
+	/**
+		Moves to the next sample of the pattern.
+	**/
 	public function update() {
 
 		var seq = getSeq(curPattern);

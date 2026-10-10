@@ -1,5 +1,8 @@
 package hrt.prefab.rfx;
 
+/**
+	Ray marches the reflections in screen space.
+**/
 class SSRShader extends h3d.shader.ScreenShader {
 	static var SRC = {
 
@@ -179,27 +182,75 @@ class SSRShader extends h3d.shader.ScreenShader {
 	}
 }
 
+/**
+	Screen space reflections, on the surfaces with a low roughness (or marked by the `ssrNormalMask` pass).
+**/
 class SSR extends RendererFX {
 
+	/**
+		The ray marching pass.
+	**/
 	public var ssrPass : h3d.pass.ScreenFx<SSRShader>;
 
 	var blurPass = new h3d.pass.Blur();
 	var ssr : h3d.mat.Texture;
 	var normalMaskOutput : h3d.pass.Output;
 
+	/**
+		Displays the mask.
+	**/
 	@:s public var debugSSRMask : Bool = false;
+	/**
+		The intensity of the reflections.
+	**/
 	@:s public var intensity : Float = 1.;
+	/**
+		The factor of the reflected color.
+	**/
 	@:s public var colorMul : Float = 1.;
+	/**
+		The thickness of the surfaces hit by the rays.
+	**/
 	@:s public var thicknessValue : Float = 0.0001;
+	/**
+		The blur radius.
+	**/
 	@:s public var blurRadius : Float = 1.0;
+	/**
+		The size of the reflection texture, relative to the screen.
+	**/
 	@:s public var textureSize : Float = 0.5;
+	/**
+		Reflects on the surfaces drawn in the `ssrNormalMask` pass.
+	**/
 	@:s public var useMask : Bool = false;
+	/**
+		Reflects on the surfaces with a roughness below `maxRoughness`.
+	**/
 	@:s public var useRoughness : Bool = true;
+	/**
+		The maximum roughness of the reflecting surfaces.
+	**/
 	@:s public var maxRoughness : Float = 0.75;
+	/**
+		The minimum angle between the reflection and the hit surface normal, in degrees (`0` to disable the check).
+	**/
 	@:s public var minAngle : Float = 5.0;
+	/**
+		The resolution of the ray marching, from `0` to `1`.
+	**/
 	@:s public var rayMarchingResolution : Float = 0.5;
+	/**
+		Keeps the full resolution above 2560x1440 (otherwise it is scaled down).
+	**/
 	@:s public var support4K : Bool = false;
+	/**
+		The radius of the fade of the reflections near the screen borders.
+	**/
 	@:s public var vignettingRadius : Float = 1.0;
+	/**
+		The smoothness of the fade near the screen borders.
+	**/
 	@:s public var vignettingSmoothness : Float = 0.35;
 
 	function new(parent, shared) {

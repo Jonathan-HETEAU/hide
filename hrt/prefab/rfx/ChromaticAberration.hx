@@ -1,5 +1,8 @@
 package hrt.prefab.rfx;
 
+/**
+	Shifts the red and blue channels toward the screen borders.
+**/
 class ChromaticAberrationShader extends h3d.shader.ScreenShader {
 
 	static var SRC = {
@@ -33,6 +36,9 @@ class ChromaticAberrationShader extends h3d.shader.ScreenShader {
 	}
 }
 
+/**
+	Shifts the red and blue channels toward the screen borders, as a lens would.
+**/
 @:access(h3d.scene.Renderer)
 class ChromaticAberration extends RendererFX {
 

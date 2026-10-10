@@ -1,5 +1,8 @@
 package hrt.prefab.rfx;
 
+/**
+	Blends the frame with the previous ones.
+**/
 class TemporalFilteringShader extends h3d.shader.ScreenShader {
 
 	static var SRC = {
@@ -166,19 +169,52 @@ class TemporalFilteringShader extends h3d.shader.ScreenShader {
 	}
 }
 
+/**
+	Temporal anti-aliasing: jitters the camera each frame and blends with the previous frames.
+**/
 @:access(h3d.scene.Renderer)
 class TemporalFiltering extends hrt.prefab.rfx.RendererFX {
 
+	/**
+		The weight of the previous frames.
+	**/
 	@:s public var amount : Float = 0.85;
+	/**
+		Clips the previous color to the neighborhood of the pixel, to reduce ghosting.
+	**/
 	@:s public var varianceClipping : Bool = true;
+	/**
+		Samples the previous frame with a Catmull-Rom filter.
+	**/
 	@:s public var catmullRom : Bool = true;
+	/**
+		Uses the velocity buffer to reproject the previous frame.
+	**/
 	@:s public var velocity : Bool = true;
+	/**
+		The jitter pattern.
+	**/
 	@:s public var jitterPattern : FrustumJitter.Pattern = Halton_2_3_x8;
+	/**
+		When the effect is rendered: `AfterTonemapping` or `BeforeTonemapping`.
+	**/
 	@:s public var renderMode : String = "AfterTonemapping";
+	/**
+		Keeps the alpha of the frame (otherwise `1`).
+	**/
 	@:s public var keepAlpha : Bool = false;
+	/**
+		Keeps the alpha of the frame on the sky.
+	**/
 	@:s public var keepSkyAlpha : Bool = false;
 
+	/**
+		The jitter of the camera.
+	**/
 	public var frustumJitter = new FrustumJitter();
+	/**
+		The filtering pass.
+	**/
 	public var pass = new h3d.pass.ScreenFx(new TemporalFilteringShader());
 	var curMatNoJitter = new h3d.Matrix();
 	var prevMatJittered = new h3d.Matrix();

@@ -1,5 +1,8 @@
 package hrt.prefab.rfx;
 
+/**
+	Applies a Kuwahara filter (painting effect), depending on the distance.
+**/
 class KuwaharaShader extends hrt.shader.PbrShader {
 
 	static var SRC = {
@@ -139,6 +142,9 @@ class KuwaharaShader extends hrt.shader.PbrShader {
 	}
 }
 
+/**
+	A Kuwahara filter, giving a painting look, with an opacity depending on the distance.
+**/
 @:access(h3d.scene.Renderer)
 class KuwaharaFilter extends RendererFX {
 

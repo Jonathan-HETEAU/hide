@@ -1,5 +1,8 @@
 package hrt.prefab.rfx;
 
+/**
+	Blends the blurred screen depending on the distance.
+**/
 class DistanceBlurShader extends hrt.shader.PbrShader {
 
 	static var SRC = {
@@ -45,29 +48,68 @@ class DistanceBlurShader extends hrt.shader.PbrShader {
 
 	};
 
+	/**
+		Creates the shader.
+	**/
 	public function new() {
 		super();
 	}
 
 }
+/**
+	Blurs the near and far parts of the screen (depth of field).
+**/
 @:access(h3d.scene.Renderer)
 class DistanceBlur extends RendererFX {
 
 	var blurPass = new h3d.pass.ScreenFx(new DistanceBlurShader());
 	var lbrBlur = new h3d.pass.Blur();
 
+	/**
+		The distance at which the near blur starts.
+	**/
 	@:s public var nearStartDistance : Float;
+	/**
+		The distance at which the near blur ends.
+	**/
 	@:s public var nearEndDistance : Float;
+	/**
+		The opacity of the near blur at its start.
+	**/
 	@:s public var nearStartIntensity : Float = 1;
+	/**
+		The opacity of the near blur at its end.
+	**/
 	@:s public var nearEndIntensity : Float;
 
+	/**
+		The distance at which the far blur starts.
+	**/
 	@:s public var farStartDistance : Float;
+	/**
+		The distance at which the far blur ends.
+	**/
 	@:s public var farEndDistance : Float;
+	/**
+		The opacity of the far blur at its start.
+	**/
 	@:s public var farStartIntensity : Float;
+	/**
+		The opacity of the far blur at its end.
+	**/
 	@:s public var farEndIntensity : Float = 1;
 
+	/**
+		Shows the blur zones (editor).
+	**/
 	@:s public var showDebug : Bool;
+	/**
+		The size of the blurred texture, relative to the screen.
+	**/
 	@:s public var blurTextureSize : Float;
+	/**
+		The blur radius.
+	**/
 	@:s public var blurRange : Int;
 
 	function new(parent, shared: ContextShared) {

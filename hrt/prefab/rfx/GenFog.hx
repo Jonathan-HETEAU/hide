@@ -1,5 +1,8 @@
 package hrt.prefab.rfx;
 
+/**
+	The functions computing the fog of `GenFog`.
+**/
 class GenFogFunc extends hrt.shader.PbrShader {
 	static var SRC = {
 
@@ -59,6 +62,9 @@ class GenFogFunc extends hrt.shader.PbrShader {
 	}
 }
 
+/**
+	Renders the fog of `GenFog`.
+**/
 class GenFogShader extends hrt.shader.PbrShader {
 
 	static var SRC = {
@@ -128,11 +134,17 @@ class GenFogShader extends hrt.shader.PbrShader {
 
 	};
 
+	/**
+		Creates the shader.
+	**/
 	public function new() {
 		super();
 	}
 }
 
+/**
+	Renders a blend of two `GenFog` fogs, for transitions.
+**/
 class GenFogBlendShader extends hrt.shader.PbrShader {
 
 	static var SRC = {
@@ -246,25 +258,61 @@ class GenFogBlendShader extends hrt.shader.PbrShader {
 
 	};
 
+	/**
+		Creates the shader.
+	**/
 	public function new() {
 		super();
 	}
 }
 
+/**
+	The noise displacing the fog.
+**/
 typedef GenFogNoise = {
+	/**
+		The path of the noise texture.
+	**/
 	var texture : String;
+	/**
+		The scroll speed of the noise.
+	**/
 	var speed : Float;
+	/**
+		The world size of the noise texture.
+	**/
 	var scale : Float;
+	/**
+		The vertical displacement of the fog by the noise.
+	**/
 	var amount : Float;
+	/**
+		The factor of `amount` for the horizontal displacement.
+	**/
 	var distAmount : Float;
 }
 
+/**
+	When the fog of `GenFog` is rendered.
+**/
 enum abstract GenFogRenderMode(String) {
+	/**
+		After the lighting.
+	**/
 	var Lighting;
+	/**
+		Before the tonemapping.
+	**/
 	var BeforeTonemapping;
+	/**
+		After the tonemapping.
+	**/
 	var AfterTonemapping;
 }
 
+/**
+	A fog depending on the distance and the height, with a color gradient and a light scattering toward the shadow light.
+**/
 @:access(h3d.scene.Renderer)
 class GenFog extends RendererFX {
 
@@ -272,33 +320,96 @@ class GenFog extends RendererFX {
 	var fogPass : h3d.pass.ScreenFx<GenFogShader> = null;
 	var fogPassBlend : h3d.pass.ScreenFx<GenFogBlendShader> = null;
 
+	/**
+		The intensity of the fog.
+	**/
 	@:s public var intensity : Float = 1;
 
+	/**
+		The distance at which the distance fog starts.
+	**/
 	@:s public var startDistance : Float;
+	/**
+		The distance at which the distance fog is full.
+	**/
 	@:s public var endDistance : Float;
+	/**
+		The opacity of the distance fog (`0` to disable it).
+	**/
 	@:s public var distanceOpacity : Float;
+	/**
+		Measures the distance from the camera target instead of the camera.
+	**/
 	@:s public var distanceFixed : Bool;
 
+	/**
+		The height at which the height fog starts.
+	**/
 	@:s public var startHeight : Float;
+	/**
+		The height at which the height fog is full.
+	**/
 	@:s public var endHeight : Float;
+	/**
+		The opacity of the height fog (`0` to disable it).
+	**/
 	@:s public var heightOpacity : Float;
 
+	/**
+		The opacity of the fog at its start.
+	**/
 	@:s public var startOpacity : Float;
+	/**
+		The opacity of the fog when full.
+	**/
 	@:s public var endOpacity : Float;
 
+	/**
+		The color of the fog at its start, as RGB.
+	**/
 	@:s public var startColor : Int;
+	/**
+		The color of the fog when full, as RGB.
+	**/
 	@:s public var endColor : Int;
+	/**
+		When the fog is rendered.
+	**/
 	@:s public var renderMode : GenFogRenderMode;
 
+	/**
+		The noise displacing the fog, or `null`.
+	**/
 	@:s public var noise : GenFogNoise;
 
+	/**
+		The X of the fog origin.
+	**/
 	@:s public var posX : Float;
+	/**
+		The Y of the fog origin.
+	**/
 	@:s public var posY : Float;
+	/**
+		The Z of the fog origin.
+	**/
 	@:s public var posZ : Float;
+	/**
+		Measures the distance and height from `posX`, `posY`, `posZ` instead of the camera and the ground.
+	**/
 	@:s public var usePosition : Bool;
 
+	/**
+		The color of the light scattered toward the shadow light, as RGB.
+	**/
 	@:s public var lightColor = 0xFFFFFF;
+	/**
+		The intensity of the scattered light.
+	**/
 	@:s public var lightColorAmount : Float;
+	/**
+		The angle around the light direction where the light is scattered, in degrees.
+	**/
 	@:s public var lightAngle : Float = 90.0;
 
 	public function new(parent, shared: ContextShared) {

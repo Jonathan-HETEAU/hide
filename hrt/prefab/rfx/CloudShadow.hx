@@ -2,6 +2,9 @@ package hrt.prefab.rfx;
 
 import hxd.res.Loader;
 
+/**
+	A directional light attenuated by a scrolling cloud texture.
+**/
 class DirLightWithClouds extends h3d.shader.pbr.Light {
 
 	static var SRC = {
@@ -38,17 +41,38 @@ class DirLightWithClouds extends h3d.shader.pbr.Light {
 	};
 }
 
+/**
+	Projects the shadows of scrolling clouds with the main directional light.
+**/
 @:access(h3d.scene.pbr.DirLight)
 @:access(h3d.scene.Renderer)
 class CloudShadow extends RendererFX {
 
 	var dlwc = new DirLightWithClouds();
 
+	/**
+		The opacity of the cloud shadows.
+	**/
 	@:s public var opacity : Float = 1;
+	/**
+		The world size of the cloud texture.
+	**/
 	@:s public var scale : Float = 1;
+	/**
+		The scroll speed of the clouds.
+	**/
 	@:s public var speed : Float;
+	/**
+		The scroll direction of the clouds, in degrees.
+	**/
 	@:s public var angle : Float;
+	/**
+		The path of the cloud texture.
+	**/
 	@:s public var texturePath : String;
+	/**
+		The distortion of the clouds by a scrolling texture (`path`, `scale`, `speed`, `angle`, `amount`), or `null`.
+	**/
 	@:s public var distort : {
 		var path : String;
 		var scale : Float;

@@ -1,5 +1,8 @@
 package hrt.prefab.rfx;
 
+/**
+	Offsets the texture coordinates of the tonemapping by the distortion map.
+**/
 class DistortionTonemap extends hxsl.Shader {
 	static var SRC = {
 
@@ -13,10 +16,16 @@ class DistortionTonemap extends hxsl.Shader {
 		}
 	}
 }
+/**
+	Distorts the screen with the objects drawn in the `distortion` pass.
+**/
 @:access(h3d.scene.Renderer)
 class Distortion extends RendererFX {
 
 	var tonemap = new DistortionTonemap();
+	/**
+		The amount of distortion.
+	**/
 	@:s public var amount : Float = 1;
 
 	override function end( r:h3d.scene.Renderer, step:h3d.impl.RendererFX.Step ) {

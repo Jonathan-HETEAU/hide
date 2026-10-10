@@ -1,5 +1,8 @@
 package hrt.prefab.rfx;
 
+/**
+	The base of the renderer effect prefabs: a `h3d.impl.RendererFX` added to the renderer. The prefab is cloned as the effect instance.
+**/
 @:prefabIcon(hrt.ui.HuiRes.ui.icons.prefab.renderer_fx)
 @:prefabName("Renderer FX")
 @:prefabCategory("RFX")
@@ -9,15 +12,27 @@ class RendererFX extends Prefab implements h3d.impl.RendererFX {
 
 	var instance : RendererFX;
 
+	/**
+		Called when the rendering starts. Does nothing by default.
+	**/
 	public function start( r : h3d.scene.Renderer ) {
 	}
 
+	/**
+		Called at the beginning of a rendering step. Does nothing by default.
+	**/
 	public function begin( r : h3d.scene.Renderer, step : h3d.impl.RendererFX.Step ) {
 	}
 
+	/**
+		Called at the end of a rendering step. Does nothing by default.
+	**/
 	public function end( r : h3d.scene.Renderer, step : h3d.impl.RendererFX.Step ) {
 	}
 
+	/**
+		Returns a transition from `r1` to `r2`: switches to `r2` without blending by default.
+	**/
 	public function transition( r1 : h3d.impl.RendererFX, r2 : h3d.impl.RendererFX ) : h3d.impl.RendererFX.RFXTransition {
 		var rfx1 = Std.downcast(r1, RendererFX);
 		if (rfx1.instance == null)
@@ -30,6 +45,9 @@ class RendererFX extends Prefab implements h3d.impl.RendererFX {
 		return { effect : rfx2, setFactor : (f : Float) -> {} };
 	}
 
+	/**
+		Returns the effect instance (made if needed).
+	**/
 	public function modulate( t : Float ) : h3d.impl.RendererFX {
 		if (this.instance == null)
 			this.make();

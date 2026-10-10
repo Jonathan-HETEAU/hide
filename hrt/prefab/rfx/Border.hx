@@ -1,5 +1,8 @@
 package hrt.prefab.rfx;
 
+/**
+	Draws a colored border around the screen.
+**/
 class BorderShader extends h3d.shader.ScreenShader {
 	static var SRC = {
 		@param var size:Float;
@@ -13,8 +16,17 @@ class BorderShader extends h3d.shader.ScreenShader {
 	};
 }
 
+/**
+	Draws a colored border around the screen.
+**/
 class Border extends RendererFX {
+	/**
+		The screen pass.
+	**/
 	public var pass : h3d.pass.ScreenFx<BorderShader>;
+	/**
+		The shader.
+	**/
 	public var shader : BorderShader;
 
 	public function new(parent: Prefab, shared: ContextShared) {
@@ -25,6 +37,9 @@ class Border extends RendererFX {
 		pass.pass.setBlendMode(Alpha);
 	}
 
+	/**
+		Sets the size (relative to the screen), color (RGB) and alpha of the border.
+	**/
 	public function setParams( size = 0.1, color: Int = 0, alpha = 1.0) {
 		shader.size = size;
 		shader.alpha = alpha;

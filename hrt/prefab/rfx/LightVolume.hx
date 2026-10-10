@@ -1,5 +1,8 @@
 package hrt.prefab.rfx;
 
+/**
+	Renders the light volumes (`hrt.prefab.pbr.LightVolume`) drawn in the `lightVolume` pass.
+**/
 @:access(h3d.pass.PassList)
 @:access(h3d.pass.PassObject)
 @:access(h3d.scene.Renderer)
@@ -8,11 +11,26 @@ class LightVolume extends RendererFX {
 	var blurPass = new h3d.pass.Blur();
 	var ssr : h3d.mat.Texture;
 
+	/**
+		The number of ray marching steps.
+	**/
 	@:s public var steps : Int = 10;
+	/**
+		The blur radius.
+	**/
 	@:s public var blurRadius : Float = 1.0;
+	/**
+		The size of the texture, relative to the screen.
+	**/
 	@:s public var textureSize : Float = 0.5;
 
+	/**
+		The path of the dithering noise texture, or `null` for no dithering.
+	**/
 	@:s public var ditheringNoise : String;
+	/**
+		The intensity of the dithering.
+	**/
 	@:s public var ditheringIntensity : Float = 1.0;
 
 	var passes : h3d.pass.PassList;

@@ -1,5 +1,8 @@
 package hrt.prefab.rfx;
 
+/**
+	Ray marches the fog and the lights of `VolumetricLighting`.
+**/
 class VolumetricLightingShader extends h3d.shader.pbr.DefaultForward {
 
 	static var SRC = {
@@ -348,12 +351,27 @@ class VolumetricLightingShader extends h3d.shader.pbr.DefaultForward {
 	}
 }
 
+/**
+	The lights of `VolumetricLighting`.
+**/
 enum VolumetricLightingMode {
+	/**
+		All the lights.
+	**/
 	All;
+	/**
+		The directional lights.
+	**/
 	DirectionalOnly;
+	/**
+		The directional and spot lights.
+	**/
 	DirectionalAndSpot;
 }
 
+/**
+	A volumetric fog lit by the lights (with their shadows), computed by ray marching at half resolution.
+**/
 @:access(h3d.scene.Renderer)
 class VolumetricLighting extends RendererFX {
 
@@ -364,46 +382,151 @@ class VolumetricLighting extends RendererFX {
 	var blurPass = new h3d.pass.Blur();
 	var vshader = new VolumetricLightingShader();
 
+	/**
+		The intensity of the effect.
+	**/
 	@:s public var intensity : Float = 1.0;
 
+	/**
+		Renders after the other effects of the step.
+	**/
 	@:s public var AFTER_FX : Bool = false;
+	/**
+		How the fog is blended.
+	**/
 	@:s public var blend : h3d.mat.PbrMaterial.PbrBlend = Alpha;
+	/**
+		The color of the fog, as RGB.
+	**/
 	@:s public var color : Int = 0xFFFFFF;
+	/**
+		The number of ray marching steps.
+	**/
 	@:s public var steps : Int = 10;
+	/**
+		The lights.
+	**/
 	@:s public var mode : VolumetricLightingMode = DirectionalOnly;
+	/**
+		The blur radius.
+	**/
 	@:s public var blur : Float = 0.0;
+	/**
+		The depth difference above which the blur stops.
+	**/
 	@:s public var blurDepthThreshold : Float = 10.0;
+	/**
+		The distance at which the fog starts.
+	**/
 	@:s public var startDistance : Float = 0.0;
+	/**
+		The distance at which the ray marching stops.
+	**/
 	@:s public var endDistance : Float = 200.0;
+	/**
+		The maximum distance of the ray marching (`0` for none).
+	**/
 	@:s public var maxCamDist : Float = 0.0;
+	/**
+		The opacity of the fog (`0` disables the effect).
+	**/
 	@:s public var distanceOpacity : Float = 1.0;
+	/**
+		The dithering of the ray marching steps.
+	**/
 	@:s public var ditheringIntensity : Float = 1.0;
 
+	/**
+		The scale of the noise.
+	**/
 	@:s public var noiseScale : Float = 1.0;
+	/**
+		The frequency factor between the noise octaves.
+	**/
 	@:s public var noiseLacunarity : Float = 2.0;
+	/**
+		The sharpness of the noise.
+	**/
 	@:s public var noiseSharpness : Float = 1.0;
+	/**
+		The amplitude factor between the noise octaves.
+	**/
 	@:s public var noisePersistence : Float = 0.5;
+	/**
+		The speed of the noise animation.
+	**/
 	@:s public var noiseTurmoil : Float = 1.0;
+	/**
+		The number of noise octaves.
+	**/
 	@:s public var noiseOctave : Int = 1;
 
+	/**
+		The density of the fog.
+	**/
 	@:s public var fogDensity : Float = 1.0;
+	/**
+		How much the noise modulates the fog, from `0` to `1`.
+	**/
 	@:s public var fogUseNoise : Float = 1.0;
+	/**
+		The decrease of the density with the height.
+	**/
 	@:s public var fogHeightFalloff : Float = 1.0;
+	/**
+		The intensity of the environment lighting of the fog.
+	**/
 	@:s public var fogEnvPower : Float = 1.0;
+	/**
+		The height of the bottom of the fog.
+	**/
 	@:s public var fogBottom : Float = 0.0;
+	/**
+		The height of the top of the fog.
+	**/
 	@:s public var fogTop : Float = 200.0;
+	/**
+		How much the environment color tints the fog, from `0` to `1`.
+	**/
 	@:s public var fogEnvColorMult : Float = 0.0;
 
+	/**
+		The color of the second fog layer, as RGB.
+	**/
 	@:s public var secondFogColor : Int = 0xFFFFFF;
+	/**
+		How much the noise modulates the second fog, from `0` to `1`.
+	**/
 	@:s public var secondFogUseNoise : Float = 1.0;
+	/**
+		The density of the second fog (`0` to disable it).
+	**/
 	@:s public var secondFogDensity : Float = 0.0;
+	/**
+		The decrease of the density of the second fog with the height.
+	**/
 	@:s public var secondFogHeightFalloff : Float = 5.0;
+	/**
+		The height of the bottom of the second fog.
+	**/
 	@:s public var secondFogBottom : Float = 0.0;
+	/**
+		The height of the top of the second fog.
+	**/
 	@:s public var secondFogTop : Float = 50.0;
 
+	/**
+		The color of the light emitted by the fog, as RGB.
+	**/
 	@:s public var emissiveColor : Int = 0xFFFFFF;
+	/**
+		The intensity of the light emitted by the fog.
+	**/
 	@:s public var emissiveIntensity : Float = 0.0;
 
+	/**
+		Moves the top of the fog layers with the camera height.
+	**/
 	@:s public var offsetCamHeight : Bool = false;
 
 	function execute(r : h3d.scene.Renderer, step : h3d.impl.RendererFX.Step) {

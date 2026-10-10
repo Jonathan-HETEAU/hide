@@ -3,6 +3,9 @@ package hrt.prefab.rfx;
 import hrt.prefab.rfx.RendererFX;
 import hxd.Math;
 
+/**
+	Colors the screen borders.
+**/
 class VignettingShader extends h3d.shader.ScreenShader {
 	static var SRC = {
 
@@ -20,15 +23,33 @@ class VignettingShader extends h3d.shader.ScreenShader {
 	}
 }
 
+/**
+	Colors the screen borders.
+**/
 @:access(h3d.scene.Renderer)
 class Vignetting extends RendererFX {
 
 	var vignettingPass = new h3d.pass.ScreenFx(new VignettingShader());
 
+	/**
+		The color, as RGB.
+	**/
 	@:s public var color : Int = 0xFFFFFF;
+	/**
+		The opacity.
+	**/
 	@:s public var alpha : Float = 1;
+	/**
+		The radius, relative to the screen, from which the borders are colored.
+	**/
 	@:s public var radius : Float = 1;
+	/**
+		The width of the transition.
+	**/
 	@:s public var softness : Float;
+	/**
+		Renders after the upscaling instead of after the tonemapping.
+	**/
 	@:s public var renderAfterUpscaling : Bool = false;
 
 	function sync( r : h3d.scene.Renderer ) {

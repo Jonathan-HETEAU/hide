@@ -3,6 +3,9 @@ package hrt.prefab.rfx;
 import hxsl.Eval;
 import h3d.pass.Copy;
 
+/**
+	Downscales the bloom (dual filtering).
+**/
 class DualFilterDown extends h3d.shader.ScreenShader {
 
 	static var SRC = {
@@ -22,6 +25,9 @@ class DualFilterDown extends h3d.shader.ScreenShader {
 	};
 }
 
+/**
+	Upscales the bloom (dual filtering).
+**/
 class DualFilterUp extends h3d.shader.ScreenShader {
 
 	static var SRC = {
@@ -44,6 +50,9 @@ class DualFilterUp extends h3d.shader.ScreenShader {
 	};
 }
 
+/**
+	Keeps the bright pixels, with a temporal filter.
+**/
 class Threshold extends h3d.shader.ScreenShader {
 
 	static var SRC = {
@@ -78,15 +87,39 @@ class Threshold extends h3d.shader.ScreenShader {
 	};
 }
 
+/**
+	A bloom with dual filtering and a temporal filter, more stable than `Bloom`.
+**/
 @:access(h3d.scene.Renderer)
 class TemporalBloom extends RendererFX {
 
+	/**
+		The size of the bloom texture, relative to the screen.
+	**/
 	@:s public var size : Float;
+	/**
+		The number of downscales.
+	**/
 	@:s public var downScaleCount : Int;
+	/**
+		The luminance above which the pixels glow.
+	**/
 	@:s public var threshold : Float;
+    /**
+    	The intensity of the glow.
+    **/
     @:s public var intensity : Float = 1;
+	/**
+		The maximum luminance of a pixel.
+	**/
 	@:s public var maxValue : Float;
+	/**
+		Blends with the previous frames.
+	**/
 	@:s public var useTemporalFilter : Bool = true;
+	/**
+		The weight of the previous frames.
+	**/
 	@:s public var temporalStrength : Float;
 
 	var thresholdPass = new h3d.pass.ScreenFx(new Threshold());

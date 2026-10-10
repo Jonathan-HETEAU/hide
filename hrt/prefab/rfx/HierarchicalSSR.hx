@@ -1,5 +1,8 @@
 package hrt.prefab.rfx;
 
+/**
+	Hierarchical screen space reflections (`h3d.pass.SSR`). Not rendered in the editor.
+**/
 class HierarchicalSSR extends RendererFX {
 
 	@:s var stepCount : Int = 64;

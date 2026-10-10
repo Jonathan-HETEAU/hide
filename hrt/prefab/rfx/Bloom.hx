@@ -1,5 +1,8 @@
 package hrt.prefab.rfx;
 
+/**
+	Adds the bloom texture in the tonemapping.
+**/
 class BloomTonemap extends hxsl.Shader {
 	static var SRC = {
 		@param var bloomTexture : Sampler2D;
@@ -11,6 +14,9 @@ class BloomTonemap extends hxsl.Shader {
 	}
 }
 
+/**
+	Adds a glow around the bright pixels.
+**/
 @:access(h3d.scene.Renderer)
 class Bloom extends RendererFX {
 
@@ -18,12 +24,33 @@ class Bloom extends RendererFX {
 	var bloomBlur = new h3d.pass.Blur();
 	var tonemap = new BloomTonemap();
 
+	/**
+		The size of the bloom texture, relative to the screen.
+	**/
 	@:s public var size : Float;
+	/**
+		The luminance above which the pixels glow.
+	**/
 	@:s public var threshold : Float;
+	/**
+		The intensity of the glow.
+	**/
 	@:s public var intensity : Float = 1;
+	/**
+		The blur radius.
+	**/
 	@:s public var blur : Float;
+	/**
+		The saturation of the glow.
+	**/
 	@:s public var saturation : Float;
+	/**
+		The blur quality.
+	**/
 	@:s public var blurQuality : Float = 1;
+	/**
+		The linear part of the blur.
+	**/
 	@:s public var blurLinear : Float;
 
 	function new(parent, shared: ContextShared) {

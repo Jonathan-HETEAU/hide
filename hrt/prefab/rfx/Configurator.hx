@@ -6,10 +6,19 @@ import h3d.scene.Renderer;
 
 private typedef ChangedVar = { obj : Dynamic, field : String, value : Dynamic, set : Bool };
 
+/**
+	The script interpreter of a `Configurator`: remembers the fields it changes, to restore them after the frame.
+**/
 class ConfiguratorInterp extends hscript.Interp {
+	/**
+		Keeps the changes instead of restoring them after the frame.
+	**/
 	public var allowChanges : Bool = false;
 	var prevVars : Map<String,Array<ChangedVar>> = [];
 	var allVars : Array<ChangedVar> = [];
+	/**
+		Creates the interpreter.
+	**/
 	public function new() {
 		super();
 	}
@@ -61,6 +70,9 @@ class ConfiguratorInterp extends hscript.Interp {
 		return v;
 	}
 
+	/**
+		Restores the fields changed by the script.
+	**/
 	public function restoreVars() {
 		for( v in allVars ) {
 			if( v.set ) {
@@ -111,9 +123,15 @@ class ConfiguratorInterp extends hscript.Interp {
 }
 #end
 
+/**
+	Runs a script each frame to change properties of the renderer and prefabs, depending on variables. The script can use the variables and the functions `get` and `getOpt` (a prefab by path), `getParts`, `smooth`, `mix`, `mixColor` and `allowChanges`. The changes are restored after the frame.
+**/
 @:access(h3d.scene.Renderer)
 class Configurator extends RendererFX {
 
+	/**
+		The variables of the script, with their default values.
+	**/
 	@:s public var vars : Array<{ name : String, defValue : Float }> = [];
 	@:s var script : String = "";
 	var values : Map<String, Float> = new Map();
@@ -134,6 +152,9 @@ class Configurator extends RendererFX {
 		super(parent, shared);
 	}
 
+	/**
+		Sets the value of a variable.
+	**/
 	public function set( name : String, value : Float ) {
 		values.set(name,value);
 	}
@@ -181,6 +202,9 @@ class Configurator extends RendererFX {
 	}
 	#end
 
+	/**
+		Clears the cache of the prefabs and objects found by the script.
+	**/
 	public function resetCache() {
 		prefabCache = [];
 		particlesCache = [];

@@ -2,8 +2,14 @@ package hrt.prefab.rfx;
 
 import hxd.Pixels;
 
+/**
+	Applies a color lookup table.
+**/
 class ColorGradingFunc extends hxsl.Shader {
 	static var SRC = {
+		/**
+			Returns `base` transformed by the lookup table `lut` of `size` colors per channel.
+		**/
 		function getColorGrading(base : Vec3, lut : Sampler2D, size : Float) : Vec3 {
 			var innerWidth = size - 1.0;
 			var sliceSize = 1.0 / size;
@@ -39,6 +45,9 @@ class ColorGradingFunc extends hxsl.Shader {
 	}
 }
 
+/**
+	Applies the lookup table in the tonemapping.
+**/
 class ColorGradingTonemap extends hxsl.Shader {
 	static var SRC = {
 
@@ -57,6 +66,9 @@ class ColorGradingTonemap extends hxsl.Shader {
 	}
 }
 
+/**
+	Applies a blend of two lookup tables in the tonemapping, for transitions.
+**/
 class ColorGradingTonemapBlend extends ColorGradingTonemap {
 	static var SRC = {
 
@@ -73,17 +85,32 @@ class ColorGradingTonemapBlend extends ColorGradingTonemap {
 	}
 }
 
+/**
+	Transforms the colors with a lookup table texture, in the tonemapping.
+**/
 @:access(h3d.scene.Renderer)
 class ColorGrading extends RendererFX {
 
 	var tonemap = new ColorGradingTonemap();
+	/**
+		A lookup table texture replacing the one of the prefab, or `null`.
+	**/
 	public var customLut : h3d.mat.Texture;
+	/**
+		The two lookup tables of a transition, or `null`.
+	**/
 	public var customLutsBlend : { from : h3d.mat.Texture, to : h3d.mat.Texture } = null;
 
 	@:s var size : Int = 16;
 	@:s var texturePath : String;
+	/**
+		The intensity of the effect.
+	**/
 	@:s public var intensity : Float = 1;
 
+	/**
+		Returns the lookup table texture of the prefab, or `null`.
+	**/
 	public function getLutTexture() {
 		if( texturePath == null ) return null;
 		return hxd.res.Loader.currentInstance.load(texturePath).toTexture();

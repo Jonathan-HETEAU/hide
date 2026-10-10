@@ -1,7 +1,13 @@
 package hrt.prefab.rfx;
 @:access(h3d.scene.Renderer)
 
+/**
+	Draws an outline around the objects drawn in the `highlight` passes.
+**/
 class Outline extends RendererFX {
+	/**
+		The color of the outline, as RGB.
+	**/
 	public var color = 0xFF6600;
 
 	var outlineShader = new h3d.pass.ScreenFx(new hide.Renderer.ScreenOutline());
@@ -11,6 +17,9 @@ class Outline extends RendererFX {
 		super(parent, shared);
 	}
 
+	/**
+		Adds (or removes) the `highlight` passes to the materials of an object.
+	**/
 	public static function setHighlight(obj : h3d.scene.Object, visible : Bool = true) {
 		var frontColor = new h3d.shader.FixedColor(0xFFFFFF, 1);
 		var backColor = new h3d.shader.FixedColor(0xFF0000, 1);
