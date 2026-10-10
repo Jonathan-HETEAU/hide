@@ -2,6 +2,9 @@ package hrt.prefab.terrain;
 import h3d.pass.ScreenFx;
 using Lambda;
 
+/**
+	Copies a texture into a part of another, to resize the tiles.
+**/
 class TerrainCopy extends h3d.shader.ScreenShader {
 	static var SRC = {
 
@@ -20,10 +23,16 @@ class TerrainCopy extends h3d.shader.ScreenShader {
 	}
 }
 
+/**
+	Resizes the tiles of a terrain, resampling their textures.
+**/
 @:access(hrt.prefab.terrain.TerrainMesh)
 @:access(hrt.prefab.terrain.Tile)
 class TerrainResize {
 
+	/**
+		Creates the resizer.
+	**/
 	public function new( ) {
 
 	}
@@ -37,6 +46,9 @@ class TerrainResize {
 		return b;
 	}
 
+	/**
+		Resizes the tiles of the terrain to `tileSize`.
+	**/
 	static public function resize( prefab : Terrain, tileSize : h2d.col.Point ) {
 
 		if( prefab.terrain.tileSize.x == tileSize.x && prefab.terrain.tileSize.y == tileSize.y )

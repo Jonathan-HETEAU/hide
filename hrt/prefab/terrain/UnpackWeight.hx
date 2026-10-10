@@ -1,5 +1,8 @@
 package hrt.prefab.terrain;
 
+/**
+	Extracts the weight texture of a surface from the index map and the packed weight texture.
+**/
 class UnpackWeight extends h3d.shader.ScreenShader {
 
 	static var SRC = {

@@ -1,5 +1,8 @@
 package hrt.prefab.terrain;
 
+/**
+	Packs the weight textures of the surfaces into an index map and a packed weight texture (the strongest surfaces of each pixel).
+**/
 class PackWeight extends h3d.shader.ScreenShader {
 
 	static var SRC = {
@@ -28,6 +31,9 @@ class PackWeight extends h3d.shader.ScreenShader {
 		}
 	}
 
+	/**
+		Creates the shader.
+	**/
 	public function new(){
 		super();
 		mask = [new h3d.Vector4(1,0,0,0), new h3d.Vector4(0,1,0,0), new h3d.Vector4(0,0,1,0), new h3d.Vector4(0,0,0,1)];

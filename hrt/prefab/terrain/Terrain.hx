@@ -1,39 +1,105 @@
 package hrt.prefab.terrain;
 using Lambda;
 
+/**
+	The serialized properties of a surface.
+**/
 typedef SurfaceProps = {
-	albedo : String,
-	normal : String,
-	pbr : String,
-	tilling : Float,
-	angle : Float,
-	offsetX : Float,
-	offsetY : Float,
-	minHeight : Float,
-	maxHeight : Float,
+	/**
+		The path of the albedo texture.
+	**/
+	var albedo : String;
+	/**
+		The path of the normal texture.
+	**/
+	var normal : String;
+	/**
+		The path of the PBR texture.
+	**/
+	var pbr : String;
+	/**
+		The tiling of the textures.
+	**/
+	var tilling : Float;
+	/**
+		The rotation of the textures, in degrees.
+	**/
+	var angle : Float;
+	/**
+		The X offset of the textures.
+	**/
+	var offsetX : Float;
+	/**
+		The Y offset of the textures.
+	**/
+	var offsetY : Float;
+	/**
+		The minimum height of the height blending.
+	**/
+	var minHeight : Float;
+	/**
+		The maximum height of the height blending.
+	**/
+	var maxHeight : Float;
 };
 
+/**
+	A terrain made of tiles, with height maps and painted surfaces, editable in the editor. Its textures are saved as binary files next to the prefab.
+**/
 @:access(hrt.prefab.terrain.TerrainMesh)
 @:access(hrt.prefab.terrain.Tile)
 @:prefabIcon(HuiRes.ui.icons.prefab.terrain)
 class Terrain extends Object3D {
 
+	/**
+		The terrain mesh.
+	**/
 	public var terrain : TerrainMesh;
 
 	// Tile Param
+	/**
+		The X size of a tile.
+	**/
 	@:s public var tileSizeX : Float = 64.0;
+	/**
+		The Y size of a tile.
+	**/
 	@:s public var tileSizeY : Float = 64.0;
+	/**
+		The number of vertices per unit.
+	**/
 	@:s public var vertexPerMeter : Float = 1.0;
 	// Texture Param
+	/**
+		The number of pixels of the weight maps per unit.
+	**/
 	@:s public var weightMapPixelPerMeter : Float = 1.0;
 	// Parallax Param
+	/**
+		The amount of parallax mapping (`0` to disable it).
+	**/
 	@:s public var parallaxAmount = 0.0;
+	/**
+		The minimum number of parallax steps.
+	**/
 	@:s public var parallaxMinStep : Int = 1;
+	/**
+		The maximum number of parallax steps.
+	**/
 	@:s public var parallaxMaxStep : Int = 16;
 	// Blend Param
+	/**
+		The strength of the blending of the surfaces by height.
+	**/
 	@:s public var heightBlendStrength : Float = 0.0;
+	/**
+		The sharpness of the blending of the surfaces.
+	**/
 	@:s public var blendSharpness : Float = 0.0;
 	// Shadows Param
+	/**
+		Casts shadows.
+	**/
 	@:s public var castShadows = false;
 	// Data for binary save/load
 	@:c var surfaceCount = 0;
@@ -57,9 +123,21 @@ class Terrain extends Object3D {
 	#if editor
 	var packWeight = new h3d.pass.ScreenFx(new PackWeight());
 	var editor : hide.prefab.terrain.TerrainEditor;
+	/**
+		Displays a checker texture (editor only).
+	**/
 	@:s public var showChecker = false;
+	/**
+		Creates the tiles while painting (editor only).
+	**/
 	@:s public var autoCreateTile = false;
+	/**
+		Allows creating tiles not connected to the others (editor only).
+	**/
 	@:s public var allowDisconnectedTiles = false;
+	/**
+		The opacity of the brush (editor only).
+	**/
 	@:s public var brushOpacity : Float = 1.0;
 	#end
 
@@ -302,6 +380,9 @@ class Terrain extends Object3D {
 		}
 	}
 
+	/**
+		Creates the primitive and the surface textures, once they are loaded.
+	**/
 	public function initTerrain() {
 
 		terrain.createBigPrimitive();
@@ -332,6 +413,9 @@ class Terrain extends Object3D {
 
 	#if editor
 
+	/**
+		Saves the weight, height and normal textures. Throws if the terrain is not ready.
+	**/
 	public function saveTextures()  {
 		if( !readyToSave() ) {
 			throw "Failed to save terrain";
@@ -406,6 +490,9 @@ class Terrain extends Object3D {
 		}
 	}
 
+	/**
+		Saves the height maps of the tiles.
+	**/
 	public function saveHeightTextures() {
 		for( tile in terrain.tiles ) {
 			var pixels = tile.heightMap.capturePixels();
@@ -414,6 +501,9 @@ class Terrain extends Object3D {
 		}
 	}
 
+	/**
+		Saves the normal maps of the tiles.
+	**/
 	public function saveNormalTextures() {
 		for( tile in terrain.tiles ) {
 			var pixels : hxd.Pixels = tile.normalMap.capturePixels();
@@ -422,6 +512,9 @@ class Terrain extends Object3D {
 		}
 	}
 
+	/**
+		Saves the packed weight maps and index maps of the tiles.
+	**/
 	public function saveWeightTextures() {
 		var packedWeightsTex = new h3d.mat.Texture(terrain.weightMapResolution.x, terrain.weightMapResolution.y, [Target], RGBA);
 		for( tile in terrain.tiles ) {

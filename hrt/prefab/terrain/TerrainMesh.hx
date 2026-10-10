@@ -2,33 +2,87 @@ package hrt.prefab.terrain;
 
 import h3d.mat.Texture;
 
+/**
+	The object of a `Terrain`: its tiles and surfaces.
+**/
 @:access(hrt.prefab.terrain.Tile)
 class TerrainMesh extends h3d.scene.Object {
 
 	var primitive : h3d.prim.BigPrimitive;
 
 	// Resolution Vertexes/Pixels
+	/**
+		The size of a tile.
+	**/
 	public var tileSize : h2d.col.Point;
+	/**
+		The size of a cell of the grid.
+	**/
 	public var cellSize : h2d.col.Point;
+	/**
+		The number of cells of a tile.
+	**/
 	public var cellCount : h2d.col.IPoint;
+	/**
+		The number of vertices per unit.
+	**/
 	public var vertexPerMeter : Float;
 
+	/**
+		The resolution of the height maps.
+	**/
 	public var heightMapResolution : h2d.col.IPoint;
+	/**
+		The resolution of the weight maps.
+	**/
 	public var weightMapResolution : h2d.col.IPoint;
+	/**
+		Not used.
+	**/
 	public var useBigPrim = false;
 
 	// Shader Params
 	#if editor
+	/**
+		Displays the grid (editor only).
+	**/
 	public var showGrid : Bool;
+	/**
+		Displays a checker texture (editor only).
+	**/
 	public var showChecker : Bool;
+	/**
+		Displays the number of surfaces per pixel (editor only).
+	**/
 	public var showComplexity : Bool;
 	#end
+	/**
+		Enables the parallax mapping.
+	**/
 	public var enableParallax : Bool = true;
+	/**
+		The amount of parallax mapping.
+	**/
 	public var parallaxAmount : Float;
+	/**
+		The minimum number of parallax steps.
+	**/
 	public var parallaxMinStep : Int;
+	/**
+		The maximum number of parallax steps.
+	**/
 	public var parallaxMaxStep : Int;
+	/**
+		The strength of the blending of the surfaces by height.
+	**/
 	public var heightBlendStrength : Float;
+	/**
+		The sharpness of the blending of the surfaces.
+	**/
 	public var blendSharpness : Float;
+	/**
+		Generates the mip maps of the surface textures.
+	**/
 	public var generateMipMaps : Bool;
 
 	// Data
@@ -36,6 +90,9 @@ class TerrainMesh extends h3d.scene.Object {
 	var surfaces : Array<Surface> = [];
 	var surfaceArray : Surface.SurfaceArray;
 
+	/**
+		Creates the terrain.
+	**/
 	public function new(?parent){
 		super(parent);
 	}
@@ -46,6 +103,9 @@ class TerrainMesh extends h3d.scene.Object {
 			surfaceArray.dispose();
 	}
 
+	/**
+		Returns the height at a position in the space of the terrain, or `null` outside the tiles. `fast` skips the bilinear filtering.
+	**/
 	public function getLocalHeight( x : Float, y : Float, fast = false) : Null<Float> {
 		var xi = hxd.Math.floor(x/tileSize.x);
 		var yi = hxd.Math.floor(y/tileSize.y);
@@ -56,6 +116,9 @@ class TerrainMesh extends h3d.scene.Object {
 		return null;
 	}
 
+	/**
+		Returns the height at a world position, or `null` outside the tiles. `fast` skips the bilinear filtering.
+	**/
 	public function getHeight( x : Float, y : Float, fast = false) : Null<Float> {
 		var t = getTileAtWorldPos(x, y);
 		if( t != null ) {
@@ -66,12 +129,18 @@ class TerrainMesh extends h3d.scene.Object {
 		return null;
 	}
 
+	/**
+		Returns the surface `i`, or `null`.
+	**/
 	public function getSurface( i : Int ) : Surface {
 		if(i < surfaces.length)
 				return surfaces[i];
 		return null;
 	}
 
+	/**
+		Returns the surface using these textures (by name), or `null`.
+	**/
 	public function getSurfaceFromTex( albedo, ?normal, ?pbr ) : Surface {
 		for( s in surfaces ) {
 			var valid = false;
@@ -83,16 +152,25 @@ class TerrainMesh extends h3d.scene.Object {
 		return null;
 	}
 
+	/**
+		Adds a surface with these textures.
+	**/
 	public function addSurface( albedo, normal, pbr ) : Surface {
 		surfaces.push(new Surface(albedo, normal, pbr));
 		return surfaces[surfaces.length - 1];
 	}
 
+	/**
+		Adds a surface without textures.
+	**/
 	public function addEmptySurface() : Surface {
 		surfaces.push( new Surface() );
 		return surfaces[surfaces.length - 1];
 	}
 
+	/**
+		Copies the textures of the surfaces into the texture arrays.
+	**/
 	public function generateSurfaceArray() {
 		if( surfaces.length == 0 ) return;
 		var surfaceSize = 1;
@@ -148,6 +226,9 @@ class TerrainMesh extends h3d.scene.Object {
 		refreshAllTex();
 	}
 
+	/**
+		Updates the parameters of the surfaces in the texture arrays.
+	**/
 	public function updateSurfaceParams() {
 		for( i in 0 ... surfaces.length ) {
 			surfaceArray.params[i] = new h3d.Vector4(surfaces[i].tilling, surfaces[i].offset.x, surfaces[i].offset.y, hxd.Math.degToRad(surfaces[i].angle));
@@ -197,20 +278,32 @@ class TerrainMesh extends h3d.scene.Object {
 		primitive.flush();
 	}
 
+	/**
+		Rebuilds the grid primitive.
+	**/
 	public function refreshAllGrids() {
 		createBigPrimitive();
 	}
 
+	/**
+		Refreshes the textures of the tiles.
+	**/
 	public function refreshAllTex() {
 		for( tile in tiles )
 			tile.refreshTex();
 	}
 
+	/**
+		Rebuilds the grid and refreshes the textures.
+	**/
 	public function refreshAll() {
 		refreshAllGrids();
 		refreshAllTex();
 	}
 
+	/**
+		Returns the tile at `(x, y)`, created if missing.
+	**/
 	public function createTile(x : Int, y : Int, ?createTexture = true) : Tile {
 		var tile = getTile(x,y);
 		if(tile == null){
@@ -221,6 +314,9 @@ class TerrainMesh extends h3d.scene.Object {
 		return tile;
 	}
 
+	/**
+		Adds a tile (replacing the one at its position if `replace`).
+	**/
 	public function addTile( tile : Tile, ?replace = false ) {
 		for( t in tiles ) {
 			if( tile == t ) return;
@@ -237,6 +333,9 @@ class TerrainMesh extends h3d.scene.Object {
 		addChild(tile);
 	}
 
+	/**
+		Removes the tile at `(x, y)`. Note: as written, it only calls `removeTile` when there is no tile, so it removes nothing.
+	**/
 	public function removeTileAt( x : Int, y : Int ) : Bool {
 		var t = getTile(x,y);
 		if( t == null ) {
@@ -246,6 +345,9 @@ class TerrainMesh extends h3d.scene.Object {
 		return false;
 	}
 
+	/**
+		Removes a tile. Returns `false` if it is not in the terrain.
+	**/
 	public function removeTile( t : Tile ) : Bool {
 		if( t == null ) return false;
 		var r = tiles.remove(t);
@@ -253,12 +355,18 @@ class TerrainMesh extends h3d.scene.Object {
 		return r;
 	}
 
+	/**
+		Returns the index of a tile, or `-1`.
+	**/
 	public function getTileIndex( t : Tile ) : Int {
 		for( i in 0 ... tiles.length )
 			if( t == tiles[i] ) return i;
 		return -1;
 	}
 
+	/**
+		Returns the tile at `(x, y)`, or `null`.
+	**/
 	public function getTile( x : Int, y : Int ) : Tile {
 		var result : Tile = null;
 		for( tile in tiles )
@@ -266,6 +374,9 @@ class TerrainMesh extends h3d.scene.Object {
 		return result;
 	}
 
+	/**
+		Returns the tile at a world position, or `null`.
+	**/
 	public function getTileAtWorldPos( x : Float, y : Float ) : Tile {
 		var pos = toLocalPos(x, y);
 		var result : Tile = null;
@@ -276,6 +387,9 @@ class TerrainMesh extends h3d.scene.Object {
 		return result;
 	}
 
+	/**
+		Returns the tile at a world position, created if missing.
+	**/
 	public function createTileAtWorldPos( x : Float, y : Float ) : Tile {
 		var pos = toLocalPos(x, y);
 		var tileX = Math.floor(pos.x / tileSize.x);
@@ -284,6 +398,9 @@ class TerrainMesh extends h3d.scene.Object {
 		return result == null ? createTile(tileX, tileY) : result;
 	}
 
+	/**
+		Returns the tiles within `range` of a world position, creating them if `create` (next to existing tiles, or anywhere with `disconectedTiles`).
+	**/
 	public function getTiles( x : Float, y : Float, range : Float, ?create = false, ?disconectedTiles = false ) : Array<Tile> {
 		var pos = toLocalPos(x, y);
 		if( create != null && create ) {
@@ -344,6 +461,9 @@ class TerrainMesh extends h3d.scene.Object {
 		return tmpPt;
 	}
 
+	/**
+		Returns the distance of the intersection of a local ray with the tiles, or `-1`.
+	**/
 	public function localRayIntersection(ray:h3d.col.Ray) : Float {
 		if( ray.lz > 0 )
 			return -1; // only from top
@@ -396,5 +516,8 @@ class TerrainMesh extends h3d.scene.Object {
 		return -1;
 	}
 
+	/**
+		Called when the terrain is modified. Does nothing by default.
+	**/
 	public function onModified() {}
 }

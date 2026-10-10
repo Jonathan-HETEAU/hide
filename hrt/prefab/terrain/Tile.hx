@@ -1,5 +1,8 @@
 package hrt.prefab.terrain;
 
+/**
+	Computes a normal map from a height map.
+**/
 class NormalBake extends h3d.shader.ScreenShader {
 
 	static var SRC = {
@@ -25,10 +28,47 @@ class NormalBake extends h3d.shader.ScreenShader {
 	};
 }
 
+/**
+	A direction in the grid of tiles (not used).
+**/
 enum Direction {
-	Up; Down; Left; Right; UpLeft; UpRight; DownLeft; DownRight;
+	/**
+		Up.
+	**/
+	Up;
+	/**
+		Down.
+	**/
+	Down;
+	/**
+		Left.
+	**/
+	Left;
+	/**
+		Right.
+	**/
+	Right;
+	/**
+		Up and left.
+	**/
+	UpLeft;
+	/**
+		Up and right.
+	**/
+	UpRight;
+	/**
+		Down and left.
+	**/
+	DownLeft;
+	/**
+		Down and right.
+	**/
+	DownRight;
 }
 
+/**
+	A tile of a terrain, with its height map, normal map and surface weight maps.
+**/
 @:access(hrt.prefab.terrain.TerrainMesh)
 class Tile extends h3d.scene.Mesh {
 
@@ -36,31 +76,70 @@ class Tile extends h3d.scene.Mesh {
 	var terrain : TerrainMesh;
 
 	// INDEXES
+	/**
+		The X index of the tile.
+	**/
 	public var tileX (default, null) : Int;
+	/**
+		The Y index of the tile.
+	**/
 	public var tileY (default, null) : Int;
 
 	// TEXTURE & PIXEL
+	/**
+		The height map.
+	**/
 	public var heightMap : h3d.mat.Texture;
 	var heightMapPixels : hxd.Pixels;
 
+	/**
+		The normal map, computed from the height map.
+	**/
 	public var normalMap(default, null) : h3d.mat.Texture;
 	var normalMapPixels : hxd.Pixels.Pixels;
 	var needNormalBake = true;
 
+	/**
+		The index map: the surfaces of each pixel.
+	**/
 	public var surfaceIndexMap : h3d.mat.Texture;
+	/**
+		The weight map of each surface.
+	**/
 	public var surfaceWeights : Array<h3d.mat.Texture> = [];
+	/**
+		The weight maps, in a texture array.
+	**/
 	public var surfaceWeightArray (default, null) : h3d.mat.TextureArray;
+	/**
+		Captures the height map pixels again on the next `getHeightMapPixels`.
+	**/
 	public var needNewPixelCapture = false;
 
 	// PRIMITIVE
 	var bigPrim : h3d.prim.BigPrimitive;
+	/**
+		Tells if the tile was in the camera frustum at the last emit.
+	**/
 	public var insideFrustrum(default, null) = false;
 
 	// Set by prefab loader for CPU access ingame
+	/**
+		The packed weights, set by the loader for CPU access.
+	**/
 	public var packedWeightMapPixel : hxd.Pixels;
+	/**
+		The index map, set by the loader for CPU access.
+	**/
 	public var indexMapPixels : hxd.Pixels;
+	/**
+		The normals and tangents, set by the loader.
+	**/
 	public var normalTangentBytes : haxe.io.Bytes;
 
+	/**
+		Creates the tile `(x, y)` of the terrain.
+	**/
 	public function new( x : Int, y : Int, parent : TerrainMesh) {
 		super(null, null, parent);
 		terrain = parent;
@@ -101,6 +180,9 @@ class Tile extends h3d.scene.Mesh {
 		if( bigPrim != null ) bigPrim.dispose();
 	}
 
+	/**
+		Returns the pixels of the height map (captured from the texture if needed).
+	**/
 	public inline function getHeightMapPixels() {
 		if( (needNewPixelCapture || heightMapPixels == null) && heightMap != null )
 			heightMapPixels = heightMap.capturePixels();
@@ -108,6 +190,9 @@ class Tile extends h3d.scene.Mesh {
 		return heightMapPixels;
 	}
 
+	/**
+		Returns the pixels of the normal map (captured from the texture if needed).
+	**/
 	public inline function getNormalMapPixels() {
 		if( normalMapPixels == null && normalMap != null )
 			normalMapPixels = normalMap.capturePixels();
@@ -128,6 +213,9 @@ class Tile extends h3d.scene.Mesh {
 		}
 	}
 
+	/**
+		Creates the primitive of the tile, with the heights and normals of its pixels.
+	**/
 	public function createBigPrim() {
 
 		if( normalMapPixels == null || heightMapPixels == null )
@@ -270,6 +358,9 @@ class Tile extends h3d.scene.Mesh {
 		}
 	}
 
+	/**
+		Creates the missing textures of the tile.
+	**/
 	public function refreshTex() {
 		refreshHeightMap();
 		refreshNormalMap();
@@ -278,6 +369,9 @@ class Tile extends h3d.scene.Mesh {
 		generateWeightTextureArray();
 	}
 
+	/**
+		Copies the weight maps into the texture array.
+	**/
 	public function generateWeightTextureArray() {
 		if( surfaceWeightArray == null || surfaceWeightArray.width != terrain.weightMapResolution.x || surfaceWeightArray.height != terrain.weightMapResolution.y || surfaceWeightArray.layerCount != terrain.surfaceArray.surfaceCount  ) {
 			if( surfaceWeightArray != null ) surfaceWeightArray.dispose();
@@ -308,6 +402,9 @@ class Tile extends h3d.scene.Mesh {
 	}
 
 	static var tmpVec4: h3d.Vector4 = new h3d.Vector4();
+	/**
+		Returns the height at `(u, v)` (from `0` to `1` on the tile), from the captured height map pixels (`0` if none). `fast` skips the bilinear filtering.
+	**/
 	public function getHeight( u : Float, v : Float, ?fast = false ) : Float {
 		var pixels = heightMapPixels;
 		if( pixels == null ) return 0.0;
@@ -366,12 +463,18 @@ class Tile extends h3d.scene.Mesh {
 			cachedBounds.transform(getAbsPos());
 	}
 
+	/**
+		Returns the bounds of the tile, computed once.
+	**/
 	inline public function getCachedBounds() : h3d.col.Bounds {
 		if( cachedBounds == null )
 			computeBounds();
 		return cachedBounds;
 	}
 
+	/**
+		Called before drawing the tile: returns `false` to skip it. Returns `true` by default.
+	**/
 	public dynamic function beforeEmit() : Bool { return true; };
 	override function emit( ctx:h3d.scene.RenderContext ) {
 		if( !isReadyForDraw() )
