@@ -10,30 +10,78 @@ import hide.prefab.HideProps;
 
 
 
+/**
+	The shape of a `Polygon`.
+**/
 enum Shape {
+	/**
+		A unit square in the XY plane, subdivided.
+	**/
 	Quad(subdivision : Int);
+	/**
+		A disc (or a part of it, of `angle` degrees) of radius `1`, with an inner radius and rings.
+	**/
 	Disc(segments: Int, angle: Float, inner: Float, rings:Int);
+	/**
+		The polygon of `points`.
+	**/
 	Custom;
+	/**
+		A sphere.
+	**/
 	Sphere( segsW : Int, segsH : Int );
+	/**
+		A capsule along an axis.
+	**/
 	Capsule( segsW : Int, segsH : Int, axis: h3d.prim.Capsule.Axis);
+	/**
+		A box.
+	**/
 	Box;
 }
 
+/**
+	The primitives of the shapes, shared by the polygons.
+**/
 typedef PrimCache = Map<Shape, h3d.prim.Polygon>;
 
 
+/**
+	A mesh of a simple shape, or of a custom polygon in the XY plane.
+**/
 @:prefabIcon(HuiRes.ui.icons.prefab.polygon)
 class Polygon extends Object3D {
 
+	/**
+		The shape.
+	**/
 	@:c public var shape(default, null) : Shape = Quad(0);
+	/**
+		The points of the `Custom` shape.
+	**/
 	@:c public var points : h2d.col.Polygon;
+	/**
+		The color of the debug display, as ARGB.
+	**/
 	@:s public var color : Int = 0xFFFFFFFF;
 
 	var cachedCollider : h3d.col.Collider;
 	#if editor
+	/**
+		The polygon editor (editor only).
+	**/
 	public var editor : hide.prefab.PolygonEditor;
+	/**
+		The size of the grid of the polygon editor (editor only).
+	**/
 	@:s public var gridSize:Float = 1;
+	/**
+		The primitive of the custom polygon (editor only).
+	**/
 	public var cachedPrim : h3d.prim.Polygon;
+	/**
+		Displays the polygon with its debug color (editor only).
+	**/
 	@:s public var hasDebugColor : Bool = true;
 	var prevScale = [1.0, 1.0];
 	#end
@@ -76,6 +124,9 @@ class Polygon extends Object3D {
 		this.points = p.points;
 	}
 
+	/**
+		Sets the shape and clears the points.
+	**/
 	public function setShape(newShape: Shape) {
 		shape = newShape;
 		points = [];
@@ -97,6 +148,9 @@ class Polygon extends Object3D {
 		#end
 	}
 
+	/**
+		Returns the primitive cache of the engine.
+	**/
 	public static function getPrimCache() {
 		var engine = h3d.Engine.getCurrent();
 		var cache : PrimCache = @:privateAccess engine.resCache.get(Polygon);
@@ -107,6 +161,9 @@ class Polygon extends Object3D {
 		return cache;
 	}
 
+	/**
+		Returns the primitive of the shape (cached, except for a custom polygon).
+	**/
 	public function makePrimitive() {
 		cachedCollider = null;
 		if(shape == Custom) {
@@ -135,6 +192,9 @@ class Polygon extends Object3D {
 		return cachedCollider.rayIntersection(ray, true);
 	}
 
+	/**
+		Returns the outline of a 2D shape, or `null` for a 3D shape.
+	**/
 	public function getPolygonBounds() : h2d.col.Polygon {
 		return switch( shape ) {
 		case Quad(subdivision):
@@ -167,6 +227,9 @@ class Polygon extends Object3D {
 		};
 	}
 
+	/**
+		Creates the primitive of a shape (not for `Custom`).
+	**/
 	public static function createPrimitive( shape : Shape ) : h3d.prim.Polygon {
 		var uvs : Array<Point> = null;
 		var points : Array<Point> = null;
@@ -284,6 +347,9 @@ class Polygon extends Object3D {
 	}
 
 	#if editor
+	/**
+		Sets the debug color of the mesh (editor only).
+	**/
 	public function setColor(color: Int) {
 		if(hrt.prefab.Material.hasOverride(this))
 			return;
@@ -295,6 +361,9 @@ class Polygon extends Object3D {
 	}
 	#end
 
+	/**
+		Creates the primitive of the custom polygon by triangulating `points`.
+	**/
 	public function generateCustomPolygon(){
 		var polyPrim : h3d.prim.Polygon = null;
 		if( points != null ){
@@ -315,6 +384,9 @@ class Polygon extends Object3D {
 		return polyPrim;
 	}
 
+	/**
+		Returns the primitive of the mesh.
+	**/
 	public function getPrimitive() : h3d.prim.Polygon {
 		var mesh : h3d.scene.Mesh = cast local3d;
 		return Std.downcast(mesh.primitive, h3d.prim.Polygon);
@@ -669,6 +741,9 @@ class Polygon extends Object3D {
 	static var _ = Prefab.register("polygon", Polygon);
 }
 
+/**
+	Renders the signed distance field of a polygon (up to 256 points).
+**/
 class GenSDF extends hxsl.Shader {
 	var SRC = {
 		var calculatedUV : Vec2;
@@ -702,6 +777,9 @@ class GenSDF extends hxsl.Shader {
 	}
 }
 
+/**
+	A collider of a polygon projected on the ground.
+**/
 @:access(hrt.prefab.l3d.ProjectedDisplay)
 @:access(hrt.prefab.l3d.Polygon)
 class WorldProjectedCollider extends h3d.col.Collider {
@@ -709,6 +787,9 @@ class WorldProjectedCollider extends h3d.col.Collider {
 	var groundCollide : (ray: h3d.col.Ray) -> Float;
 
 
+	/**
+		Creates the collider. `groundCollide` returns the distance to the ground along a ray, or a negative value.
+	**/
 	public function new(polygon: Polygon, groundCollide : (ray: h3d.col.Ray) -> Float) {
 		this.polygon = polygon;
 		this.groundCollide = groundCollide;
@@ -758,6 +839,9 @@ class WorldProjectedCollider extends h3d.col.Collider {
 	#end
 }
 
+/**
+	Displays a polygon projected on the ground, with a decal.
+**/
 @:access(hrt.prefab.l3d.Polygon)
 class ProjectedDisplay extends h3d.scene.Object {
 	var polygon : Polygon;
@@ -767,6 +851,9 @@ class ProjectedDisplay extends h3d.scene.Object {
 	var sdf : hrt.shader.SDF;
 	final texWidth = 128;
 
+	/**
+		Creates the display.
+	**/
 	public function new(polygon: Polygon, parent: h3d.scene.Object) {
 		super(parent);
 		this.polygon = polygon;
@@ -893,14 +980,23 @@ class ProjectedDisplay extends h3d.scene.Object {
 }
 
 #if domkit
+/**
+	The tool editing the points of a custom polygon.
+**/
 @:access(hrt.prefab.l3d.Polygon)
 class PolygonEditor2 extends hrt.prefab.editor.Tool {
 	var polygon : Polygon;
 	var handles : Array<PolygonEditorHandle2> = [];
 	var dragStart : h2d.col.Point = null;
 	var dragging : Bool = false;
+	/**
+		The list of the points in the properties.
+	**/
 	public var listEditor : hide.kit.List<h2d.col.Point>;
 
+	/**
+		Creates the tool.
+	**/
 	public function new(ctx, polygon: Polygon) {
 		super(ctx);
 		this.polygon = polygon;
@@ -1087,6 +1183,9 @@ class PolygonEditor2 extends hrt.prefab.editor.Tool {
 		}
 	}
 
+	/**
+		Returns the position of the mouse in the plane of the polygon.
+	**/
 	public function getMousePos() : h3d.Vector {
 		var polygonAbsPos = polygon.getAbsPos();
 		var ray = s3d.camera.rayFromScreen(ctx.s2d.mouseX, ctx.s2d.mouseY, ctx.s2d.width, ctx.s2d.height);
@@ -1165,15 +1264,33 @@ class PolygonEditor2 extends hrt.prefab.editor.Tool {
 
 
 
+/**
+	A handle of a point of the polygon editor.
+**/
 class PolygonEditorHandle2 extends h3d.scene.Object {
+	/**
+		The tool.
+	**/
 	public var tool : PolygonEditor2 = null;
+	/**
+		The displayed sphere.
+	**/
 	public var sphere : h3d.scene.Mesh = null;
+	/**
+		The scale of the handle.
+	**/
 	public var baseScale : Float = 1.0;
+	/**
+		Tells if the handle is selected.
+	**/
 	public var selected : Bool = false;
 	var interactive : h3d.scene.Interactive;
 
 	static var prim: h3d.prim.Primitive;
 
+	/**
+		Creates the handle.
+	**/
 	public function new(tool: PolygonEditor2, parent: h3d.scene.Object) {
 		super(parent);
 		this.tool = tool;
@@ -1238,6 +1355,9 @@ class PolygonEditorHandle2 extends h3d.scene.Object {
 		super.sync(ctx);
 	}
 
+	/**
+		Selects or unselects the handle.
+	**/
 	public function setSelected(selected: Bool) {
 		this.selected = selected;
 		if (selected) {
@@ -1247,6 +1367,9 @@ class PolygonEditorHandle2 extends h3d.scene.Object {
 		}
 	}
 
+	/**
+		Highlights the handle when hovered.
+	**/
 	public function setHover(hover: Bool) {
 		if (hover) {
 			baseScale = 1.1;

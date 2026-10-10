@@ -1,10 +1,22 @@
 package hrt.prefab.l3d;
 
+/**
+	A socket of a model, where a part can be attached: an object named `Socket_<type>` or `Socket_<type>_<name>`.
+**/
 class Socket {
 
+	/**
+		The type.
+	**/
 	public var type : String;
+	/**
+		The name, or `null`.
+	**/
 	public var name : String;
 
+	/**
+		Creates a socket.
+	**/
 	public function new( ?type, ?name ) {
 		this.type = type;
 		this.name = name;
@@ -12,23 +24,50 @@ class Socket {
 
 }
 
+/**
+	A part of a `MeshGenerator`: a model attached to a socket of its parent part.
+**/
 class MeshPart {
 
+	/**
+		The socket of the parent part.
+	**/
 	public var socket : Socket;
+	/**
+		The path of the model, or `null`.
+	**/
 	public var meshPath : String;
+	/**
+		The position offset.
+	**/
 	public var offset : h3d.Vector;
+	/**
+		Enables the part.
+	**/
 	public var enable : Bool = false;
+	/**
+		The parts attached to this part.
+	**/
 	public var childParts : Array<MeshPart> = [];
 
 	#if editor
+	/**
+		Shows the socket position (editor only).
+	**/
 	public var previewPos = false;
 	#end
 
+	/**
+		Creates a part.
+	**/
 	public function new() {
 		socket = new Socket();
 		offset = new h3d.Vector(0);
 	}
 
+	/**
+		Returns a copy of the part (the children list is copied, reversed).
+	**/
 	public function clone() : MeshPart {
 		var clone = new MeshPart();
 		clone.socket.name = socket.name;
@@ -41,6 +80,9 @@ class MeshPart {
 		return clone;
 	}
 
+	/**
+		Copies another part.
+	**/
 	public function loadFrom( mp : MeshPart ) {
 		socket.name = mp.socket.name;
 		socket.type = mp.socket.type;
@@ -50,6 +92,9 @@ class MeshPart {
 		childParts = mp.childParts.copy();
 	}
 
+	/**
+		Returns the serialized part.
+	**/
 	public function save() {
 		var o : Dynamic = {};
 
@@ -69,6 +114,9 @@ class MeshPart {
 		return o;
 	}
 
+	/**
+		Loads a serialized part.
+	**/
 	public function load( o : Dynamic ) {
 		enable = o.enable == null ? true : o.enable;
 		if( o.socket != null ) {
@@ -88,17 +136,29 @@ class MeshPart {
 		}
 	}
 
+	/**
+		Tells if the part is the root (socket type `Root`).
+	**/
 	public function isRoot() : Bool {
 		return socket.type == "Root";
 	}
 
+	/**
+		Returns the type and name of the socket.
+	**/
 	public function getSocketFullName() : String {
 		return socket.type + (socket.name == null ? "" : " " + socket.name);
 	}
 }
 
+/**
+	The object of a `MeshGenerator`: syncs only when it moves.
+**/
 class MeshGeneratorRoot extends h3d.scene.Object {
 
+	/**
+		Creates the object.
+	**/
 	public function new( ?parent : h3d.scene.Object ) {
 		super(parent);
 	}
@@ -109,9 +169,15 @@ class MeshGeneratorRoot extends h3d.scene.Object {
 	}
 }
 
+/**
+	Builds a mesh from models attached to the sockets of each other.
+**/
 @:prefabIcon(HuiRes.ui.icons.prefab.mesh_generator)
 class MeshGenerator extends Object3D {
 
+	/**
+		The root part.
+	**/
 	@:c public var root : MeshPart;
 
 	#if editor
@@ -121,7 +187,13 @@ class MeshGenerator extends Object3D {
 	var undo : hide.ui.UndoHistory;
 	#end
 
+	/**
+		The depth of the parts shown in the editor.
+	**/
 	public var maxDepth = 1;
+	/**
+		Casts shadows.
+	**/
 	@:s public var shadows = true;
 
 	override function save() : Dynamic {
@@ -187,6 +259,9 @@ class MeshGenerator extends Object3D {
 		#end
 	}
 
+	/**
+		Returns the child of `obj` matching the socket, or `null`.
+	**/
 	public function getSocket( obj : h3d.scene.Object, s : Socket ) : h3d.scene.Object {
 		for( c in @:privateAccess obj.children ) {
 			if( c.name == null ) continue;

@@ -4,11 +4,26 @@ import h3d.scene.Object;
 
 // NOTE(ces) : Not Tested
 
+/**
+	The object of a `Camera`: applies its field of view and planes to the scene camera when enabled.
+**/
 class CameraSyncObject extends h3d.scene.Object {
 
+	/**
+		Applies the properties to the scene camera at each sync.
+	**/
 	public var enable : Bool;
+	/**
+		The vertical field of view, in degrees.
+	**/
 	public var fovY : Float;
+	/**
+		The far plane.
+	**/
 	public var zFar : Float;
+	/**
+		The near plane.
+	**/
 	public var zNear : Float;
 
 	override function sync( ctx ) {
@@ -23,6 +38,9 @@ class CameraSyncObject extends h3d.scene.Object {
 	}
 }
 
+/**
+	A camera position, with its field of view, planes and renderer effects (children), previewable in the editor. Not tested.
+**/
 @:prefabIcon(HuiRes.ui.icons.prefab.camera)
 class Camera extends Object3D {
 
@@ -166,6 +184,9 @@ class Camera extends Object3D {
 		#end
 	}
 
+	/**
+		Returns the transform between this camera (`k = 0`) and `to` (`k = 1`).
+	**/
 	public function lerp( to : Camera, k : Float ) {
 		var start = getAbsPos();
 		var target = to.getAbsPos();
@@ -182,6 +203,9 @@ class Camera extends Object3D {
 		return m;
 	}
 
+	/**
+		Applies the transform, field of view, planes and orthographic bounds to `c`. The target is placed where the view hits the ground (`z = 0`).
+	**/
 	public function applyTo(c: h3d.Camera) {
 		c.orthoBounds = null;
 

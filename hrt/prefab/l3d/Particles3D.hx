@@ -2,6 +2,9 @@ package hrt.prefab.l3d;
 
 // NOTE(ces) : Not Tested
 
+/**
+	GPU particles (`h3d.parts.GpuParticles`), loaded from `source` or the saved data. Not tested.
+**/
 @:prefabHideInAddMenu
 class Particles3D extends Object3D {
 

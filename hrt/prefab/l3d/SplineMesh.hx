@@ -1,5 +1,8 @@
 package hrt.prefab.l3d;
 
+/**
+	Uses the texture coordinates of the spline mesh.
+**/
 class SplineUV extends hxsl.Shader {
 	static var SRC = {
 		@input var input : {
@@ -12,9 +15,15 @@ class SplineUV extends hxsl.Shader {
 	}
 }
 
+/**
+	The mesh of a `SplineMesh`, with bounds following the spline.
+**/
 class SplineMeshObject extends h3d.scene.Mesh {
 	var spline : Spline;
 
+	/**
+		Creates the mesh.
+	**/
 	override public function new(spline : Spline, primitive : h3d.prim.Primitive, parent : h3d.scene.Object) {
 		super(primitive, parent);
 		this.spline = spline;
@@ -37,6 +46,9 @@ class SplineMeshObject extends h3d.scene.Mesh {
 	}
 }
 
+/**
+	A mesh along its parent `Spline`.
+**/
 @:prefabIcon(HuiRes.ui.icons.prefab.spline_mesh)
 @:prefabName("Spline Mesh")
 class SplineMesh extends hrt.prefab.Object3D {

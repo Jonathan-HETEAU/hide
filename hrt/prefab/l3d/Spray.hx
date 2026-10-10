@@ -1,43 +1,124 @@
 package hrt.prefab.l3d;
 
+/**
+	A model or prefab that can be sprayed.
+**/
 typedef Source = {
+	/**
+		The path.
+	**/
 	var path: String;
+	/**
+		Tells if it is a prefab (not a model).
+	**/
 	var isRef: Bool;
 }
 
+/**
+	A set of sources with a spray configuration.
+**/
 typedef Set = {
+	/**
+		The name.
+	**/
 	var name: String;
+	/**
+		The sources.
+	**/
 	var sources: Array<Source>;
+	/**
+		The configuration.
+	**/
 	var config: SprayConfig;
 }
 
+/**
+	A group of sets.
+**/
 typedef SetGroup = {
+	/**
+		The name.
+	**/
 	var name: String;
+	/**
+		The sets.
+	**/
 	var sets: Array<Set>;
 }
 
+/**
+	The configuration of the spray brush.
+**/
 typedef SprayConfig = {
+	/**
+		The number of items per stroke (`1` to place one item every `step`).
+	**/
 	var density : Int;
+	/**
+		The distance between the items placed one by one.
+	**/
 	var step : Float;
+	/**
+		The random number of items added to `density`.
+	**/
 	var densityOffset : Int;
+	/**
+		The radius of the brush.
+	**/
 	var radius : Float;
+	/**
+		The radius of the brush when deleting (with Shift).
+	**/
 	var deleteRadius : Float;
+	/**
+		The scale of the items.
+	**/
 	var scale : Float;
+	/**
+		The random variation of the scale.
+	**/
 	var scaleOffset : Float;
+	/**
+		The rotation of the items around Z, in degrees.
+	**/
 	var rotation : Float;
+	/**
+		The random variation of the rotation, in degrees.
+	**/
 	var rotationOffset : Float;
+	/**
+		The height offset of the items above the ground.
+	**/
 	var zOffset: Float;
+	/**
+		Avoids placing the same item twice in a row.
+	**/
 	var dontRepeatItem : Bool;
+	/**
+		Enables the brush (and locks the spray in the editor).
+	**/
 	var enableBrush : Bool;
+	/**
+		How much the items follow the slope of the ground, from `0` to `1`.
+	**/
 	var orientTerrain : Float;
+	/**
+		The random tilt of the items.
+	**/
 	var tiltAmount : Float;
 }
 
+/**
+	The object of a `Spray`.
+**/
 @:access(hrt.prefab.l3d.MeshSpray)
 class SprayObject extends h3d.scene.Object {
 
 	var spray : Spray;
 
+	/**
+		Creates the object.
+	**/
 	public function new(spray,?parent) {
 		this.spray = spray;
 		super(parent);
@@ -45,6 +126,9 @@ class SprayObject extends h3d.scene.Object {
 
 	#if editor
 
+	/**
+		Updates the bounds of the children (editor only).
+	**/
 	public function redraw(updateShaders=false) {
 		getBounds(); // force absBos calculus on children
 		for( c in children ) {
@@ -56,6 +140,9 @@ class SprayObject extends h3d.scene.Object {
 	#end
 }
 
+/**
+	The base of `MeshSpray`: places models or prefabs on the ground with a brush, in the editor.
+**/
 @:prefabHideInAddMenu
 class Spray extends Object3D {
 
@@ -553,6 +640,9 @@ class Spray extends Object3D {
 		}
 	}
 
+	/**
+		Displays the brush circle (editor only).
+	**/
 	public function drawCircle(originX : Float, originY : Float, originZ : Float, radius: Float, thickness: Float, color) {
 		var newColor = h3d.Vector4.fromColor(color);
 		if (gBrushes == null || gBrushes.length == 0 || gBrushes[0].scaleX != radius || gBrushes[0].material.color != newColor) {
@@ -586,6 +676,9 @@ class Spray extends Object3D {
 		}
 	}
 
+	/**
+		Returns this prefab if it is of class `cl` (editor only).
+	**/
 	public function flattenSpray<T:Prefab>( ?cl : Class<T>, ?arr: Array<T> ) : Array<T> {
 		if(arr == null)
 			arr = [];
@@ -601,6 +694,9 @@ class Spray extends Object3D {
 
 	#end
 
+	/**
+		Creates a disc primitive of radius `1`, with an inner radius and rings.
+	**/
 	static public function makePrimCircle(segments: Int, inner : Float = 0, rings : Int = 0) {
 		var points = [];
 		var uvs = [];

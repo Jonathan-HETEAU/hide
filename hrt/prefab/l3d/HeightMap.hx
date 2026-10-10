@@ -2,13 +2,31 @@ package hrt.prefab.l3d;
 
 // NOTE(ces) : Not Tested
 
+/**
+	The kind of a texture of a `HeightMap`.
+**/
 enum abstract HeightMaPTexturePathKind(String) {
+	/**
+		An albedo texture, blended by the splat maps.
+	**/
 	var Albedo = "albedo";
+	/**
+		The height texture.
+	**/
 	var Height = "height";
+	/**
+		The normal map (computed from the height if none).
+	**/
 	var Normal = "normal";
+	/**
+		A splat map, giving the weights of the albedo textures.
+	**/
 	var SplatMap = "splatmap";
 }
 
+/**
+	Displaces the grid by the height texture and blends the albedo textures.
+**/
 class HeightMapShader extends hxsl.Shader {
 	static var SRC = {
 		@:import h3d.shader.BaseMesh;
@@ -244,18 +262,39 @@ private class HeightMapTileBakeShader extends h3d.shader.ScreenShader {
 	};
 }
 
+/**
+	A tile of a `HeightMap`, of size `size`.
+**/
 class HeightMapTile {
 
+	/**
+		The X index of the tile.
+	**/
 	public var tx(default,null) : Int;
+	/**
+		The Y index of the tile.
+	**/
 	public var ty(default,null) : Int;
+	/**
+		The bounds of the tile.
+	**/
 	public var bounds(default, null) : h3d.col.Bounds;
+	/**
+		The mesh of the tile, once created.
+	**/
 	public var root(default,null) : h3d.scene.Mesh;
+	/**
+		The baked albedo texture, if `bakedAlbedo`.
+	**/
 	public var albedoTex : h3d.mat.Texture;
 
 	var hmap : HeightMap;
 	var height : hxd.Pixels;
 	var shader : HeightMapShader;
 
+	/**
+		Creates the tile `(tx, ty)`.
+	**/
 	public function new(hmap, tx, ty) {
 		this.hmap = hmap;
 		this.tx = tx;
@@ -263,6 +302,9 @@ class HeightMapTile {
 		bounds = h3d.col.Bounds.fromValues(tx * hmap.size, ty * hmap.size, hmap.minZ, hmap.size, hmap.size, hmap.maxZ - hmap.minZ);
 	}
 
+	/**
+		Removes the mesh and disposes the baked albedo.
+	**/
 	public function remove() {
 		if( root != null ) {
 			root.remove();
@@ -272,6 +314,9 @@ class HeightMapTile {
 			albedoTex.dispose();
 	}
 
+	/**
+		Tells if the tile has no height texture.
+	**/
 	public function isEmpty() {
 		if( tx == 0 && ty == 0 && hmap.sizeX == 0 && hmap.sizeY == 0 && !hmap.autoSize )
 			return false;
@@ -279,6 +324,9 @@ class HeightMapTile {
 		return height.width == 1;
 	}
 
+	/**
+		Returns the heights of the tile (loaded on first call), as a `R32F` pixels.
+	**/
 	public function getHeight() {
 		if( height == null ) {
 			for( t in hmap.textures )
@@ -296,6 +344,9 @@ class HeightMapTile {
 		return height;
 	}
 
+	/**
+		Creates the mesh rendering the shadows.
+	**/
 	public function createShadows(mesh:HeightMapMesh) {
 		shadows = new h3d.scene.Mesh(@:privateAccess mesh.shadowGrid, root);
 		shadows.material.shadows = false;
@@ -306,6 +357,9 @@ class HeightMapTile {
 	}
 
 	var shadows : h3d.scene.Mesh;
+	/**
+		Creates the mesh of the tile.
+	**/
 	@:access(hrt.prefab.l3d.HeightMapMesh)
 	public function create(mesh:HeightMapMesh) {
 		if( root != null ) throw "assert";
@@ -378,6 +432,9 @@ class HeightMapTile {
 			bake();
 	}
 
+	/**
+		Bakes the blended albedo textures into `albedoTex`.
+	**/
 	public function bake() {
 		albedoTex = new h3d.mat.Texture(hmap.bakedAlbedoSize, hmap.bakedAlbedoSize, [Target]);
 		albedoTex.preventAutoDispose();
@@ -415,12 +472,18 @@ class HeightMapTile {
 
 }
 
+/**
+	The object of a `HeightMap`: shows the tiles visible by the camera, created on demand.
+**/
 class HeightMapMesh extends h3d.scene.Object {
 
 	var hmap : HeightMap;
 	var grid : HeightGrid;
 	var shadowGrid : HeightGrid;
 
+	/**
+		Creates the object.
+	**/
 	public function new(hmap, ?parent) {
 		super(parent);
 		this.hmap = hmap;
@@ -468,9 +531,15 @@ class HeightMapMesh extends h3d.scene.Object {
 		}
 	}
 
+	/**
+		Called when a tile mesh is created.
+	**/
 	public dynamic function onTileReady( t : HeightMapTile ) {
 	}
 
+	/**
+		Tells if a world model should be filtered out. Returns `false` by default.
+	**/
 	public dynamic function isAssetFiltered( obj : h3d.scene.World.WorldModel, pos : h3d.Matrix ) {
 		return false;
 	}
@@ -488,6 +557,9 @@ class HeightMapMesh extends h3d.scene.Object {
 		return true;
 	}
 
+	/**
+		Creates the mesh of a tile.
+	**/
 	public function initTile( t : HeightMapTile ) {
 		if( t.root != null ) return;
 		t.create(this);
@@ -495,6 +567,9 @@ class HeightMapMesh extends h3d.scene.Object {
 		onTileReady(t);
 	}
 
+	/**
+		Creates the grids from the height texture size and the quality.
+	**/
 	public function init() {
 		var htex = hmap.getTextures(Height, 0, 0)[0];
 		var size = hmap.size;
@@ -533,24 +608,59 @@ class HeightMapMesh extends h3d.scene.Object {
 
 }
 
+/**
+	How the splat maps give the weights of the albedo textures.
+**/
 enum abstract SplatMode(String) {
+	/**
+		Each splat map gives the weights (RGB) of 3 albedo textures.
+	**/
 	var Weights3;
+	/**
+		Each splat map gives the weights (RGBA) of 4 albedo textures.
+	**/
 	var Weights4;
+	/**
+		Like `Weights3`, over the first albedo texture.
+	**/
 	var BaseWeights3;
+	/**
+		Like `Weights4`, over the first albedo texture.
+	**/
 	var BaseWeights4;
+	/**
+		Each splat map gives two albedo indexes (RG) and their weights (BA).
+	**/
 	var I1I2W1W2;
 }
 
+/**
+	A texture of a `HeightMap`.
+**/
 typedef TextureItem = {
-	path : String,
-	kind : HeightMaPTexturePathKind,
-	enable : Bool,
-	?props : { color : Int, scale : Float }
+	/**
+		The path of the texture. For the tile `(x, y)`, the two `0` of the path are replaced by `x` and `y`.
+	**/
+	var path : String;
+	/**
+		The kind of texture.
+	**/
+	var kind : HeightMaPTexturePathKind;
+	/**
+		Uses the texture.
+	**/
+	var enable : Bool;
+	/**
+		The tint color (RGB) and scale of an albedo texture.
+	**/
+	var ?props : { color : Int, scale : Float };
 }
 
+/**
+	A terrain displaced by height textures, optionally made of tiles. Not tested.
+**/
 @:allow(hrt.prefab.l3d)
 @:prefabIcon(HuiRes.ui.icons.prefab.heightmap)
-
 class HeightMap extends Object3D {
 
 	#if editor
@@ -567,7 +677,13 @@ class HeightMap extends Object3D {
 	@:s var heightPrecision = 1.;
 	@:s var minZ = -10;
 	@:s var maxZ = 30;
+	/**
+		The resolution of the grid, from `0` to `4` (full resolution of the height texture).
+	**/
 	@:s public var quality(get, default) = 4;
+	/**
+		Bakes the blended albedo textures of each tile in a texture.
+	**/
 	@:s public var bakedAlbedo = false;
 	@:s var bakedAlbedoSize = 2048;
 	function get_quality() {
@@ -585,6 +701,9 @@ class HeightMap extends Object3D {
 		return quality;
 
 	}
+	/**
+		The resolution of the shadow grid, from `0` to `4`.
+	**/
 	@:s public var shadowQuality(get, default) = 4;
 	function get_shadowQuality() {
 
@@ -601,6 +720,9 @@ class HeightMap extends Object3D {
 		return shadowQuality;
 
 	}
+	/**
+		Casts shadows.
+	**/
 	@:s public var castShadows = true;
 	public function set_castShadows(v : Bool) {
 		castShadows = v;
@@ -683,8 +805,14 @@ class HeightMap extends Object3D {
 		return albedoProps;
 	}
 
+	/**
+		The height returned outside the height map.
+	**/
 	public static var INVALID_Z = 1e128;
 
+	/**
+		Returns the height at a position, or `INVALID_Z`.
+	**/
 	public function getZ( x : Float, y : Float ) : Float {
 		var rx = x / size;
 		var ry = y / size;
@@ -766,6 +894,9 @@ class HeightMap extends Object3D {
 		return -1;
 	}
 
+	/**
+		Tells if the tile is in the bounds of the height map.
+	**/
 	public inline function isTileInBounds(x : Int, y : Int) {
 		return x >= minTileX && y >= minTileY && x < sizeX + minTileX && y < sizeY + minTileY;
 	}
@@ -1209,6 +1340,9 @@ class HeightMap extends Object3D {
 }
 
 
+/**
+	A grid primitive for the tiles of a `HeightMap`, displaced by the shader.
+**/
 class HeightGrid extends h3d.prim.Primitive {
 
 	/**
@@ -1241,12 +1375,21 @@ class HeightGrid extends h3d.prim.Primitive {
 	 **/
 	public var zMax = 0.;
 
+	/**
+		The X offset of the grid.
+	**/
 	public var xOffset = 0.;
+	/**
+		The Y offset of the grid.
+	**/
 	public var yOffset = 0.;
 
 	var hasNormals : Bool;
 	var hasUVs : Bool;
 
+	/**
+		Creates a grid of `width` x `height` cells.
+	**/
 	public function new( width : Int, height : Int, cellWidth = 1., cellHeight = 1., xOffset = 0., yOffset = 0. ) {
 		this.width = width;
 		this.height = height;
@@ -1256,10 +1399,16 @@ class HeightGrid extends h3d.prim.Primitive {
 		this.yOffset = yOffset;
 	}
 
+	/**
+		Adds normals to the vertices.
+	**/
 	public function addNormals() {
 		hasNormals = true;
 	}
 
+	/**
+		Adds texture coordinates to the vertices.
+	**/
 	public function addUVs() {
 		hasUVs = true;
 	}

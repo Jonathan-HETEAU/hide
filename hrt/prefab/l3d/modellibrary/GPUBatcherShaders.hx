@@ -1,5 +1,8 @@
 package hrt.prefab.l3d.modellibrary;
 
+/**
+	Copies the transforms of the instances into a mesh batch.
+**/
 class CopyModelViews extends hxsl.Shader {
 	static var SRC = {
 		@param var positions : StorageBuffer<Mat4>;
@@ -17,6 +20,9 @@ class CopyModelViews extends hxsl.Shader {
 	}
 }
 
+/**
+	Copies the atlas texture coordinates of the instances into a mesh batch.
+**/
 class CopyUvTransform extends hxsl.Shader {
 	static var SRC = {
 		@param var uvTransform : Vec4;
@@ -29,6 +35,9 @@ class CopyUvTransform extends hxsl.Shader {
 	}
 }
 
+/**
+	Copies the library parameters of the instances into a mesh batch.
+**/
 class CopyLibraryParams extends hxsl.Shader {
 	static var SRC = {
 		@param var libraryParams : Vec4;

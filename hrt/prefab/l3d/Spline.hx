@@ -2,21 +2,54 @@ package hrt.prefab.l3d;
 
 import hxd.Math;
 
+/**
+	A handle of the spline edition.
+**/
 enum HandleType {
+	/**
+		The position of a point.
+	**/
 	Point;
+	/**
+		The incoming tangent of a point.
+	**/
 	TangentIn(point : Spline.SplinePoint);
+	/**
+		The outgoing tangent of a point.
+	**/
 	TangentOut(point : Spline.SplinePoint);
 }
 
+/**
+	The interpolation between the points of a spline.
+**/
 enum SplineShape {
+	/**
+		Straight segments.
+	**/
 	Linear;
+	/**
+		Quadratic Bezier curves.
+	**/
 	Quadratic;
+	/**
+		Cubic Bezier curves, using the tangents of the points.
+	**/
 	Cubic;
 }
 
+/**
+	The object of a `Spline`: invalidates its samples when it moves.
+**/
 class SplineObject extends h3d.scene.Object {
+	/**
+		The prefab.
+	**/
 	public var spline : Spline;
 
+	/**
+		Creates the object.
+	**/
 	public function new(parent: h3d.scene.Object) {
 		super(parent);
 	}
@@ -27,17 +60,47 @@ class SplineObject extends h3d.scene.Object {
 	}
 }
 
+/**
+	A point of a spline.
+**/
 class SplinePoint {
+	/**
+		The default length of the tangents.
+	**/
 	public static var DEFAULT_TAN_LENGTH = 3.0;
 
+	/**
+		The position, relative to the spline (in world space for samples).
+	**/
 	public var pos : h3d.col.Point; // Relative to the spline
+	/**
+		The up vector, relative to the spline.
+	**/
 	public var up : h3d.Vector; // Relative to the spline
+	/**
+		The incoming tangent, relative to the point.
+	**/
 	public var tangentIn : h3d.Vector; // Relative to point
+	/**
+		The outgoing tangent, relative to the point.
+	**/
 	public var tangentOut : h3d.Vector; // Relative to point
+	/**
+		The length of the spline from its start to this point.
+	**/
 	public var length : Float = 0;
+	/**
+		The progress of the point along the spline, from `0` to `1`.
+	**/
 	public var t : Float = 0;
+	/**
+		For a sample: the integer part is the index of the spline point before it, the fractional part the progress to the next point.
+	**/
 	public var realPointIndex: Float; // When sampled, integer part is equal to index of the first real spline point before this sampled point, fractional part is equal to the t between the point and the next one
 
+	/**
+		Creates a point. The values are copied.
+	**/
 	public function new(?pos: h3d.col.Point, ?up: h3d.Vector, ?tangentIn: h3d.Vector, ?tangentOut: h3d.Vector) {
 		this.pos = (pos == null) ? new h3d.col.Point(0, 0, 0) : pos.clone();
 		this.up = (up == null) ? new h3d.col.Point(0, 0, 1) : up.clone();
@@ -45,6 +108,9 @@ class SplinePoint {
 		this.tangentOut = (tangentOut == null) ? new h3d.Vector(DEFAULT_TAN_LENGTH, 0, 0) : tangentOut.clone();
 	}
 
+	/**
+		Returns the serialized point.
+	**/
 	public function save() : Dynamic {
 		var obj: Dynamic = {}
 		obj.x = pos.x;
@@ -61,6 +127,9 @@ class SplinePoint {
 		return obj;
 	}
 
+	/**
+		Loads a serialized point, or copies a `SplinePoint`.
+	**/
 	public function load(obj : Dynamic) {
 		var splinePoint = Std.downcast(obj, SplinePoint);
 		if (splinePoint != null) {
@@ -82,6 +151,9 @@ class SplinePoint {
 		length = obj.length;
 	}
 
+	/**
+		Copies another point.
+	**/
 	public function loadOther(other: SplinePoint) {
 		pos.load(other.pos);
 		up.load(other.up);
@@ -92,12 +164,18 @@ class SplinePoint {
 	}
 }
 
+/**
+	A 3D curve through points, editable in the editor. It is sampled in world space to be evaluated at a progress `t` from `0` to `1`.
+**/
 @:allow(hrt.prefab.l3d.SplineMesh)
 @:allow(hrt.prefab.l3d.SplineMeshSpawner)
 @:prefabIcon(HuiRes.ui.icons.prefab.spline)
 class Spline extends hrt.prefab.Object3D {
 	static var OLD_CLASS_POINT = "splinePoint";
 
+	/**
+		The points, relative to the spline.
+	**/
 	@:c public var points: Array<SplinePoint> = []; // Local to spline
 	@:c var samples(get, default): Array<SplinePoint> = null; // World relative
 	function get_samples() {
@@ -106,8 +184,17 @@ class Spline extends hrt.prefab.Object3D {
 		return samples;
 	}
 
+	/**
+		Closes the spline.
+	**/
 	@:s public var loop : Bool = false;
+	/**
+		The number of samples between two points (`1` for a linear spline).
+	**/
 	@:s public var sampleResolution: Int = 16;
+	/**
+		The interpolation between the points.
+	**/
 	@:c public var shape : SplineShape = Linear;
 
 	#if editor
@@ -130,8 +217,17 @@ class Spline extends hrt.prefab.Object3D {
 	#end
 
 	// Spline display
+	/**
+		Displays the spline (editor).
+	**/
 	@:s public var showSpline : Bool = true;
+	/**
+		Displays the spline handles over the scene (editor).
+	**/
 	@:s public var overlayGizmos : Bool = false;
+	/**
+		The scale of the tangent handles (editor).
+	**/
 	@:s public var factorTanLengthEdition : Float = 1.0;
 	var graphics : h3d.scene.Graphics;
 	var lineThickness : Int = 2;
@@ -262,6 +358,9 @@ class Spline extends hrt.prefab.Object3D {
 	}
 
 
+	/**
+		Returns the point at progress `t`, in world space, interpolated between the samples (or `null` for less than two samples).
+	**/
 	inline public function getSplinePoint(t: Float, ?out: SplinePoint) : SplinePoint {
 
 		if (samples.length <= 1)
@@ -315,6 +414,9 @@ class Spline extends hrt.prefab.Object3D {
 		return out;
 	}
 
+	/**
+		Returns the position at progress `t`, in world space (or `null` for less than two samples).
+	**/
 	inline public function getPoint(t: Float, ?out: h3d.col.Point) : h3d.col.Point {
 
 		if (samples.length <= 1)
@@ -363,6 +465,9 @@ class Spline extends hrt.prefab.Object3D {
 		return out;
 	}
 
+	/**
+		Returns the progress of the point of the spline nearest to `p`.
+	**/
 	inline public function getNearestPointProgressOnSpline(p: h3d.col.Point) : Float {
 		var closestSq = hxd.Math.POSITIVE_INFINITY;
 		var closestT = 0.;
@@ -404,12 +509,18 @@ class Spline extends hrt.prefab.Object3D {
 		return closestT;
 	}
 
+	/**
+		Returns the length of the spline.
+	**/
 	public function getLength() {
 		if (samples == null || samples.length == 0)
 			return 0.0;
 		return samples[samples.length - 1].length;
 	}
 
+	/**
+		Sets the tangents of the points along the direction between their neighbors, of the default length.
+	**/
 	public function recomputeTangents() {
 		for (idx in 1...points.length) {
 			var tan : h3d.Vector;
@@ -432,6 +543,9 @@ class Spline extends hrt.prefab.Object3D {
 		}
 	}
 
+	/**
+		Moves the spline to the center of its points, keeping their world position.
+	**/
 	public function recenterSpline() {
 		var centroid = new h3d.col.Point();
 		for (p in points) {
@@ -451,6 +565,9 @@ class Spline extends hrt.prefab.Object3D {
 	}
 
 
+	/**
+		Inserts a point (a default one if `null`) at `idx` (or at the end).
+	**/
 	public function addPoint(?idx : Int, ?point : SplinePoint) {
 		var newPoint = point;
 		if (newPoint == null)
@@ -463,6 +580,9 @@ class Spline extends hrt.prefab.Object3D {
 		this.updateInstance();
 	}
 
+	/**
+		Removes the point at `idx` (or the last one).
+	**/
 	public function removePoint(?idx : Int) {
 		if (points.length == 0 || points.length - 1 < idx)
 			return;
@@ -488,14 +608,23 @@ class Spline extends hrt.prefab.Object3D {
 		#end
 	}
 
+	/**
+		Returns the point transformed from the space of the spline to world space.
+	**/
 	public function localToGlobal(point : h3d.col.Point) {
 		return point.transformed(getCachedAbsPos());
 	}
 
+	/**
+		Returns the point transformed from world space to the space of the spline.
+	**/
 	public function globalToLocal(point : h3d.col.Point) {
 		return point.transformed(getCachedAbsPos(true));
 	}
 
+	/**
+		Returns a copy of the point with its up vector and tangents transformed to the space of the spline. Note: its position is transformed with `localToGlobal`.
+	**/
 	public function globalToLocalSplinePoint(sp : SplinePoint) {
 		if (sp == null)
 			return null;
@@ -511,6 +640,9 @@ class Spline extends hrt.prefab.Object3D {
 		return out;
 	}
 
+	/**
+		Returns a copy of the point transformed to world space.
+	**/
 	public function localToGlobalSplinePoint(sp : SplinePoint) {
 		if (sp == null)
 			return null;
@@ -526,6 +658,9 @@ class Spline extends hrt.prefab.Object3D {
 		return out;
 	}
 
+	/**
+		Draws the spline (editor).
+	**/
 	public function drawSpline() {
 		if( !showSpline || points == null || points.length <= 1) {
 			if( graphics != null ) {
@@ -565,6 +700,9 @@ class Spline extends hrt.prefab.Object3D {
 	}
 
 	static var tmpPoint = new h3d.Vector();
+	/**
+		Draws the handles of a point (editor).
+	**/
 	public function drawHandle(point: SplinePoint) {
 		var precision = 16;
 
@@ -692,6 +830,9 @@ class Spline extends hrt.prefab.Object3D {
 		drawTangent(point.pos, point.tangentOut, tOutGraphics);
 	}
 
+	/**
+		Removes the handles (only the orphan ones if `onlyOrphans`).
+	**/
 	public function clearHandles(onlyOrphans = false) {
 		while(orphanHandles.length > 0) {
 			var h = orphanHandles[orphanHandles.length - 1];
@@ -710,6 +851,9 @@ class Spline extends hrt.prefab.Object3D {
 		}
 	}
 
+	/**
+		Returns a collider made of oriented boxes along the samples.
+	**/
 	public function getLocalCollider() : h3d.col.Collider {
 		if (points == null || points.length <= 1)
 			return new h3d.col.Bounds();
@@ -819,6 +963,9 @@ class Spline extends hrt.prefab.Object3D {
 		p.length = length;
 	}
 
+	/**
+		Returns the length of the spline, as the sum of the distances between the samples.
+	**/
 	public function getSplineLength() : Float {
 		// Compute the average length of the spline
 		var length = 0.0;

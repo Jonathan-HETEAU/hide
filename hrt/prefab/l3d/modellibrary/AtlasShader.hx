@@ -1,5 +1,8 @@
 package hrt.prefab.l3d.modellibrary;
 
+/**
+	Renders the meshes of a `ModelLibrary` with its texture atlas.
+**/
 class AtlasShader extends hxsl.Shader {
 	static var SRC = {
 

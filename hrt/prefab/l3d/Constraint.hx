@@ -1,13 +1,28 @@
 package hrt.prefab.l3d;
 
+/**
+	Makes an object follow another one (`h3d.scene.Object.follow`).
+**/
 @:prefabIcon(HuiRes.ui.icons.prefab.constraint)
 @:prefabCategory("3D")
 class Constraint extends Prefab {
 
+	/**
+		The path of the object following.
+	**/
 	@:s public var object(default,null) : String;
+	/**
+		The path of the object followed.
+	**/
 	@:s public var target(default,null) : String;
+	/**
+		Follows only the position.
+	**/
 	@:s public var positionOnly(default,null) : Bool;
 
+	/**
+		Applies the constraint, the objects being found by name in `root` (or by path if `null`). Returns `false` if it would create a loop (editor).
+	**/
 	public function apply(root : h3d.scene.Object = null) : Bool {
 		var binds = getBindedObjects(root);
 		if( binds.object != null && binds.target != null ){

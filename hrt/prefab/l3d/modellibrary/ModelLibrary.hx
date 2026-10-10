@@ -3,28 +3,85 @@ package hrt.prefab.l3d.modellibrary;
 import h3d.mat.PbrMaterial.PbrProps;
 import hxd.fmt.hmd.Data;
 
+/**
+	A material of a mesh baked in a `ModelLibrary`.
+**/
 typedef BakedMaterialData = {
+	/**
+		The first index in the library primitive.
+	**/
 	var indexStart : Int;
+	/**
+		The number of indexes.
+	**/
 	var indexCount : Int;
+	/**
+		The geometry in the library model.
+	**/
 	var geomId : Int;
+	/**
+		The first index of each LOD.
+	**/
 	var lodIndexStart : Array<Int>;
+	/**
+		The number of indexes of each LOD.
+	**/
 	var lodIndexCount : Array<Int>;
+	/**
+		The texture in the atlas texture array.
+	**/
 	var texId : Int;
+	/**
+		The X position in the atlas.
+	**/
 	var uvX : Float;
+	/**
+		The Y position in the atlas.
+	**/
 	var uvY : Float;
+	/**
+		The width in the atlas.
+	**/
 	var uvSX : Float;
+	/**
+		The height in the atlas.
+	**/
 	var uvSY : Float;
+	/**
+		The material configuration (shaders and properties), one mesh batch each.
+	**/
 	var materialConfig : Int;
 }
 
+/**
+	The loaded data of a `ModelLibrary`, shared by its clones.
+**/
 class ModelLibraryCache {
+	/**
+		Creates the cache.
+	**/
 	public function new() {};
+	/**
+		Tells if the library was made.
+	**/
 	public var wasMade = false;
+	/**
+		The primitive of all the meshes.
+	**/
 	public var hmdPrim : h3d.prim.HMDModel;
+	/**
+		The atlas shader.
+	**/
 	public var shader : AtlasShader;
+	/**
+		The bounds of the geometries.
+	**/
 	public var geomBounds : Array<h3d.col.Bounds>;
 }
 
+/**
+	Bakes its children models into a single model and texture atlas, to render many instances with few draw calls (see `Batcher`).
+**/
 @:access(h3d.prim.HMDModel)
 @:prefabIcon(HuiRes.ui.icons.prefab.model_library)
 @:prefabName("Model Library")
@@ -51,6 +108,9 @@ class ModelLibrary extends Prefab {
 	@:s var autoLod : Bool = false;
 	@:s var sighash : String = "";
 
+	/**
+		The version of the baked data.
+	**/
 	public static inline var CURRENT_VERSION = 5;
 
 	var meshEmitters : Map<String, MeshEmitter>;
@@ -76,12 +136,18 @@ class ModelLibrary extends Prefab {
 	}
 	#end
 
+	/**
+		Creates a batcher for the meshes of the library.
+	**/
 	public function createBatcher(parent : h3d.scene.Object) {
 		if ( meshEmitters == null )
 			initMeshEmitters();
 		return new Batcher(parent, this);
 	}
 
+	/**
+		Creates a GPU batcher for the meshes of the library.
+	**/
 	public function createGPUBatcher(parent : h3d.scene.Object) {
 		if ( meshEmitters == null )
 			initMeshEmitters();
@@ -204,6 +270,9 @@ class ModelLibrary extends Prefab {
 		#end
 	}
 
+	/**
+		Tells if the baked data matches the version and the models (`paths`, or the children).
+	**/
 	public function isUpToDate( ?paths : Array<String> ) : Bool {
 		if ( version != CURRENT_VERSION ) {
 			trace("ModelLibrary is not up to date : version does not match");
@@ -232,6 +301,9 @@ class ModelLibrary extends Prefab {
 		return true;
 	}
 
+	/**
+		Bakes the models and textures.
+	**/
 	public function bake() {
 		var prevTimeout = hxd.System.allowTimeout;
 		hxd.System.allowTimeout = false;
@@ -758,6 +830,9 @@ class ModelLibrary extends Prefab {
 		return key;
 	}
 
+	/**
+		Saves the library to a prefab file (`shared.prefabSource` by default).
+	**/
 	public function saveLibrary( ?filePath : String ) {
 		var path = ( filePath != null ) ? filePath : shared.prefabSource;
 		if ( path == null )
@@ -773,6 +848,9 @@ class ModelLibrary extends Prefab {
 		sys.io.File.saveContent(getSystemPath(path), content);
 	}
 
+	/**
+		Creates and saves a library of the models.
+	**/
 	public static function createLibrary( dir : String, name : String, paths : Array<String> ) {
 		var systemDir = getSystemPath(dir);
 		if ( !sys.FileSystem.exists(systemDir) )
@@ -834,6 +912,9 @@ class ModelLibrary extends Prefab {
 	}
 	#end
 
+	/**
+		Returns the primitive of all the meshes.
+	**/
 	public function getPrim() {
 		return cache.hmdPrim;
 	}
@@ -846,6 +927,9 @@ class ModelLibrary extends Prefab {
 		return false;
 	}
 
+	/**
+		Compresses the atlas textures to DDS (BC3).
+	**/
 	public function compression() {
 		var convert = new hxd.fs.Convert.CompressIMG("png,tga,jpg,jpeg,dds,envd,envs","dds");
 		convert.params = {format: "BC3"};

@@ -1,8 +1,10 @@
 package hrt.prefab.l3d;
 using Lambda;
 
+/**
+	An instance of a CastleDB line: displays the model (or prefab) referenced by the line in the editor.
+**/
 @:prefabIcon(HuiRes.ui.icons.prefab.instance)
-
 class Instance extends Object3D {
 
 	var instance : Prefab;
@@ -74,6 +76,9 @@ class Instance extends Object3D {
 
 	// ---- statics
 
+	/**
+		Returns the referenced sheet and line of the prefab properties, or `null` (editor only).
+	**/
 	public static function getRefSheet(p: Prefab) {
 		var name = p.getCdbType();
 		if( name == null )
@@ -95,6 +100,9 @@ class Instance extends Object3D {
 		return {sheet: refSheet, idx: refSheet.index.get(refId)};
 	}
 
+	/**
+		Returns the first reference column of a sheet (possibly in a sub property), or `null` (editor only).
+	**/
 	public static function findRefColumns(sheet : cdb.Sheet) {
 		for(col in sheet.columns) {
 			switch(col.type) {
@@ -119,10 +127,16 @@ class Instance extends Object3D {
 		return null;
 	}
 
+	/**
+		Returns the id column of a sheet (editor only).
+	**/
 	public static function findIDColumn(refSheet : cdb.Sheet) {
 		return refSheet.columns.find(c -> c.type == cdb.Data.ColumnType.TId);
 	}
 
+	/**
+		Returns the first model or prefab file of a line, or `null` (editor only).
+	**/
 	public static function findModelPath(refSheet : cdb.Sheet, obj : Dynamic) {
 		function filter(f: String) {
 			if(f != null) {

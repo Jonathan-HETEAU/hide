@@ -1,17 +1,40 @@
 package hrt.prefab.l3d;
 
 
+/**
+	An environment map for PBR lighting, computed from a sky texture and stored next to the prefab.
+**/
 @:access(h3d.scene.pbr.Environment)
 @:prefabIcon(HuiRes.ui.icons.prefab.environment)
-
 class Environment extends Object3D {
 
+	/**
+		The power of the lighting.
+	**/
 	@:s public var power : Float = 1.0;
+	/**
+		The maximum value of the HDR colors.
+	**/
 	@:s public var hdrMax : Float = 10.0;
+	/**
+		The rotation of the environment around Z, in degrees.
+	**/
 	@:s public var rotation : Float = 0.0;
+	/**
+		The number of samples of the computation, as a power of 2.
+	**/
 	@:s public var sampleBits : Int = 12;
+	/**
+		The size of the diffuse map.
+	**/
 	@:s public var diffSize : Int = 64;
+	/**
+		The size of the specular map.
+	**/
 	@:s public var specSize : Int = 512;
+	/**
+		The number of lowest mip levels of the specular map not used.
+	**/
 	@:s public var ignoredSpecLevels : Int = 1;
 
 	@:s var sourceMapPath : String;
@@ -113,6 +136,9 @@ class Environment extends Object3D {
 			applyToRenderer(scene.renderer);
 	}
 
+	/**
+		Sets the environment of a PBR renderer.
+	**/
 	public function applyToRenderer( r : h3d.scene.Renderer) {
 		var r = Std.downcast(r, h3d.scene.pbr.Renderer);
 		if( r != null )

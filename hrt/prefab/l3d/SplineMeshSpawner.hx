@@ -1,14 +1,23 @@
 package hrt.prefab.l3d;
 
+/**
+	The object of a `SplineMeshSpawner`.
+**/
 class SplineMeshSpawnerObject extends h3d.scene.Object {
 	var spline : Spline;
 	var batches : Array<h3d.scene.MeshBatch> = [];
 
+	/**
+		Creates the object.
+	**/
 	override public function new(spline : Spline, parent : h3d.scene.Object) {
 		super(parent);
 		this.spline = spline;
 	}
 
+	/**
+		Returns the instances of the child meshes, repeated and stretched along the spline.
+	**/
 	public function getInstances() {
 		if ( spline == null )
 			return [];
@@ -66,6 +75,9 @@ class SplineMeshSpawnerObject extends h3d.scene.Object {
 		return instances;
 	}
 
+	/**
+		Creates the mesh batches of the instances.
+	**/
 	public function init() {
 		for ( b in batches )
 			b.remove();
@@ -92,11 +104,23 @@ class SplineMeshSpawnerObject extends h3d.scene.Object {
 	}
 }
 
+/**
+	The instances of a mesh along a spline.
+**/
 typedef InstanceData = {
+	/**
+		The transforms of the instances.
+	**/
 	var positions : Array<h3d.Matrix>;
+	/**
+		The mesh.
+	**/
 	var mesh : h3d.scene.Mesh;
 }
 
+/**
+	Repeats its child meshes along its parent `Spline`.
+**/
 @:prefabIcon(HuiRes.ui.icons.prefab.spline_mesh_spawner)
 @:prefabName("Spline Mesh Spawner")
 class SplineMeshSpawner extends hrt.prefab.Object3D {

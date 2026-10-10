@@ -1,5 +1,8 @@
 package hrt.prefab.l3d;
 
+/**
+	Makes the mesh face the camera, with a uniform scale.
+**/
 class BillboardShader extends hxsl.Shader {
 	static var SRC = {
 		@param var scale:Float;
@@ -27,12 +30,21 @@ class BillboardShader extends hxsl.Shader {
 	};
 }
 
+/**
+	A textured quad facing the camera.
+**/
 class BillboardObj extends h3d.scene.Mesh {
 	var prim:h3d.prim.Polygon;
 	var shader:BillboardShader;
 
+	/**
+		The scale of the quad.
+	**/
 	public var billboardScale:Float = 1.0;
 
+	/**
+		The texture.
+	**/
 	public var texture(get, set):h3d.mat.Texture;
 
 	function set_texture(tex:h3d.mat.Texture):h3d.mat.Texture {
@@ -43,6 +55,9 @@ class BillboardObj extends h3d.scene.Mesh {
 		return material.texture;
 	}
 
+	/**
+		The color.
+	**/
 	public var color(get, set):h3d.Vector4;
 
 	function set_color(col:h3d.Vector4):h3d.Vector4 {
@@ -58,6 +73,9 @@ class BillboardObj extends h3d.scene.Mesh {
 		super.sync(ctx);
 	}
 
+	/**
+		Creates the billboard.
+	**/
 	public function new(?tile:h3d.mat.Texture, ?parent:h3d.scene.Object) {
 		var shape:hrt.prefab.l3d.Polygon.Shape = Quad(0);
 		var cache = hrt.prefab.l3d.Polygon.getPrimCache();

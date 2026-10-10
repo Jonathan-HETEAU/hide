@@ -1,74 +1,212 @@
 package hrt.prefab.l3d;
 
 #if (hl_ver >= version("1.13.0")) @:struct #end
+/**
+	A point of a trail (a struct on HashLink).
+**/
 class TrailPoint {
+	/**
+		The X position of the head.
+	**/
 	public var x : Float = 0;
+	/**
+		The Y position of the head.
+	**/
 	public var y : Float = 0;
+	/**
+		The Z position of the head.
+	**/
 	public var z : Float = 0;
+	/**
+		The width.
+	**/
 	public var w : Float = 0;
+	/**
+		The X of the tangent.
+	**/
 	public var tx : Float = 0;
+	/**
+		The Y of the tangent.
+	**/
 	public var ty : Float = 0;
+	/**
+		The Z of the tangent.
+	**/
 	public var tz : Float = 0;
+	/**
+		The X of the orientation axis.
+	**/
 	public var ux : Float = 0;
+	/**
+		The Y of the orientation axis.
+	**/
 	public var uy : Float = 0;
+	/**
+		The Z of the orientation axis.
+	**/
 	public var uz : Float = 0;
+	/**
+		The color, as ARGB.
+	**/
 	public var color : Int = 0xFFFFFFFF;
+	/**
+		The speed of the head when the point was added.
+	**/
 	public var speed : Float = 0;
+	/**
+		The distance to the next point (toward the tail).
+	**/
 	public var len : Float = 0;
+	/**
+		The remaining lifetime, in seconds.
+	**/
 	public var lifetime : Float = 0;
+	/**
+		The factor of the width.
+	**/
 	public var sizeMultiplier : Float = 1;
+	/**
+		The next point, toward the tail.
+	**/
 	public var next : TrailPoint = null;
 
+	/**
+		Creates a trail.
+	**/
 	public function new(){};
 }
 
 #if (hl_ver >= version("1.13.0")) @:struct #end
+/**
+	A trail of a `TrailObj` (a struct on HashLink).
+**/
 class TrailHead {
+	/**
+		The newest point.
+	**/
 	public var firstPoint : TrailPoint = null;
+	/**
+		The length of the trail.
+	**/
 	public var totalLength : Float = 0;
+	/**
+		The number of points.
+	**/
 	public var numPoints : Int = 0;
+	/**
+		Incremented each time the trail is cleared, to detect a reused trail.
+	**/
 	public var generation : Int = 0;
+	/**
+		The next free trail, in the pool.
+	**/
 	public var nextTrail : TrailHead = null;
+	/**
+		The X position.
+	**/
 	public var x : Float = 0;
+	/**
+		The Y position.
+	**/
 	public var y : Float = 0;
+	/**
+		The Z position.
+	**/
 	public var z : Float = 0;
+	/**
+		The time before the next point is added, in seconds.
+	**/
 	public var cooldown : Float = 0;
 
+	/**
+		Creates a point.
+	**/
 	public function new(){};
 }
 
+/**
+	The orientation of the trails.
+**/
 enum TrailOrientation {
+	/**
+		Facing the camera.
+	**/
 	Camera;
+	/**
+		The up axis of the trail is the given axis.
+	**/
 	Up(x : Float, y : Float, z : Float);
+	/**
+		The side axis of the trail is the given axis.
+	**/
 	Right(x : Float, y : Float, z : Float);
 }
 
+/**
+	How the texture coordinate U goes along the trails.
+**/
 enum UVMode {
+	/**
+		Stretched between the head (`u = 0`) and the tail (`u = 1`).
+	**/
 	@display("Stretch", "Stretch the UV between the head (u=0) and the tail (u=1) of the trails")
 	EStretch;
+	/**
+		Tiled along the trail, the texture staying fixed in world space.
+	**/
 	@display("Tile Fixed", "Tile the texture through the trail, but the texture stay fixed in world space")
 	ETileFixed;
+	/**
+		Tiled along the trail, the texture following the head (`u = 0` at the head).
+	**/
 	@display("Tile Follow", "Tile the texture throught the tail, and the texture follow the head of the tail (u=0 at the head)")
 	ETileFollow;
+	/**
+		The life of the point.
+	**/
 	@display("Life", "The value of the U is equal to the life of the trail point")
 	ELifetime;
 }
 
+/**
+	How the texture coordinate U repeats.
+**/
 enum UVRepeat {
+	/**
+		From `0` to `1`, then back to `0`: for textures tiling horizontally.
+	**/
 	@display("Mod", "U value goes from 0 to 1, then back to 0 again. For textures that tile horizontally")
 	EMod;
+	/**
+		From `0` to `1`, then from `1` to `0`: for textures not tiling horizontally.
+	**/
 	@display("Mirror", "U value goes from 0 to 1 then from 1 to 0, repeating. For textures that don't tile horizontally")
 	EMirror;
+	/**
+		From `0` to `1`, then stays at `1`.
+	**/
 	@display("Clamp", "U value goes from 0 to 1, then stay at 1")
 	EClamp;
+	/**
+		No repeat.
+	**/
 	@display("None", "No repeat for the UV values")
 	ENone;
 }
 
 
+/**
+	The storage of the trail points.
+**/
 typedef PointsArray = #if (hl_ver >= version("1.14.0")) hl.CArray<TrailPoint> #else Array<TrailPoint> #end;
+/**
+	The storage of the trails.
+**/
 typedef TrailsArray = #if (hl_ver >= version("1.14.0")) hl.CArray<TrailHead> #else Array<TrailHead> #end;
 
+/**
+	The mesh of `Trails`: several trails following positions, built each frame.
+**/
 class TrailObj extends h3d.scene.Mesh {
 
 	var points : PointsArray;
@@ -96,7 +234,13 @@ class TrailObj extends h3d.scene.Mesh {
 	var constantSpeedY: Float = 0;
 	var constantSpeedZ: Float = 0;
 
+	/**
+		The speed of the time of the trails (`0` to update them manually with `update`).
+	**/
 	public var timeScale : Float = 1.0;
+	/**
+		The factor of the width of the new points.
+	**/
 	public var sizeMultiplier : Float = 1.0;
 
 	#if editor
@@ -107,8 +251,14 @@ class TrailObj extends h3d.scene.Mesh {
 
 	// Sets whenever we check the position of this object to automaticaly add points to the 0th trail.
 	// If set to false, trail can be created by manually calling addPoint()
+	/**
+		Adds the position of this object to the first trail at each update. Otherwise the trails are fed with `updateTrail` or `addPoint`.
+	**/
 	public var autoTrackPosition : Bool = true;
 
+	/**
+		The number of trails.
+	**/
 	public var numTrails(default, null) : Int;
 
 	static var tmpHead = new TrailPoint();
@@ -121,6 +271,9 @@ class TrailObj extends h3d.scene.Mesh {
 	var shader : hrt.shader.BaseTrails;
 	var colorShader : h3d.shader.VertexColorAlpha;
 
+	/**
+		Returns the maximum number of points of a trail.
+	**/
 	public function calcMaxTrailPoints() : Int {
 		return hxd.Math.ceil( prefab.lifetime * prefab.framerate ) + 2; // Segment count + head and tail
 	}
@@ -167,6 +320,9 @@ class TrailObj extends h3d.scene.Mesh {
 		trails = null;
 	}
 
+	/**
+		Allocates the buffers, the points and the trails.
+	**/
 	public function init() {
 		dispose();
 
@@ -196,6 +352,9 @@ class TrailObj extends h3d.scene.Mesh {
 
 	var pool : TrailPoint = null;
 
+	/**
+		The material properties, by material setup.
+	**/
 	public var materialData = {};
 
 	function allocPoint() : TrailPoint {
@@ -214,6 +373,9 @@ class TrailObj extends h3d.scene.Mesh {
 		return r;
 	}
 
+	/**
+		Returns a free trail. Throws if none is left.
+	**/
 	public function allocTrail() : TrailHead {
 		if (trailsPool == null)
 			throw "assert";
@@ -229,6 +391,9 @@ class TrailObj extends h3d.scene.Mesh {
 		t.generation++;
 	}
 
+	/**
+		Clears a trail and returns it to the free trails.
+	**/
 	public function disposeTrail(t : TrailHead) {
 		var p = t.firstPoint;
 		while (p != null) {
@@ -270,6 +435,9 @@ class TrailObj extends h3d.scene.Mesh {
 		dispose();
 	}
 
+	/**
+		Clears all the trails.
+	**/
 	public function reset() {
 		if( points == null )
 			return;
@@ -285,6 +453,9 @@ class TrailObj extends h3d.scene.Mesh {
 		}
 	}
 
+	/**
+		Applies the UV repeat and color settings of the prefab to the shaders.
+	**/
 	public function updateShader() {
 		shader.uvRepeat = prefab.uvRepeat.getIndex();
 
@@ -316,6 +487,9 @@ class TrailObj extends h3d.scene.Mesh {
 		}
 	}
 
+	/**
+		Adds a point at the head of a trail (ignored if too close to the last one).
+	**/
 	public function addPoint( head : TrailHead, x : Float, y : Float, z : Float ) {
 		var prev = head.firstPoint;
 
@@ -360,6 +534,9 @@ class TrailObj extends h3d.scene.Mesh {
 		head.numPoints++;
 	}
 
+	/**
+		Returns the material properties of the current material setup.
+	**/
 	public function getMaterialProps() {
 		var name = h3d.mat.MaterialSetup.current.name;
 		var p = Reflect.field(materialData, name);
@@ -379,6 +556,9 @@ class TrailObj extends h3d.scene.Mesh {
 		};
 	}
 
+	/**
+		Creates the mesh with `numTrails` trails.
+	**/
 	public function new(parentPrefab: Trails, parent : h3d.scene.Object, numTrails : Int) {
 		this.numTrails = numTrails;
 		bounds = new h3d.col.Bounds();
@@ -429,6 +609,9 @@ class TrailObj extends h3d.scene.Mesh {
 		#end
 	}
 
+	/**
+		Moves the head of a trail to a position, adding points at the framerate of the prefab, and ages its points by `dt`.
+	**/
 	public function updateTrail( t : TrailHead, dt : Float, x : Float, y : Float, z : Float) {
 		t.x = x;
 		t.y = y;
@@ -530,6 +713,9 @@ class TrailObj extends h3d.scene.Mesh {
 		}
 	}
 
+	/**
+		Updates the trails for the elapsed time `dt`.
+	**/
 	public function update(dt: Float) {
 		if( points == null )
 			init();  // FXEditor can update before onAdd
@@ -764,35 +950,101 @@ class TrailObj extends h3d.scene.Mesh {
 	}
 }
 
+/**
+	Trails following the object (or positions given to the `TrailObj`), with a width fading over their lifetime.
+**/
 @:prefabIcon(HuiRes.ui.icons.prefab.trails)
 class Trails extends Object3D {
 
+	/**
+		The width at the head.
+	**/
 	@:s public var startWidth : Float = 1.0;
+	/**
+		The width at the tail.
+	**/
 	@:s public var endWidth : Float = 0.0;
+	/**
+		The lifetime of the points, in seconds.
+	**/
 	@:s public var lifetime : Float = 1.0;
+	/**
+		The orientation of the trails.
+	**/
 	@:c public var orientation : TrailOrientation = TrailOrientation.Camera;
+	/**
+		Scales the width by the scale of the object.
+	**/
 	@:s public var useScale : Bool = false;
 
+	/**
+		Scales the width with the distance to the camera, `1` at `magnificationRefDist`.
+	**/
 	@:s public var useMagnification : Bool = false;
+	/**
+		The distance at which the magnification scale is `1`.
+	**/
 	@:s public var magnificationRefDist : Float = 10.0;
+	/**
+		Allows a magnification scale below `1`.
+	**/
 	@:s public var useMinify : Bool = true;
+	/**
+		The maximum distance of the magnification.
+	**/
 	@:s public var magnificationMaxDist : Float = 1000.0;
 
+	/**
+		The minimum speed of the head for a segment to be drawn.
+	**/
 	@:s public var minSpeed : Float = 10.0;
+	/**
+		The maximum speed of the head for a segment to be drawn.
+	**/
 	@:s public var maxSpeed : Float = 1000.0;
 
+	/**
+		How the texture coordinate U goes along the trails.
+	**/
 	@:s public var uvMode : UVMode = EStretch;
+	/**
+		The scale of the texture coordinate U.
+	**/
 	@:s public var uvStretch: Float = 1.0;
+	/**
+		How the texture coordinate U repeats.
+	**/
 	@:s public var uvRepeat : UVRepeat = EMod;
+	/**
+		The number of points added per second.
+	**/
 	@:s public var framerate : Float = 30.0;
 
+	/**
+		Uses the vertex colors.
+	**/
 	@:s public var useColor : Bool = false;
+	/**
+		The color of the points, as ARGB.
+	**/
 	@:s public var color : Int = 0xFFFFFFFF;
 
+	/**
+		The X of a constant speed applied to the points, to make the trails appear to move.
+	**/
 	@:s public var constantSpeedX: Float = 0.0;
+	/**
+		The Y of a constant speed applied to the points.
+	**/
 	@:s public var constantSpeedY: Float = 0.0;
+	/**
+		The Z of a constant speed applied to the points.
+	**/
 	@:s public var constantSpeedZ: Float = 0.0;
 
+	/**
+		Displays the length of the trails in the editor.
+	**/
 	public var debug : Bool = false;
 
 	function new(parent, shared) {
@@ -838,6 +1090,9 @@ class Trails extends Object3D {
 		return obj;
 	}
 
+	/**
+		Creates the mesh with `numTrails` trails.
+	**/
 	public function create( parent : h3d.scene.Object, numTrails : Int ) {
 		var tr = new TrailObj(this, parent, numTrails);
 		applyTransform();
@@ -991,6 +1246,9 @@ class Trails extends Object3D {
 		return { icon : "toggle-on", name : "Trails" };
 	}
 
+	/**
+		The element displaying the debug information (editor only).
+	**/
 	public var debugElement : hide.Element = null;
 
 	override public function edit(ctx:hide.prefab.EditContext) {

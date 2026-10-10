@@ -2,6 +2,9 @@ package hrt.prefab.l3d.modellibrary;
 
 import hrt.prefab.l3d.modellibrary.ModelLibrary.BakedMaterialData;
 
+/**
+	Emits the instances of a mesh of a `ModelLibrary` into a `Batcher`.
+**/
 @:access(hrt.prefab.l3d.modellibrary.Batcher)
 @:access(hrt.prefab.l3d.modellibrary.ModelLibrary)
 @:allow(hrt.prefab.l3d.modellibrary.ModelLibrary)

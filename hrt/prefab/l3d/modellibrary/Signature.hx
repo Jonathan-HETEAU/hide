@@ -1,5 +1,8 @@
 package hrt.prefab.l3d.modellibrary;
 
+/**
+	The signature of the sources of a `ModelLibrary`, to know if it must be baked again.
+**/
 @:access(hrt.prefab.l3d.modellibrary.ModelLibrary)
 class Signature {
 	var version : Int;
@@ -10,6 +13,9 @@ class Signature {
 	function new() {
 	}
 
+	/**
+		Returns the SHA-1 of the signature.
+	**/
 	public function computeHash() {
 		var content = #if editor
 			hide.Ide.inst.toJSON(this);
@@ -19,6 +25,9 @@ class Signature {
 		return haxe.crypto.Sha1.make(haxe.io.Bytes.ofString(content)).toHex();
 	}
 
+	/**
+		Saves the signature.
+	**/
 	public function save( path : String ) {
 		var content = #if editor
 			hide.Ide.inst.toJSON(this);
@@ -28,6 +37,9 @@ class Signature {
 		sys.io.File.saveContent(ModelLibrary.getSystemPath(path), content);
 	}
 
+	/**
+		Loads a signature, or returns `null`.
+	**/
 	public static function load( path : String ) : Signature {
 		var content = sys.io.File.getContent(ModelLibrary.getSystemPath(path));
 		var dyn = try haxe.Json.parse(content) catch( e : Dynamic ) null;
@@ -42,6 +54,9 @@ class Signature {
 		return null;
 	}
 
+	/**
+		Returns the signature of models.
+	**/
 	public static function fromModels( targetPath : String, modelPaths : Array<String> ) : Signature {
 		var sig = new Signature();
 		sig.version = ModelLibrary.CURRENT_VERSION;
@@ -53,6 +68,9 @@ class Signature {
 		return sig;
 	}
 
+	/**
+		Returns the signature of the models of a library.
+	**/
 	public static function fromLib( lib : ModelLibrary ) : Signature {
 		var sig = new Signature();
 		sig.version = ModelLibrary.CURRENT_VERSION;
@@ -141,9 +159,18 @@ class Signature {
 	}
 }
 
+/**
+	The path and SHA-1 of a file.
+**/
 @:access(hrt.prefab.l3d.modellibrary.ModelLibrary)
 class FileSignature {
+	/**
+		The path.
+	**/
 	public var path : String;
+	/**
+		The SHA-1 of the content.
+	**/
 	public var hash : String;
 	function new( path : String ) {
 		this.path = path;
@@ -152,17 +179,41 @@ class FileSignature {
 	}
 }
 
+/**
+	The signature of a material.
+**/
 class MaterialSignature {
+	/**
+		The path of the diffuse map.
+	**/
 	public var diffuseMapPath : String;
+	/**
+		The path of the normal map.
+	**/
 	public var normalMapPath : String;
+	/**
+		The path of the specular map.
+	**/
 	public var specularMapPath : String;
+	/**
+		The properties.
+	**/
 	public var props : String;
+	/**
+		The shaders.
+	**/
 	public var shaders : Array<String> = [];
 	function new() {
 	}
 }
 
+/**
+	The signature of a model and its materials.
+**/
 class ModelSignature extends FileSignature {
+	/**
+		The materials.
+	**/
 	public var materials : Array<MaterialSignature> = [];
 	function new( path : String ) {
 		super(path);

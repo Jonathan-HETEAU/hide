@@ -1,18 +1,51 @@
 package hrt.prefab.l3d.modellibrary;
 
+/**
+	Instances of a mesh, with their transforms in a GPU buffer.
+**/
 typedef EmitUnit = {
+	/**
+		The mesh.
+	**/
 	var mesh : h3d.scene.Mesh;
+	/**
+		The transforms.
+	**/
 	var modelViews : h3d.Buffer;
+	/**
+		The number of instances.
+	**/
 	var count : Int;
 }
 
+/**
+	A copy of transforms into a mesh batch.
+**/
 typedef CopyInfo = {
+	/**
+		The transforms of the instances.
+	**/
 	var modelViews : h3d.Buffer;
+	/**
+		The first instance.
+	**/
 	var start : Int;
+	/**
+		The number of instances.
+	**/
 	var size : Int;
+	/**
+		The mesh batch.
+	**/
 	var batch : h3d.scene.MeshBatch;
+	/**
+		The baked material.
+	**/
 	var bakedMat : ModelLibrary.BakedMaterialData;
 }
+/**
+	A `Batcher` filled from GPU buffers of transforms, with GPU culling and LOD for large batches.
+**/
 @:access(hrt.prefab.l3d.modellibrary.MeshEmitter)
 @:access(hrt.prefab.l3d.modellibrary.ModelLibrary)
 @:allow(hrt.prefab.l3d.modellibrary.ModelLibrary)
@@ -26,8 +59,14 @@ class GPUBatcher extends Batcher {
 	var libraryParamShader : GPUBatcherShaders.CopyLibraryParams;
 
 	var currentBatchCount : Int;
+	/**
+		The number of batches from which `h3d.scene.GPUMeshBatch` is used.
+	**/
 	public var GPUMeshBatchThreshold : Int = 100;
 
+	/**
+		Creates the batcher.
+	**/
 	public function new(parent : h3d.scene.Object, library : ModelLibrary){
 		super(parent, library);
 		copyShader = new GPUBatcherShaders.CopyModelViews();
@@ -66,6 +105,9 @@ class GPUBatcher extends Batcher {
 		throw "Unit emitInstance is not compatible with GPU Batcher, use emitInstances with GPU data or use a Batcher instead";
 	}
 
+	/**
+		Adds the instances, in a single call. Throws if instances were already added.
+	**/
 	public function emitInstances(emitList : Array<EmitUnit>, ctx : h3d.scene.RenderContext) {
 		if(batches.length > 0) {
 			throw "GPUBatcher is currently incompatible with additive instancing, please group them in one call";

@@ -1,21 +1,48 @@
 package hrt.prefab.l3d;
 
+/**
+	A mesh batch of a `MeshSpray`, for a model.
+**/
 typedef BatchData = {
-	batch : h3d.scene.MeshBatch,
-	pivot : h3d.Matrix,
-	emitCountTip : Int,
-	init : Bool
+	/**
+		The mesh batch.
+	**/
+	var batch : h3d.scene.MeshBatch;
+	/**
+		The default transform of the mesh, or `null` for the identity.
+	**/
+	var pivot : h3d.Matrix;
+	/**
+		The number of instances, to preallocate the batch.
+	**/
+	var emitCountTip : Int;
+	/**
+		Tells if the batch was started.
+	**/
+	var init : Bool;
 };
 
+/**
+	The object of a `MeshSpray`: renders the meshes with mesh batches.
+**/
 @:access(hrt.prefab.l3d.Spray)
 class MeshSprayObject extends Spray.SprayObject {
+	/**
+		The mesh batches.
+	**/
 	public var batches : Array<h3d.scene.MeshBatch> = [];
+	/**
+		The batches by cell (see `split`) and model path.
+	**/
 	public var batchesMap : Map<Int,Map<String,BatchData>> = [];
 
 	#if editor
 
 	var blookup : Map<h3d.prim.Primitive, h3d.scene.MeshBatch> = new Map();
 	var mlookup : Map<String, h3d.scene.Mesh> = [];
+	/**
+		Shows the children as objects, to edit them (editor only).
+	**/
 	public var editChildren : Bool;
 
 	override function emitRec(ctx:h3d.scene.RenderContext) {
@@ -101,6 +128,9 @@ class MeshSprayObject extends Spray.SprayObject {
 	#end
 }
 
+/**
+	Places models on the ground with a brush in the editor, rendered with mesh batches (optionally split in cells, or stored in binary).
+**/
 @:prefabIcon(HuiRes.ui.icons.prefab.mesh_spray)
 @:prefabName("Mesh Spray")
 class MeshSpray extends Spray {
@@ -632,6 +662,9 @@ class MeshSpray extends Spray {
 		}
 	}
 
+	/**
+		Creates a disc primitive of radius `1`, with an inner radius and rings.
+	**/
 	static public function makePrimCircle(segments: Int, inner : Float = 0, rings : Int = 0) {
 		var points = [];
 		var uvs = [];

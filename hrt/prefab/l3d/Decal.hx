@@ -1,12 +1,30 @@
 package hrt.prefab.l3d;
 
+/**
+	How a `Decal` is rendered.
+**/
 enum abstract DecalMode(String) {
+	/**
+		A PBR decal, modifying the albedo, normal and material of the surfaces.
+	**/
 	var Default;
+	/**
+		A color decal, before the tonemapping.
+	**/
 	var BeforeTonemapping;
+	/**
+		A color decal, after the tonemapping.
+	**/
 	var AfterTonemapping;
+	/**
+		A PBR decal on the terrain.
+	**/
 	var Terrain;
 }
 
+/**
+	A volume decal: projects textures on the surfaces inside its unit box.
+**/
 @:prefabIcon(HuiRes.ui.icons.prefab.decal)
 class Decal extends Object3D {
 
@@ -110,6 +128,9 @@ class Decal extends Object3D {
 	}
 	#end
 
+	/**
+		Applies the properties (or the referenced library material) to the decal mesh.
+	**/
 	public function updateRenderParams() {
 		var mesh = Std.downcast(local3d, h3d.scene.Mesh);
 		if (mesh == null)

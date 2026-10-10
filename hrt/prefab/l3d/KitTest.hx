@@ -1,51 +1,141 @@
 package hrt.prefab.l3d;
 
+/**
+	A recursive structure, to test the editor kit.
+**/
 typedef SubStruct = {
-	innerValue: Float,
-	?rec: SubStruct,
+	/**
+		A float value.
+	**/
+	var innerValue : Float;
+	/**
+		A nested structure.
+	**/
+	var ?rec : SubStruct;
 };
 
+/**
+	An enum, to test the editor kit.
+**/
 enum TestEnum {
+	/**
+		A value.
+	**/
 	Foo;
+	/**
+		A value.
+	**/
 	Bar;
+	/**
+		A value.
+	**/
 	Fizz;
+	/**
+		A value.
+	**/
 	Buzz;
+	/**
+		A value.
+	**/
 	FooBar;
 }
 
+/**
+	A string enum abstract, to test the editor kit.
+**/
 enum abstract TestAbstractString(String) {
+	/**
+		A value.
+	**/
 	var Foo;
+	/**
+		A value.
+	**/
 	var Bar;
+	/**
+		A value.
+	**/
 	var Fizz;
+	/**
+		A value.
+	**/
 	var Buzz;
+	/**
+		A value.
+	**/
 	var FooBar;
 }
 
+/**
+	An int enum abstract, to test the editor kit.
+**/
 enum abstract TestAbstractInt(Int) {
+	/**
+		A value.
+	**/
 	var Foo;
+	/**
+		A value.
+	**/
 	var Bar;
+	/**
+		A value.
+	**/
 	var Fizz;
+	/**
+		A value.
+	**/
 	var Buzz;
+	/**
+		A value.
+	**/
 	var FooBar;
 }
 
 
+/**
+	An item of a list, to test the editor kit.
+**/
 typedef ListItem = {
-	x: Float,
-	y: Float,
-	name: String,
-	role: String,
-	subclass: String,
+	/**
+		A float value.
+	**/
+	var x : Float;
+	/**
+		A float value.
+	**/
+	var y : Float;
+	/**
+		A name.
+	**/
+	var name : String;
+	/**
+		A role.
+	**/
+	var role : String;
+	/**
+		A subclass.
+	**/
+	var subclass : String;
 }
 
+/**
+	An empty tool, to test the editor kit.
+**/
 class KitTestTool1 extends hrt.prefab.editor.Tool {
 
 }
 
+/**
+	An empty tool, to test the editor kit.
+**/
 class KitTestTool2 extends hrt.prefab.editor.Tool {
 
 }
 
+/**
+	A cube prefab with properties of all kinds, to test the editor kit (`hide.kit`).
+**/
 @:prefabHideInAddMenu
 @:prefabIcon(HuiRes.ui.icons.prefab.kit_test)
 class KitTest extends Object3D {

@@ -1,9 +1,15 @@
 package hrt.prefab.l3d;
 
+/**
+	A unit box, displayed with a debug color in the editor.
+**/
 @:prefabIcon(HuiRes.ui.icons.prefab.box)
 class Box extends Object3D {
 
 
+	/**
+		Sets the debug color (editor only).
+	**/
 	public function setColor(color: Int) {
 		#if (editor || editor_hl)
 		if(local3d == null)
@@ -35,6 +41,9 @@ class Box extends Object3D {
 	}
 
 	#if (editor || editor_hl)
+	/**
+		Sets the debug color of a material, transparent when its alpha is below `0xFF` (editor only).
+	**/
 	static public function setDebugColor(color : Int, mat : h3d.mat.Material) {
 		mat.color.setColor(color);
 		var opaque = (color >>> 24) == 0xff;

@@ -2,6 +2,9 @@ package hrt.prefab.l3d;
 
 // NOTE(ces) : Not Tested
 
+/**
+	Sets the speed of the current animation of its parent object. Not tested.
+**/
 @:prefabIcon(HuiRes.ui.icons.prefab.anim_speed_control)
 @:prefabName("Anim Speed Control")
 class AnimSpeedControl extends hrt.prefab.Prefab {

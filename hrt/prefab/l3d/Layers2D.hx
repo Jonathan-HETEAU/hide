@@ -2,17 +2,41 @@ package hrt.prefab.l3d;
 
 // NOTE(ces) : Not Tested
 
+/**
+	A value of a `Layer2D`.
+**/
 typedef Layer2DValue = {
-	index	: Int,
-	name 	: String,
-	color	: Int
+	/**
+		The value of the pixels.
+	**/
+	var index : Int;
+	/**
+		The name.
+	**/
+	var name : String;
+	/**
+		The display color, as RGB.
+	**/
+	var color : Int;
 }
 
+/**
+	A layer of `Layers2D`: a map of values painted on the ground.
+**/
 typedef Layer2D = {
-	name	: String,
-	values 	: Array<Layer2DValue>
+	/**
+		The name.
+	**/
+	var name : String;
+	/**
+		The values.
+	**/
+	var values : Array<Layer2DValue>;
 }
 
+/**
+	Displays the painted layer over the scene.
+**/
 class LayerView2DRFXShader extends h3d.shader.ScreenShader {
 
 	static var SRC = {
@@ -94,9 +118,15 @@ class LayerView2DRFXShader extends h3d.shader.ScreenShader {
 	}
 }
 
+/**
+	The renderer effect displaying the painted layer.
+**/
 @:access(h3d.scene.Renderer)
 class Layer2DRFX extends hrt.prefab.rfx.RendererFX {
 
+	/**
+		The screen pass.
+	**/
 	public var pass = new h3d.pass.ScreenFx(new LayerView2DRFXShader());
 
 	var tmp = new h3d.Matrix();
@@ -142,6 +172,9 @@ class Layer2DRFX extends hrt.prefab.rfx.RendererFX {
 }
 
 #if domkit
+/**
+	The tool painting the layers of a `Layers2D`.
+**/
 @:access(hrt.prefab.l3d.Layers2D)
 @:allow(hrt.prefab.l3d.Layers2D)
 class Layers2DTool extends hrt.prefab.editor.Tool {
@@ -169,6 +202,9 @@ class Layers2DTool extends hrt.prefab.editor.Tool {
 	var collidePixels : hxd.Pixels;
 	var colorMap : h3d.mat.Texture;
 
+	/**
+		Creates the tool.
+	**/
 	public function new(ctx: EditContext2, layers: Layers2D) {
 		super(ctx);
 		this.layers = layers;
@@ -623,6 +659,9 @@ class Layers2DTool extends hrt.prefab.editor.Tool {
 		updateVisuals();
 	}
 
+	/**
+		Displays the brush circle (editor only).
+	**/
 	public function drawCircle(originX : Float, originY : Float, originZ : Float, radius: Float, thickness: Float, color) {
 		var newColor = h3d.Vector4.fromColor(color);
 		if (brushes == null || brushes.length == 0 || brushes[0].scaleX != radius || brushes[0].material.color != newColor) {
@@ -658,6 +697,9 @@ class Layers2DTool extends hrt.prefab.editor.Tool {
 #end
 
 
+/**
+	Layers of values painted on the ground in the editor (zones, materials...), stored as images next to the prefab. Not tested.
+**/
 @:allow(hrt.prefab.l3d)
 @:prefabIcon(HuiRes.ui.icons.prefab.layers_2d)
 @:prefabName("Layers 2D")
@@ -674,6 +716,9 @@ class Layers2D extends hrt.prefab.Object3D {
 
 	@:s var highlightColor : Int = 0xff00ff;
 
+	/**
+		Keeps the layers displayed when the prefab is not selected (editor).
+	**/
 	@:s public var keepVisible : Bool = false;
 
 	#if domkit
@@ -758,10 +803,16 @@ class Layers2D extends hrt.prefab.Object3D {
 			null;
 	}
 
+	/**
+		Returns the pixels of a layer, or `null`.
+	**/
 	public function getLayer( key : String ) {
 		return layerTextures.get(key);
 	}
 
+	/**
+		Returns the pixel of the layer at a world position, or `-1` outside.
+	**/
 	public function getLayerColor( layer : hxd.Pixels, x : Float, y : Float ) {
 		if ( layer == null )
 			return -1;
@@ -773,6 +824,9 @@ class Layers2D extends hrt.prefab.Object3D {
 		return layer.getPixel(ix, iy);
 	}
 
+	/**
+		Returns the name of the value of a layer at a world position, or `null`.
+	**/
 	public function getLayerValue(key : String, x : Float, y : Float) {
 		var color = getLayerColor(getLayer(key), x, y);
 		if ( color == -1 ) return null;
@@ -1109,6 +1163,9 @@ class Layers2D extends hrt.prefab.Object3D {
 
 	}
 
+	/**
+		Displays the brush circle.
+	**/
 	public function drawCircle(originX : Float, originY : Float, originZ : Float, radius: Float, thickness: Float, color) {
 		var newColor = h3d.Vector4.fromColor(color);
 		if (gBrushes == null || gBrushes.length == 0 || gBrushes[0].scaleX != radius || gBrushes[0].material.color != newColor) {

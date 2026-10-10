@@ -1,5 +1,8 @@
 package hrt.prefab.l3d;
 
+/**
+	Renders a volume of fog by integrating it along the view ray.
+**/
 class LocalVolumetricShader extends hxsl.Shader {
 
 	static var SRC = {
@@ -311,17 +314,41 @@ class LocalVolumetricShader extends hxsl.Shader {
 	}
 }
 
+/**
+	The object of a `LocalVolumetricLighting`: a unit cube rendered from inside or outside.
+**/
 class LocalVolumetricLightingObject extends h3d.scene.Object {
 
+	/**
+		The prefab.
+	**/
 	public var localVolume : LocalVolumetricLighting;
+	/**
+		The bounds of the volume.
+	**/
 	public var bounds : h3d.col.OrientedBounds;
 
+	/**
+		The mesh rendered when the camera is inside.
+	**/
 	public var meshInside : h3d.scene.Mesh;
+	/**
+		The mesh rendered when the camera is outside.
+	**/
 	public var meshOutside : h3d.scene.Mesh;
+	/**
+		The display of the bounds, or `null`.
+	**/
 	public var boundsDisplay : h3d.scene.Graphics;
 
+	/**
+		The shader.
+	**/
 	public var shader : LocalVolumetricShader;
 
+	/**
+		Creates the object.
+	**/
 	public function new(parent:h3d.scene.Object, localVolume:LocalVolumetricLighting) {
 		this.localVolume = localVolume;
 		super(parent);
@@ -382,6 +409,9 @@ class LocalVolumetricLightingObject extends h3d.scene.Object {
 		}
 	}
 
+	/**
+		Applies the properties of the prefab.
+	**/
 	public function refresh() {
 		shader.obH.set(0.5, 0.5, 0.5);
 
@@ -404,21 +434,42 @@ class LocalVolumetricLightingObject extends h3d.scene.Object {
 	}
 }
 
+/**
+	A local volume of fog, in a unit cube scaled by the transform.
+**/
 @:prefabIcon(HuiRes.ui.icons.prefab.local_volumetric_lighting)
 @:prefabName("Local Volumetric Lighting")
 class LocalVolumetricLighting extends hrt.prefab.Object3D {
 
 	var localVolumeObject : LocalVolumetricLightingObject;
 
+	/**
+		The shape: `0` box, `1` cone, `2` capsule.
+	**/
 	@:s public var shape : Int = 0;
 
+	/**
+		The radius of the tip of the cone.
+	**/
 	@:s public var coneTipRadius : Float = 0.5;
+	/**
+		The rounding of the box corners.
+	**/
 	@:s public var cubeRoundCorner : Float = 0.0;
 
+	/**
+		The density of the fog.
+	**/
 	@:s public var fogDensity : Float = 1.0;
 
+	/**
+		The color of the fog, as RGB.
+	**/
 	@:s public var color : Int = 0xFFFFFF;
 
+	/**
+		Displays the bounds.
+	**/
 	@:s public var showBounds : Bool = false;
 
 	override public function copy(other:Prefab) {

@@ -2,24 +2,68 @@ package hrt.prefab.l3d;
 
 // NOTE(ces) : Not Tested
 
+/**
+	Controls the object with a gamepad in the editor (Start to toggle), with a third person camera. Not tested.
+**/
 @:prefabIcon(HuiRes.ui.icons.prefab.game_controller)
 @:prefabName("Game Controller")
-
 class GameController extends Object3D {
 
+	/**
+		The move speed.
+	**/
 	@:s public var moveSpeed : Float = 1.;
+	/**
+		The height of the camera target above the object.
+	**/
 	@:s public var zOffset : Float = 0.0;
+	/**
+		Keeps the object on the ground.
+	**/
 	@:s public var followGround : Bool = true;
+	/**
+		Makes the camera target follow the height of the object.
+	**/
 	@:s public var cameraFollowGround : Bool = true;
+	/**
+		Switches the editor to full screen while controlling.
+	**/
 	@:s public var startFullScreen : Bool = true;
+	/**
+		The name of the idle animation of the models.
+	**/
 	@:s public var animIdle : String = "idle";
+	/**
+		The name of the move animation.
+	**/
 	@:s public var animMove : String = "walk";
+	/**
+		The name of the jump animation.
+	**/
 	@:s public var animJump : String = "jump";
+	/**
+		The name of the fall animation.
+	**/
 	@:s public var animFall : String = "fall";
+	/**
+		The blend time between the animations, in seconds.
+	**/
 	@:s public var animSmooth : Float = 0.2;
+	/**
+		The initial speed of a jump (`0` to disable jumping).
+	**/
 	@:s public var jumpPower : Float = 0.;
+	/**
+		The speed added while the jump button is held.
+	**/
 	@:s public var jumpPowerHold : Float = 0.;
+	/**
+		The time during which holding the jump button adds speed, in seconds.
+	**/
 	@:s public var jumpPowerHoldTime : Float = 0.;
+	/**
+		The gravity.
+	**/
 	@:s public var gravity : Float = 50.;
 
 	#if editor

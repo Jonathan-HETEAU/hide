@@ -3,12 +3,24 @@ package hrt.prefab.l3d.modellibrary;
 import hrt.prefab.l3d.modellibrary.ModelLibrary.BakedMaterialData;
 import h3d.mat.PbrMaterial.PbrProps;
 
+/**
+	Renders meshes of a `ModelLibrary` with a mesh batch per material configuration.
+**/
 @:access(hrt.prefab.l3d.modellibrary.MeshEmitter)
 @:access(hrt.prefab.l3d.modellibrary.ModelLibrary)
 @:allow(hrt.prefab.l3d.modellibrary.ModelLibrary)
 class Batcher extends h3d.scene.Object {
+	/**
+		The library.
+	**/
 	public var library : ModelLibrary;
+	/**
+		Makes the batches static (fixed position, static shadows).
+	**/
 	public var isStatic : Bool = false;
+	/**
+		The expected number of instances, to preallocate the batches (`-1` for none).
+	**/
 	public var emitCountTip : Int = -1;
 
 	var batches: Array<h3d.scene.MeshBatch>;
@@ -19,12 +31,18 @@ class Batcher extends h3d.scene.Object {
 		batches = [];
 	}
 
+	/**
+		Calls `f` for each mesh batch.
+	**/
 	public function iterateBatches(f : h3d.scene.MeshBatch -> Void) {
 		for ( b in batches )
 			if ( b != null )
 				f(b);
 	}
 
+	/**
+		Adds an instance of a mesh of the library. Throws if the mesh is not in the library.
+	**/
 	public function emitInstance(mesh : h3d.scene.Mesh, ?absPos : h3d.Matrix, ?cb : (h3d.scene.MeshBatch, Int) -> Void) {
 		var meshEmitter = library.getMeshEmitter(mesh);
 		if(meshEmitter == null) {
@@ -33,16 +51,25 @@ class Batcher extends h3d.scene.Object {
 		meshEmitter.emitInstance(this, absPos, cb);
 	}
 
+	/**
+		Returns the primitive of the library.
+	**/
 	public function getPrimitive() {
 		return library.getPrim();
 	}
 
+	/**
+		Creates a mesh batch for a material.
+	**/
 	public function defaultCreateMeshBatch(?props : PbrProps, ?material : h3d.mat.Material) {
 		var batch = new h3d.scene.MeshBatch(getPrimitive(), null, this);
 		setupMeshBatch(batch, props, material);
 		return batch;
 	}
 
+	/**
+		Creates a mesh batch for a material. Calls `defaultCreateMeshBatch` by default.
+	**/
 	public dynamic function createMeshBatch(batcher : Batcher, ?props : PbrProps, ?material : h3d.mat.Material) {
 		return defaultCreateMeshBatch(props, material);
 	}
@@ -59,6 +86,9 @@ class Batcher extends h3d.scene.Object {
 		return batch;
 	}
 
+	/**
+		Copies the shaders of a material to a mesh batch and sets up its rendering.
+	**/
 	public function setupMeshBatch(batch : h3d.scene.MeshBatch, ?props : PbrProps, ?material : h3d.mat.Material ) {
 		if ( material != null ) {
 			for ( s in material.mainPass.getShaders())

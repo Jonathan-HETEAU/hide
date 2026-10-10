@@ -2,6 +2,9 @@ package hrt.prefab.l3d;
 
 import h2d.col.Point;
 
+/**
+	The primitive of a `Text3DMesh`: the glyphs as quads in the XY plane.
+**/
 class Text3DPrimitive extends h2d.TileGroup.TileLayerContent {
 
 	override public function add( x : Float, y : Float, r : Float, g : Float, b : Float, a : Float, t : h2d.Tile ) {
@@ -87,6 +90,9 @@ class Text3DPrimitive extends h2d.TileGroup.TileLayerContent {
 	}
 }
 
+/**
+	Renders a multi-channel signed distance field font.
+**/
 class SignedDistanceField3D extends hxsl.Shader {
 
 	static var SRC = {
@@ -116,13 +122,25 @@ class SignedDistanceField3D extends hxsl.Shader {
 
 }
 
+/**
+	A text in 3D, laid out by a `h2d.Text`.
+**/
 class Text3DMesh extends h3d.scene.Mesh {
 
+	/**
+		The font.
+	**/
 	public var font(get, set) : h2d.Font;
+	/**
+		The text.
+	**/
 	public var text(get, set): String;
 
 	var text2d : h2d.Text = null;
 
+	/**
+		Creates the mesh, with the default font.
+	**/
 	public function new(parent : h3d.scene.Object) {
 		text2d = new h2d.Text(hxd.res.DefaultFont.get(), null);
 		var prim = new Text3DPrimitive();
@@ -155,6 +173,9 @@ class Text3DMesh extends h3d.scene.Mesh {
 	}
 }
 
+/**
+	A text in 3D, with a signed distance field font.
+**/
 @:prefabIcon(HuiRes.ui.icons.prefab.text_3d)
 @:prefabName("Text 3D")
 class Text3D extends Object3D {
@@ -167,6 +188,9 @@ class Text3D extends Object3D {
 	@:s var align : Int = 0;
 	@:s var pathFont : String;
 
+	/**
+		The text, or a text id resolved by `defaultLoadText`.
+	**/
 	@:s public var contentText : String = "Empty string";
 
 	#if editor
@@ -296,6 +320,9 @@ class Text3D extends Object3D {
 		mesh.material.mainPass.addShader(shader);
 	}
 
+	/**
+		Returns the font: `defaultLoadFont`, or the font at `pathFont` converted to a SDF font.
+	**/
 	public dynamic function loadFont() : h2d.Font {
 		var f = defaultLoadFont(pathFont, size, cutoff, smoothing);
 		if (f == null) {
@@ -309,10 +336,16 @@ class Text3D extends Object3D {
 		else return f;
 	}
 
+	/**
+		Returns the font to use, or `null` to load `pathFont`. Returns `null` by default.
+	**/
 	public static dynamic function defaultLoadFont( pathFont : String, size : Int, cutoff : Float, smoothing : Float ) : h2d.Font {
 		return null;
 	}
 
+	/**
+		Returns the text: `defaultLoadText(contentText)`, or `contentText`.
+	**/
 	public dynamic function loadText() : String {
 		var str = defaultLoadText(contentText);
 		if (str == null) {
@@ -321,6 +354,9 @@ class Text3D extends Object3D {
 		else return str;
 	}
 
+	/**
+		Returns the text for an id (for localization), or `null` to use the id. Returns `null` by default.
+	**/
 	public static dynamic function defaultLoadText(id: String) : String {
 		return null;
 	}

@@ -1,5 +1,8 @@
 package hrt.prefab.l3d;
 
+/**
+	Places prefabs on the ground with a brush, in the editor.
+**/
 @:prefabIcon(HuiRes.ui.icons.prefab.prefab_spray)
 @:prefabName("Prefab Spray")
 class PrefabSpray extends Spray {
