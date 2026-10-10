@@ -1,9 +1,21 @@
 package hide.view.settings;
 
+/**
+	A category of a settings view.
+**/
 class Categorie {
+	/**
+		The name.
+	**/
 	public var name : String;
+	/**
+		The element of the settings of the category.
+	**/
 	public var element : Element;
 
+	/**
+		Creates a category.
+	**/
 	public function new(name: String) {
 		this.name = name;
 		this.element = new Element('
@@ -12,6 +24,9 @@ class Categorie {
 		</div>');
 	}
 
+	/**
+		Adds a setting with its edit element. `onChange` is called with the new value.
+	**/
 	public function add(settingsName: String, editElement: Element, value: Dynamic, ?onChange : Dynamic -> Void) {
 		var el = new Element('<dl><dt>${settingsName}</dt><dd class="edit"></dd></dl>');
 		el.find('.edit').append(editElement);
@@ -37,9 +52,18 @@ class Categorie {
 	}
 }
 
+/**
+	The base of the settings views: a list of categories of settings.
+**/
 class Settings extends hide.ui.View<{}> {
+	/**
+		The categories.
+	**/
 	public var categories : Array<Categorie>;
 
+	/**
+		Creates the view.
+	**/
 	public function new( ?state ) {
 		super(state);
 

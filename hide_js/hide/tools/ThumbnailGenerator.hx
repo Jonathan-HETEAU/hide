@@ -1,6 +1,22 @@
 package hide.tools;
 
-typedef RenderInfo = {path: String, cb: hide.tools.FileManager.MiniatureReadyCallback, priority: Int};
+/**
+	A thumbnail to render.
+**/
+typedef RenderInfo = {
+	/**
+		The path of the file.
+	**/
+	var path : String;
+	/**
+		Called with the path of the thumbnail.
+	**/
+	var cb : hide.tools.FileManager.MiniatureReadyCallback;
+	/**
+		The render priority.
+	**/
+	var priority : Int;
+};
 /**
 	Handle recieving messages separated by `\n` characters by a socket, correctly buffering the data
 **/
@@ -10,6 +26,9 @@ class MessageHandler {
 	var bufferSize = 0;
 	static final maxBufferSize = 16384;
 
+	/**
+		Creates the handler of a socket. `callback` is called with each message.
+	**/
 	public function new(socket: hxd.net.Socket, callback: (content: String) -> Void) {
 		this.socket = socket;
 		bufferedData = haxe.io.Bytes.alloc(maxBufferSize);
@@ -54,6 +73,9 @@ class MessageHandler {
 	}
 }
 
+/**
+	Renders the file thumbnails in a hidden window, on requests from the `FileManager` through a socket.
+**/
 @:access(hide.tools.FileManager)
 class ThumbnailGenerator {
 	var miniaturesToRender : Array<RenderInfo> = [];
@@ -175,7 +197,13 @@ class ThumbnailGenerator {
 		}
 	}
 
+	/**
+		The directory of the thumbnails, in the resources.
+	**/
 	public static final thumbRoot = ".tmp/";
+	/**
+		The image format of the thumbnails.
+	**/
 	public static final thumbExt = "jpg";
 
 	static function getThumbnailPath(basePath: String) : haxe.io.Path {

@@ -1,14 +1,26 @@
 package hide.view;
 
+/**
+	The base of the views editing a file (`state.path`): watches the file, tracks modifications and saves.
+**/
 class FileView extends hide.ui.View<{ path : String }> {
 
+	/**
+		The extension of the file.
+	**/
 	public var extension(get,never) : String;
+	/**
+		True if the file has unsaved changes.
+	**/
 	public var modified(default, set) : Bool = false;
 	var skipNextChange : Bool;
 	var lastSaveTag : Int;
 
 	var currentSign : String;
 
+	/**
+		Creates the view and watches its file.
+	**/
 	public function new(state) {
 		super(state);
 		if( state.path != null )
@@ -99,6 +111,9 @@ class FileView extends hide.ui.View<{ path : String }> {
 		return file.indexOf(".") < 0 ? "" : file.split(".").pop().toLowerCase();
 	}
 
+	/**
+		Returns the content of a new file. Throws: to override.
+	**/
 	public function getDefaultContent() : haxe.io.Bytes {
 		throw "Not implemented";
 		return null;
@@ -117,10 +132,16 @@ class FileView extends hide.ui.View<{ path : String }> {
 		keys.register("view.refreshApp", function() untyped chrome.runtime.reload());
 	}
 
+	/**
+		Tells if the file can be saved (true by default).
+	**/
 	public function canSave() {
 		return true;
 	}
 
+	/**
+		Saves the file.
+	**/
 	public function save() {
 		if( !canSave() )
 			return;
@@ -157,6 +178,9 @@ class FileView extends hide.ui.View<{ path : String }> {
 		}
 	}
 
+	/**
+		Asks a path and saves the file there.
+	**/
 	public function saveAs() {
 		ide.chooseFileSave(state.path, function(target) {
 			state.path = target;

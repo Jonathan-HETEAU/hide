@@ -1,10 +1,25 @@
 package hide.view.l3d;
 
+/**
+	A 2D camera controller: pans with the mouse and zooms with the wheel, with inertia.
+**/
 class CameraController2D extends h2d.Object {
 
+	/**
+		How fast the pan inertia stops (0 to 1).
+	**/
 	public var friction = 0.4;
+	/**
+		The zoom factor of a wheel step.
+	**/
 	public var zoomAmount = 1.15;
+	/**
+		The pan speed factor.
+	**/
 	public var panSpeed = 1.;
+	/**
+		The smoothing of the moves (0 for none).
+	**/
 	public var smooth = 0.6;
 
 	var scene : h2d.Scene;
@@ -19,6 +34,9 @@ class CameraController2D extends h2d.Object {
 	var curPos = new h3d.col.Point(0,0,1);
 	var targetPos = new h3d.col.Point(0,0,1);
 
+	/**
+		Creates the controller.
+	**/
 	public function new(?parent) {
 		super(parent);
 		name = "CameraController";
@@ -88,9 +106,15 @@ class CameraController2D extends h2d.Object {
 		scene = null;
 	}
 
+	/**
+		Called on a click.
+	**/
 	public dynamic function onClick( e : hxd.Event ) {
 	}
 
+	/**
+		Called with each event, to handle extra controls.
+	**/
 	public dynamic function onCustomEvent(e : hxd.Event ) {
 
 	}

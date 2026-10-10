@@ -2,6 +2,9 @@ package hide.view;
 
 using hide.tools.Extensions;
 
+/**
+	The CastleDB view: the sheets of the database in tabs, with categories.
+**/
 class CdbTable extends hide.ui.View<{}> {
 	var tabContents : Array<Element>;
 	var editor : hide.comp.cdb.Editor;
@@ -15,6 +18,9 @@ class CdbTable extends hide.ui.View<{}> {
 	var warningCountEl : Element;
 	var errorCountEl : Element;
 
+	/**
+		Creates the view.
+	**/
 	public function new( ?state ) {
 		super(state);
 		editor = new hide.comp.cdb.Editor(config, {
@@ -40,6 +46,9 @@ class CdbTable extends hide.ui.View<{}> {
 		super.destroy();
 	}
 
+	/**
+		Shows the line at a path in a sheet.
+	**/
 	public function goto2(rootSheet : cdb.Sheet, path: hrt.tools.CdbUtils.Path) {
 		var sheets = [for( s in getSheets() ) s.name];
 		var index = sheets.indexOf(rootSheet.name);
@@ -149,6 +158,9 @@ class CdbTable extends hide.ui.View<{}> {
 		}, 1);
 	}
 
+	/**
+		Shows a sheet, at a line and column if set.
+	**/
 	public function goto( s : cdb.Sheet, ?line : Int, ?column : Int, ?scriptLine : Int ) {
 		var sheets = [for( s in getSheets() ) s.name];
 		var index = sheets.indexOf(s.name);
@@ -192,6 +204,9 @@ class CdbTable extends hide.ui.View<{}> {
 		}
 	}
 
+	/**
+		Returns the shown sheets, in tab order.
+	**/
 	public function getSheets() {
 		var arr = [for( s in ide.database.sheets ) if( !s.props.hide && (view == null || view.exists(s.name)) ) s];
 		haxe.ds.ArraySort.sort(arr, (s1, s2) -> hide.comp.cdb.Editor.getSheetProps(s1).index - hide.comp.cdb.Editor.getSheetProps(s2).index);
@@ -361,6 +376,9 @@ class CdbTable extends hide.ui.View<{}> {
 		watch(@:privateAccess ide.databaseFile, () -> syncTabs());
 	}
 
+	/**
+		Applies the proofreading mode (`dbProofread` project setting).
+	**/
 	public function applyProofing(doRefresh = true) {
 		if (doRefresh)
 			@:privateAccess tabs.syncTabs();
@@ -385,6 +403,9 @@ class CdbTable extends hide.ui.View<{}> {
 		applyCategories(ide.projectConfig.dbCategories, doRefresh);
 	}
 
+	/**
+		Marks the sheet tabs with their categories.
+	**/
 	public function applyCategories(displayedCats: Array<String>, doRefresh=true) {
 		var sheets = getSheets();
 		var header = @:privateAccess tabs.header;
@@ -439,6 +460,9 @@ class CdbTable extends hide.ui.View<{}> {
 		cell.dragDropFile(path, true);
 	}
 
+	/**
+		Returns the cell at a position of the window, or null.
+	**/
 	public function getCellFromMousePos( x : Int, y : Int ) : Null<hide.comp.cdb.Cell> {
 		var pickedEl = js.Browser.document.elementFromPoint(x, y);
 		var el = pickedEl;
