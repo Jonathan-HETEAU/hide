@@ -1,10 +1,22 @@
 package hide.tools;
 
+/**
+	An event sent to a draggable element.
+**/
 enum DragEvent {
+	/**
+		The drag starts: set the data of the drag here, or cancel it.
+	**/
 	Start;
+	/**
+		The drag ended.
+	**/
 	Stop;
 }
 
+/**
+	An event sent to a drop target.
+**/
 enum DropEvent {
 	/**
 		Called when the cursor has moved over a registered drop target
@@ -29,20 +41,46 @@ enum DropEvent {
 	Drop;
 }
 
+/**
+	The result of a drag event. Not used.
+**/
 enum OnDragEventResult {
+	/**
+		Allows the drag.
+	**/
 	Allow;
+	/**
+		Cancels the drag.
+	**/
 	Cancel;
 }
 
+/**
+	Tells if the hovered drop target accepts the drag.
+**/
 enum DropTargetValidity {
+	/**
+		The drop is allowed.
+	**/
 	AllowDrop;
+	/**
+		The drop is forbidden.
+	**/
 	ForbidDrop;
 }
 
+/**
+	The state of a drag and drop operation.
+**/
 @:allow(hide.tools.DragAndDrop)
 class DragData {
-	/** Mouse position on the screen **/
+	/**
+		The mouse X position in the window.
+	**/
 	public var mouseX : Int = 0;
+	/**
+		The mouse Y position in the window.
+	**/
 	public var mouseY : Int = 0;
 
 	/**
@@ -54,6 +92,9 @@ class DragData {
 		Custom data for the drag and drop operation. Set it up in the onDrag event handler, and read it in the onDropEvent
 	**/
 	public var data: Map<String, Dynamic> = [];
+	/**
+		The dragged element.
+	**/
 	public var sourceElement : DragElement = null;
 
 	/** Allow to feedback to the user if the current drag operation has a valid target or no. Defaults to AllowDrop each time onDropEvent is called, so you'll need to set it to ForbidDrop if you want to prevent the operation each time**/
@@ -62,6 +103,9 @@ class DragData {
 	var thumbnail : js.html.Element;
 	var canceled : Bool = false;
 
+	/**
+		Shows a copy of an element under the cursor during the drag.
+	**/
 	public function setThumbnail(element: js.html.Element) : Void {
 		if (thumbnail != null)
 			throw "already has thumbnail";
@@ -75,6 +119,9 @@ class DragData {
 		thumbnail = container;
 	}
 
+	/**
+		Shows or hides the drag thumbnail.
+	**/
 	public function setThumbnailVisiblity(visible: Bool) : Void {
 		if (thumbnail != null)
 			thumbnail.style.visibility = visible ? "visible" : "hidden";
@@ -104,14 +151,29 @@ class DragData {
 }
 
 
+/**
+	An element registered as a drop target.
+**/
 class DropTarget extends js.html.Element {
+	/**
+		The drop event handler.
+	**/
 	public var onHideDropEvent : (event: DropEvent, data: DragData) -> Void = null;
 }
 
+/**
+	An element registered as draggable.
+**/
 class DragElement extends js.html.Element {
+	/**
+		The drag event handler.
+	**/
 	public var onHideDragEvent : (event: DragEvent, data: DragData) -> Void = null;
 }
 
+/**
+	Drag and drop between HTML elements of the editor, with a thumbnail and native drops support.
+**/
 class DragAndDrop {
 	static var currentDragElement: js.html.Element = null;
 	static var currentDrag : DragData = null;
@@ -121,6 +183,9 @@ class DragAndDrop {
 	static var lastMouseY : Int = -1;
 	static final minDragDistance : Float = 15;
 
+	/**
+		Makes an element draggable. `onDragEvent` is called when the drag starts and stops.
+	**/
 	static public function makeDraggable(element: js.html.Element, onDragEvent : (event: DragEvent, data: DragData) -> Void) : Void {
 		element.addEventListener("pointerdown", onInitialPointerDown);
 		element.addEventListener("pointerup", onInitialPointerUp);
@@ -130,6 +195,9 @@ class DragAndDrop {
 	}
 
 	static var tmpDrag : DragData = new DragData(null);
+	/**
+		Makes an element a drop target. `onDropEvent` is called when a drag moves over it, enters, leaves or drops.
+	**/
 	static public function makeDropTarget(element: js.html.Element, onDropEvent: (event: DropEvent, data: DragData) -> Void) : Void {
 		var dropTarget : DropTarget = cast element;
 		dropTarget.onHideDropEvent = onDropEvent;

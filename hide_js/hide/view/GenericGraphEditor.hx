@@ -2,6 +2,9 @@ package hide.view;
 
 import hide.view.GraphInterface;
 
+/**
+	A base file view for the graph editors, holding a `GraphEditor`. The `IGraphEditor` methods must be overridden.
+**/
 class GenericGraphEditor extends hide.view.FileView implements IGraphEditor {
 
     var graphEditor : hide.view.GraphEditor;
@@ -126,54 +129,93 @@ class GenericGraphEditor extends hide.view.FileView implements IGraphEditor {
     }
 
     // IGraphEditor interface
+    /**
+    	Returns the nodes. Throws: to override.
+    **/
     public function getNodes() : Iterator<IGraphNode> {
         throw "implement";
     }
 
+    /**
+    	Returns the edges. Throws: to override.
+    **/
     public function getEdges() : Iterator<Edge> {
         throw "implement";
     }
 
+    /**
+    	Returns the add node menu entries. Throws: to override.
+    **/
     public function getAddNodesMenu(currentEdge: Null<Edge>) : Array<AddNodeMenuEntry> {
         throw "implement";
     }
 
+    /**
+    	Adds a node to the graph. Throws: to override.
+    **/
     public function addNode(node : IGraphNode) : Void {
         throw "implement";
     }
 
+    /**
+    	Removes a node from the graph. Throws: to override.
+    **/
     public function removeNode(id:Int) : Void {
         throw "implement";
     }
 
+    /**
+    	Returns the data of a node, for copy and undo. Throws: to override.
+    **/
     public function serializeNode(node : IGraphNode) : Dynamic {
         throw "implement";
     }
 
+    /**
+    	Creates a node from its data, with a new unique id if `newId`. Throws: to override.
+    **/
     public function unserializeNode(data: Dynamic, newId: Bool) : IGraphNode {
         throw "implement";
     }
 
+    /**
+    	Creates a comment node. Throws: to override.
+    **/
     public function createCommentNode() : Null<IGraphNode> {
         throw "implement";
     }
 
+    /**
+    	Returns null: the editor has no reroute nodes.
+    **/
     public function createRerouteNode(edge: Edge) : Null<IGraphNode> {
         return null;
     }
 
+    /**
+    	Returns false if the edge can't be created because the input/output types don't match. Throws: to override.
+    **/
     public function canAddEdge(edge : Edge) : Bool {
         throw "implement";
     }
 
+    /**
+    	Adds an edge to the graph. Throws: to override.
+    **/
     public function addEdge(edge : Edge) : Void {
         throw "implement";
     }
 
+    /**
+    	Removes the edge connected to an input. Throws: to override.
+    **/
     public function removeEdge(nodeToId: Int, inputToId : Int) : Void {
         throw "implement";
     }
 
+    /**
+    	Returns the undo history.
+    **/
     public function getUndo() : hide.ui.UndoHistory {
         return undo;
     }

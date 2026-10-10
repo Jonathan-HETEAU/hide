@@ -3,8 +3,17 @@ package hide.view.textureeditor;
 import hrt.texgraph.TexNode;
 import hide.view.GraphInterface;
 
+/**
+	The texture graph editor view (`.texgraph` files): graph, parameters and preview of the generated textures.
+**/
 class TextureEditor extends hide.view.FileView implements GraphInterface.IGraphEditor {
+	/**
+		The color of the empty preview.
+	**/
 	public static var DEFAULT_PREVIEW_COLOR = 16716947;
+	/**
+		The size of the preview, in pixels.
+	**/
 	public static var DEFAULT_PREVIEW_SIZE = 2048;
 
 	var graphEditor : hide.view.GraphEditor;
@@ -159,6 +168,9 @@ class TextureEditor extends hide.view.FileView implements GraphInterface.IGraphE
 		super.save();
 	}
 
+	/**
+		Called when the preview scene is ready.
+	**/
 	public function onPreviewSceneReady() {
 		if (previewScene.s3d == null || previewScene.s2d == null)
 			throw "Preview scene not ready";
@@ -171,6 +183,9 @@ class TextureEditor extends hide.view.FileView implements GraphInterface.IGraphE
 		centerPreviewCamera();
 	}
 
+	/**
+		Updates the preview each frame.
+	**/
 	public function onPreviewSceneUpdate(dt: Float) {
 		if (!previewRefreshRequested)
 			return;
@@ -197,6 +212,9 @@ class TextureEditor extends hide.view.FileView implements GraphInterface.IGraphE
 		catch(e) Ide.inst.quickError("Can't create 2D preview");
 	}
 
+	/**
+		Generates the textures if requested, and updates the node previews. Returns true.
+	**/
 	public function onPreviewUpdate() : Bool {
 		checkGeneration();
 
@@ -215,6 +233,9 @@ class TextureEditor extends hide.view.FileView implements GraphInterface.IGraphE
 		return true;
 	}
 
+	/**
+		Updates the preview of a node.
+	**/
 	public function onNodePreviewUpdate(node: IGraphNode, bitmap: h2d.Bitmap) @:privateAccess {
 		if (initializedPreviews.get(bitmap) == null) {
 			bitmap.addShader(previewShaderAlpha);
@@ -231,6 +252,9 @@ class TextureEditor extends hide.view.FileView implements GraphInterface.IGraphE
 		}
 	}
 
+	/**
+		Shows the parameters of the selected nodes, or of the graph without selection.
+	**/
 	public function onSelectionChanged(selectedNodes: Array<IGraphNode>) {
 		this.selectedNodes = cast selectedNodes;
 
@@ -257,10 +281,16 @@ class TextureEditor extends hide.view.FileView implements GraphInterface.IGraphE
 		}
 	}
 
+	/**
+		Returns the nodes.
+	**/
 	public function getNodes():Iterator<IGraphNode> {
 		return textureGraph.nodes.iterator();
 	}
 
+	/**
+		Returns the edges.
+	**/
 	public function getEdges():Iterator<Edge> {
 		var edges : Array<Edge> = [];
 		for (id => node in textureGraph.nodes) {
@@ -279,6 +309,9 @@ class TextureEditor extends hide.view.FileView implements GraphInterface.IGraphE
 		return edges.iterator();
 	}
 
+	/**
+		Returns the add node menu entries.
+	**/
 	public function getAddNodesMenu(currentEdge: Null<Edge>):Array<AddNodeMenuEntry> {
 		var entries : Array<AddNodeMenuEntry> = [];
 		var id = 0;
@@ -310,20 +343,32 @@ class TextureEditor extends hide.view.FileView implements GraphInterface.IGraphE
 		return entries;
 	}
 
+	/**
+		Adds a node to the graph and generates the textures again.
+	**/
 	public function addNode(node: IGraphNode) {
 		textureGraph.addNode(cast node);
 		generate();
 	}
 
+	/**
+		Removes a node from the graph and generates the textures again.
+	**/
 	public function removeNode(id:Int) {
 		textureGraph.removeNode(id);
 		generate();
 	}
 
+	/**
+		Returns the data of a node, for copy and undo.
+	**/
 	public function serializeNode(node: IGraphNode):Dynamic {
 		return (cast node:TexNode).serializeToDynamic();
 	}
 
+	/**
+		Creates a node from its data, with a new unique id if `newId`.
+	**/
 	public function unserializeNode(data:Dynamic, newId:Bool): IGraphNode {
 		var node = TexNode.createFromDynamic(data, textureGraph);
 		if (newId) {
@@ -333,6 +378,9 @@ class TextureEditor extends hide.view.FileView implements GraphInterface.IGraphE
 		return node;
 	}
 
+	/**
+		Creates a comment node.
+	**/
 	public function createCommentNode():Null<IGraphNode> {
 		var node = new hrt.texgraph.nodes.Comment();
 		node.comment = "Comment";
@@ -341,34 +389,55 @@ class TextureEditor extends hide.view.FileView implements GraphInterface.IGraphE
 		return node;
 	}
 
+	/**
+		Returns null: the editor has no reroute nodes.
+	**/
 	public function createRerouteNode(edge: Edge):Null<IGraphNode> {
 		return null;
 	}
 
+	/**
+		Returns false if the edge can't be created because the input/output types don't match.
+	**/
 	public function canAddEdge(edge: Edge):Bool {
 		return textureGraph.canAddEdge({ outputNodeId: edge.nodeFromId, outputId: edge.outputFromId, inputNodeId: edge.nodeToId, inputId: edge.inputToId });
 	}
 
+	/**
+		Adds an edge to the graph and generates the textures again.
+	**/
 	public function addEdge(edge: Edge) {
 		var input = textureGraph.nodes.get(edge.nodeToId);
 		input.connections[edge.inputToId] = {from: textureGraph.nodes.get(edge.nodeFromId), outputId: edge.outputFromId};
 		generate();
 	}
 
+	/**
+		Removes the edge connected to an input and generates the textures again.
+	**/
 	public function removeEdge(nodeToId:Int, inputToId:Int) {
 		var input = textureGraph.nodes.get(nodeToId);
 		input.connections[inputToId] = null;
 		generate();
 	}
 
+	/**
+		Returns the undo history.
+	**/
 	public function getUndo() : hide.ui.UndoHistory {
 		return undo;
 	}
 
+	/**
+		Generates the textures on the next update.
+	**/
 	public function generate() {
 		generationRequested = true;
 	}
 
+	/**
+		Refreshes the preview on the next update.
+	**/
 	public function refreshPreview() {
 		previewRefreshRequested = true;
 	}

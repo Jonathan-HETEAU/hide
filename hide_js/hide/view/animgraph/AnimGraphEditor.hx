@@ -3,18 +3,30 @@ using Lambda;
 import hide.view.GraphInterface;
 import hrt.animgraph.*;
 
+/**
+	The saved preview settings of the animation graph editor.
+**/
 @:structInit
 @:build(hrt.prefab.Macros.buildSerializable())
 class AnimGraphEditorPreviewState {
+    /**
+    	The index of the selected anim set provider.
+    **/
     @:s public var providerIndex: Int = 0;
 }
 
+/**
+	The animation graph editor view (`.animgraph` files): graph, parameters and animated model preview.
+**/
 @:access(hrt.animgraph.AnimGraph)
 @:access(hrt.animgraph.AnimGraphInstance)
 @:access(hrt.animgraph.Node)
 class AnimGraphEditor extends GenericGraphEditor {
 
     var animGraph : hrt.animgraph.AnimGraph;
+    /**
+    	The previewed prefab.
+    **/
     public var previewPrefab : hrt.prefab.Prefab;
 
     var parametersList : hide.comp.FancyArray<hrt.animgraph.AnimGraph.Parameter>;
@@ -173,6 +185,9 @@ class AnimGraphEditor extends GenericGraphEditor {
 
     }
 
+    /**
+    	Returns the animations available in an animation directory (and those of the custom lister).
+    **/
     static public function getAnims(scene: hide.comp.Scene, ctx: hrt.animgraph.AnimGraph.EditorProviderContext ) : Array<String> {
         var anims : Array<String> = [];
 
@@ -184,6 +199,9 @@ class AnimGraphEditor extends GenericGraphEditor {
         return anims;
     }
 
+    /**
+    	Returns a prompt asking for the folder of the models to animate. `onSet` is called with the chosen folder.
+    **/
     public static function createChooseFolderPrompt(baseDir: String, onSet: (path: String) -> Void) : Element {
         var element = new Element("<center-content>
                 <div class='basic-border' style='width: 600px'>
@@ -231,16 +249,25 @@ class AnimGraphEditor extends GenericGraphEditor {
         return menu;
     }
 
+    /**
+    	Loads the preview state from the display state.
+    **/
     public function loadPreviewState() : Void {
         var settingsSer = haxe.Json.parse(getDisplayState("previewState") ?? "{}");
         previewState = {};
         @:privateAccess previewState.copyFromDynamic(settingsSer);
     }
 
+    /**
+    	Saves the preview state in the display state.
+    **/
     public function savePreviewState() : Void {
         saveDisplayState("previewState", haxe.Json.stringify(@:privateAccess previewState.copyToDynamic({})));
     }
 
+    /**
+    	Returns the prefabs and the non animation FBX of a folder and its sub folders.
+    **/
     static public function gatherAllPreviewModels(basePath : String) : Array<String> {
         var paths = [];
 
@@ -283,6 +310,9 @@ class AnimGraphEditor extends GenericGraphEditor {
         return options;
     }
 
+    /**
+    	Adds a selector of the anim set (custom editor resolver provider) to an element, if there is a custom provider.
+    **/
     static public function addAnimSetSelector(target: Element, context:hrt.animgraph.AnimGraph.EditorProviderContext, undo: hide.ui.UndoHistory, getIndex: () -> Int, setIndex:(Int) -> Void) {
         if (hrt.animgraph.AnimGraph.customEditorResolverProvider != null)
         {
@@ -320,15 +350,24 @@ class AnimGraphEditor extends GenericGraphEditor {
         }
     }
 
+    /**
+    	Previews the current node again.
+    **/
     public function refreshPreview() {
         if (previewNode != null)
             setPreview(previewNode);
     }
 
+    /**
+    	Previews the output of a node on the next update.
+    **/
     public function setPreview(newOutput: hrt.animgraph.nodes.AnimNode) {
         queuedPreview = newOutput;
     }
 
+    /**
+    	Previews the output of a node now.
+    **/
     public function setPreviewInternal(newOutput: hrt.animgraph.nodes.AnimNode) {
         previewNode = newOutput;
 
