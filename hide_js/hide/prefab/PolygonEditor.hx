@@ -3,23 +3,56 @@ import hxd.Key as K;
 
 using hrt.prefab.Object3D; // GetLocal3D
 
+/**
+	The highlight state of a polygon point.
+**/
 enum ColorState{
+	/**
+		Not highlighted (black).
+	**/
 	None;
+	/**
+		Under the mouse (yellow).
+	**/
 	Overlapped;
+	/**
+		Under the mouse, to delete (red).
+	**/
 	OverlappedForDelete;
+	/**
+		Selected (blue).
+	**/
 	Selected;
 }
 
+/**
+	An edge of the edited polygon.
+**/
 class Edge{
+	/**
+		The first point.
+	**/
 	public var p1 : h2d.col.Point;
+	/**
+		The second point.
+	**/
 	public var p2 : h2d.col.Point;
+	/**
+		Creates an edge.
+	**/
 	public function new(p1, p2){
 		this.p1 = p1;
 		this.p2 = p2;
 	}
 }
 
+/**
+	A point handle keeping a constant size on screen.
+**/
 class SphereHandle extends h3d.scene.Mesh {
+	/**
+		Creates a handle.
+	**/
 	public function new(prim, mat, parent) {
 		super(prim, mat, parent);
 	}
@@ -49,15 +82,30 @@ class SphereHandle extends h3d.scene.Mesh {
 	}
 }
 
+/**
+	A movable point handle of the polygon editor.
+**/
 class MovablePoint {
 
+	/**
+		Shows the local and world positions of the point.
+	**/
 	public var showDebug : Bool;
+	/**
+		The polygon point.
+	**/
 	public var point : h2d.col.Point;
 	var mesh: h3d.scene.Mesh;
+	/**
+		The highlight state.
+	**/
 	public var colorState = None;
 	var localPosText : h2d.ObjectFollower;
 	var worldPosText : h2d.ObjectFollower;
 
+	/**
+		Creates the handle of a point of a polygon.
+	**/
 	public function new(point : h2d.col.Point, ctx : hrt.prefab.l3d.Polygon){
 		this.point = point;
 		mesh = new SphereHandle(h3d.prim.Cube.defaultUnitCube(), null, ctx.local3d);
@@ -86,6 +134,9 @@ class MovablePoint {
 		return o;
 	}
 
+	/**
+		Removes the handle.
+	**/
 	public function dispose(){
 		mesh.remove();
 		worldPosText.remove();
@@ -100,6 +151,9 @@ class MovablePoint {
 		return new h2d.col.Point( pt.x, pt.y);
 	}
 
+	/**
+		Updates the position texts.
+	**/
 	public function updateText(ctx : hrt.prefab.l3d.Polygon){
 		inline function getText(o) : h2d.Text{
 			return Std.downcast(o.getChildAt(0), h2d.Text);
@@ -112,6 +166,9 @@ class MovablePoint {
 		getText(worldPosText).text = "World : " + untyped pointWorldPos.x.toFixed(3) + " / " + untyped pointWorldPos.y.toFixed(3) + " / " + untyped pointWorldPos.z.toFixed(3);
 	}
 
+	/**
+		Applies the highlight state to the handle color.
+	**/
 	public function updateColor(){
 		switch(colorState){
 			case None : mesh.material.color.set(0,0,0);
@@ -121,21 +178,45 @@ class MovablePoint {
 		}
 	}
 
+	/**
+		Tells if a ray hits the handle.
+	**/
 	public function interset(ray : h3d.col.Ray) : Bool{
 		return mesh.getCollider().rayIntersection(ray, false) != -1;
 	}
 
+	/**
+		Sets the highlight state.
+	**/
 	public function setColorState(s : ColorState){
 		colorState = s;
 	}
 }
 
+/**
+	The editor of a polygon prefab: moves, adds and deletes its points in the scene.
+**/
 class PolygonEditor {
 
+	/**
+		The edit context.
+	**/
 	public var editContext : hide.prefab.EditContext;
+	/**
+		Shows the positions of the points.
+	**/
 	public var showDebug : Bool;
+	/**
+		The snap grid size, stored in the polygon prefab.
+	**/
 	public var gridSize(get, set): Float;
+	/**
+		Shows the triangles of the polygon.
+	**/
 	public var showTriangles : Bool = false;
+	/**
+		With ctrl, snaps the points to the grid in world space instead of local space.
+	**/
 	public var worldSnap = false;
 
 	var polygonPrefab : hrt.prefab.l3d.Polygon;
@@ -156,11 +237,17 @@ class PolygonEditor {
 	var beforeMoveList : Array<h2d.col.Point> = [];
 	var afterMoveList : Array<h2d.col.Point> = [];
 
+	/**
+		Creates the editor of a polygon.
+	**/
 	public function new( polygonPrefab , undo : hide.ui.UndoHistory ){
 		this.polygonPrefab = polygonPrefab;
 		this.undo = undo;
 	}
 
+	/**
+		Removes the handles and the edition graphics.
+	**/
 	public function dispose(){
 		reset();
 	}
@@ -172,6 +259,9 @@ class PolygonEditor {
 		}
 	}
 
+	/**
+		Removes the handles and the edition graphics.
+	**/
 	public function reset(){
 		clearMovablePoints();
 		clearSelectedPoint();
@@ -189,6 +279,9 @@ class PolygonEditor {
 		editContext.scene.editor.refreshInteractive(polygonPrefab);
 	}
 
+	/**
+		Applies a changed editor property.
+	**/
 	public function update( ?propName : String) {
 		if(propName == "showDebug"){
 			for(mp in movablePoints){
@@ -358,6 +451,9 @@ class PolygonEditor {
 		return localPos;
 	}
 
+	/**
+		Starts or stops the edition when the polygon is selected or unselected (in edit mode).
+	**/
 	public function setSelected(b : Bool ) {
 		if (!polygonPrefab.enabled) return;
 		reset();
@@ -578,6 +674,9 @@ class PolygonEditor {
 			refreshPointList(editContext.getCurrentProps(polygonPrefab));
 	}
 
+	/**
+		Adds the polygon editor properties to the properties panel.
+	**/
 	public function addProps( ctx : hide.prefab.EditContext ){
 		var props = new hide.Element('
 		<div class="poly-editor">

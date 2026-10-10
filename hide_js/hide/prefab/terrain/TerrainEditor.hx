@@ -4,46 +4,121 @@ import hxd.Pixels;
 import hrt.prefab.terrain.Tile;
 import hxd.Key as K;
 
+/**
+	The debug render mode of the terrain editor.
+**/
 enum RenderMode {
+	/**
+		The normal rendering.
+	**/
 	PBR;
+	/**
+		Shows the number of surfaces blended per pixel.
+	**/
 	ShaderComplexity;
+	/**
+		Shows a checker texture.
+	**/
 	Checker;
 }
 
+/**
+	The undo data of a surface change.
+**/
 class TerrainRevertData {
+	/**
+		The index of the surface.
+	**/
 	public var surfaceIndex : Int;
+	/**
+		The surface.
+	**/
 	public var surface : hrt.prefab.terrain.Surface;
+	/**
+		Creates empty undo data.
+	**/
 	public function new(){
 
 	}
 }
 
+/**
+	The undo data of a tile change: its maps before and after.
+**/
 class TileRevertData {
+	/**
+		The X index of the tile.
+	**/
 	public var x : Int;
+	/**
+		The Y index of the tile.
+	**/
 	public var y : Int;
+	/**
+		The height map before the change.
+	**/
 	public var prevHeightMapPixels : hxd.Pixels;
+	/**
+		The height map after the change.
+	**/
 	public var nextHeightMapPixels : hxd.Pixels;
+	/**
+		The surface weight maps before the change.
+	**/
 	public var prevWeightMapPixels : Array<hxd.Pixels> = [];
+	/**
+		The surface weight maps after the change.
+	**/
 	public var nextWeightMapPixels : Array<hxd.Pixels> = [];
+	/**
+		The surface index map before the change.
+	**/
 	public var prevSurfaceIndexMapPixels : hxd.Pixels;
+	/**
+		The surface index map after the change.
+	**/
 	public var nextSurfaceIndexMapPixels : hxd.Pixels;
+	/**
+		Creates the undo data of a tile.
+	**/
 	public function new(x, y){
 		this.x = x;
 		this.y = y;
 	}
 }
 
+/**
+	The editor of a terrain prefab: sculpts the heights, paints the surfaces and deletes the tiles with brushes.
+**/
 @:access(hrt.prefab.terrain.TerrainMesh)
 @:access(hrt.prefab.terrain.Terrain)
 @:access(hrt.prefab.terrain.Tile)
 class TerrainEditor {
 
+	/**
+		The current brush.
+	**/
 	public var currentBrush = new Brush();
+	/**
+		The edited surface.
+	**/
 	public var currentSurface : hrt.prefab.terrain.Surface;
+	/**
+		The suffixes of the surface textures: albedo, normal, and metalness gloss AO.
+	**/
 	public var textureType = ["_Albedo", "_Normal", "_MetallicGlossAO"];
+	/**
+		Creates the missing tiles under the brush.
+	**/
 	public var autoCreateTile = false;
+	/**
+		Allows creating tiles not connected to the existing ones.
+	**/
 	public var allowDisconnectedTiles = false;
 
+	/**
+		The edit context.
+	**/
 	public var editContext : hide.prefab.EditContext;
 
 	// Debug
@@ -77,6 +152,9 @@ class TerrainEditor {
 	var customScene = new h3d.scene.Scene(false, false);
 	var customRenderer = new hide.prefab.terrain.CustomRenderer("terrainUV");
 
+	/**
+		Creates the editor of a terrain.
+	**/
 	public function new( terrainPrefab : hrt.prefab.terrain.Terrain, undo : hide.ui.UndoHistory ) {
 		this.terrainPrefab = terrainPrefab;
 		this.undo = undo;
@@ -94,6 +172,9 @@ class TerrainEditor {
 		#end
 	}
 
+	/**
+		Disposes the editor resources.
+	**/
 	public function dispose() {
 		if(uvTex != null) uvTex.dispose();
 		heightStrokeBufferArray.dispose();
@@ -102,6 +183,9 @@ class TerrainEditor {
 		if( interactive != null ) interactive.remove();
 	}
 
+	/**
+		Applies a changed property of the terrain or editor.
+	**/
 	public function update( ?propName : String ) {
 		if( propName == "editor.currentSurface.tilling"
 		|| propName == "editor.currentSurface.offset.x"
@@ -119,6 +203,9 @@ class TerrainEditor {
 		if( propName == "editor.renderMode" ) updateRender();
 	}
 
+	/**
+		Resizes the stroke buffers to the terrain resolution.
+	**/
 	public function refresh() {
 		heightStrokeBufferArray.refresh(new h2d.col.IPoint(terrainPrefab.terrain.heightMapResolution.x + 1, terrainPrefab.terrain.heightMapResolution.y + 1));
 		weightStrokeBufferArray.refresh(terrainPrefab.terrain.weightMapResolution);
@@ -686,6 +773,9 @@ class TerrainEditor {
 			remainingDist += dist;
 	}
 
+	/**
+		Deletes the tile at a position.
+	**/
 	public function deleteTile( pos : h3d.col.Point) {
 		var brushWorldPos = uvTexPixels == null ? pos : getBrushWorldPosFromTex(pos);
 		if( brushWorldPos == null ) return;
@@ -701,6 +791,9 @@ class TerrainEditor {
 		renderTerrainUV();
 	}
 
+	/**
+		Paints the current surface at a position.
+	**/
 	public function drawSurface( pos : h3d.col.Point) {
 		if( currentBrush.index == -1 ) return;
 		var brushWorldPos = uvTexPixels == null ? pos : getBrushWorldPosFromTex(pos);
@@ -738,6 +831,9 @@ class TerrainEditor {
 		}
 	}
 
+	/**
+		Changes the heights at a position with the current brush.
+	**/
 	public function drawHeight( pos : h3d.col.Point) {
 		var brushWorldPos = uvTexPixels == null ? pos : getBrushWorldPosFromTex(pos);
 		if( brushWorldPos == null ) return;
@@ -781,6 +877,9 @@ class TerrainEditor {
 		}
 	}
 
+	/**
+		Starts or stops the edition when the terrain is selected or unselected.
+	**/
 	public function setSelected(b : Bool ) {
 		if( b ) {
 			var s2d = terrainPrefab.shared.root2d.getScene();
@@ -1135,6 +1234,9 @@ class TerrainEditor {
 		</div>
 	</div>';
 
+	/**
+		Adds the brush and surface properties to the properties panel.
+	**/
 	public function setupUI( props : hide.Element, ctx : EditContext ) {
 		props.append(brushMode);
 		props.append(brushParams);

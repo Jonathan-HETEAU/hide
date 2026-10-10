@@ -1,13 +1,34 @@
 package hide.view;
 
 #if (hashlink >= "1.15.0")
+/**
+	The HashLink memory profiler view: loads a `.hl` file and memory dumps, and shows the memory used by type, with their parents and roots.
+**/
 class MemProfiler extends hide.ui.View<{}> {
+	/**
+		The memory analyzer, or null before processing.
+	**/
 	public var analyzer : hlmem.Analyzer = null;
+	/**
+		The path of the `.hl` file.
+	**/
 	public var hlPath(default, set) : String = null;
+	/**
+		The paths of the memory dumps.
+	**/
 	public var dumpPaths(default, set) : Array<String> = [];
 	var currentFilter : hlmem.Memory.FilterMode = None;
+	/**
+		The number of lines shown in the tables before expanding.
+	**/
 	public var defaultTableLines : Int = 5;
+	/**
+		Locates the roots of the inspected type when it is opened.
+	**/
 	public var defaultLocateRoot : Bool = false;
+	/**
+		Shows the type ids.
+	**/
 	public var showTid : Bool = false;
 
 	var hlSelect : hide.comp.FileSelect;
@@ -18,6 +39,9 @@ class MemProfiler extends hide.ui.View<{}> {
 	var summaryView : MemProfilerSummaryView;
 	var inspectView : MemProfilerInspectView;
 
+	/**
+		Creates the view.
+	**/
 	public function new( ?state ) {
 		super(state);
 	}
@@ -219,6 +243,9 @@ class MemProfiler extends hide.ui.View<{}> {
 		return "Memory profiler";
 	}
 
+	/**
+		Loads the `.hl` file and the dumps, and shows the summary.
+	**/
 	public function process() {
 		if( hlPath == null || hlPath == '' || dumpPaths == null || dumpPaths.length <= 0 ) {
 			Ide.inst.quickMessage('.hl or/and .dump files are missing. Please provide both files before hit the process button');
@@ -366,10 +393,16 @@ class MemProfiler extends hide.ui.View<{}> {
 		inspectView.element.appendTo(content);
 	}
 
+	/**
+		Adds a search to the history.
+	**/
 	public function addHistory(str) {
 		searchBar.addHistory(str);
 	}
 
+	/**
+		Shows the summary tab.
+	**/
 	public function openSummaryTab() {
 		var header = tabsView.find(".tabs-header");
 		header.find("[name=inspect]").removeClass("active");
@@ -378,10 +411,16 @@ class MemProfiler extends hide.ui.View<{}> {
 		summaryView.element.toggle(true);
 	}
 
+	/**
+		Returns the summary statistics of a type.
+	**/
 	public function getTypeStat( ttype : hlmem.TType ) {
 		return summaryView.typeStats.get(ttype);
 	}
 
+	/**
+		Shows the inspect tab, for a type if set.
+	**/
 	public function openInspectTab( ?tstr : String ) {
 		var header = tabsView.find(".tabs-header");
 		header.find("[name=summary]").removeClass("active");
@@ -391,6 +430,9 @@ class MemProfiler extends hide.ui.View<{}> {
 		inspectView.open(tstr);
 	}
 
+	/**
+		Removes a parent type from the inspected blocks.
+	**/
 	public function inspectRemoveParent( pstr : String ) {
 		var mainMemory = analyzer.getMainMemory();
 		var ptype = mainMemory.resolveType(pstr);
@@ -403,14 +445,26 @@ class MemProfiler extends hide.ui.View<{}> {
 	static var _ = hide.ui.View.register(MemProfiler);
 }
 
+/**
+	The type search bar of the memory profiler, with a history.
+**/
 class MemProfilerSearchBar extends hide.comp.Component {
 	var profiler : MemProfiler;
+	/**
+		The searches, latest first.
+	**/
 	public var searchHistory : Array<String> = [];
+	/**
+		The index of the shown search.
+	**/
 	public var searchHistoryIndex : Int = 0;
 	var searchInput : Element;
 	var searchBtn : Element;
 	var searchPrev : Element;
 	var searchNext : Element;
+	/**
+		Creates the inspect tab of a profiler.
+	**/
 	public function new( profiler : MemProfiler ) {
 		super(null, null);
 		this.profiler = profiler;
@@ -450,12 +504,18 @@ class MemProfilerSearchBar extends hide.comp.Component {
 		profiler.keys.register("memprof.inspectPrev", () -> searchPrev.click());
 		profiler.keys.register("memprof.inspectNext", () -> searchNext.click());
 	}
+	/**
+		Shows the current search.
+	**/
 	public function refreshSearchBar() {
 		if( searchHistory[searchHistoryIndex] != null )
 			searchInput.val(searchHistory[searchHistoryIndex]);
 		searchPrev.toggleClass("disable", searchHistoryIndex >= searchHistory.length - 1);
 		searchNext.toggleClass("disable", searchHistoryIndex <= 0);
 	}
+	/**
+		Adds a search to the history.
+	**/
 	public function addHistory( str : String ) {
 		if( str != null && str.length > 0 && searchHistory[searchHistoryIndex] != str ) {
 			searchHistory.unshift(str);
@@ -487,9 +547,18 @@ class MemProfilerSearchBar extends hide.comp.Component {
 	}
 }
 
+/**
+	The summary tab of the memory profiler: memory used by type.
+**/
 class MemProfilerSummaryView extends hide.comp.Component {
 	var profiler : MemProfiler;
+	/**
+		The statistics by type.
+	**/
 	public var typeStats : hlmem.Result.BlockStats = null;
+	/**
+		Creates the search bar of a profiler.
+	**/
 	public function new( profiler : MemProfiler ) {
 		super(null, null);
 		this.profiler = profiler;
@@ -510,17 +579,32 @@ class MemProfilerSummaryView extends hide.comp.Component {
 	}
 }
 
+/**
+	The inspect tab of the memory profiler: the parents and roots of the blocks of a type.
+**/
 class MemProfilerInspectView extends hide.comp.Component {
 	var profiler : MemProfiler;
+	/**
+		The inspected type.
+	**/
 	public var ttype : hlmem.TType;
+	/**
+		The name of the inspected type.
+	**/
 	public var ttypeName : String;
 	var locateRootBtn : Element;
 	var locateRootTable : MemProfilerTable;
+	/**
+		Creates the summary of a profiler.
+	**/
 	public function new( profiler : MemProfiler ) {
 		super(null, null);
 		this.profiler = profiler;
 		element = new Element('<div class="hide-scroll"></div>');
 	}
+	/**
+		Inspects a type, by name.
+	**/
 	public function open( ?tstr : String ) {
 		if( tstr == null || tstr.length <= 0 ) return;
 		var mainMemory = profiler.analyzer.getMainMemory();
@@ -565,6 +649,9 @@ class MemProfilerInspectView extends hide.comp.Component {
 	}
 }
 
+/**
+	A table of block statistics of the memory profiler.
+**/
 class MemProfilerTable extends hide.comp.Component {
 	var profiler : MemProfiler;
 	var title : String;
@@ -572,6 +659,9 @@ class MemProfilerTable extends hide.comp.Component {
 	var allowRemoveParent : Bool;
 	var currentLine : Int;
 	var expandBtn : Element;
+	/**
+		Creates a table showing `maxLine` lines. `allowRemoveParent` adds an action removing a parent.
+	**/
 	public function new( profiler : MemProfiler, title : String, data : hlmem.Result.BlockStats, maxLine : Int, allowRemoveParent : Bool = false ) {
 		super(null, null);
 		this.profiler = profiler;
@@ -595,6 +685,9 @@ class MemProfilerTable extends hide.comp.Component {
 		var size = (maxLine > 0 && maxLine < data.allT.length) ? maxLine : data.allT.length;
 		expand(size);
 	}
+	/**
+		Shows `size` more lines.
+	**/
 	public function expand( size : Int ) {
 		if( expandBtn != null )
 			expandBtn.remove();
@@ -622,10 +715,16 @@ class MemProfilerTable extends hide.comp.Component {
 	}
 }
 
+/**
+	A line of a memory profiler table.
+**/
 class MemProfilerTableLine extends hide.comp.Component {
 	var profiler : MemProfiler;
 	var data : hlmem.Result.BlockStatsElement;
 	var actions : Element;
+	/**
+		Creates the line of a statistic.
+	**/
 	public function new( profiler : MemProfiler, el : hlmem.Result.BlockStatsElement ) {
 		super(null, null);
 		this.profiler = profiler;
@@ -651,6 +750,9 @@ class MemProfilerTableLine extends hide.comp.Component {
 		);
 		actions = element.find("#actions");
 	}
+	/**
+		Adds an action button to the line.
+	**/
 	public function addAction( icon : String, description : String, onClick : hlmem.Result.BlockStatsElement -> Void ) {
 		var btn = new Element('<i class="ico ${icon}" title="${description}"></i>').appendTo(actions);
 		btn.on('click', (e) -> onClick(data));
