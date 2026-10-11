@@ -1183,11 +1183,11 @@ class Prefab {
 	static var NULL_CHILDREN = [];
 
 	/**
-		Register the given prefab class with the given typeName in the prefab regsitry.
+		Register the given prefab class with the given typeName in the prefab registry.
 		This is necessary for the serialisation system.
-		Call it by placing this in you prefab class :
-		```
-		public static var _ = Prefab.register("myPrefabName", myPrefabClassName);
+		Call it by placing this in your prefab class:
+		```haxe
+		static var _ = Prefab.register("myPrefabName", MyPrefabClass);
 		```
 	**/
 	static function register(typeName : String, prefabClass: Class<hrt.prefab.Prefab>, ?extension: String) {

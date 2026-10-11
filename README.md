@@ -105,20 +105,16 @@ Aside from javascript plugins, you can add your own stylsheets:
 
 Example of a project-specific custom prefab:
 ```haxe
-import hrt.prefab.Context;
-import hrt.prefab.Library;
-
 class MyPrefab extends hrt.prefab.Object3D {
-    
-    public function new(?parent) {
-        super(parent);
-        type = "myprefab";
-    }
 
-    override function make(ctx:Context):Context {
-        var ret = super.make(ctx);
+    // fields with @:s are saved in the prefab file
+    @:s public var size : Float = 1.0;
+
+    // creates the 3D object of the prefab, under the object of its parent
+    override function makeObject(parent3d : h3d.scene.Object) : h3d.scene.Object {
+        var obj = new h3d.scene.Object(parent3d);
         // Custom code...
-        return ret;
+        return obj;
     }
 
     #if editor
@@ -129,7 +125,8 @@ class MyPrefab extends hrt.prefab.Object3D {
 
     #end
 
-    static var _ = Library.register("myprefab", MyPrefab);
+    // the type name used in the prefab files
+    static var _ = hrt.prefab.Prefab.register("myprefab", MyPrefab);
 }
 ```
 
@@ -140,10 +137,9 @@ You can add your own viewers/editors for files, by extending `hide.view.FileView
 import hide.view.FileView;
 
 class CustomView extends FileView {
-    
-    // onDisplay should create html layout of your view. It is also called each when file is changed externally.
-    override public function onDisplay()
-    {
+
+    // onDisplay should create the html layout of your view. It is also called each time the file is changed externally.
+    override function onDisplay() {
         // Example of initial layout setup.
         element.html('
           <div class="flex vertical">
@@ -152,18 +148,18 @@ class CustomView extends FileView {
           </div>
         ');
         var tools = new hide.comp.Toolbar(null, element.find(".toolbar"));
-        var content = element.find(".content"));
-        // Importantly, use `getPath()` to obtain file path that you can use for filesystem access.
+        var content = element.find(".content");
+        // Importantly, use `getPath()` to obtain the file path that you can use for filesystem access.
         var path = getPath();
         // ... your code to fill content
-  }
-  
-  // Register the view with specific extensions.
-  // Extensions starting with `json.` refer to `.json` files with `type` at root
-  // object being second part of extension ("type": "customView" in this sample).
-  // Otherwise it is treated as regular file extension.
-  // Providing icon and createNew is optional. If createNew set, HIDE file tree will have a context menu item to create new file that FileView represents.
-  static var _ = hide.view.FileTree.registerExtension(CustomView, ["json.customView", "customview"], { icon: "snowflake-o", createNew: "Dialog Context" });
-  
+    }
+
+    // Register the view with specific extensions.
+    // Extensions starting with `json.` refer to `.json` files with `type` at root
+    // object being second part of extension ("type": "customView" in this sample).
+    // Otherwise it is treated as regular file extension.
+    // Providing icon and createNew is optional. If createNew set, HIDE file tree will have a context menu item to create new file that FileView represents.
+    static var _ = hide.Extension.registerExtension(CustomView, ["json.customView", "customview"], { icon: "snowflake-o", createNew: "Dialog Context" });
+
 }
 ```
