@@ -1,13 +1,22 @@
 package hide.comp.cdb;
 
+/**
+	A CDB editor of one object (all its properties) of a sheet type, stored in a file.
+**/
 class ObjEditor extends Editor {
 
+	/**
+		The view of the file, or null.
+	**/
 	public var fileView : hide.view.FileView;
 
 	var obj : {};
 	var structureWasChanged = false;
 	var fileReference : String;
 
+	/**
+		Creates the editor of an object.
+	**/
 	public function new( sheet : cdb.Sheet, props, obj : {}, fileReference, ?parent : Element ) {
 		this.displayMode = AllProperties;
 		this.obj = obj;
@@ -101,6 +110,9 @@ class ObjEditor extends Editor {
 		onChange(column.name);
 	}
 
+	/**
+		Called with the name of a changed property.
+	**/
 	public dynamic function onChange(propName : String) {}
 
 }

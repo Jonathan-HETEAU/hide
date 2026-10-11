@@ -1,11 +1,26 @@
 package hide.prefab;
 
+/**
+	The shared context of the prefabs in the editor: adds the scene editor and scene.
+**/
 class ContextShared extends hrt.prefab.ContextShared.ContextSharedBase {
 	#if editor
+	/**
+		The scene editor, or null.
+	**/
 	public var editor : hide.comp.SceneEditor;
+	/**
+		The scene.
+	**/
 	public var scene : hide.comp.Scene;
+	/**
+		Shows the editor helpers (light gizmos for example) even when not selected.
+	**/
 	public var editorDisplay : Bool;
 
+	/**
+		Creates the context.
+	**/
 	public function new(?path : String, ?root2d: h2d.Object = null, ?root3d: h3d.scene.Object = null, isInstance: Bool = true) {
 		super(path, root2d, root3d, isInstance);
 	}

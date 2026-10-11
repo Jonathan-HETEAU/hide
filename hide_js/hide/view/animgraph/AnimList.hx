@@ -1,11 +1,20 @@
 package hide.view.animgraph;
 
+/**
+	A filterable list of animation files, draggable to the graph.
+**/
 class AnimList extends hide.comp.Component {
+	/**
+		The drag data key of the animation path.
+	**/
 	public static final dragEventKey = "animlist.path";
 
 	var paths : Array<String> = [];
 	var filter = "";
 
+	/**
+		Creates the list of animation paths.
+	**/
 	public function new(parent, el, paths: Array<String>) {
 		super(parent, el);
 		this.paths = paths;
@@ -29,6 +38,9 @@ class AnimList extends hide.comp.Component {
 		refreshList();
 	}
 
+	/**
+		Rebuilds the list with the filter.
+	**/
 	public function refreshList() {
 		var list = element.find("ul");
 		list.html("");

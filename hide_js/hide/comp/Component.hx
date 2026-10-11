@@ -1,10 +1,22 @@
 package hide.comp;
 
+/**
+	The base class of the editor HTML components.
+**/
 class Component {
 
 	var ide : hide.Ide;
+	/**
+		The class name of the component.
+	**/
 	public var componentName(get, never) : String;
+	/**
+		The root element.
+	**/
 	public var element(default,null) : Element;
+	/**
+		The key of the saved display state, or null.
+	**/
 	public var saveDisplayKey : String;
 
 	function new(parent:Element,el:Element) {
@@ -16,6 +28,9 @@ class Component {
 			parent.append(element);
 	}
 
+	/**
+		Removes the element.
+	**/
 	public function remove() {
 		element.remove();
 	}

@@ -1,11 +1,20 @@
 package hide.view.animgraph;
 
+/**
+	The saved preview settings of the blend space editor.
+**/
 @:structInit
 @:build(hrt.prefab.Macros.buildSerializable())
 class BlendSpacePreviewState {
+    /**
+    	The index of the selected anim set provider.
+    **/
     @:s public var providerIndex: Int = 0;
 }
 
+/**
+	The 2D blend space editor view (`.bs2d` files): the animation points and a preview.
+**/
 @:access(hrt.animgraph.BlendSpace2D)
 @:access(h3d.anim.BlendSpace2D)
 class BlendSpace2DEditor extends hide.view.FileView {
@@ -58,12 +67,18 @@ class BlendSpace2DEditor extends hide.view.FileView {
 		return inline new h2d.col.Point(x, y);
 	}
 
+    /**
+    	Loads the preview state from the display state.
+    **/
     public function loadPreviewState() : Void {
         var settingsSer = haxe.Json.parse(getDisplayState("previewState") ?? "{}");
         previewState = {};
         @:privateAccess previewState.copyFromDynamic(settingsSer);
     }
 
+    /**
+    	Saves the preview state in the display state.
+    **/
     public function savePreviewState() : Void {
         saveDisplayState("previewState", haxe.Json.stringify(@:privateAccess previewState.copyToDynamic({})));
     }

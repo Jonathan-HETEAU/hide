@@ -1,9 +1,14 @@
 package hide.comp;
 using Lambda;
 
+/**
+	A searchable choice among a list, with copy and paste.
+**/
 class Select extends Component {
 
-	// The id in the choices list that correspond to the current value
+	/**
+		The id of the chosen item in the choices list.
+	**/
 	public var value(default, set) : String;
 	var choices : Array<hide.comp.Dropdown.Choice> = null;
 	var isClearable : Bool = false;
@@ -18,6 +23,9 @@ class Select extends Component {
 		return value;
 	}
 
+	/**
+		Creates the choice. `isClearable` allows choosing nothing.
+	**/
 	public function new(?parent,?root, choices: Array<hide.comp.Dropdown.Choice>, isClearable : Bool = true) {
 		if (root == null)
 			root = new Element('<input value="--- Choose ---">');
@@ -49,6 +57,9 @@ class Select extends Component {
 		});
 	}
 
+	/**
+		Opens the context menu (copy, paste, clear).
+	**/
 	public dynamic function onContextmenu(e: js.jquery.Event) {
 		var options = [
 			{ label : "Copy", click : () -> ide.setClipboard(value)},
@@ -65,6 +76,9 @@ class Select extends Component {
 		onChange(newId);
 	}
 
+	/**
+		Called with the chosen id.
+	**/
 	public dynamic function onChange(newId : String) {
 
 	}

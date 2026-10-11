@@ -1,6 +1,12 @@
 package hide.comp;
 
+/**
+	Several sliders editing a vector of values, which can be linked to keep them uniform.
+**/
 class MultiRange extends Component {
+    /**
+    	The values.
+    **/
     public var value(get, set) : Array<Float>;
 
     var current : Array<Float> = [];
@@ -52,6 +58,9 @@ class MultiRange extends Component {
         }
     }
 
+    /**
+    	Called when the values change. `tempChange` is true during a drag.
+    **/
     public dynamic function onChange(tempChange : Bool) {
 
     }
@@ -60,6 +69,9 @@ class MultiRange extends Component {
         onChange(tempChange);
     }
 
+	/**
+		Creates `num` sliders with labels.
+	**/
 	public function new(?parent:Element,?root:Element, num : Int , labels : Array<String>) {
         this.numValues = num;
         super(null, null);

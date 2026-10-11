@@ -7,6 +7,9 @@ package hide.comp;
 class FancyClosable extends hide.comp.Component {
 	var open = false;
 
+	/**
+		Creates the container, in `target` if set.
+	**/
 	public override function new(parent: Element = null, target: Element = null) {
 		var el = new hide.Element('
 			<fancy-closable class="shadow">
@@ -26,9 +29,18 @@ class FancyClosable extends hide.comp.Component {
 		close.onclick = (e) -> toggleOpen(false);
 	}
 
+	/**
+		Called when the container opens.
+	**/
 	public dynamic function onOpen() : Void {};
+	/**
+		Called when the container closes.
+	**/
 	public dynamic function onClose() : Void {};
 
+	/**
+		Opens or closes the container (toggles if `force` is null).
+	**/
 	public function toggleOpen(?force: Bool) : Void {
 		var want = force != null ? force : !open;
 		if (open != want) {
@@ -43,6 +55,9 @@ class FancyClosable extends hide.comp.Component {
 		}
 	}
 
+	/**
+		Tells if the container is shown.
+	**/
 	public function isOpen() : Bool {
 		return open;
 	}

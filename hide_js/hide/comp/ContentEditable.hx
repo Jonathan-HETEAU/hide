@@ -1,7 +1,7 @@
 package hide.comp;
 
 /**
-	An editable text element: Enter validates, Escape cancels.
+	An editable text element: Enter or focus loss validates, Escape cancels.
 **/
 class ContentEditable extends Component {
 	/**
@@ -97,7 +97,7 @@ class ContentEditable extends Component {
 	public dynamic function onCancel() {};
 
 	/**
-		Called with the text when it is validated.
+		Called with the text when the edition ends (Enter or focus loss) with a change.
 	**/
 	public dynamic function onChange(v: String) {};
 }

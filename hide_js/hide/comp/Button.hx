@@ -1,14 +1,23 @@
 package hide.comp;
 
 
+/**
+	The options of a `Button`.
+**/
 typedef Options = {
-	?hasDropdown: Bool,
+	/**
+		Shows a dropdown arrow.
+	**/
+	var ?hasDropdown : Bool;
 }
 
 /**
-	Dropdown that uses a ContextMenu for it's dropdown element
+	A button with a label, and a dropdown arrow if `hasDropdown`.
 **/
 class Button extends hide.comp.Component {
+	/**
+		The label.
+	**/
 	public var label(default, set) : String;
 
 	var labelElem : hide.Element;
@@ -18,6 +27,9 @@ class Button extends hide.comp.Component {
 		return label;
 	}
 
+	/**
+		Creates a button, or wraps a `<button-2>` element.
+	**/
 	public function new(parent: hide.Element = null, element: hide.Element = null, ?label: String, ?options: Options) {
 		options ??= {};
 		if (element != null) {
@@ -39,6 +51,9 @@ class Button extends hide.comp.Component {
 		element.click((e) -> onClick());
 	}
 
+	/**
+		Called on click.
+	**/
 	public dynamic function onClick() {
 
 	}

@@ -1,12 +1,27 @@
 package hide.comp;
 
+/**
+	A texture file selection with a preview.
+**/
 class TextureSelect extends FileSelect {
+	/**
+		The selectable image extensions.
+	**/
 	public static var IMG_EXTS = hide.Ide.IMG_EXTS.concat(["svg"]);
 
+	/**
+		The selected texture.
+	**/
 	public var value(default, set) : h3d.mat.Texture;
+	/**
+		The area of the texture to use, in pixels, or null.
+	**/
 	public var area(default, set) : { x : Int, y : Int, width : Int, height : Int };
 	var preview : Element;
 
+	/**
+		Creates the selection.
+	**/
 	public function new(?parent,?root, handleDrop: Bool = true) {
 		preview = new Element("<div class='texture-preview'>");
 		super(IMG_EXTS, parent, root, handleDrop);
