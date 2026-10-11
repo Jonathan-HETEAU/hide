@@ -9161,17 +9161,17 @@
 	<class path="h2d.domkit.ObjectComp" params="" file="/home/user/heaps/h2d/domkit/BaseComponents.hx" module="h2d.domkit.BaseComponents">
 		<implements path="domkit.ComponentDecl"><c path="h2d.Object"/></implements>
 		<implements path="h2d.domkit.Object"/>
-		<set_rotation set="method" line="662" static="1"><f a="o:v">
+		<set_rotation set="method" line="687" static="1"><f a="o:v">
 	<c path="h2d.Object"/>
 	<x path="Float"/>
 	<x path="Void"/>
 </f></set_rotation>
-		<set_visible set="method" line="666" static="1"><f a="o:v">
+		<set_visible set="method" line="691" static="1"><f a="o:v">
 	<c path="h2d.Object"/>
 	<x path="Bool"/>
 	<x path="Void"/>
 </f></set_visible>
-		<set_scale set="method" line="670" static="1"><f a="o:v">
+		<set_scale set="method" line="695" static="1"><f a="o:v">
 	<c path="h2d.Object"/>
 	<x path="Null"><a>
 	<y set="null"><x path="Float"/></y>
@@ -9179,26 +9179,26 @@
 </a></x>
 	<x path="Void"/>
 </f></set_scale>
-		<set_filter set="method" line="680" static="1"><f a="o:f">
+		<set_filter set="method" line="705" static="1"><f a="o:f">
 	<c path="h2d.Object"/>
 	<c path="h2d.filter.Filter"/>
 	<x path="Void"/>
 </f></set_filter>
-		<set_filterSmooth set="method" line="684" static="1"><f a="o:b">
+		<set_filterSmooth set="method" line="709" static="1"><f a="o:b">
 	<c path="h2d.Object"/>
 	<x path="Bool"/>
 	<x path="Void"/>
 </f></set_filterSmooth>
-		<set_blend set="method" line="688" static="1"><f a="o:b">
+		<set_blend set="method" line="713" static="1"><f a="o:b">
 	<c path="h2d.Object"/>
 	<e path="h2d.BlendMode"/>
 	<x path="Void"/>
 </f></set_blend>
-		<getFlowProps set="method" line="692" static="1"><f a="o">
+		<getFlowProps set="method" line="717" static="1"><f a="o">
 	<c path="h2d.Object"/>
 	<x path="Null"><x path="Null"><c path="h2d.FlowProperties"/></x></x>
 </f></getFlowProps>
-		<set_margin set="method" line="697" static="1"><f a="o:v">
+		<set_margin set="method" line="722" static="1"><f a="o:v">
 	<c path="h2d.Object"/>
 	<x path="Null"><a>
 	<top set="null"><x path="Int"/></top>
@@ -9208,27 +9208,27 @@
 </a></x>
 	<x path="Void"/>
 </f></set_margin>
-		<set_marginLeft set="method" line="711" static="1"><f a="o:v">
+		<set_marginLeft set="method" line="736" static="1"><f a="o:v">
 	<c path="h2d.Object"/>
 	<x path="Int"/>
 	<x path="Void"/>
 </f></set_marginLeft>
-		<set_marginRight set="method" line="716" static="1"><f a="o:v">
+		<set_marginRight set="method" line="741" static="1"><f a="o:v">
 	<c path="h2d.Object"/>
 	<x path="Int"/>
 	<x path="Void"/>
 </f></set_marginRight>
-		<set_marginTop set="method" line="721" static="1"><f a="o:v">
+		<set_marginTop set="method" line="746" static="1"><f a="o:v">
 	<c path="h2d.Object"/>
 	<x path="Int"/>
 	<x path="Void"/>
 </f></set_marginTop>
-		<set_marginBottom set="method" line="726" static="1"><f a="o:v">
+		<set_marginBottom set="method" line="751" static="1"><f a="o:v">
 	<c path="h2d.Object"/>
 	<x path="Int"/>
 	<x path="Void"/>
 </f></set_marginBottom>
-		<set_align set="method" line="731" static="1"><f a="o:v">
+		<set_align set="method" line="756" static="1"><f a="o:v">
 	<c path="h2d.Object"/>
 	<x path="Null"><a>
 	<v set="null"><x path="Null"><e path="h2d.FlowAlign"/></x></v>
@@ -9236,22 +9236,22 @@
 </a></x>
 	<x path="Void"/>
 </f></set_align>
-		<set_halign set="method" line="739" static="1"><f a="o:v">
+		<set_halign set="method" line="764" static="1"><f a="o:v">
 	<c path="h2d.Object"/>
 	<x path="Null"><e path="h2d.FlowAlign"/></x>
 	<x path="Void"/>
 </f></set_halign>
-		<set_valign set="method" line="744" static="1"><f a="o:v">
+		<set_valign set="method" line="769" static="1"><f a="o:v">
 	<c path="h2d.Object"/>
 	<x path="Null"><e path="h2d.FlowAlign"/></x>
 	<x path="Void"/>
 </f></set_valign>
-		<set_position set="method" line="749" static="1"><f a="o:v">
+		<set_position set="method" line="774" static="1"><f a="o:v">
 	<c path="h2d.Object"/>
 	<x path="Bool"/>
 	<x path="Void"/>
 </f></set_position>
-		<set_offset set="method" line="754" static="1"><f a="o:v">
+		<set_offset set="method" line="779" static="1"><f a="o:v">
 	<c path="h2d.Object"/>
 	<x path="Null"><a>
 	<y set="null"><x path="Float"/></y>
@@ -9259,54 +9259,54 @@
 </a></x>
 	<x path="Void"/>
 </f></set_offset>
-		<set_offsetX set="method" line="762" static="1"><f a="o:v">
+		<set_offsetX set="method" line="787" static="1"><f a="o:v">
 	<c path="h2d.Object"/>
 	<x path="Int"/>
 	<x path="Void"/>
 </f></set_offsetX>
-		<set_offsetY set="method" line="767" static="1"><f a="o:v">
+		<set_offsetY set="method" line="792" static="1"><f a="o:v">
 	<c path="h2d.Object"/>
 	<x path="Int"/>
 	<x path="Void"/>
 </f></set_offsetY>
-		<set_minWidth set="method" line="772" static="1"><f a="o:v">
+		<set_minWidth set="method" line="797" static="1"><f a="o:v">
 	<c path="h2d.Object"/>
 	<x path="Null"><x path="Int"/></x>
 	<x path="Void"/>
 </f></set_minWidth>
-		<set_minHeight set="method" line="777" static="1"><f a="o:v">
+		<set_minHeight set="method" line="802" static="1"><f a="o:v">
 	<c path="h2d.Object"/>
 	<x path="Null"><x path="Int"/></x>
 	<x path="Void"/>
 </f></set_minHeight>
-		<set_autoSize set="method" line="782" static="1"><f a="o:v">
+		<set_autoSize set="method" line="807" static="1"><f a="o:v">
 	<c path="h2d.Object"/>
 	<x path="Null"><x path="Float"/></x>
 	<x path="Void"/>
 </f></set_autoSize>
-		<set_autoSizeWidth set="method" line="789" static="1"><f a="o:v">
+		<set_autoSizeWidth set="method" line="814" static="1"><f a="o:v">
 	<c path="h2d.Object"/>
 	<x path="Null"><x path="Float"/></x>
 	<x path="Void"/>
 </f></set_autoSizeWidth>
-		<set_autoSizeHeight set="method" line="793" static="1"><f a="o:v">
+		<set_autoSizeHeight set="method" line="818" static="1"><f a="o:v">
 	<c path="h2d.Object"/>
 	<x path="Null"><x path="Float"/></x>
 	<x path="Void"/>
 </f></set_autoSizeHeight>
-		<set_forceLineBreak set="method" line="798" static="1"><f a="o:v">
+		<set_forceLineBreak set="method" line="823" static="1"><f a="o:v">
 	<c path="h2d.Object"/>
 	<x path="Bool"/>
 	<x path="Void"/>
 </f></set_forceLineBreak>
-		<updateComponentId set="method" line="803" static="1"><f a="p">
+		<updateComponentId set="method" line="828" static="1"><f a="p">
 	<c path="domkit.Properties"><d/></c>
 	<x path="Void"/>
 </f></updateComponentId>
 		<_ expr="{
 	@:privateAccess domkit.Properties.updateComponentId = updateComponentId;
 	true;
-}" line="807" static="1">
+}" line="832" static="1">
 			<x path="Bool"/>
 			<meta>
 				<m n=":value"><e>{
@@ -9477,7 +9477,7 @@
 			<x path="Null"><x path="Float"/></x>
 			<meta><m n=":p"><e>none</e></m></meta>
 		</autoSizeHeight>
-		<new public="1" set="method" line="627">
+		<new public="1" set="method" line="652">
 			<f a=""><x path="Void"/></f>
 			<meta><m n=":compilerGenerated"/></meta>
 		</new>
@@ -9493,12 +9493,12 @@
 	<class path="h2d.domkit.DrawableComp" params="" file="/home/user/heaps/h2d/domkit/BaseComponents.hx" module="h2d.domkit.BaseComponents">
 		<extends path="h2d.domkit.ObjectComp"/>
 		<implements path="domkit.ComponentDecl"><c path="h2d.Drawable"/></implements>
-		<set_tint set="method" line="822" static="1"><f a="o:v">
+		<set_tint set="method" line="847" static="1"><f a="o:v">
 	<c path="h2d.Drawable"/>
 	<x path="Null"><x path="h3d.Vector4"/></x>
 	<x path="Void"/>
 </f></set_tint>
-		<set_colorAdjust set="method" line="829" static="1"><f a="o:v">
+		<set_colorAdjust set="method" line="854" static="1"><f a="o:v">
 	<c path="h2d.Drawable"/>
 	<x path="Null"><t path="h3d.ColorAdjust"/></x>
 	<x path="Void"/>
@@ -9529,7 +9529,7 @@
 			<x path="Bool"/>
 			<meta><m n=":p"/></meta>
 		</tileWrap>
-		<new public="1" set="method" line="815">
+		<new public="1" set="method" line="840">
 			<f a=""><x path="Void"/></f>
 			<meta><m n=":compilerGenerated"/></meta>
 		</new>
@@ -9545,16 +9545,16 @@
 	<class path="h2d.domkit.BitmapComp" params="" file="/home/user/heaps/h2d/domkit/BaseComponents.hx" module="h2d.domkit.BaseComponents">
 		<extends path="h2d.domkit.DrawableComp"/>
 		<implements path="domkit.ComponentDecl"><c path="h2d.Bitmap"/></implements>
-		<create set="method" line="883" static="1"><f a="parent">
+		<create set="method" line="908" static="1"><f a="parent">
 	<c path="h2d.Object"/>
 	<c path="h2d.Bitmap"/>
 </f></create>
-		<set_src set="method" line="887" static="1"><f a="o:t">
+		<set_src set="method" line="912" static="1"><f a="o:t">
 	<c path="h2d.Bitmap"/>
 	<x path="Null"><c path="h2d.Tile"/></x>
 	<x path="Void"/>
 </f></set_src>
-		<set_srcPos set="method" line="891" static="1"><f a="o:pos">
+		<set_srcPos set="method" line="916" static="1"><f a="o:pos">
 	<c path="h2d.Bitmap"/>
 	<x path="Null"><a>
 	<y>
@@ -9565,27 +9565,27 @@
 </a></x>
 	<x path="Void"/>
 </f></set_srcPos>
-		<set_srcPosX set="method" line="895" static="1"><f a="o:x">
+		<set_srcPosX set="method" line="920" static="1"><f a="o:x">
 	<c path="h2d.Bitmap"/>
 	<x path="Int"/>
 	<x path="Void"/>
 </f></set_srcPosX>
-		<set_srcPosY set="method" line="899" static="1"><f a="o:y">
+		<set_srcPosY set="method" line="924" static="1"><f a="o:y">
 	<c path="h2d.Bitmap"/>
 	<x path="Int"/>
 	<x path="Void"/>
 </f></set_srcPosY>
-		<set_srcFlipX set="method" line="903" static="1"><f a="o:b">
+		<set_srcFlipX set="method" line="928" static="1"><f a="o:b">
 	<c path="h2d.Bitmap"/>
 	<x path="Bool"/>
 	<x path="Void"/>
 </f></set_srcFlipX>
-		<set_srcFlipY set="method" line="907" static="1"><f a="o:b">
+		<set_srcFlipY set="method" line="932" static="1"><f a="o:b">
 	<c path="h2d.Bitmap"/>
 	<x path="Bool"/>
 	<x path="Void"/>
 </f></set_srcFlipY>
-		<setTilePos set="method" line="911" static="1"><f a="t:pos">
+		<setTilePos set="method" line="936" static="1"><f a="t:pos">
 	<c path="h2d.Tile"/>
 	<x path="Null"><a>
 	<y>
@@ -9596,32 +9596,32 @@
 </a></x>
 	<x path="Null"><c path="h2d.Tile"/></x>
 </f></setTilePos>
-		<setTilePosX set="method" line="923" static="1"><f a="t:x">
+		<setTilePosX set="method" line="948" static="1"><f a="t:x">
 	<c path="h2d.Tile"/>
 	<x path="Int"/>
 	<x path="Null"><c path="h2d.Tile"/></x>
 </f></setTilePosX>
-		<setTilePosY set="method" line="930" static="1"><f a="t:y">
+		<setTilePosY set="method" line="955" static="1"><f a="t:y">
 	<c path="h2d.Tile"/>
 	<x path="Int"/>
 	<x path="Null"><c path="h2d.Tile"/></x>
 </f></setTilePosY>
-		<setTileFlipX set="method" line="937" static="1"><f a="t:b">
+		<setTileFlipX set="method" line="962" static="1"><f a="t:b">
 	<c path="h2d.Tile"/>
 	<x path="Bool"/>
 	<x path="Null"><c path="h2d.Tile"/></x>
 </f></setTileFlipX>
-		<setTileFlipY set="method" line="949" static="1"><f a="t:b">
+		<setTileFlipY set="method" line="974" static="1"><f a="t:b">
 	<c path="h2d.Tile"/>
 	<x path="Bool"/>
 	<x path="Null"><c path="h2d.Tile"/></x>
 </f></setTileFlipY>
-		<set_width set="method" line="961" static="1"><f a="o:v">
+		<set_width set="method" line="986" static="1"><f a="o:v">
 	<c path="h2d.Bitmap"/>
 	<x path="Null"><x path="Float"/></x>
 	<x path="Void"/>
 </f></set_width>
-		<set_height set="method" line="965" static="1"><f a="o:v">
+		<set_height set="method" line="990" static="1"><f a="o:v">
 	<c path="h2d.Bitmap"/>
 	<x path="Null"><x path="Float"/></x>
 	<x path="Void"/>
@@ -9668,7 +9668,7 @@
 			<x path="Null"><x path="Float"/></x>
 			<meta><m n=":p"><e>auto</e></m></meta>
 		</height>
-		<new public="1" set="method" line="872">
+		<new public="1" set="method" line="897">
 			<f a=""><x path="Void"/></f>
 			<meta><m n=":compilerGenerated"/></meta>
 		</new>
@@ -12687,7 +12687,7 @@
 	</class>
 	<class path="h2d.domkit.CustomParser" params="" file="/home/user/heaps/h2d/domkit/BaseComponents.hx" module="h2d.domkit.BaseComponents">
 		<extends path="domkit.ValueParser"/>
-		<adjustSdfParams public="1" set="dynamic" line="308" static="1">
+		<adjustSdfParams public="1" set="dynamic" line="333" static="1">
 			<f a="sdf">
 				<a>
 					<smooth><x path="Float"/></smooth>
@@ -12699,61 +12699,61 @@
 			</f>
 			<haxe_doc>Called with the SDF parameters of a font before it is loaded, to adjust them.</haxe_doc>
 		</adjustSdfParams>
-		<NULL_BG expr="{ color : 0xFFFFFF, borderL : 0, borderR : 0, borderT : 0, borderB : 0, tile : null }" line="326" static="1">
+		<NULL_BG expr="{ color : 0xFFFFFF, borderL : 0, borderR : 0, borderT : 0, borderB : 0, tile : null }" line="351" static="1">
 			<t path="h2d.domkit.FlowBg"/>
 			<meta><m n=":value"><e>{ color : 0xFFFFFF, borderL : 0, borderR : 0, borderT : 0, borderB : 0, tile : null }</e></m></meta>
 		</NULL_BG>
-		<parseScale set="method" line="23"><f a="value">
+		<parseScale set="method" line="48"><f a="value">
 	<e path="domkit.CssValue"/>
 	<a>
 		<y><x path="Float"/></y>
 		<x><x path="Float"/></x>
 	</a>
 </f></parseScale>
-		<parseDimension set="method" line="33"><f a="value">
+		<parseDimension set="method" line="58"><f a="value">
 	<e path="domkit.CssValue"/>
 	<a>
 		<y><x path="Float"/></y>
 		<x><x path="Float"/></x>
 	</a>
 </f></parseDimension>
-		<parsePosition set="method" line="45"><f a="value">
+		<parsePosition set="method" line="70"><f a="value">
 	<e path="domkit.CssValue"/>
 	<x path="Bool"/>
 </f></parsePosition>
-		<transitionColorF set="method" line="57"><f a="v1:v2:t">
+		<transitionColorF set="method" line="82"><f a="v1:v2:t">
 	<x path="h3d.Vector4"/>
 	<x path="h3d.Vector4"/>
 	<x path="Float"/>
 	<x path="h3d.Vector4"/>
 </f></transitionColorF>
-		<parseColorF set="method" line="63"><f a="v">
+		<parseColorF set="method" line="88"><f a="v">
 	<e path="domkit.CssValue"/>
 	<x path="h3d.Vector4"/>
 </f></parseColorF>
-		<loadResource set="method" line="76"><f a="path">
+		<loadResource set="method" line="101"><f a="path">
 	<c path="String"/>
 	<c path="hxd.res.Any"/>
 </f></loadResource>
-		<parseResource public="1" set="method" line="94">
+		<parseResource public="1" set="method" line="119">
 			<f a="v">
 				<e path="domkit.CssValue"/>
 				<c path="hxd.res.Any"/>
 			</f>
 			<haxe_doc>Parses a resource path (`url("path")` or a string) and loads it.</haxe_doc>
 		</parseResource>
-		<toTile set="method" line="100"><f a="r">
+		<toTile set="method" line="125"><f a="r">
 	<c path="hxd.res.Any"/>
 	<c path="h2d.Tile"/>
 </f></toTile>
-		<parseTile public="1" set="method" line="108">
+		<parseTile public="1" set="method" line="133">
 			<f a="v">
 				<e path="domkit.CssValue"/>
 				<x path="Null"><c path="h2d.Tile"/></x>
 			</f>
 			<haxe_doc>Parses a tile: `none`, a color, `color width height`, a resource path, or `tile("path", size)`, `tile("path", w, h)`, `grid("path", hsplit, vsplit)`, `hgrid("path", n)`, `vgrid("path", n)` for a part of an image.</haxe_doc>
 		</parseTile>
-		<parseTilePos public="1" set="method" line="147">
+		<parseTilePos public="1" set="method" line="172">
 			<f a="value">
 				<e path="domkit.CssValue"/>
 				<a>
@@ -12766,21 +12766,21 @@
 			</f>
 			<haxe_doc>Parses a tile position in a grid: `default`, an index, or `x y`.</haxe_doc>
 		</parseTilePos>
-		<parseHAlign public="1" set="method" line="159">
+		<parseHAlign public="1" set="method" line="184">
 			<f a="value">
 				<e path="domkit.CssValue"/>
 				<e path="h2d.FlowAlign"/>
 			</f>
 			<haxe_doc>Parses a horizontal alignment: `auto`, `left`, `middle` or `right`.</haxe_doc>
 		</parseHAlign>
-		<parseVAlign public="1" set="method" line="177">
+		<parseVAlign public="1" set="method" line="202">
 			<f a="value">
 				<e path="domkit.CssValue"/>
 				<e path="h2d.FlowAlign"/>
 			</f>
 			<haxe_doc>Parses a vertical alignment: `auto`, `top`, `middle` or `bottom`.</haxe_doc>
 		</parseVAlign>
-		<parseAlign public="1" set="method" line="195">
+		<parseAlign public="1" set="method" line="220">
 			<f a="value">
 				<e path="domkit.CssValue"/>
 				<a>
@@ -12790,7 +12790,7 @@
 			</f>
 			<haxe_doc>Parses an alignment: `auto`, a single horizontal or vertical alignment, or both.</haxe_doc>
 		</parseAlign>
-		<parseFont public="1" set="method" line="220">
+		<parseFont public="1" set="method" line="245">
 			<f a="value">
 				<e path="domkit.CssValue"/>
 				<c path="h2d.Font"/>
@@ -12798,7 +12798,7 @@
 			<haxe_doc>Parses a font: `default`, a font resource path, or a group of fonts with `group(...)`.
 		The path can be followed by `offset(...)`, `line-height(...)`, `base-line(...)`, then by the SDF parameters: size, channel (`alpha`, `red`, `green`, `blue` or `multi`), cutoff and smoothing.</haxe_doc>
 		</parseFont>
-		<parseTextShadow public="1" set="method" line="315">
+		<parseTextShadow public="1" set="method" line="340">
 			<f a="value">
 				<e path="domkit.CssValue"/>
 				<x path="Null"><a>
@@ -12810,34 +12810,34 @@
 			</f>
 			<haxe_doc>Parses a text shadow: `none`, a color, or `dx dy [color [alpha]]`.</haxe_doc>
 		</parseTextShadow>
-		<transitionFlowBackground set="method" line="327"><f a="bg1:bg2:v">
+		<transitionFlowBackground set="method" line="352"><f a="bg1:bg2:v">
 	<t path="h2d.domkit.FlowBg"/>
 	<t path="h2d.domkit.FlowBg"/>
 	<x path="Float"/>
 	<t path="h2d.domkit.FlowBg"/>
 </f></transitionFlowBackground>
-		<parseFlowBackground public="1" set="method" line="344">
+		<parseFlowBackground public="1" set="method" line="369">
 			<f a="value">
 				<e path="domkit.CssValue"/>
 				<t path="h2d.domkit.FlowBg"/>
 			</f>
 			<haxe_doc>Parses a flow background: `transparent`, `tile width height` or `tile left top right bottom` (scale grid borders), `color alpha`, or `disc(color [alpha])`.</haxe_doc>
 		</parseFlowBackground>
-		<parseCursor public="1" set="method" line="367">
+		<parseCursor public="1" set="method" line="392">
 			<f a="value">
 				<e path="domkit.CssValue"/>
 				<e path="hxd.Cursor"/>
 			</f>
 			<haxe_doc>Parses a cursor: `default`, `button`, `move`, `textinput`, `hide`, `none`, or a resize cursor (`ns-resize`, `ew-resize`, `nwse-resize`, `nesw-resize`).</haxe_doc>
 		</parseCursor>
-		<parseFilter public="1" set="method" line="388">
+		<parseFilter public="1" set="method" line="413">
 			<f a="value">
 				<e path="domkit.CssValue"/>
 				<c path="h2d.filter.Filter"/>
 			</f>
 			<haxe_doc>Parses a filter: `none`, `nothing`, `grayscale(...)`, `saturate(...)`, `hue(...)`, `brightness(...)`, `outline(size, color)`, `glow(...)`, `blur(radius)`, or several of them to combine.</haxe_doc>
 		</parseFilter>
-		<transitionColorAdjust public="1" set="method" line="484">
+		<transitionColorAdjust public="1" set="method" line="509">
 			<f a="col1:col2:t">
 				<t path="h3d.ColorAdjust"/>
 				<t path="h3d.ColorAdjust"/>
@@ -12855,28 +12855,28 @@
 			</f>
 			<haxe_doc>Interpolates two color adjustments, for CSS transitions.</haxe_doc>
 		</transitionColorAdjust>
-		<parseColorAdjust public="1" set="method" line="514">
+		<parseColorAdjust public="1" set="method" line="539">
 			<f a="value">
 				<e path="domkit.CssValue"/>
 				<t path="h3d.ColorAdjust"/>
 			</f>
 			<haxe_doc>Parses a color adjustment: `none`, or one or several of `hue-rotate(...)`, `contrast(...)`, `gain(color, alpha)`, `brightness(...)`, `saturate(...)`.</haxe_doc>
 		</parseColorAdjust>
-		<parseAngleRad public="1" set="method" line="551">
+		<parseAngleRad public="1" set="method" line="576">
 			<f a="value">
 				<e path="domkit.CssValue"/>
 				<x path="Float"/>
 			</f>
 			<haxe_doc>Parses an angle (with a `rad` or `deg` unit, radians by default) and returns it in radians.</haxe_doc>
 		</parseAngleRad>
-		<parseAngleDeg public="1" set="method" line="566">
+		<parseAngleDeg public="1" set="method" line="591">
 			<f a="value">
 				<e path="domkit.CssValue"/>
 				<x path="Float"/>
 			</f>
 			<haxe_doc>Parses an angle (with a `rad` or `deg` unit, degrees by default) and returns it in degrees.</haxe_doc>
 		</parseAngleDeg>
-		<parseTagDefinition set="method" line="578"><f a="value">
+		<parseTagDefinition set="method" line="603"><f a="value">
 	<e path="domkit.CssValue"/>
 	<a>
 		<name><c path="String"/></name>
@@ -12890,7 +12890,7 @@
 		</color>
 	</a>
 </f></parseTagDefinition>
-		<parseTagDefinitions public="1" set="method" line="596">
+		<parseTagDefinitions public="1" set="method" line="621">
 			<f a="value">
 				<e path="domkit.CssValue"/>
 				<c path="Array"><a>
@@ -12907,14 +12907,14 @@
 			</f>
 			<haxe_doc>Parses the HTML text tag definitions: `name("font")`, `name(color)` or `name("font", color)`.</haxe_doc>
 		</parseTagDefinitions>
-		<parseMargin public="1" set="method" line="606">
+		<parseMargin public="1" set="method" line="631">
 			<f a="value">
 				<e path="domkit.CssValue"/>
 				<x path="Null"><x path="Int"/></x>
 			</f>
 			<haxe_doc>Parses a margin: a number, or `ignore-parent` to ignore the padding of the parent flow (see `h2d.Flow.PADDING_IGNORE_PARENT`).</haxe_doc>
 		</parseMargin>
-		<parseMarginBox public="1" set="method" line="616">
+		<parseMarginBox public="1" set="method" line="641">
 			<f a="v">
 				<e path="domkit.CssValue"/>
 				<a>
@@ -12926,7 +12926,7 @@
 			</f>
 			<haxe_doc>Parses the margins of the 4 sides, with the CSS box syntax.</haxe_doc>
 		</parseMarginBox>
-		<new public="1" set="method" line="18">
+		<new public="1" set="method" line="43">
 			<f a=""><x path="Void"/></f>
 			<haxe_doc>Creates the parser.</haxe_doc>
 		</new>
@@ -13780,37 +13780,37 @@
 	<class path="h2d.domkit.FlowComp" params="" file="/home/user/heaps/h2d/domkit/BaseComponents.hx" module="h2d.domkit.BaseComponents">
 		<extends path="h2d.domkit.ObjectComp"/>
 		<implements path="domkit.ComponentDecl"><c path="h2d.Flow"/></implements>
-		<set_minWidth set="method" line="1130" static="1"><f a="o:v">
+		<set_minWidth set="method" line="1155" static="1"><f a="o:v">
 	<c path="h2d.Flow"/>
 	<x path="Null"><x path="Int"/></x>
 	<x path="Void"/>
 </f></set_minWidth>
-		<set_minHeight set="method" line="1134" static="1"><f a="o:v">
+		<set_minHeight set="method" line="1159" static="1"><f a="o:v">
 	<c path="h2d.Flow"/>
 	<x path="Null"><x path="Int"/></x>
 	<x path="Void"/>
 </f></set_minHeight>
-		<set_width set="method" line="1138" static="1"><f a="o:v">
+		<set_width set="method" line="1163" static="1"><f a="o:v">
 	<c path="h2d.Flow"/>
 	<x path="Null"><x path="Int"/></x>
 	<x path="Void"/>
 </f></set_width>
-		<set_height set="method" line="1142" static="1"><f a="o:v">
+		<set_height set="method" line="1167" static="1"><f a="o:v">
 	<c path="h2d.Flow"/>
 	<x path="Null"><x path="Int"/></x>
 	<x path="Void"/>
 </f></set_height>
-		<set_contentValign set="method" line="1146" static="1"><f a="o:a">
+		<set_contentValign set="method" line="1171" static="1"><f a="o:a">
 	<c path="h2d.Flow"/>
 	<x path="Null"><e path="h2d.FlowAlign"/></x>
 	<x path="Void"/>
 </f></set_contentValign>
-		<set_contentHalign set="method" line="1150" static="1"><f a="o:a">
+		<set_contentHalign set="method" line="1175" static="1"><f a="o:a">
 	<c path="h2d.Flow"/>
 	<x path="Null"><e path="h2d.FlowAlign"/></x>
 	<x path="Void"/>
 </f></set_contentHalign>
-		<set_contentAlign set="method" line="1154" static="1"><f a="o:v">
+		<set_contentAlign set="method" line="1179" static="1"><f a="o:v">
 	<c path="h2d.Flow"/>
 	<x path="Null"><a>
 	<v set="null"><x path="Null"><e path="h2d.FlowAlign"/></x></v>
@@ -13818,7 +13818,7 @@
 </a></x>
 	<x path="Void"/>
 </f></set_contentAlign>
-		<set_background set="method" line="1163" static="1"><f a="o:v">
+		<set_background set="method" line="1188" static="1"><f a="o:v">
 	<c path="h2d.Flow"/>
 	<x path="Null"><a>
 	<tile set="null"><c path="h2d.Tile"/></tile>
@@ -13829,17 +13829,17 @@
 </a></x>
 	<x path="Void"/>
 </f></set_background>
-		<set_backgroundTile set="method" line="1176" static="1"><f a="o:t">
+		<set_backgroundTile set="method" line="1201" static="1"><f a="o:t">
 	<c path="h2d.Flow"/>
 	<c path="h2d.Tile"/>
 	<x path="Void"/>
 </f></set_backgroundTile>
-		<set_backgroundRepeat set="method" line="1180" static="1"><f a="o:v">
+		<set_backgroundRepeat set="method" line="1205" static="1"><f a="o:v">
 	<c path="h2d.Flow"/>
 	<x path="Bool"/>
 	<x path="Void"/>
 </f></set_backgroundRepeat>
-		<set_backgroundTilePos set="method" line="1185" static="1"><f a="o:pos">
+		<set_backgroundTilePos set="method" line="1210" static="1"><f a="o:pos">
 	<c path="h2d.Flow"/>
 	<x path="Null"><a>
 	<y>
@@ -13850,42 +13850,42 @@
 </a></x>
 	<x path="Void"/>
 </f></set_backgroundTilePos>
-		<set_backgroundTilePosX set="method" line="1189" static="1"><f a="o:x">
+		<set_backgroundTilePosX set="method" line="1214" static="1"><f a="o:x">
 	<c path="h2d.Flow"/>
 	<x path="Int"/>
 	<x path="Void"/>
 </f></set_backgroundTilePosX>
-		<set_backgroundTilePosY set="method" line="1193" static="1"><f a="o:y">
+		<set_backgroundTilePosY set="method" line="1218" static="1"><f a="o:y">
 	<c path="h2d.Flow"/>
 	<x path="Int"/>
 	<x path="Void"/>
 </f></set_backgroundTilePosY>
-		<set_backgroundId set="method" line="1197" static="1"><f a="o:id">
+		<set_backgroundId set="method" line="1222" static="1"><f a="o:id">
 	<c path="h2d.Flow"/>
 	<x path="Bool"/>
 	<x path="Void"/>
 </f></set_backgroundId>
-		<set_backgroundAlpha set="method" line="1207" static="1"><f a="o:v">
+		<set_backgroundAlpha set="method" line="1232" static="1"><f a="o:v">
 	<c path="h2d.Flow"/>
 	<x path="Float"/>
 	<x path="Void"/>
 </f></set_backgroundAlpha>
-		<set_backgroundSmooth set="method" line="1214" static="1"><f a="o:v">
+		<set_backgroundSmooth set="method" line="1239" static="1"><f a="o:v">
 	<c path="h2d.Flow"/>
 	<x path="Null"><x path="Bool"/></x>
 	<x path="Void"/>
 </f></set_backgroundSmooth>
-		<set_cursor set="method" line="1221" static="1"><f a="o:c">
+		<set_cursor set="method" line="1246" static="1"><f a="o:c">
 	<c path="h2d.Flow"/>
 	<x path="Null"><e path="hxd.Cursor"/></x>
 	<x path="Void"/>
 </f></set_cursor>
-		<set_propagate set="method" line="1226" static="1"><f a="o:b">
+		<set_propagate set="method" line="1251" static="1"><f a="o:b">
 	<c path="h2d.Flow"/>
 	<x path="Bool"/>
 	<x path="Void"/>
 </f></set_propagate>
-		<set_padding set="method" line="1232" static="1"><f a="o:v">
+		<set_padding set="method" line="1257" static="1"><f a="o:v">
 	<c path="h2d.Flow"/>
 	<x path="Null"><a>
 	<top set="null"><x path="Int"/></top>
@@ -13895,42 +13895,42 @@
 </a></x>
 	<x path="Void"/>
 </f></set_padding>
-		<set_layout set="method" line="1243" static="1"><f a="o:v">
+		<set_layout set="method" line="1268" static="1"><f a="o:v">
 	<c path="h2d.Flow"/>
 	<e path="h2d.FlowLayout"/>
 	<x path="Void"/>
 </f></set_layout>
-		<set_inlineBlock set="method" line="1247" static="1"><f a="o:v">
+		<set_inlineBlock set="method" line="1272" static="1"><f a="o:v">
 	<c path="h2d.Flow"/>
 	<x path="Bool"/>
 	<x path="Void"/>
 </f></set_inlineBlock>
-		<set_vertical set="method" line="1251" static="1"><f a="o:v">
+		<set_vertical set="method" line="1276" static="1"><f a="o:v">
 	<c path="h2d.Flow"/>
 	<x path="Bool"/>
 	<x path="Void"/>
 </f></set_vertical>
-		<set_horizontal set="method" line="1255" static="1"><f a="o:v">
+		<set_horizontal set="method" line="1280" static="1"><f a="o:v">
 	<c path="h2d.Flow"/>
 	<x path="Null"><x path="Bool"/></x>
 	<x path="Void"/>
 </f></set_horizontal>
-		<set_stack set="method" line="1259" static="1"><f a="o:v">
+		<set_stack set="method" line="1284" static="1"><f a="o:v">
 	<c path="h2d.Flow"/>
 	<x path="Bool"/>
 	<x path="Void"/>
 </f></set_stack>
-		<set_hspacing set="method" line="1263" static="1"><f a="o:v">
+		<set_hspacing set="method" line="1288" static="1"><f a="o:v">
 	<c path="h2d.Flow"/>
 	<x path="Int"/>
 	<x path="Void"/>
 </f></set_hspacing>
-		<set_vspacing set="method" line="1267" static="1"><f a="o:v">
+		<set_vspacing set="method" line="1292" static="1"><f a="o:v">
 	<c path="h2d.Flow"/>
 	<x path="Int"/>
 	<x path="Void"/>
 </f></set_vspacing>
-		<set_spacing set="method" line="1271" static="1"><f a="o:v">
+		<set_spacing set="method" line="1296" static="1"><f a="o:v">
 	<c path="h2d.Flow"/>
 	<x path="Null"><a>
 	<y set="null"><x path="Float"/></y>
@@ -13938,27 +13938,27 @@
 </a></x>
 	<x path="Void"/>
 </f></set_spacing>
-		<set_fillWidth set="method" line="1281" static="1"><f a="o:v">
+		<set_fillWidth set="method" line="1306" static="1"><f a="o:v">
 	<c path="h2d.Flow"/>
 	<x path="Bool"/>
 	<x path="Void"/>
 </f></set_fillWidth>
-		<set_fillHeight set="method" line="1285" static="1"><f a="o:v">
+		<set_fillHeight set="method" line="1310" static="1"><f a="o:v">
 	<c path="h2d.Flow"/>
 	<x path="Bool"/>
 	<x path="Void"/>
 </f></set_fillHeight>
-		<set_overflow set="method" line="1289" static="1"><f a="o:v">
+		<set_overflow set="method" line="1314" static="1"><f a="o:v">
 	<c path="h2d.Flow"/>
 	<e path="h2d.FlowOverflow"/>
 	<x path="Void"/>
 </f></set_overflow>
-		<set_scrollWheelSpeed set="method" line="1303" static="1"><f a="o:v">
+		<set_scrollWheelSpeed set="method" line="1328" static="1"><f a="o:v">
 	<c path="h2d.Flow"/>
 	<x path="Float"/>
 	<x path="Void"/>
 </f></set_scrollWheelSpeed>
-		<set_reverse set="method" line="1307" static="1"><f a="o:v">
+		<set_reverse set="method" line="1332" static="1"><f a="o:v">
 	<c path="h2d.Flow"/>
 	<x path="Bool"/>
 	<x path="Void"/>
@@ -14139,7 +14139,7 @@
 			<x path="Bool"/>
 			<meta><m n=":p"/></meta>
 		</inlineBlock>
-		<new public="1" set="method" line="1088">
+		<new public="1" set="method" line="1113">
 			<f a=""><x path="Void"/></f>
 			<meta><m n=":compilerGenerated"/></meta>
 		</new>
@@ -14274,16 +14274,16 @@
 	<class path="h2d.domkit.TextComp" params="" file="/home/user/heaps/h2d/domkit/BaseComponents.hx" module="h2d.domkit.BaseComponents">
 		<extends path="h2d.domkit.DrawableComp"/>
 		<implements path="domkit.ComponentDecl"><c path="h2d.Text"/></implements>
-		<create set="method" line="987" static="1"><f a="parent">
+		<create set="method" line="1012" static="1"><f a="parent">
 	<c path="h2d.Object"/>
 	<c path="h2d.Text"/>
 </f></create>
-		<set_font set="method" line="991" static="1"><f a="t:v">
+		<set_font set="method" line="1016" static="1"><f a="t:v">
 	<c path="h2d.Text"/>
 	<x path="Null"><c path="h2d.Font"/></x>
 	<x path="Void"/>
 </f></set_font>
-		<set_textShadow set="method" line="995" static="1"><f a="t:v">
+		<set_textShadow set="method" line="1020" static="1"><f a="t:v">
 	<c path="h2d.Text"/>
 	<a>
 		<dy><x path="Float"/></dy>
@@ -14293,17 +14293,17 @@
 	</a>
 	<x path="Void"/>
 </f></set_textShadow>
-		<set_lineBreak set="method" line="999" static="1"><f a="t:v">
+		<set_lineBreak set="method" line="1024" static="1"><f a="t:v">
 	<c path="h2d.Text"/>
 	<x path="Bool"/>
 	<x path="Void"/>
 </f></set_lineBreak>
-		<set_wordBreak set="method" line="1003" static="1"><f a="t:v">
+		<set_wordBreak set="method" line="1028" static="1"><f a="t:v">
 	<c path="h2d.Text"/>
 	<x path="Bool"/>
 	<x path="Void"/>
 </f></set_wordBreak>
-		<set_color set="method" line="1008" static="1"><f a="t:v">
+		<set_color set="method" line="1033" static="1"><f a="t:v">
 	<c path="h2d.Text"/>
 	<x path="Null"><x path="Int"/></x>
 	<x path="Void"/>
@@ -14365,7 +14365,7 @@
 				<m n=":t"><e>color</e></m>
 			</meta>
 		</color>
-		<new public="1" set="method" line="975">
+		<new public="1" set="method" line="1000">
 			<f a=""><x path="Void"/></f>
 			<meta><m n=":compilerGenerated"/></meta>
 		</new>
@@ -14381,21 +14381,21 @@
 	<class path="h2d.domkit.HtmlTextComp" params="" file="/home/user/heaps/h2d/domkit/BaseComponents.hx" module="h2d.domkit.BaseComponents">
 		<extends path="h2d.domkit.TextComp"/>
 		<implements path="domkit.ComponentDecl"><c path="h2d.HtmlText"/></implements>
-		<create set="method" line="1023" static="1"><f a="parent">
+		<create set="method" line="1048" static="1"><f a="parent">
 	<c path="h2d.Object"/>
 	<c path="h2d.HtmlText"/>
 </f></create>
-		<set_condenseWhite set="method" line="1027" static="1"><f a="o:v">
+		<set_condenseWhite set="method" line="1052" static="1"><f a="o:v">
 	<c path="h2d.HtmlText"/>
 	<x path="Bool"/>
 	<x path="Void"/>
 </f></set_condenseWhite>
-		<set_propagateInteractiveNode set="method" line="1031" static="1"><f a="o:v">
+		<set_propagateInteractiveNode set="method" line="1056" static="1"><f a="o:v">
 	<c path="h2d.HtmlText"/>
 	<x path="Bool"/>
 	<x path="Void"/>
 </f></set_propagateInteractiveNode>
-		<set_tags set="method" line="1035" static="1"><f a="o:tags">
+		<set_tags set="method" line="1060" static="1"><f a="o:tags">
 	<c path="h2d.HtmlText"/>
 	<c path="Array"><a>
 	<name><c path="String"/></name>
@@ -14424,7 +14424,7 @@
 </a></c>
 			<meta><m n=":p"><e>tagDefinitions</e></m></meta>
 		</tags>
-		<new public="1" set="method" line="1018">
+		<new public="1" set="method" line="1043">
 			<f a=""><x path="Void"/></f>
 			<meta><m n=":compilerGenerated"/></meta>
 		</new>
@@ -15586,36 +15586,36 @@
 	<class path="h2d.domkit.InputComp" params="" file="/home/user/heaps/h2d/domkit/BaseComponents.hx" module="h2d.domkit.BaseComponents">
 		<extends path="h2d.domkit.TextComp"/>
 		<implements path="domkit.ComponentDecl"><c path="h2d.TextInput"/></implements>
-		<create set="method" line="1326" static="1"><f a="parent">
+		<create set="method" line="1351" static="1"><f a="parent">
 	<c path="h2d.Object"/>
 	<c path="h2d.TextInput"/>
 </f></create>
-		<set_width set="method" line="1330" static="1"><f a="o:v">
+		<set_width set="method" line="1355" static="1"><f a="o:v">
 	<c path="h2d.TextInput"/>
 	<x path="Null"><x path="Int"/></x>
 	<x path="Void"/>
 </f></set_width>
-		<set_cursor set="method" line="1334" static="1"><f a="o:t">
+		<set_cursor set="method" line="1359" static="1"><f a="o:t">
 	<c path="h2d.TextInput"/>
 	<c path="h2d.Tile"/>
 	<x path="Void"/>
 </f></set_cursor>
-		<set_selection set="method" line="1338" static="1"><f a="o:t">
+		<set_selection set="method" line="1363" static="1"><f a="o:t">
 	<c path="h2d.TextInput"/>
 	<c path="h2d.Tile"/>
 	<x path="Void"/>
 </f></set_selection>
-		<set_edit set="method" line="1342" static="1"><f a="o:b">
+		<set_edit set="method" line="1367" static="1"><f a="o:b">
 	<c path="h2d.TextInput"/>
 	<x path="Bool"/>
 	<x path="Void"/>
 </f></set_edit>
-		<set_backgroundColor set="method" line="1346" static="1"><f a="o:col">
+		<set_backgroundColor set="method" line="1371" static="1"><f a="o:col">
 	<c path="h2d.TextInput"/>
 	<x path="Null"><x path="Int"/></x>
 	<x path="Void"/>
 </f></set_backgroundColor>
-		<set_multiline set="method" line="1350" static="1"><f a="o:b">
+		<set_multiline set="method" line="1375" static="1"><f a="o:b">
 	<c path="h2d.TextInput"/>
 	<x path="Bool"/>
 	<x path="Void"/>
@@ -15651,7 +15651,7 @@
 			<x path="Bool"/>
 			<meta><m n=":p"/></meta>
 		</multiline>
-		<new public="1" set="method" line="1317">
+		<new public="1" set="method" line="1342">
 			<f a=""><x path="Void"/></f>
 			<meta><m n=":compilerGenerated"/></meta>
 		</new>
@@ -16471,7 +16471,7 @@
 	<class path="h2d.domkit.MaskComp" params="" file="/home/user/heaps/h2d/domkit/BaseComponents.hx" module="h2d.domkit.BaseComponents">
 		<extends path="h2d.domkit.ObjectComp"/>
 		<implements path="domkit.ComponentDecl"><c path="h2d.Mask"/></implements>
-		<create set="method" line="842" static="1"><f a="parent">
+		<create set="method" line="867" static="1"><f a="parent">
 	<c path="h2d.Object"/>
 	<c path="h2d.Mask"/>
 </f></create>
@@ -16487,7 +16487,7 @@
 			<x path="Int"/>
 			<meta><m n=":p"/></meta>
 		</height>
-		<new public="1" set="method" line="838">
+		<new public="1" set="method" line="863">
 			<f a=""><x path="Void"/></f>
 			<meta><m n=":compilerGenerated"/></meta>
 		</new>
@@ -16631,36 +16631,36 @@
 	<class path="h2d.domkit.ScaleGridComp" params="" file="/home/user/heaps/h2d/domkit/BaseComponents.hx" module="h2d.domkit.BaseComponents">
 		<extends path="h2d.domkit.DrawableComp"/>
 		<implements path="domkit.ComponentDecl"><c path="h2d.ScaleGrid"/></implements>
-		<create set="method" line="1054" static="1"><f a="parent">
+		<create set="method" line="1079" static="1"><f a="parent">
 	<c path="h2d.Object"/>
 	<c path="h2d.ScaleGrid"/>
 </f></create>
-		<set_ignoreScale set="method" line="1058" static="1"><f a="o:v">
+		<set_ignoreScale set="method" line="1083" static="1"><f a="o:v">
 	<c path="h2d.ScaleGrid"/>
 	<x path="Bool"/>
 	<x path="Void"/>
 </f></set_ignoreScale>
-		<set_borderScale set="method" line="1062" static="1"><f a="o:v">
+		<set_borderScale set="method" line="1087" static="1"><f a="o:v">
 	<c path="h2d.ScaleGrid"/>
 	<x path="Float"/>
 	<x path="Void"/>
 </f></set_borderScale>
-		<set_tileBorders set="method" line="1066" static="1"><f a="o:v">
+		<set_tileBorders set="method" line="1091" static="1"><f a="o:v">
 	<c path="h2d.ScaleGrid"/>
 	<x path="Bool"/>
 	<x path="Void"/>
 </f></set_tileBorders>
-		<set_tileCenter set="method" line="1070" static="1"><f a="o:v">
+		<set_tileCenter set="method" line="1095" static="1"><f a="o:v">
 	<c path="h2d.ScaleGrid"/>
 	<x path="Bool"/>
 	<x path="Void"/>
 </f></set_tileCenter>
-		<set_width set="method" line="1074" static="1"><f a="o:v">
+		<set_width set="method" line="1099" static="1"><f a="o:v">
 	<c path="h2d.ScaleGrid"/>
 	<x path="Float"/>
 	<x path="Void"/>
 </f></set_width>
-		<set_height set="method" line="1078" static="1"><f a="o:v">
+		<set_height set="method" line="1103" static="1"><f a="o:v">
 	<c path="h2d.ScaleGrid"/>
 	<x path="Float"/>
 	<x path="Void"/>
@@ -16693,7 +16693,7 @@
 			<x path="Float"/>
 			<meta><m n=":p"/></meta>
 		</height>
-		<new public="1" set="method" line="1045">
+		<new public="1" set="method" line="1070">
 			<f a=""><x path="Void"/></f>
 			<meta><m n=":compilerGenerated"/></meta>
 		</new>
@@ -17514,16 +17514,16 @@
 	<class path="h2d.domkit.VideoComp" params="" file="/home/user/heaps/h2d/domkit/BaseComponents.hx" module="h2d.domkit.BaseComponents">
 		<extends path="h2d.domkit.DrawableComp"/>
 		<implements path="domkit.ComponentDecl"><c path="h2d.Video"/></implements>
-		<create set="method" line="855" static="1"><f a="parent">
+		<create set="method" line="880" static="1"><f a="parent">
 	<c path="h2d.Object"/>
 	<c path="h2d.Video"/>
 </f></create>
-		<set_src set="method" line="859" static="1"><f a="o:v">
+		<set_src set="method" line="884" static="1"><f a="o:v">
 	<c path="h2d.Video"/>
 	<c path="hxd.res.Resource"/>
 	<x path="Void"/>
 </f></set_src>
-		<set_loop set="method" line="863" static="1"><f a="o:v">
+		<set_loop set="method" line="888" static="1"><f a="o:v">
 	<c path="h2d.Video"/>
 	<x path="Bool"/>
 	<x path="Void"/>
@@ -17540,7 +17540,7 @@
 			<x path="Bool"/>
 			<meta><m n=":p"/></meta>
 		</loop>
-		<new public="1" set="method" line="851">
+		<new public="1" set="method" line="876">
 			<f a=""><x path="Void"/></f>
 			<meta><m n=":compilerGenerated"/></meta>
 		</new>
@@ -30909,15 +30909,31 @@
 	</class>
 	<typedef path="h2d.domkit.FlowBg" params="" file="/home/user/heaps/h2d/domkit/BaseComponents.hx" module="h2d.domkit.BaseComponents">
 		<a>
-			<tile><c path="h2d.Tile"/></tile>
+			<tile>
+				<c path="h2d.Tile"/>
+				<haxe_doc>The background tile (a color tile for a color background).</haxe_doc>
+			</tile>
 			<color>
 				<x path="Null"><x path="Int"/></x>
 				<meta><m n=":optional"/></meta>
+				<haxe_doc>The ARGB color of a color background, used by the transitions.</haxe_doc>
 			</color>
-			<borderT><x path="Int"/></borderT>
-			<borderR><x path="Int"/></borderR>
-			<borderL><x path="Int"/></borderL>
-			<borderB><x path="Int"/></borderB>
+			<borderT>
+				<x path="Int"/>
+				<haxe_doc>The top border of the 9-slice scaling, in pixels.</haxe_doc>
+			</borderT>
+			<borderR>
+				<x path="Int"/>
+				<haxe_doc>The right border of the 9-slice scaling, in pixels.</haxe_doc>
+			</borderR>
+			<borderL>
+				<x path="Int"/>
+				<haxe_doc>The left border of the 9-slice scaling, in pixels.</haxe_doc>
+			</borderL>
+			<borderB>
+				<x path="Int"/>
+				<haxe_doc>The bottom border of the 9-slice scaling, in pixels.</haxe_doc>
+			</borderB>
 		</a>
 		<haxe_doc>The value of the `background` CSS property of a flow: a tile with its scale grid borders, and its color for transitions.</haxe_doc>
 	</typedef>
@@ -129238,11 +129254,11 @@
 				<c path="String"/>
 				<x path="Bool"/>
 			</f>
-			<haxe_doc>Register the given prefab class with the given typeName in the prefab regsitry.
+			<haxe_doc>Register the given prefab class with the given typeName in the prefab registry.
 		This is necessary for the serialisation system.
-		Call it by placing this in you prefab class :
-		```
-		public static var _ = Prefab.register("myPrefabName", myPrefabClassName);
+		Call it by placing this in your prefab class:
+		```haxe
+		static var _ = Prefab.register("myPrefabName", MyPrefabClass);
 		```</haxe_doc>
 		</register>
 		<_ expr="Prefab.register(&quot;prefab&quot;, Prefab, &quot;prefab&quot;)" line="1209" static="1">
@@ -200459,7 +200475,7 @@
 		</dt>
 		<tmod public="1" get="accessor" set="accessor" static="1">
 			<x path="Float"/>
-			<haxe_doc>The smoothed frame modifier, based on wantedFPS. Its value is the same as dt/wantedFPS
+			<haxe_doc>The smoothed frame modifier, based on wantedFPS. Its value is the same as dt*wantedFPS
 		Allows to express movements in terms of pixels-per-frame-at-wantedFPS instead of per second.</haxe_doc>
 		</tmod>
 		<currentDT expr="1 / wantedFPS" line="57" static="1">

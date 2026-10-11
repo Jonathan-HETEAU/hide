@@ -75344,11 +75344,11 @@
 				<c path="String"/>
 				<x path="Bool"/>
 			</f>
-			<haxe_doc>Register the given prefab class with the given typeName in the prefab regsitry.
+			<haxe_doc>Register the given prefab class with the given typeName in the prefab registry.
 		This is necessary for the serialisation system.
-		Call it by placing this in you prefab class :
-		```
-		public static var _ = Prefab.register("myPrefabName", myPrefabClassName);
+		Call it by placing this in your prefab class:
+		```haxe
+		static var _ = Prefab.register("myPrefabName", MyPrefabClass);
 		```</haxe_doc>
 		</register>
 		<_ expr="Prefab.register(&quot;prefab&quot;, Prefab, &quot;prefab&quot;)" line="1209" static="1">
@@ -146926,7 +146926,7 @@
 		</dt>
 		<tmod public="1" get="accessor" set="accessor" static="1">
 			<x path="Float"/>
-			<haxe_doc>The smoothed frame modifier, based on wantedFPS. Its value is the same as dt/wantedFPS
+			<haxe_doc>The smoothed frame modifier, based on wantedFPS. Its value is the same as dt*wantedFPS
 		Allows to express movements in terms of pixels-per-frame-at-wantedFPS instead of per second.</haxe_doc>
 		</tmod>
 		<currentDT expr="1 / wantedFPS" line="57" static="1">
