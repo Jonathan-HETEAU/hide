@@ -1,5 +1,8 @@
 package hide.view;
 
+/**
+	The view replacing a view whose class is not found.
+**/
 class Unknown extends hide.ui.View<{}> {
 
 	override function onDisplay() {

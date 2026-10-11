@@ -1,5 +1,8 @@
 package hide.prefab.terrain;
 
+/**
+	Terrain shader: replaces surface indexes in the surface index map.
+**/
 class SwapIndex extends h3d.shader.ScreenShader {
 
 	static var SRC = {
@@ -33,6 +36,9 @@ class SwapIndex extends h3d.shader.ScreenShader {
 		}
 	}
 
+	/**
+		Creates the shader.
+	**/
 	public function new(){
 		super();
 		this.USE_ARRAY = false;

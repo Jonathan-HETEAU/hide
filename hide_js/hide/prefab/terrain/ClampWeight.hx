@@ -1,5 +1,8 @@
 package hide.prefab.terrain;
 
+/**
+	Terrain painting shader: where more than 3 surfaces are painted, removes the one with the smallest weight (except the base surface).
+**/
 class ClampWeight extends h3d.shader.ScreenShader {
 
 	static var SRC = {

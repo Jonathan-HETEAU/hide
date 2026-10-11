@@ -1,5 +1,8 @@
 package hide.view;
 
+/**
+	The view editing the CastleDB custom types as code.
+**/
 class CdbCustomTypes extends hide.ui.View<{}> {
 
 	var script : hide.comp.CodeEditor;

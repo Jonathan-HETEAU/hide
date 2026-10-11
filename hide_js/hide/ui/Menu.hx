@@ -1,9 +1,18 @@
 package hide.ui;
 
+/**
+	The native menu bar built from an HTML menu description.
+**/
 class Menu {
 
+	/**
+		The native menu.
+	**/
 	public var root : nw.Menu;
 
+	/**
+		Builds the native menu bar from a menu element.
+	**/
 	public function new( menu : Element) {
 		root = new nw.Menu({type: Menubar});
 		buildMenuRec(root,"",menu);

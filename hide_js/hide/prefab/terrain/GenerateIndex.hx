@@ -1,5 +1,8 @@
 package hide.prefab.terrain;
 
+/**
+	Terrain painting shader: computes the surface index map from the weight maps.
+**/
 class GenerateIndex extends h3d.shader.ScreenShader {
 
 	static var SRC = {
@@ -22,6 +25,9 @@ class GenerateIndex extends h3d.shader.ScreenShader {
 		}
 	}
 
+	/**
+		Creates the shader.
+	**/
 	public function new(){
 		super();
 		mask = [new h3d.Vector4(1,0,0,0), new h3d.Vector4(0,1,0,0), new h3d.Vector4(0,0,1,0), new h3d.Vector4(0,0,0,1)];

@@ -1,9 +1,15 @@
 package hide.comp;
 
 
+/**
+	A slider with an exponential scale (base 10).
+**/
 class ExpRange extends Range {
 	var inputGuard: Bool = false;
 
+	/**
+		Sets the range of the values.
+	**/
 	public function setMinMax(min: Float, max: Float) {
 		originMin = Math.log(min) / Math.log(scale);
 		originMax = Math.log(max) / Math.log(scale);
@@ -16,6 +22,9 @@ class ExpRange extends Range {
 	}
 
 
+    /**
+    	Creates the slider.
+    **/
     public function new(?parent:Element,?root:Element) {
         super(parent, root);
         scale = 10;

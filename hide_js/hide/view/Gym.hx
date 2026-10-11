@@ -1,5 +1,8 @@
 package hide.view;
 
+/**
+	A test view showing the editor UI components (buttons, toolbars...) and offscreen rendering tests.
+**/
 class Gym extends hide.ui.View<{}> {
 	override function onDisplay() {
 		element.empty();
@@ -365,6 +368,9 @@ class Gym extends hide.ui.View<{}> {
 		return new Element('<details><summary>$name</summary></details>').appendTo(parent);
 	}
 
+	/**
+		Closes the test socket before the IDE reloads.
+	**/
 	static public function onBeforeReload() {
 		sock?.close();
 		sock = null;

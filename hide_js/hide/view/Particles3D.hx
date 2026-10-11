@@ -1,5 +1,8 @@
 package hide.view;
 
+/**
+	The 3D particles view (`json.particles3D` files).
+**/
 class Particles3D extends FileView {
 
 	var scene : hide.comp.Scene;

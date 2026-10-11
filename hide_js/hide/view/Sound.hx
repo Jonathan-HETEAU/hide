@@ -1,5 +1,8 @@
 package hide.view;
 
+/**
+	The sound view (`wav`, `mp3` and `ogg` files).
+**/
 class Sound extends FileView {
 
 	override function onDisplay() {

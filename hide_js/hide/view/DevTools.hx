@@ -1,8 +1,14 @@
 package hide.view;
 
+/**
+	A view embedding the Chrome developer tools, to open a profile file.
+**/
 class DevTools extends hide.ui.View<{ profileFilePath : String }> {
 	var devtools : Element.HTMLElement;
 
+	/**
+		Creates the view.
+	**/
 	public function new( ?state ) {
 		super(state);
 	}
@@ -47,6 +53,9 @@ class DevTools extends hide.ui.View<{ profileFilePath : String }> {
 		return menu;
 	}
 
+	/**
+		Opens the profile file of the state.
+	**/
 	public function openProfile() {
 		if( this.state.profileFilePath == null )
 			return;

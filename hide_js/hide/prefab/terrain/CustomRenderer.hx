@@ -1,9 +1,15 @@
 package hide.prefab.terrain;
 
+/**
+	A renderer drawing only one pass, used by the terrain editor.
+**/
 class CustomRenderer extends h3d.scene.Renderer {
 
 	var passName : String;
 
+	/**
+		Creates a renderer of a pass.
+	**/
 	public function new(passName) {
 		super();
 		this.passName = passName;

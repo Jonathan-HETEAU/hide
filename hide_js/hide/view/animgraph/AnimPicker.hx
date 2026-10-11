@@ -2,9 +2,15 @@ package hide.view.animgraph;
 
 
 
+/**
+	A dropdown button choosing an animation.
+**/
 class AnimPicker extends hide.comp.Component {
 	var button : hide.comp.Button;
 
+	/**
+		Creates the picker. `get` and `set` read and write the animation, with undo.
+	**/
 	public function new(parent = null, undo: hide.ui.UndoHistory, get: () -> String, set: (string: String) -> Void, ?animations: Array<String> ) {
 		button = new hide.comp.Button(parent, null, "", {hasDropdown: true});
 		super(parent, button.element);
@@ -73,6 +79,9 @@ class AnimPicker extends hide.comp.Component {
 		};
 	}
 
+	/**
+		Shows an animation name.
+	**/
 	public function setAnim(string: String) {
 		button.label = string;
 	}

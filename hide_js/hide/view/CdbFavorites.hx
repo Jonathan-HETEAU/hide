@@ -1,7 +1,13 @@
 package hide.view;
 
+/**
+	The view listing the CDB favorites.
+**/
 class CdbFavorites extends hide.ui.View<{}> {
     var favorites: Array<RefViewer.Result> = [];
+	/**
+		Creates the view.
+	**/
 	public function new(state: Dynamic) {
         super(state);
 	}
@@ -10,6 +16,9 @@ class CdbFavorites extends hide.ui.View<{}> {
 		return "Favorites";
 	}
 
+    /**
+    	Adds a favorite, unless already listed.
+    **/
     public function addFavorite(result: RefViewer.Result) {
         for (f in favorites) {
             if (f.text == result.text)

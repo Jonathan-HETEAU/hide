@@ -1,6 +1,12 @@
 package hide.comp;
 
+/**
+	HTML helpers.
+**/
 class JsTools {
+    /**
+    	Copies the attributes of an element to another.
+    **/
     public static function copyAttributes(to : Element, from : Element) {
         var old = from.get(0);
         var our = to.get(0);

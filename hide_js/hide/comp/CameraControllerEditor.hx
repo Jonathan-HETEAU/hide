@@ -6,12 +6,18 @@ import hide.comp.ExpRange;
 
 
 
+/**
+	The popup editing the camera controller and its settings of a scene editor.
+**/
 class CameraControllerEditor extends Popup {
 
     var form_div : Element = null;
     var editor : SceneEditor = null;
 
 
+    /**
+    	The available camera controllers.
+    **/
     static public var controllersClasses : Array<{name: String, cl : Class<CameraControllerBase>}> = [
         {name: "Classic", cl: CamController},
         {name: "Orthographic", cl: OrthoController},
@@ -19,6 +25,9 @@ class CameraControllerEditor extends Popup {
         {name: "Fly/6DOF", cl: FlightController},
     ];
 
+    /**
+    	Creates the popup for a scene editor.
+    **/
     public function new(editor: SceneEditor, ?parent : Element) {
         super(parent);
         this.editor = editor;

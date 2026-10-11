@@ -1,7 +1,13 @@
 package hide.tools;
 
+/**
+	GPU memory dump.
+**/
 class MemDump {
 
+	/**
+		Writes the GPU memory allocations (textures and buffers, with their stacks) to `../dump/gpudump.txt`. Returns the path.
+	**/
 	public static function gpudump() {
 		var engine = h3d.Engine.getCurrent();
 		var sb = new StringBuf();

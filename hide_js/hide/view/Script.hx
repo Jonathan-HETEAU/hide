@@ -1,5 +1,8 @@
 package hide.view;
 
+/**
+	The code view (`js`, `hx`, `xml`, `html` and `json` files).
+**/
 class Script extends FileView {
 
 	var editor : monaco.ScriptEditor;

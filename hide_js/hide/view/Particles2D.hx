@@ -2,6 +2,9 @@ package hide.view;
 import h2d.Graphics in Graphics;
 import h2d.Particles.ParticleGroup in ParticleGroup;
 
+/**
+	The 2D particles view (`json.particles2D` files).
+**/
 class Particles2D extends FileView {
 
 	var scene : hide.comp.Scene;
@@ -66,6 +69,9 @@ class Particles2D extends FileView {
 	}
 
 
+	/**
+		Returns the HTML of the particles parameters.
+	**/
 	static public function getParamsHTMLform() {
 		return
 			'<div class="content">

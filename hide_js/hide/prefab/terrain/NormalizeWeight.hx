@@ -1,5 +1,8 @@
 package hide.prefab.terrain;
 
+/**
+	Terrain painting shader: normalizes the surface weights.
+**/
 class NormalizeWeight extends h3d.shader.ScreenShader {
 
 	static var SRC = {

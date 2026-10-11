@@ -1,5 +1,8 @@
 package hide.prefab.terrain;
 
+/**
+	Terrain sculpting shader: moves the height towards a target height with the stroke strength.
+**/
 class SetHeight extends h3d.shader.ScreenShader {
 
 	static var SRC = {

@@ -1,6 +1,12 @@
 package hide.view.settings;
 
+/**
+	The user settings view.
+**/
 class UserSettings extends Settings {
+	/**
+		Creates the view.
+	**/
 	public function new( ?state ) {
 		super(state);
 

@@ -16,6 +16,9 @@ private typedef CompDef = {
 	var event : hide.tools.FileWatcher.FileWatchEvent;
 }
 
+/**
+	The domkit studio view: browses the domkit components of the project and edits their markup and style.
+**/
 class DomkitStudio extends hide.ui.View<{ ?comp : String }> {
 
 	static var R_PACKAGE = ~/package[ \t\r\n]+([A-Za-z0-9_\.]+)/;
@@ -340,6 +343,9 @@ class DomkitStudio extends hide.ui.View<{ ?comp : String }> {
 }
 
 
+/**
+	The view of domkit style sheets (`.less` files).
+**/
 class DomkitLess extends FileView {
 
 	var editor : hide.comp.DomkitEditor;

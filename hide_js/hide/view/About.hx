@@ -1,7 +1,13 @@
 package hide.view;
 
+/**
+	The about view.
+**/
 class About extends hide.ui.View<{}> {
 
+	/**
+		Creates the view.
+	**/
 	public function new(state) {
 		super(state);
 	}

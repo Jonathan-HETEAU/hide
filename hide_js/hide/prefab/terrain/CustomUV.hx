@@ -1,5 +1,8 @@
 package hide.prefab.terrain;
 
+/**
+	Terrain editor shader: outputs the UV and tile index of the terrain, to pick the position under the mouse.
+**/
 class CustomUV extends hxsl.Shader {
 
 	static var SRC = {

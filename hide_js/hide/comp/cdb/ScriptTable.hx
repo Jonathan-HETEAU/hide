@@ -1,5 +1,8 @@
 package hide.comp.cdb;
 
+/**
+	The sub table of a script cell: a script editor.
+**/
 class ScriptTable extends SubTable {
 
 	var script : hide.comp.ScriptEditor;

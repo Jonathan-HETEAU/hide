@@ -1,7 +1,13 @@
 package hide.comp;
 
+/**
+	The browser `ResizeObserver` API.
+**/
 @:native("ResizeObserver")
 extern class ResizeObserver {
+    /**
+    	Creates an observer calling `callback` when the observed elements are resized.
+    **/
     function new(callback: (entries : Array<Dynamic>, self: ResizeObserver) -> Void);
 
     /**

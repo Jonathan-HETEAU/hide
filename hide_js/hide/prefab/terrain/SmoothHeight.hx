@@ -1,5 +1,8 @@
 package hide.prefab.terrain;
 
+/**
+	Terrain sculpting shader: moves the height towards the average of its neighbors with the stroke strength.
+**/
 class SmoothHeight extends h3d.shader.ScreenShader {
 
 	static var SRC = {
