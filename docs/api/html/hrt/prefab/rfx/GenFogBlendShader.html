@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en"><!-- use theme color or fallback -->
+<!--use textcolor from settings, otherwise create a contrasting color to theme color-->
+<head><meta charset="utf-8"/><link href="../../../bootstrap/css/bootstrap.min.css" rel="stylesheet"/><link href="../../../bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet"/><link href="../../../bootstrap/css/bootstrap-select.min.css" rel="stylesheet"/><link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700,700italic,400italic" rel="stylesheet" type="text/css"/><link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600,600italic,400" rel="stylesheet" type="text/css"/><link href="https://netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.css" rel="stylesheet" type="text/css"/><script src="../../../jquery-3.6.0.min.js"></script><script src="../../../bootstrap/js/bootstrap.min.js"></script><script src="../../../bootstrap/js/bootstrap-select.min.js"></script><link href="../../../styles.css" rel="stylesheet"/><link href="../../../extra-styles.css" rel="stylesheet"/><link href="../../../haxe-nav.css" rel="stylesheet"/><link href="../../../dark-mode.css" rel="stylesheet"/><script>var dox = {rootPath: "../../../",platforms: ["hide_js","hide_hrt"]};</script><script src="../../../nav.js"></script><script src="../../../index.js"></script><link rel="icon" href="../../../favicon.ico" type="image/x-icon"/><title>hrt.prefab.rfx.GenFogBlendShader - Hide API</title><meta name="description" content="Renders a blend of two &lt;code&gt;&lt;a href=&quot;../../../hrt/prefab/rfx/GenFog.html#GenFog&quot;&gt;GenFog&lt;/a&gt;&lt;/code&gt; fogs, for transitions."/></head><body><script>/* Here to prevent flash of unstyled content */let systemDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;if ((!localStorage.theme && systemDarkMode) || localStorage.theme == "dark") {document.body.style.backgroundColor = "#111";document.body.style.opacity = "0";document.addEventListener("DOMContentLoaded", function(event) {toggleTheme();document.body.style.backgroundColor = "";document.body.style.opacity = "";});}</script><style>
+.navbar .brand {
+	display: inline-block;
+	float: none;
+	text-shadow: 0 0 0 transparent;
+}
+</style><nav class="nav"><div class="navbar"><div class="navbar-inner" style="background:#FAFAFA; border-bottom:1px solid rgba(0,0,0,.09)"><div class="container"><a class="brand" style="color:#000000" href="../../../">Hide API</a><a href="#" id="theme-toggle" class="brand" style="color:#000000" onclick="toggleTheme()" title="Toggle Dark Mode"><i class="fa fa-moon-o"></i></a></div></div></div></nav><div class="container main-content"><div class="row-fluid"><div class="span3"><div class="well sidebar-nav"><form class="form-search" id="searchForm"><div class="input-prepend input-block-level"><span class="add-on"><i class="fa fa-search"></i></span><input id="search" type="text" placeholder="Filter (Ctrl+P)" autocomplete="off"/></div></form><div class="dropdown"><select id="select-platform" class="selectpicker" title="Filter by platform" data-width="100%"><option value="all" selected="selected">All Platforms</option><option>hide_js</option><option>hide_hrt</option></select></div></div><div class="well sidebar-nav" id="explorer"><div id="nav"></div></div></div><div class="span9"><div class="page-header"><span class="viewsource"><a href="https://github.com/HeapsIO/hide/blob/master/hrt/prefab/rfx/GenFog.hx" class="btn btn-medium"><i class="fa fa-eye"></i> View source</a></span><h1><small>class</small> GenFogBlendShader</h1><h4><small>package <a href="../../../hrt/prefab/rfx/index.html">hrt.prefab.rfx</a></small></h4><h4><small>extends <a class="type" title="hrt.shader.PbrShader - The base of the PBR screen shaders: reads the depth, occlusion and HDR maps." href="../../../hrt/shader/PbrShader.html">PbrShader</a></small></h4>    <h4><small>import <a href="../../../hrt/prefab/rfx/GenFog.html">hrt.prefab.rfx.GenFog</a></small></h4><span class="label label-meta label-meta-directlyUsed" title="Marks types that are directly referenced by non-extern code.">@:directlyUsed</span><span class="label label-meta label-meta-src" title="">@:src({
+	@param var blendFactor:Float;
+	@param var cameraDistance:Float;
+	@param var intensity1:Float;
+	@param var startDistance1:Float;
+	@param var distanceScale1:Float;
+	@param var distanceOpacity1:Float;
+	@param var startHeight1:Float;
+	@param var heightScale1:Float;
+	@param var heightOpacity1:Float;
+	@param var startColor1:Vec4;
+	@param var endColor1:Vec4;
+	@const var usePosition1:Bool;
+	@param var position1:Vec3;
+	@const var useNoise1:Bool;
+	@param var noiseTex1:Sampler2D;
+	@param var noiseScale1:Float;
+	@param var noiseSpeed1:Float;
+	@param var noiseAmount1:Vec3;
+	@param var lightDirection1:Vec3;
+	@param var lightColor1:Vec3;
+	@param var dotThreshold1:Float;
+	@param var intensity2:Float;
+	@param var startDistance2:Float;
+	@param var distanceScale2:Float;
+	@param var distanceOpacity2:Float;
+	@param var startHeight2:Float;
+	@param var heightScale2:Float;
+	@param var heightOpacity2:Float;
+	@param var startColor2:Vec4;
+	@param var endColor2:Vec4;
+	@const var usePosition2:Bool;
+	@param var position2:Vec3;
+	@const var useNoise2:Bool;
+	@param var noiseTex2:Sampler2D;
+	@param var noiseScale2:Float;
+	@param var noiseSpeed2:Float;
+	@param var noiseAmount2:Vec3;
+	@param var lightDirection2:Vec3;
+	@param var lightColor2:Vec3;
+	@param var dotThreshold2:Float;
+	@:import GenFogFunc;
+	function initFogParams1() {
+		fogParams.startDistance = startDistance1;
+		fogParams.distanceScale = distanceScale1;
+		fogParams.distanceOpacity = distanceOpacity1;
+		fogParams.cameraDistance = cameraDistance;
+		fogParams.startHeight = startHeight1;
+		fogParams.heightScale = heightScale1;
+		fogParams.heightOpacity = heightOpacity1;
+		fogParams.startColor = startColor1;
+		fogParams.endColor = endColor1;
+		fogParams.usePosition = usePosition1;
+		fogParams.position = position1;
+		fogParams.noiseScale = noiseScale1;
+		fogParams.noiseSpeed = noiseSpeed1;
+		fogParams.noiseAmount = noiseAmount1;
+		fogParams.lightDirection = lightDirection1;
+		fogParams.lightColor = lightColor1;
+		fogParams.dotThreshold = dotThreshold1;
+	};
+	function initFogParams2() {
+		fogParams.startDistance = startDistance2;
+		fogParams.distanceScale = distanceScale2;
+		fogParams.distanceOpacity = distanceOpacity2;
+		fogParams.cameraDistance = cameraDistance;
+		fogParams.startHeight = startHeight2;
+		fogParams.heightScale = heightScale2;
+		fogParams.heightOpacity = heightOpacity2;
+		fogParams.startColor = startColor2;
+		fogParams.endColor = endColor2;
+		fogParams.usePosition = usePosition2;
+		fogParams.position = position2;
+		fogParams.noiseScale = noiseScale2;
+		fogParams.noiseSpeed = noiseSpeed2;
+		fogParams.noiseAmount = noiseAmount2;
+		fogParams.lightDirection = lightDirection2;
+		fogParams.lightColor = lightColor2;
+		fogParams.dotThreshold = dotThreshold2;
+	};
+	function fragment() {
+		initFogParams1();
+		var origin = getPosition();
+		var amount = 0.;
+		if (useNoise1) origin = applyNoise(origin, noiseTex1);
+		amount = applyDistanceOpacity(amount, origin);
+		amount = applyHeightOpacity(amount, origin);
+		var fogColor1 = getFogColor(amount, origin);
+		initFogParams2();
+		origin = getPosition();
+		amount = 0.;
+		if (useNoise2) origin = applyNoise(origin, noiseTex2);
+		amount = applyDistanceOpacity(amount, origin);
+		amount = applyHeightOpacity(amount, origin);
+		var fogColor2 = getFogColor(amount, origin);
+		pixelColor = mix(fogColor1, fogColor2, blendFactor);
+	};
+})</span><span class="label label-meta label-meta-build" title="Builds a class or enum from a macro.">@:build(hxsl.Macros.buildShader())</span><span class="label label-meta label-meta-autoBuild" title="Extends `@:build` metadata to all extending and implementing classes.">@:autoBuild(hxsl.Macros.buildShader())</span><hr/><p class="availability"><em>Available on  all platforms</em></p></div><div class="body"><div class="doc doc-main"><p>Renders a blend of two <code><a href="../../../hrt/prefab/rfx/GenFog.html#GenFog">GenFog</a></code> fogs, for transitions.</p></div><h3 class="section">Constructor</h3><div class="fields"><div class="field "><a name="new"></a><h3 class="anchor"><code><a href="#new"><span class="identifier">new</span></a>()</code></h3><div class="doc"><p>Creates the shader.</p></div></div></div><h3 class="section">Variables</h3><div class="fields"><div class="field "><a name="blendFactor"></a><h3 class="anchor"><code><a href="#blendFactor"><span class="identifier">blendFactor</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="cameraDistance"></a><h3 class="anchor"><code><a href="#cameraDistance"><span class="identifier">cameraDistance</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="distanceOpacity1"></a><h3 class="anchor"><code><a href="#distanceOpacity1"><span class="identifier">distanceOpacity1</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="distanceOpacity2"></a><h3 class="anchor"><code><a href="#distanceOpacity2"><span class="identifier">distanceOpacity2</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="distanceScale1"></a><h3 class="anchor"><code><a href="#distanceScale1"><span class="identifier">distanceScale1</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="distanceScale2"></a><h3 class="anchor"><code><a href="#distanceScale2"><span class="identifier">distanceScale2</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="dotThreshold1"></a><h3 class="anchor"><code><a href="#dotThreshold1"><span class="identifier">dotThreshold1</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="dotThreshold2"></a><h3 class="anchor"><code><a href="#dotThreshold2"><span class="identifier">dotThreshold2</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="endColor1"></a><h3 class="anchor"><code><a href="#endColor1"><span class="identifier">endColor1</span></a>:<span class="type">Vec4</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="endColor2"></a><h3 class="anchor"><code><a href="#endColor2"><span class="identifier">endColor2</span></a>:<span class="type">Vec4</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="heightOpacity1"></a><h3 class="anchor"><code><a href="#heightOpacity1"><span class="identifier">heightOpacity1</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="heightOpacity2"></a><h3 class="anchor"><code><a href="#heightOpacity2"><span class="identifier">heightOpacity2</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="heightScale1"></a><h3 class="anchor"><code><a href="#heightScale1"><span class="identifier">heightScale1</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="heightScale2"></a><h3 class="anchor"><code><a href="#heightScale2"><span class="identifier">heightScale2</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="intensity1"></a><h3 class="anchor"><code><a href="#intensity1"><span class="identifier">intensity1</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="intensity2"></a><h3 class="anchor"><code><a href="#intensity2"><span class="identifier">intensity2</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="lightColor1"></a><h3 class="anchor"><code><a href="#lightColor1"><span class="identifier">lightColor1</span></a>:<span class="type">Vec</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="lightColor2"></a><h3 class="anchor"><code><a href="#lightColor2"><span class="identifier">lightColor2</span></a>:<span class="type">Vec</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="lightDirection1"></a><h3 class="anchor"><code><a href="#lightDirection1"><span class="identifier">lightDirection1</span></a>:<span class="type">Vec</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="lightDirection2"></a><h3 class="anchor"><code><a href="#lightDirection2"><span class="identifier">lightDirection2</span></a>:<span class="type">Vec</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="noiseAmount1"></a><h3 class="anchor"><code><a href="#noiseAmount1"><span class="identifier">noiseAmount1</span></a>:<span class="type">Vec</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="noiseAmount2"></a><h3 class="anchor"><code><a href="#noiseAmount2"><span class="identifier">noiseAmount2</span></a>:<span class="type">Vec</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="noiseScale1"></a><h3 class="anchor"><code><a href="#noiseScale1"><span class="identifier">noiseScale1</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="noiseScale2"></a><h3 class="anchor"><code><a href="#noiseScale2"><span class="identifier">noiseScale2</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="noiseSpeed1"></a><h3 class="anchor"><code><a href="#noiseSpeed1"><span class="identifier">noiseSpeed1</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="noiseSpeed2"></a><h3 class="anchor"><code><a href="#noiseSpeed2"><span class="identifier">noiseSpeed2</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="noiseTex1"></a><h3 class="anchor"><code><a href="#noiseTex1"><span class="identifier">noiseTex1</span></a>:<span class="type">Texture</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="noiseTex2"></a><h3 class="anchor"><code><a href="#noiseTex2"><span class="identifier">noiseTex2</span></a>:<span class="type">Texture</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="position1"></a><h3 class="anchor"><code><a href="#position1"><span class="identifier">position1</span></a>:<span class="type">Vec</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="position2"></a><h3 class="anchor"><code><a href="#position2"><span class="identifier">position2</span></a>:<span class="type">Vec</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="startColor1"></a><h3 class="anchor"><code><a href="#startColor1"><span class="identifier">startColor1</span></a>:<span class="type">Vec4</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="startColor2"></a><h3 class="anchor"><code><a href="#startColor2"><span class="identifier">startColor2</span></a>:<span class="type">Vec4</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="startDistance1"></a><h3 class="anchor"><code><a href="#startDistance1"><span class="identifier">startDistance1</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="startDistance2"></a><h3 class="anchor"><code><a href="#startDistance2"><span class="identifier">startDistance2</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="startHeight1"></a><h3 class="anchor"><code><a href="#startHeight1"><span class="identifier">startHeight1</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="startHeight2"></a><h3 class="anchor"><code><a href="#startHeight2"><span class="identifier">startHeight2</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="useNoise1"></a><h3 class="anchor"><code><a href="#useNoise1"><span class="identifier">useNoise1</span></a>:<span class="type">Bool</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="useNoise2"></a><h3 class="anchor"><code><a href="#useNoise2"><span class="identifier">useNoise2</span></a>:<span class="type">Bool</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="usePosition1"></a><h3 class="anchor"><code><a href="#usePosition1"><span class="identifier">usePosition1</span></a>:<span class="type">Bool</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="usePosition2"></a><h3 class="anchor"><code><a href="#usePosition2"><span class="identifier">usePosition2</span></a>:<span class="type">Bool</span></code></h3><div class="doc"><p></p></div></div></div><h3 class="section">Methods</h3><div class="fields"></div>  <div class="inherited-fields well"><h3 class="section">Inherited Variables</h3><div class="fields"><div style="display:none"></div></div><h3 class="section">Inherited Methods</h3><div class="fields"><div style="display:none"></div></div></div></div></div></div></div><footer class="section site-footer" style="background:#FAFAFA"><div class="container"><div class="copyright"><p style="color:#000000">&copy; 2026 &nbsp;</p></div></div></footer><script src="../../../highlighter.js"></script><link href="../../../highlighter.css" rel="stylesheet"/></body></html>

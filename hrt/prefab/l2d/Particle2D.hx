@@ -152,6 +152,9 @@ class Particles extends h2d.Particles {
 
 }
 
+/**
+	Deprecated: use `Emitter2D`. A 2D particle system prefab.
+**/
 @:deprecated("Use Emitter2D instead")
 @:prefabHideInAddMenu
 class Particle2D extends Object2D {

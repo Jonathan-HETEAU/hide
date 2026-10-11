@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en"><!-- use theme color or fallback -->
+<!--use textcolor from settings, otherwise create a contrasting color to theme color-->
+<head><meta charset="utf-8"/><link href="../../../bootstrap/css/bootstrap.min.css" rel="stylesheet"/><link href="../../../bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet"/><link href="../../../bootstrap/css/bootstrap-select.min.css" rel="stylesheet"/><link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700,700italic,400italic" rel="stylesheet" type="text/css"/><link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600,600italic,400" rel="stylesheet" type="text/css"/><link href="https://netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.css" rel="stylesheet" type="text/css"/><script src="../../../jquery-3.6.0.min.js"></script><script src="../../../bootstrap/js/bootstrap.min.js"></script><script src="../../../bootstrap/js/bootstrap-select.min.js"></script><link href="../../../styles.css" rel="stylesheet"/><link href="../../../extra-styles.css" rel="stylesheet"/><link href="../../../haxe-nav.css" rel="stylesheet"/><link href="../../../dark-mode.css" rel="stylesheet"/><script>var dox = {rootPath: "../../../",platforms: ["hide_js","hide_hrt"]};</script><script src="../../../nav.js"></script><script src="../../../index.js"></script><link rel="icon" href="../../../favicon.ico" type="image/x-icon"/><title>hrt.prefab.rfx.VolumetricLightingShader - Hide API</title><meta name="description" content="Ray marches the fog and the lights of &lt;code&gt;&lt;a href=&quot;../../../hrt/prefab/rfx/VolumetricLighting.html#VolumetricLighting&quot;&gt;VolumetricLighting&lt;/a&gt;&lt;/code&gt;."/></head><body><script>/* Here to prevent flash of unstyled content */let systemDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;if ((!localStorage.theme && systemDarkMode) || localStorage.theme == "dark") {document.body.style.backgroundColor = "#111";document.body.style.opacity = "0";document.addEventListener("DOMContentLoaded", function(event) {toggleTheme();document.body.style.backgroundColor = "";document.body.style.opacity = "";});}</script><style>
+.navbar .brand {
+	display: inline-block;
+	float: none;
+	text-shadow: 0 0 0 transparent;
+}
+</style><nav class="nav"><div class="navbar"><div class="navbar-inner" style="background:#FAFAFA; border-bottom:1px solid rgba(0,0,0,.09)"><div class="container"><a class="brand" style="color:#000000" href="../../../">Hide API</a><a href="#" id="theme-toggle" class="brand" style="color:#000000" onclick="toggleTheme()" title="Toggle Dark Mode"><i class="fa fa-moon-o"></i></a></div></div></div></nav><div class="container main-content"><div class="row-fluid"><div class="span3"><div class="well sidebar-nav"><form class="form-search" id="searchForm"><div class="input-prepend input-block-level"><span class="add-on"><i class="fa fa-search"></i></span><input id="search" type="text" placeholder="Filter (Ctrl+P)" autocomplete="off"/></div></form><div class="dropdown"><select id="select-platform" class="selectpicker" title="Filter by platform" data-width="100%"><option value="all" selected="selected">All Platforms</option><option>hide_js</option><option>hide_hrt</option></select></div></div><div class="well sidebar-nav" id="explorer"><div id="nav"></div></div></div><div class="span9"><div class="page-header"><span class="viewsource"><a href="https://github.com/HeapsIO/hide/blob/master/hrt/prefab/rfx/VolumetricLighting.hx" class="btn btn-medium"><i class="fa fa-eye"></i> View source</a></span><h1><small>class</small> VolumetricLightingShader</h1><h4><small>package <a href="../../../hrt/prefab/rfx/index.html">hrt.prefab.rfx</a></small></h4><h4><small>extends <span class="type">DefaultForward</span></small></h4>    <h4><small>import <a href="../../../hrt/prefab/rfx/VolumetricLighting.html">hrt.prefab.rfx.VolumetricLighting</a></small></h4><span class="label label-meta label-meta-directlyUsed" title="Marks types that are directly referenced by non-extern code.">@:directlyUsed</span><span class="label label-meta label-meta-src" title="">@:src({
+	@global var global:{ var time : Float};
+	@const var MODE:Int;
+	@param var invViewProj:Mat4;
+	@param var intensity:Float;
+	@param var noiseTurmoil:Float;
+	@param var noiseScale:Float;
+	@param var noiseLacunarity:Float;
+	@param var noisePersistence:Float;
+	@param var noiseSharpness:Float;
+	@param var noiseOctave:Int;
+	@param var noiseTex:Sampler2D;
+	@param var halfDepthMap:Sampler2D;
+	@param var steps:Int;
+	@param var startDistance:Float;
+	@param var endDistance:Float;
+	@param var maxCamDist:Float = 0.0;
+	@param var distanceOpacity:Float;
+	@param var ditheringNoise:Sampler2D;
+	@param var ditheringSize:Vec2;
+	@param var targetSize:Vec2;
+	@param var ditheringIntensity:Float;
+	@param var color:Vec3;
+	@param var fogDensity:Float;
+	@param var fogUseNoise:Float;
+	@param var fogBottom:Float;
+	@param var fogTop:Float;
+	@param var fogHeightFalloff:Float;
+	@param var fogEnvPower:Float;
+	@param var fogEnvColorMult:Float;
+	@param var secondFogColor:Vec3;
+	@param var secondFogDensity:Float;
+	@param var secondFogUseNoise:Float;
+	@param var secondFogBottom:Float;
+	@param var secondFogTop:Float;
+	@param var secondFogHeightFalloff:Float;
+	@param var emissiveColor:Vec3;
+	@param var emissiveIntensity:Float;
+	@param var offsetCamHeight:Float;
+	var calculatedUV:Vec2;
+	function noise(pos:Vec3):Float {
+		var i = floor(pos);
+		var f = fract(pos);
+		f = f * f * (3.0 - 2.0 * f);
+		var uv = (i.xy + vec2(37.0, 239.0) * i.z) + f.xy;
+		var rg = noiseTex.getLod((uv + 0.5) / 256.0, 0).yx;
+		return mix(rg.x, rg.y, f.z);
+	};
+	function noiseAt(pos:Vec3):Float {
+		var amount = 0.;
+		if (noiseOctave &gt; 0) {
+			var p = pos * 0.1 * noiseScale;
+			var t = global.time * noiseTurmoil;
+			amount += noise(p - t * vec3(0, 0, 1));
+			var tot = 1.;
+			var k = noisePersistence;
+			p *= noiseLacunarity;
+			if (noiseOctave &gt;= 2) {
+				amount += noise(p + t * vec3(0, 0, -0.6)) * k;
+				k *= noisePersistence;
+				p *= noiseLacunarity;
+				tot += k;
+			};
+			if (noiseOctave &gt;= 3) {
+				amount += noise(p + t * vec3(-0.9, 0, 1.1)) * k;
+				k *= noisePersistence;
+				p *= noiseLacunarity;
+				tot += k;
+			};
+			if (noiseOctave &gt;= 4) {
+				amount += noise(p + t * vec3(0.8, 0.95, -1.2)) * k;
+				k *= noisePersistence;
+				p *= noiseLacunarity;
+				tot += k;
+			};
+			if (noiseOctave &gt;= 5) {
+				amount += noise(p + t * vec3(0, -0.84, -1.3)) * k;
+				tot += k;
+				p *= noiseLacunarity;
+				k *= noisePersistence;
+				tot += k;
+			};
+			amount = pow(amount / tot, noiseSharpness);
+		} else {
+			amount = 1.0;
+		};
+		return amount;
+	};
+	function indirectLighting():Vec3 {
+		return envColor * irrPower * fogEnvPower;
+	};
+	function getFogColor():Vec3 {
+		return mix(color, secondFogColor, useSecondColor);
+	};
+	function directLighting(lightColor:Vec3, lightDirection:Vec3, specularDirection:Vec3):Vec3 {
+		return lightColor;
+	};
+	function pointLightIntensity(delta:Vec3, size:Float, invRange4:Float):Float {
+		var dist = delta.dot(delta);
+		var falloff = saturate(1 - dist * dist * invRange4);
+		if (size &gt; 0) {
+			dist = (dist.sqrt() - size).max(0.);
+			dist *= dist;
+		};
+		falloff *= falloff;
+		return falloff * falloff * exp(-extinction * dist);
+	};
+	function evaluateCapsuleLight(index:Int):Vec3 {
+		var i = capsuleLightOffset + index * CAPSULE_LIGHT_STRIDE;
+		var lightColor = unpackIntColor(int(lightInfos[i].r)).rgb * lightInfos[i].g;
+		var radius = lightInfos[i].b;
+		var halfLength = lightInfos[i].a;
+		var lightPos = lightInfos[i + 1].rgb;
+		var invRange4 = lightInfos[i + 1].a;
+		var left = lightInfos[i + 2].rgb;
+		var light = capsuleLightDiffuse(lightPos, left, halfLength, radius, invRange4, transformedPosition);
+		return directLighting(light.w * lightColor, light.xyz, light.xyz);
+	};
+	function evaluateRectLight(index:Int):Vec3 {
+		var i = rectLightOffset + index * RECT_LIGHT_STRIDE;
+		var lightColor = unpackIntColor(int(lightInfos[i].r)).rgb * lightInfos[i].g;
+		var halfSize = vec2(lightInfos[i].b, lightInfos[i].a);
+		var lightPos = lightInfos[i + 1].rgb;
+		var invRange4 = lightInfos[i + 1].a;
+		var lightDir = lightInfos[i + 2].rgb;
+		var range = lightInfos[i + 2].a;
+		var right = lightInfos[i + 3].rgb;
+		var up = lightInfos[i + 4].rgb;
+		var angles = vec4(lightInfos[i + 3].a, lightInfos[i + 4].a, lightInfos[i + 5].r, lightInfos[i + 5].g);
+		var light = rectangleLightDiffuse(lightPos, lightDir, right, up, halfSize, angles, range, invRange4, transformedPosition);
+		return directLighting(light.w * lightColor, light.xyz, light.xyz);
+	};
+	var skipShadow:Bool = false;
+	function evaluateCascadeShadow():Float {
+		var shadow = 1.0;
+		var shadowViewProj = mat3x4(lightInfos[2], lightInfos[3], lightInfos[4]);
+		@unroll for (c  in  0 ... MAX_CASCADE_COUNT) {
+			var cascadeScale = lightInfos[5 + 2 * c];
+			var shadowPos0 = transformedPosition * shadowViewProj;
+			var shadowPos = c == 0 ? shadowPos0 : shadowPos0 * cascadeScale.xyz + lightInfos[6 + 2 * c].xyz;
+			if (inside(shadowPos)) {
+				var zMax = saturate(shadowPos.z);
+				var shadowUv = shadowPos.xy;
+				shadowUv.y = 1.0 - shadowUv.y;
+				var depth = cascadeShadowMaps.get(vec3(shadowUv.xy, c)).r;
+				shadow -= zMax &gt; depth ? 1.0 : 0.0;
+			};
+		};
+		return skipShadow ? 1.0 : saturate(shadow);
+	};
+	var useSecondColor:Float;
+	function fogAt(pos:Vec3):Float {
+		var n = noiseAt(pos);
+		var camOffset = offsetCamHeight * camera.position.z;
+		var finalFogTop = fogTop + camOffset;
+		var hNorm = smoothstep(0.0, 1.0, (pos.z - fogBottom) / (finalFogTop - fogBottom));
+		var firstFog = exp(-hNorm * fogHeightFalloff) * (1.0 - hNorm) * fogDensity;
+		var finalSecondFogTop = secondFogTop + camOffset;
+		var secondHNorm = smoothstep(0.0, 1.0, (pos.z - secondFogBottom) / (finalSecondFogTop - secondFogBottom));
+		var secondFog = exp(-secondHNorm * secondFogHeightFalloff) * (1.0 - secondHNorm) * secondFogDensity;
+		firstFog *= mix(1.0, n, fogUseNoise);
+		secondFog *= mix(1.0, n, secondFogUseNoise);
+		useSecondColor = saturate(secondFog / max(firstFog, secondFog));
+		return max(firstFog, secondFog);
+	};
+	function getWPos():Vec3 {
+		var depth = halfDepthMap.get(fragCoord.xy / halfDepthMap.size()).r;
+		var uv2 = uvToScreen(calculatedUV);
+		var temp = vec4(uv2, depth, 1) * invViewProj;
+		return temp.xyz / temp.w;
+	};
+	function getDistBlend(dist:Float):Float {
+		var dfactor = smoothstep(0, 1, dist / endDistance);
+		return dfactor * dfactor;
+	};
+	function evaluateDirectionalLighting():Vec3 {
+		var lightAccumulation = vec3(0);
+		F0 = mix(pbrSpecularColor, albedoGamma, metalness);
+		lightAccumulation = accumulateLights(lightAccumulation, LIGHT_DIR, dirShadowCount, dirLightCount, MAX_DIR_SHADOW_COUNT);
+		if (HAS_CASCADE) {
+			var c = evaluateCascadeLight();
+			if (dot(c, c) &gt; 1e-6) c *= evaluateCascadeShadow();
+			lightAccumulation += c;
+		};
+		if (USE_INDIRECT) lightAccumulation += indirectLighting();
+		lightAccumulation += emissive * emissivePower * pixelColor.rgb;
+		return lightAccumulation;
+	};
+	function evaluateDirectionalAndSpotLighting():Vec3 {
+		var lightAccumulation = vec3(0);
+		F0 = mix(pbrSpecularColor, albedoGamma, metalness);
+		if (CLUSTERED) {
+			var cluster = clusterIndex();
+			clusterCounts = clusterData[cluster];
+			var spotStart = cluster + 1 + (clusterCounts &amp; 0xFF);
+			clusterStart = spotStart;
+		};
+		lightAccumulation = accumulateLights(lightAccumulation, LIGHT_DIR, dirShadowCount, dirLightCount, MAX_DIR_SHADOW_COUNT);
+		lightAccumulation = accumulateLights(lightAccumulation, LIGHT_SPOT, spotShadowCount, spotLightCount, MAX_SPOT_SHADOW_COUNT);
+		if (MAX_CASCADE_COUNT &gt; 0) {
+			var c = evaluateCascadeLight();
+			if (dot(c, c) &gt; 1e-6) c *= evaluateCascadeShadow();
+			lightAccumulation += c;
+		};
+		if (USE_INDIRECT) lightAccumulation += indirectLighting();
+		lightAccumulation += emissive * emissivePower * pixelColor.rgb;
+		return lightAccumulation;
+	};
+	function integrateStep(stepSize:Float, integrationValues:Vec4):Vec4 {
+		extinction = fogAt(transformedPosition);
+		var clampedExtinction = max(extinction, 1e-5);
+		var transmittance = exp(-extinction * stepSize);
+		var emissiveLum = emissiveIntensity * emissiveColor;
+		var lighting = vec3(0);
+		switch (MODE) {
+			case 0:
+				lighting = evaluateLighting();			
+			case 1:
+				lighting = evaluateDirectionalLighting();			
+			case 2:
+				lighting = evaluateDirectionalAndSpotLighting();			
+		};
+		var luminance = (lighting * getFogColor() * mix(vec3(1.0), saturate(envColor), fogEnvColorMult) + emissiveLum) * extinction;
+		var integScatt = (luminance - luminance * transmittance) / clampedExtinction;
+		integrationValues.rgb += integrationValues.a * integScatt;
+		integrationValues.a *= transmittance;
+		return integrationValues;
+	};
+	var camDir:Vec3;
+	var envColor:Vec3;
+	var extinction:Float;
+	var curDist = 0.0;
+	function rayMarch():Vec4 {
+		metalness = 0.0;
+		emissive = 0.0;
+		albedoGamma = vec3(0.0);
+		useSecondColor = 0.0;
+		var endPos = getWPos();
+		camDir = normalize(endPos - camera.position);
+		var startPos = camera.position + camDir * startDistance;
+		var cameraDistance = length(endPos - startPos);
+		if (dot(camDir, endPos - startPos) &lt; 0.0) discard;
+		if (maxCamDist &gt; 0.0) cameraDistance = min(cameraDistance, maxCamDist);
+		envColor = irrDiffuse.getLod(-camDir, 0.0).rgb;
+		view = -camDir;
+		transformedNormal = -camDir;
+		var stepSize = cameraDistance / float(steps);
+		var dithering = ditheringNoise.getLod(calculatedUV * targetSize / ditheringSize, 0.0).r * stepSize * ditheringIntensity;
+		startPos += dithering * camDir;
+		var integrationValues = vec4(0.0, 0.0, 0.0, 1.0);
+		skipShadow = false;
+		var transmittanceThreshold = 1e-3;
+		for (i  in  0 ... steps) {
+			transformedPosition = startPos + camDir * curDist;
+			if (integrationValues.a &lt; transmittanceThreshold) break;
+			integrationValues = integrateStep(stepSize, integrationValues);
+			curDist += stepSize;
+		};
+		stepSize = length(endPos - startPos) - curDist;
+		if (integrationValues.a &gt; transmittanceThreshold &amp;&amp; stepSize &gt; 0.0) {
+			curDist += stepSize;
+			skipShadow = true;
+			transformedPosition = startPos + camDir * curDist;
+			integrationValues = integrateStep(stepSize, integrationValues);
+		};
+		if (integrationValues.a &lt; transmittanceThreshold) integrationValues.a = 0.0;
+		integrationValues.a = 1.0 - integrationValues.a;
+		integrationValues.a = saturate(distanceOpacity * integrationValues.a);
+		return integrationValues;
+	};
+	function fragment() {
+		pixelColor.rgba = mix(pixelColor.rgba, rayMarch().rgba, intensity);
+	};
+})</span><span class="label label-meta label-meta-build" title="Builds a class or enum from a macro.">@:build(hxsl.Macros.buildShader())</span><span class="label label-meta label-meta-autoBuild" title="Extends `@:build` metadata to all extending and implementing classes.">@:autoBuild(hxsl.Macros.buildShader())</span><hr/><p class="availability"><em>Available on  all platforms</em></p></div><div class="body"><div class="doc doc-main"><p>Ray marches the fog and the lights of <code><a href="../../../hrt/prefab/rfx/VolumetricLighting.html#VolumetricLighting">VolumetricLighting</a></code>.</p></div><h3 class="section">Constructor</h3><div class="fields"><div class="field "><a name="new"></a><h3 class="anchor"><code><a href="#new"><span class="identifier">new</span></a>()</code></h3><div class="doc"><p></p></div></div></div><h3 class="section">Variables</h3><div class="fields"><div class="field "><a name="MODE"></a><h3 class="anchor"><code><a href="#MODE"><span class="identifier">MODE</span></a>:<span class="type">Int</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="color"></a><h3 class="anchor"><code><a href="#color"><span class="identifier">color</span></a>:<span class="type">Vec</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="distanceOpacity"></a><h3 class="anchor"><code><a href="#distanceOpacity"><span class="identifier">distanceOpacity</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="ditheringIntensity"></a><h3 class="anchor"><code><a href="#ditheringIntensity"><span class="identifier">ditheringIntensity</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="ditheringNoise"></a><h3 class="anchor"><code><a href="#ditheringNoise"><span class="identifier">ditheringNoise</span></a>:<span class="type">Texture</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="ditheringSize"></a><h3 class="anchor"><code><a href="#ditheringSize"><span class="identifier">ditheringSize</span></a>:<span class="type">Vec</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="emissiveColor"></a><h3 class="anchor"><code><a href="#emissiveColor"><span class="identifier">emissiveColor</span></a>:<span class="type">Vec</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="emissiveIntensity"></a><h3 class="anchor"><code><a href="#emissiveIntensity"><span class="identifier">emissiveIntensity</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="endDistance"></a><h3 class="anchor"><code><a href="#endDistance"><span class="identifier">endDistance</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="fogBottom"></a><h3 class="anchor"><code><a href="#fogBottom"><span class="identifier">fogBottom</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="fogDensity"></a><h3 class="anchor"><code><a href="#fogDensity"><span class="identifier">fogDensity</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="fogEnvColorMult"></a><h3 class="anchor"><code><a href="#fogEnvColorMult"><span class="identifier">fogEnvColorMult</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="fogEnvPower"></a><h3 class="anchor"><code><a href="#fogEnvPower"><span class="identifier">fogEnvPower</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="fogHeightFalloff"></a><h3 class="anchor"><code><a href="#fogHeightFalloff"><span class="identifier">fogHeightFalloff</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="fogTop"></a><h3 class="anchor"><code><a href="#fogTop"><span class="identifier">fogTop</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="fogUseNoise"></a><h3 class="anchor"><code><a href="#fogUseNoise"><span class="identifier">fogUseNoise</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="halfDepthMap"></a><h3 class="anchor"><code><a href="#halfDepthMap"><span class="identifier">halfDepthMap</span></a>:<span class="type">Texture</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="intensity"></a><h3 class="anchor"><code><a href="#intensity"><span class="identifier">intensity</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="invViewProj"></a><h3 class="anchor"><code><a href="#invViewProj"><span class="identifier">invViewProj</span></a>:<span class="type">Matrix</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="maxCamDist"></a><h3 class="anchor"><code><a href="#maxCamDist"><span class="identifier">maxCamDist</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="noiseLacunarity"></a><h3 class="anchor"><code><a href="#noiseLacunarity"><span class="identifier">noiseLacunarity</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="noiseOctave"></a><h3 class="anchor"><code><a href="#noiseOctave"><span class="identifier">noiseOctave</span></a>:<span class="type">Int</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="noisePersistence"></a><h3 class="anchor"><code><a href="#noisePersistence"><span class="identifier">noisePersistence</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="noiseScale"></a><h3 class="anchor"><code><a href="#noiseScale"><span class="identifier">noiseScale</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="noiseSharpness"></a><h3 class="anchor"><code><a href="#noiseSharpness"><span class="identifier">noiseSharpness</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="noiseTex"></a><h3 class="anchor"><code><a href="#noiseTex"><span class="identifier">noiseTex</span></a>:<span class="type">Texture</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="noiseTurmoil"></a><h3 class="anchor"><code><a href="#noiseTurmoil"><span class="identifier">noiseTurmoil</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="offsetCamHeight"></a><h3 class="anchor"><code><a href="#offsetCamHeight"><span class="identifier">offsetCamHeight</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="secondFogBottom"></a><h3 class="anchor"><code><a href="#secondFogBottom"><span class="identifier">secondFogBottom</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="secondFogColor"></a><h3 class="anchor"><code><a href="#secondFogColor"><span class="identifier">secondFogColor</span></a>:<span class="type">Vec</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="secondFogDensity"></a><h3 class="anchor"><code><a href="#secondFogDensity"><span class="identifier">secondFogDensity</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="secondFogHeightFalloff"></a><h3 class="anchor"><code><a href="#secondFogHeightFalloff"><span class="identifier">secondFogHeightFalloff</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="secondFogTop"></a><h3 class="anchor"><code><a href="#secondFogTop"><span class="identifier">secondFogTop</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="secondFogUseNoise"></a><h3 class="anchor"><code><a href="#secondFogUseNoise"><span class="identifier">secondFogUseNoise</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="startDistance"></a><h3 class="anchor"><code><a href="#startDistance"><span class="identifier">startDistance</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="steps"></a><h3 class="anchor"><code><a href="#steps"><span class="identifier">steps</span></a>:<span class="type">Int</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="targetSize"></a><h3 class="anchor"><code><a href="#targetSize"><span class="identifier">targetSize</span></a>:<span class="type">Vec</span></code></h3><div class="doc"><p></p></div></div></div><h3 class="section">Methods</h3><div class="fields"></div>  </div></div></div></div><footer class="section site-footer" style="background:#FAFAFA"><div class="container"><div class="copyright"><p style="color:#000000">&copy; 2026 &nbsp;</p></div></div></footer><script src="../../../highlighter.js"></script><link href="../../../highlighter.css" rel="stylesheet"/></body></html>

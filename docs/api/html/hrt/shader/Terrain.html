@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en"><!-- use theme color or fallback -->
+<!--use textcolor from settings, otherwise create a contrasting color to theme color-->
+<head><meta charset="utf-8"/><link href="../../bootstrap/css/bootstrap.min.css" rel="stylesheet"/><link href="../../bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet"/><link href="../../bootstrap/css/bootstrap-select.min.css" rel="stylesheet"/><link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700,700italic,400italic" rel="stylesheet" type="text/css"/><link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600,600italic,400" rel="stylesheet" type="text/css"/><link href="https://netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.css" rel="stylesheet" type="text/css"/><script src="../../jquery-3.6.0.min.js"></script><script src="../../bootstrap/js/bootstrap.min.js"></script><script src="../../bootstrap/js/bootstrap-select.min.js"></script><link href="../../styles.css" rel="stylesheet"/><link href="../../extra-styles.css" rel="stylesheet"/><link href="../../haxe-nav.css" rel="stylesheet"/><link href="../../dark-mode.css" rel="stylesheet"/><script>var dox = {rootPath: "../../",platforms: ["hide_js","hide_hrt"]};</script><script src="../../nav.js"></script><script src="../../index.js"></script><link rel="icon" href="../../favicon.ico" type="image/x-icon"/><title>hrt.shader.Terrain - Hide API</title><meta name="description" content="Renders a terrain tile: displacement by the height map, and blending of the surfaces by their weights."/></head><body><script>/* Here to prevent flash of unstyled content */let systemDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;if ((!localStorage.theme && systemDarkMode) || localStorage.theme == "dark") {document.body.style.backgroundColor = "#111";document.body.style.opacity = "0";document.addEventListener("DOMContentLoaded", function(event) {toggleTheme();document.body.style.backgroundColor = "";document.body.style.opacity = "";});}</script><style>
+.navbar .brand {
+	display: inline-block;
+	float: none;
+	text-shadow: 0 0 0 transparent;
+}
+</style><nav class="nav"><div class="navbar"><div class="navbar-inner" style="background:#FAFAFA; border-bottom:1px solid rgba(0,0,0,.09)"><div class="container"><a class="brand" style="color:#000000" href="../../">Hide API</a><a href="#" id="theme-toggle" class="brand" style="color:#000000" onclick="toggleTheme()" title="Toggle Dark Mode"><i class="fa fa-moon-o"></i></a></div></div></div></nav><div class="container main-content"><div class="row-fluid"><div class="span3"><div class="well sidebar-nav"><form class="form-search" id="searchForm"><div class="input-prepend input-block-level"><span class="add-on"><i class="fa fa-search"></i></span><input id="search" type="text" placeholder="Filter (Ctrl+P)" autocomplete="off"/></div></form><div class="dropdown"><select id="select-platform" class="selectpicker" title="Filter by platform" data-width="100%"><option value="all" selected="selected">All Platforms</option><option>hide_js</option><option>hide_hrt</option></select></div></div><div class="well sidebar-nav" id="explorer"><div id="nav"></div></div></div><div class="span9"><div class="page-header"><span class="viewsource"><a href="https://github.com/HeapsIO/hide/blob/master/hrt/shader/Terrain.hx" class="btn btn-medium"><i class="fa fa-eye"></i> View source</a></span><h1><small>class</small> Terrain</h1><h4><small>package <a href="../../hrt/shader/index.html">hrt.shader</a></small></h4><h4><small>extends <span class="type">Shader</span></small></h4>    <span class="label label-meta label-meta-directlyUsed" title="Marks types that are directly referenced by non-extern code.">@:directlyUsed</span><span class="label label-meta label-meta-src" title="">@:src({
+	@const var GLOSS:Bool = true;
+	@const var SHOW_GRID:Bool;
+	@const var SURFACE_COUNT:Int;
+	@const var CHECKER:Bool;
+	@const var COMPLEXITY:Bool;
+	@const var PARALLAX:Bool;
+	@const var VERTEX_DISPLACEMENT:Bool;
+	@param var primSize:Vec2;
+	@param var cellSize:Vec2;
+	@param var heightMapSize:Vec2;
+	@param var albedoTextures:Sampler2DArray;
+	@param var normalTextures:Sampler2DArray;
+	@param var pbrTextures:Sampler2DArray;
+	@param var weightTextures:Sampler2DArray;
+	@param var surfaceIndexMap:Sampler2D;
+	@param var heightMap:Sampler2D;
+	@param var normalMap:Sampler2D;
+	@param var surfaceParams:Array&lt;Vec4,SURFACE_COUNT&gt;;
+	@param var secondSurfaceParams:Array&lt;Vec4,SURFACE_COUNT&gt;;
+	@param var heightBlendStrength:Float;
+	@param var blendSharpness:Float;
+	@param var parallaxAmount:Float;
+	@param var minStep:Int;
+	@param var maxStep:Int;
+	@param var tileIndex:Vec2;
+	var worldUV:Vec2;
+	var calculatedUV:Vec2;
+	var TBN:Mat3;
+	var emissive:Float;
+	var metalness:Float;
+	var roughness:Float;
+	var occlusion:Float;
+	var tangentViewPos:Vec3;
+	var tangentFragPos:Vec3;
+	var transformedPosition:Vec3;
+	var transformedNormal:Vec3;
+	var terrainNormal:Vec3;
+	var pixelColor:Vec4;
+	@input var input:{ var position : Vec3; var normal : Vec3};
+	@global var global:{ @perObject
+	var modelView : Mat4};
+	@global var camera:{ var position : Vec3};
+	function vertex() {
+		calculatedUV = input.position.xy / primSize;
+		worldUV = transformedPosition.xy;
+		if (VERTEX_DISPLACEMENT) {
+			transformedPosition += vec3(0, 0, textureLod(heightMap, calculatedUV, 0).r);
+			terrainNormal = unpackNormal(textureLod(normalMap, calculatedUV, 0).rgba);
+		} else {
+			terrainNormal = normalize(input.normal * global.modelView.mat3());
+		};
+		var bitangent = normalize(cross(vec3(1, 0, 0), terrainNormal));
+		var tangent = normalize(cross(terrainNormal, bitangent));
+		TBN = mat3(vec3(tangent.x, bitangent.x, terrainNormal.x), vec3(tangent.y, bitangent.y, terrainNormal.y), vec3(tangent.z, bitangent.z, terrainNormal.z));
+	};
+	function getWeight(i:IVec3, uv:Vec2):Vec3 {
+		var weight = vec3(0);
+		weight.x = weightTextures.getLod(vec3(uv, i.x), 0).r;
+		if (i.y != i.x) weight.y = weightTextures.getLod(vec3(uv, i.y), 0).r;
+		if (i.z != i.x) weight.z = weightTextures.getLod(vec3(uv, i.z), 0).r;
+		return weight;
+	};
+	function getDepth(i:IVec3, uv:Vec2):Vec3 {
+		var depth = vec3(0);
+		if (w.x &gt; 0) depth.x = pbrTextures.getLod(getsurfaceUV(i.x, uv), 0).a;
+		if (w.y &gt; 0) depth.y = pbrTextures.getLod(getsurfaceUV(i.y, uv), 0).a;
+		if (w.z &gt; 0) depth.z = pbrTextures.getLod(getsurfaceUV(i.z, uv), 0).a;
+		return 1 - depth;
+	};
+	var w:Vec3;
+	var i:IVec3;
+	function getPOMUV(i:IVec3, uv:Vec2):Vec2 {
+		var viewNS = normalize(camera.position - transformedPosition) * TBN;
+		viewNS.xy /= viewNS.z;
+		viewNS.x *= -1;
+		var numLayers = mix(float(maxStep), float(minStep), saturate(viewNS.dot(terrainNormal)));
+		var layerDepth = 1.0 / numLayers;
+		var curLayerDepth = 0.;
+		var delta = (viewNS.xy * parallaxAmount / primSize) / numLayers;
+		var curUV = uv;
+		var depth = getDepth(i, curUV);
+		var curDepth = depth.dot(w);
+		var prevDepth = 0.;
+		while (curLayerDepth &lt; curDepth) {
+			curUV += delta;
+			prevDepth = curDepth;
+			i = ivec3(surfaceIndexMap.getLod(curUV, 0).rgb * 255);
+			w = getWeight(i, curUV);
+			depth = getDepth(i, curUV);
+			curDepth = depth.dot(w);
+			curLayerDepth += layerDepth;
+		};
+		var prevUV = curUV - delta;
+		var after = curDepth - curLayerDepth;
+		var before = prevDepth - curLayerDepth + layerDepth;
+		var pomUV = mix(curUV, prevUV, after / (after - before));
+		return pomUV;
+	};
+	function getsurfaceUV(id:Int, uv:Vec2):Vec3 {
+		uv = transformedPosition.xy + (uv * primSize - input.position.xy);
+		var angle = surfaceParams[id].w;
+		var offset = vec2(surfaceParams[id].y, surfaceParams[id].z);
+		var tilling = surfaceParams[id].x;
+		var worldUV = uv * tilling + offset;
+		var res = vec2(worldUV.x * cos(angle) - worldUV.y * sin(angle), worldUV.y * cos(angle) + worldUV.x * sin(angle));
+		var surfaceUV = vec3(res % 1, id);
+		return surfaceUV;
+	};
+	function fragment() {
+		if (CHECKER) {
+			var tile = abs(abs(floor(input.position.x)) % 2 - abs(floor(input.position.y)) % 2);
+			pixelColor = vec4(mix(vec3(0.4), vec3(0.1), tile), 1.0);
+			roughness = mix(0.1, 0.9, tile);
+			metalness = mix(1.0, 0, tile);
+			occlusion = 1;
+			emissive = 0;
+		} else if (COMPLEXITY) {
+			var blendCount = 0 + weightTextures.get(vec3(0)).r * 0;
+			for (i  in  0 ... SURFACE_COUNT) blendCount += ceil(weightTextures.get(vec3(calculatedUV, i)).r);
+			pixelColor = vec4(mix(vec3(0, 1, 0), vec3(1, 0, 0), blendCount / 3.0), 1);
+			emissive = 1;
+			roughness = 1;
+			metalness = 0;
+			occlusion = 1;
+		} else {
+			i = ivec3(surfaceIndexMap.get(calculatedUV).rgb * 255);
+			w = getWeight(i, calculatedUV);
+			var pomUV = PARALLAX ? getPOMUV(i, calculatedUV) : calculatedUV;
+			if (PARALLAX) {
+				i = ivec3(surfaceIndexMap.get(pomUV).rgb * 255);
+				w = getWeight(i, pomUV);
+			};
+			var h = vec3(0);
+			var surfaceUV1 = getsurfaceUV(i.x, pomUV);
+			var surfaceUV2 = getsurfaceUV(i.y, pomUV);
+			var surfaceUV3 = getsurfaceUV(i.z, pomUV);
+			var pbr1 = vec4(0), pbr2 = vec4(0), pbr3 = vec4(0);
+			if (w.x &gt; 0) pbr1 = pbrTextures.get(surfaceUV1).rgba;
+			if (w.y &gt; 0) pbr2 = pbrTextures.get(surfaceUV2).rgba;
+			if (w.z &gt; 0) pbr3 = pbrTextures.get(surfaceUV3).rgba;
+			var h = vec3(secondSurfaceParams[i.x].x + pbr1.a * (secondSurfaceParams[i.x].y - secondSurfaceParams[i.x].x), secondSurfaceParams[i.y].x + pbr2.a * (secondSurfaceParams[i.y].y - secondSurfaceParams[i.y].x), secondSurfaceParams[i.z].x + pbr3.a * (secondSurfaceParams[i.z].y - secondSurfaceParams[i.z].x));
+			var h = mix(vec3(1, 1, 1), h, heightBlendStrength);
+			w *= h;
+			var ws = mix(w, w, blendSharpness);
+			var m = max(w.x, max(w.y, w.z));
+			var mw = vec3(0, 0, 0);
+			if (m == w.x) mw = vec3(1, 0, 0);
+			if (m == w.y) mw = vec3(0, 1, 0);
+			if (m == w.z) mw = vec3(0, 0, 1);
+			w = mix(w, mw, blendSharpness);
+			var albedo = vec3(0);
+			var normal = vec3(0);
+			var pbr = vec4(0);
+			if (w.x &gt; 0) {
+				albedo += albedoTextures.get(surfaceUV1).rgb * w.x;
+				normal += unpackNormal(normalTextures.get(surfaceUV1).rgba) * w.x;
+				pbr += pbr1 * w.x;
+			};
+			if (w.y &gt; 0) {
+				albedo += albedoTextures.get(surfaceUV2).rgb * w.y;
+				normal += unpackNormal(normalTextures.get(surfaceUV2).rgba) * w.y;
+				pbr += pbr2 * w.y;
+			};
+			if (w.z &gt; 0) {
+				albedo += albedoTextures.get(surfaceUV3).rgb * w.z;
+				normal += unpackNormal(normalTextures.get(surfaceUV3).rgba) * w.z;
+				pbr += pbr3 * w.z;
+			};
+			var wSum = w.x + w.y + w.z;
+			albedo /= wSum;
+			pbr /= wSum;
+			normal /= wSum;
+			normal = normal.normalize();
+			transformedNormal = normalize(normal * TBN);
+			pixelColor = vec4(albedo, 1.0);
+			if (GLOSS) roughness = 1 - pbr.g * pbr.g else roughness = pbr.g;
+			metalness = pbr.r;
+			occlusion = pbr.b;
+			emissive = 0;
+		};
+		if (SHOW_GRID) {
+			var gridColor = vec4(1, 0, 0, 1);
+			var tileEdgeColor = vec4(1, 1, 0, 1);
+			var grid:Vec2 = ((input.position.xy.mod(cellSize.xy) / cellSize.xy) - 0.5) * 2.0;
+			grid = ceil(max(vec2(0), abs(grid) - 0.9));
+			var tileEdge = max((1 - ceil(input.position.xy / primSize - 0.1 / (primSize / cellSize))), floor(input.position.xy / primSize + 0.1 / (primSize / cellSize)));
+			emissive = max(max(grid.x, grid.y), max(tileEdge.x, tileEdge.y));
+			pixelColor = mix(pixelColor, gridColor, clamp(0, 1, max(grid.x, grid.y)));
+			pixelColor = mix(pixelColor, tileEdgeColor, clamp(0, 1, max(tileEdge.x, tileEdge.y)));
+			metalness = mix(metalness, 0, emissive);
+			roughness = mix(roughness, 1, emissive);
+			occlusion = mix(occlusion, 1, emissive);
+			transformedNormal = mix(transformedNormal, vec3(0, 1, 0), emissive);
+		};
+	};
+})</span><span class="label label-meta label-meta-build" title="Builds a class or enum from a macro.">@:build(hxsl.Macros.buildShader())</span><span class="label label-meta label-meta-autoBuild" title="Extends `@:build` metadata to all extending and implementing classes.">@:autoBuild(hxsl.Macros.buildShader())</span><hr/><p class="availability"><em>Available on  all platforms</em></p></div><div class="body"><div class="doc doc-main"><p>Renders a terrain tile: displacement by the height map, and blending of the surfaces by their weights.</p></div><h3 class="section">Constructor</h3><div class="fields"><div class="field "><a name="new"></a><h3 class="anchor"><code><a href="#new"><span class="identifier">new</span></a>()</code></h3><div class="doc"><p></p></div></div></div><h3 class="section">Variables</h3><div class="fields"><div class="field "><a name="CHECKER"></a><h3 class="anchor"><code><a href="#CHECKER"><span class="identifier">CHECKER</span></a>:<span class="type">Bool</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="COMPLEXITY"></a><h3 class="anchor"><code><a href="#COMPLEXITY"><span class="identifier">COMPLEXITY</span></a>:<span class="type">Bool</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="GLOSS"></a><h3 class="anchor"><code><a href="#GLOSS"><span class="identifier">GLOSS</span></a>:<span class="type">Bool</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="PARALLAX"></a><h3 class="anchor"><code><a href="#PARALLAX"><span class="identifier">PARALLAX</span></a>:<span class="type">Bool</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="SHOW_GRID"></a><h3 class="anchor"><code><a href="#SHOW_GRID"><span class="identifier">SHOW_GRID</span></a>:<span class="type">Bool</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="SURFACE_COUNT"></a><h3 class="anchor"><code><a href="#SURFACE_COUNT"><span class="identifier">SURFACE_COUNT</span></a>:<span class="type">Int</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="VERTEX_DISPLACEMENT"></a><h3 class="anchor"><code><a href="#VERTEX_DISPLACEMENT"><span class="identifier">VERTEX_DISPLACEMENT</span></a>:<span class="type">Bool</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="albedoTextures"></a><h3 class="anchor"><code><a href="#albedoTextures"><span class="identifier">albedoTextures</span></a>:<span class="type">TextureArray</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="blendSharpness"></a><h3 class="anchor"><code><a href="#blendSharpness"><span class="identifier">blendSharpness</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="cellSize"></a><h3 class="anchor"><code><a href="#cellSize"><span class="identifier">cellSize</span></a>:<span class="type">Vec</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="heightBlendStrength"></a><h3 class="anchor"><code><a href="#heightBlendStrength"><span class="identifier">heightBlendStrength</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="heightMap"></a><h3 class="anchor"><code><a href="#heightMap"><span class="identifier">heightMap</span></a>:<span class="type">Texture</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="heightMapSize"></a><h3 class="anchor"><code><a href="#heightMapSize"><span class="identifier">heightMapSize</span></a>:<span class="type">Vec</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="maxStep"></a><h3 class="anchor"><code><a href="#maxStep"><span class="identifier">maxStep</span></a>:<span class="type">Int</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="minStep"></a><h3 class="anchor"><code><a href="#minStep"><span class="identifier">minStep</span></a>:<span class="type">Int</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="normalMap"></a><h3 class="anchor"><code><a href="#normalMap"><span class="identifier">normalMap</span></a>:<span class="type">Texture</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="normalTextures"></a><h3 class="anchor"><code><a href="#normalTextures"><span class="identifier">normalTextures</span></a>:<span class="type">TextureArray</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="parallaxAmount"></a><h3 class="anchor"><code><a href="#parallaxAmount"><span class="identifier">parallaxAmount</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="pbrTextures"></a><h3 class="anchor"><code><a href="#pbrTextures"><span class="identifier">pbrTextures</span></a>:<span class="type">TextureArray</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="primSize"></a><h3 class="anchor"><code><a href="#primSize"><span class="identifier">primSize</span></a>:<span class="type">Vec</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="secondSurfaceParams"></a><h3 class="anchor"><code><a href="#secondSurfaceParams"><span class="identifier">secondSurfaceParams</span></a>:<span class="type">Array</span>&lt;<span class="type">Vec4</span>&gt;</code></h3><div class="doc"><p></p></div></div><div class="field "><a name="surfaceIndexMap"></a><h3 class="anchor"><code><a href="#surfaceIndexMap"><span class="identifier">surfaceIndexMap</span></a>:<span class="type">Texture</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="surfaceParams"></a><h3 class="anchor"><code><a href="#surfaceParams"><span class="identifier">surfaceParams</span></a>:<span class="type">Array</span>&lt;<span class="type">Vec4</span>&gt;</code></h3><div class="doc"><p></p></div></div><div class="field "><a name="tileIndex"></a><h3 class="anchor"><code><a href="#tileIndex"><span class="identifier">tileIndex</span></a>:<span class="type">Vec</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="weightTextures"></a><h3 class="anchor"><code><a href="#weightTextures"><span class="identifier">weightTextures</span></a>:<span class="type">TextureArray</span></code></h3><div class="doc"><p></p></div></div></div><h3 class="section">Methods</h3><div class="fields"></div>  </div></div></div></div><footer class="section site-footer" style="background:#FAFAFA"><div class="container"><div class="copyright"><p style="color:#000000">&copy; 2026 &nbsp;</p></div></div></footer><script src="../../highlighter.js"></script><link href="../../highlighter.css" rel="stylesheet"/></body></html>

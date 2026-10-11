@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en"><!-- use theme color or fallback -->
+<!--use textcolor from settings, otherwise create a contrasting color to theme color-->
+<head><meta charset="utf-8"/><link href="../../bootstrap/css/bootstrap.min.css" rel="stylesheet"/><link href="../../bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet"/><link href="../../bootstrap/css/bootstrap-select.min.css" rel="stylesheet"/><link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700,700italic,400italic" rel="stylesheet" type="text/css"/><link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600,600italic,400" rel="stylesheet" type="text/css"/><link href="https://netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.css" rel="stylesheet" type="text/css"/><script src="../../jquery-3.6.0.min.js"></script><script src="../../bootstrap/js/bootstrap.min.js"></script><script src="../../bootstrap/js/bootstrap-select.min.js"></script><link href="../../styles.css" rel="stylesheet"/><link href="../../extra-styles.css" rel="stylesheet"/><link href="../../haxe-nav.css" rel="stylesheet"/><link href="../../dark-mode.css" rel="stylesheet"/><script>var dox = {rootPath: "../../",platforms: ["hide_js","hide_hrt"]};</script><script src="../../nav.js"></script><script src="../../index.js"></script><link rel="icon" href="../../favicon.ico" type="image/x-icon"/><title>hrt.shgraph.Variables - Hide API</title><meta name="description" content="The global variables of the shader graphs."/></head><body><script>/* Here to prevent flash of unstyled content */let systemDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;if ((!localStorage.theme && systemDarkMode) || localStorage.theme == "dark") {document.body.style.backgroundColor = "#111";document.body.style.opacity = "0";document.addEventListener("DOMContentLoaded", function(event) {toggleTheme();document.body.style.backgroundColor = "";document.body.style.opacity = "";});}</script><style>
+.navbar .brand {
+	display: inline-block;
+	float: none;
+	text-shadow: 0 0 0 transparent;
+}
+</style><nav class="nav"><div class="navbar"><div class="navbar-inner" style="background:#FAFAFA; border-bottom:1px solid rgba(0,0,0,.09)"><div class="container"><a class="brand" style="color:#000000" href="../../">Hide API</a><a href="#" id="theme-toggle" class="brand" style="color:#000000" onclick="toggleTheme()" title="Toggle Dark Mode"><i class="fa fa-moon-o"></i></a></div></div></div></nav><div class="container main-content"><div class="row-fluid"><div class="span3"><div class="well sidebar-nav"><form class="form-search" id="searchForm"><div class="input-prepend input-block-level"><span class="add-on"><i class="fa fa-search"></i></span><input id="search" type="text" placeholder="Filter (Ctrl+P)" autocomplete="off"/></div></form><div class="dropdown"><select id="select-platform" class="selectpicker" title="Filter by platform" data-width="100%"><option value="all" selected="selected">All Platforms</option><option>hide_js</option><option>hide_hrt</option></select></div></div><div class="well sidebar-nav" id="explorer"><div id="nav"></div></div></div><div class="span9"><div class="page-header"><span class="viewsource"><a href="https://github.com/HeapsIO/hide/blob/master/hrt/shgraph/Variables.hx" class="btn btn-medium"><i class="fa fa-eye"></i> View source</a></span><h1><small>class</small> Variables</h1><h4><small>package <a href="../../hrt/shgraph/index.html">hrt.shgraph</a></small></h4>    <span class="label label-meta label-meta-directlyUsed" title="Marks types that are directly referenced by non-extern code.">@:directlyUsed</span><hr/><p class="availability"><em>Available on  all platforms</em></p></div><div class="body"><div class="doc doc-main"><p>The global variables of the shader graphs.</p></div><h3 class="section">Static variables</h3><div class="fields"><div class="field "><a name="Globals"></a><h3 class="anchor"><code><span class="label label-meta label-meta-value" title="Used to store default values for fields and function arguments.">@:value({
+	var g:Array&lt;GlobalInfo&gt; = [];
+	g[PixelColor] = { type : TVec(4, VFloat), name : &quot;pixelColor&quot;, varkind : KVar(Local) };
+	g[CalculatedUV] = { type : TVec(2, VFloat), name : &quot;calculatedUV&quot;, varkind : KVar(Var) };
+	g[Time] = { type : TFloat, name : &quot;time&quot;, varkind : KVar(Global, Global) };
+	g[PixelSize] = { type : TVec(2, VFloat), name : &quot;pixelSize&quot;, varkind : KVar(Global, Global) };
+	g[Global] = { type : TVoid, name : &quot;global&quot;, varkind : KVar(Global) };
+	g[Input] = { type : TVoid, name : &quot;input&quot;, varkind : KVar(Input) };
+	g[UV] = { type : TVec(2, VFloat), name : &quot;uv&quot;, varkind : KVar(Input, Input) };
+	g[UV2] = { type : TVec(2, VFloat), name : &quot;uv2&quot;, varkind : KVar(Input, Input) };
+	g[UV3] = { type : TVec(2, VFloat), name : &quot;uv3&quot;, varkind : KVar(Input, Input) };
+	g[UV4] = { type : TVec(2, VFloat), name : &quot;uv4&quot;, varkind : KVar(Input, Input) };
+	g[RelativePosition] = { type : TVec(3, VFloat), name : &quot;relativePosition&quot;, varkind : KVar(Local) };
+	g[TransformedPosition] = { type : TVec(3, VFloat), name : &quot;transformedPosition&quot;, varkind : KVar(Local) };
+	g[ProjectedPosition] = { type : TVec(4, VFloat), name : &quot;projectedPosition&quot;, varkind : KVar(Local) };
+	g[Normal] = { type : TVec(3, VFloat), name : &quot;normal&quot;, varkind : KVar(Input, Input) };
+	g[FakeNormal] = { type : TVec(3, VFloat), name : &quot;fakeNormal&quot;, varkind : KVar(Local) };
+	g[TransformedNormal] = { type : TVec(3, VFloat), name : &quot;transformedNormal&quot;, varkind : KVar(Local) };
+	g[Depth] = { type : TFloat, name : &quot;depth&quot;, varkind : KVar(Local) };
+	g[Metalness] = { type : TFloat, name : &quot;metalness&quot;, varkind : KVar(Local) };
+	g[Roughness] = { type : TFloat, name : &quot;roughness&quot;, varkind : KVar(Local) };
+	g[Emissive] = { type : TFloat, name : &quot;emissive&quot;, varkind : KVar(Local) };
+	g[Occlusion] = { type : TFloat, name : &quot;occlusion&quot;, varkind : KVar(Local) };
+	g[PreviewSelect] = { type : TInt, name : previewSelectName, varkind : KVar(Param, null, -1) };
+	g[PreviewColor] = { type : TVec(4, VFloat), name : &quot;_previewColor&quot;, varkind : KVar(Local) };
+	g[SGPixelColor] = { type : TVec(3, VFloat), name : &quot;_sg_out_color&quot;, varkind : KSwizzle(PixelColor, [X, Y, Z]) };
+	g[SGPixelAlpha] = { type : TFloat, name : &quot;_sg_out_alpha&quot;, varkind : KSwizzle(PixelColor, [W]) };
+	g[ParticleLife] = { type : TFloat, name : &quot;particleLife&quot;, varkind : KVar(Local) };
+	g[ParticleLifeTime] = { type : TFloat, name : &quot;particleLifeTime&quot;, varkind : KVar(Local) };
+	g[ParticleRandom] = { type : TFloat, name : &quot;particleRandom&quot;, varkind : KVar(Local) };
+	g[Camera] = { type : TVoid, name : &quot;camera&quot;, varkind : KVar(Local) };
+	g[CameraPosition] = { type : TVec(3, VFloat), name : &quot;position&quot;, varkind : KVar(Local, Camera) };
+	g[EmitterPosition] = { type : TVec(3, VFloat), name : &quot;emitterPosition&quot;, varkind : KVar(Local, null), __init__ : AstTools.makeVec([0.0, 0.0, 0.0]) };
+	g[SourceTexture] = { type : TSampler(T2D, false), name : &quot;screenShaderInput&quot;, varkind : KVar(Global, Global) };
+	g;
+})</span><span class="label label-static">static</span><a href="#Globals"><span class="identifier">Globals</span></a>:<span class="type">Array</span>&lt;<a class="type" title="hrt.shgraph.GlobalInfo - The definition of a global variable." href="../../hrt/shgraph/GlobalInfo.html">GlobalInfo</a>&gt;<span> = {
+	var g:Array&lt;GlobalInfo&gt; = [];
+	g[PixelColor] = { type : TVec(4, VFloat), name : &quot;pixelColor&quot;, varkind : KVar(Local) };
+	g[CalculatedUV] = { type : TVec(2, VFloat), name : &quot;calculatedUV&quot;, varkind : KVar(Var) };
+	g[Time] = { type : TFloat, name : &quot;time&quot;, varkind : KVar(Global, Global) };
+	g[PixelSize] = { type : TVec(2, VFloat), name : &quot;pixelSize&quot;, varkind : KVar(Global, Global) };
+	g[Global] = { type : TVoid, name : &quot;global&quot;, varkind : KVar(Global) };
+	g[Input] = { type : TVoid, name : &quot;input&quot;, varkind : KVar(Input) };
+	g[UV] = { type : TVec(2, VFloat), name : &quot;uv&quot;, varkind : KVar(Input, Input) };
+	g[UV2] = { type : TVec(2, VFloat), name : &quot;uv2&quot;, varkind : KVar(Input, Input) };
+	g[UV3] = { type : TVec(2, VFloat), name : &quot;uv3&quot;, varkind : KVar(Input, Input) };
+	g[UV4] = { type : TVec(2, VFloat), name : &quot;uv4&quot;, varkind : KVar(Input, Input) };
+	g[RelativePosition] = { type : TVec(3, VFloat), name : &quot;relativePosition&quot;, varkind : KVar(Local) };
+	g[TransformedPosition] = { type : TVec(3, VFloat), name : &quot;transformedPosition&quot;, varkind : KVar(Local) };
+	g[ProjectedPosition] = { type : TVec(4, VFloat), name : &quot;projectedPosition&quot;, varkind : KVar(Local) };
+	g[Normal] = { type : TVec(3, VFloat), name : &quot;normal&quot;, varkind : KVar(Input, Input) };
+	g[FakeNormal] = { type : TVec(3, VFloat), name : &quot;fakeNormal&quot;, varkind : KVar(Local) };
+	g[TransformedNormal] = { type : TVec(3, VFloat), name : &quot;transformedNormal&quot;, varkind : KVar(Local) };
+	g[Depth] = { type : TFloat, name : &quot;depth&quot;, varkind : KVar(Local) };
+	g[Metalness] = { type : TFloat, name : &quot;metalness&quot;, varkind : KVar(Local) };
+	g[Roughness] = { type : TFloat, name : &quot;roughness&quot;, varkind : KVar(Local) };
+	g[Emissive] = { type : TFloat, name : &quot;emissive&quot;, varkind : KVar(Local) };
+	g[Occlusion] = { type : TFloat, name : &quot;occlusion&quot;, varkind : KVar(Local) };
+	g[PreviewSelect] = { type : TInt, name : previewSelectName, varkind : KVar(Param, null, -1) };
+	g[PreviewColor] = { type : TVec(4, VFloat), name : &quot;_previewColor&quot;, varkind : KVar(Local) };
+	g[SGPixelColor] = { type : TVec(3, VFloat), name : &quot;_sg_out_color&quot;, varkind : KSwizzle(PixelColor, [X, Y, Z]) };
+	g[SGPixelAlpha] = { type : TFloat, name : &quot;_sg_out_alpha&quot;, varkind : KSwizzle(PixelColor, [W]) };
+	g[ParticleLife] = { type : TFloat, name : &quot;particleLife&quot;, varkind : KVar(Local) };
+	g[ParticleLifeTime] = { type : TFloat, name : &quot;particleLifeTime&quot;, varkind : KVar(Local) };
+	g[ParticleRandom] = { type : TFloat, name : &quot;particleRandom&quot;, varkind : KVar(Local) };
+	g[Camera] = { type : TVoid, name : &quot;camera&quot;, varkind : KVar(Local) };
+	g[CameraPosition] = { type : TVec(3, VFloat), name : &quot;position&quot;, varkind : KVar(Local, Camera) };
+	g[EmitterPosition] = { type : TVec(3, VFloat), name : &quot;emitterPosition&quot;, varkind : KVar(Local, null), __init__ : AstTools.makeVec([0.0, 0.0, 0.0]) };
+	g[SourceTexture] = { type : TSampler(T2D, false), name : &quot;screenShaderInput&quot;, varkind : KVar(Global, Global) };
+	g;
+}</span></code></h3><div class="doc"><p>The definitions of the globals, by <code><a href="../../hrt/shgraph/Global.html#Global">Global</a></code>.</p></div></div><div class="field "><a name="previewSelectName"></a><h3 class="anchor"><code><span class="label label-meta label-meta-value" title="Used to store default values for fields and function arguments.">@:value(&quot;previewSelect_SG&quot;)</span><span class="label label-static">static</span><a href="#previewSelectName"><span class="identifier">previewSelectName</span></a>:<span class="type">String</span><span> = &quot;previewSelect_SG&quot;</span></code></h3><div class="doc"><p>The name of the parameter selecting the node preview.</p></div></div></div><h3 class="section">Static methods</h3><div class="fields"><div class="field "><a name="getFullPath"></a><h3 class="anchor"><code><span class="label label-static">static</span><a href="#getFullPath"><span class="identifier">getFullPath</span></a>(<span style="white-space:nowrap">g:<a class="type" title="hrt.shgraph.GlobalInfo - The definition of a global variable." href="../../hrt/shgraph/GlobalInfo.html">GlobalInfo</a></span>):<span class="type">String</span></code></h3><div class="doc"><p>Returns the full path of a global, as <code>parent.name</code>.</p></div></div><div class="field "><a name="getGlobalNameMap"></a><h3 class="anchor"><code><span class="label label-static">static</span><a href="#getGlobalNameMap"><span class="identifier">getGlobalNameMap</span></a>():<span class="type">Map</span>&lt;<span class="type">String</span>, <a class="type" title="hrt.shgraph.Global - A global variable available to the shader graph nodes (see Variables." href="../../hrt/shgraph/Global.html">Global</a>&gt;</code></h3><div class="doc"><p>Returns the globals by full path.</p></div></div></div></div></div></div></div><footer class="section site-footer" style="background:#FAFAFA"><div class="container"><div class="copyright"><p style="color:#000000">&copy; 2026 &nbsp;</p></div></div></footer><script src="../../highlighter.js"></script><link href="../../highlighter.css" rel="stylesheet"/></body></html>

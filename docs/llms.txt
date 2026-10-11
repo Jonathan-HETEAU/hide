@@ -1,0 +1,1080 @@
+# Hide
+
+> Hide (Heaps IDE) is the editor of the Heaps engine. `hrt` is its runtime, used by the games: prefabs (3D levels, FX, materials, render props...), shader graphs, animation graphs and texture graphs. `hide` is the editor itself (JS/nw.js and HashLink versions): views, property editors, CastleDB editor and editing tools of the prefabs.
+
+Each link points to a Markdown page with the full public API of a type: signatures, documentation, inheritance and platform availability. File dependency map: [deps/DEPENDENCIES.md](deps/DEPENDENCIES.md).
+
+## hrt
+
+- [hrt.animgraph.AnimGraph](api/md/hrt/animgraph/AnimGraph.md): An animation graph made with nodes in the editor (`.animgraph` file): blends animations depending on parameters.
+- [hrt.animgraph.AnimGraphAnimatedObject](api/md/hrt/animgraph/AnimGraphAnimatedObject.md): An object animated by an `AnimGraphInstance`.
+- [hrt.animgraph.AnimGraphInstance](api/md/hrt/animgraph/AnimGraphInstance.md): A playing animation graph: a `h3d.anim.Animation` computing the bone transforms from the nodes.
+- [hrt.animgraph.AnimResolver](api/md/hrt/animgraph/AnimResolver.md): Returns the path of the animation to load for a path of the graph and a target object, or `null` to skip it.
+- [hrt.animgraph.BlendSpace2D](api/md/hrt/animgraph/BlendSpace2D.md): A 2D blend space (`.bs2d` file): blends the animations of its points depending on a 2D position.
+- [hrt.animgraph.BlendSpacePoint](api/md/hrt/animgraph/BlendSpacePoint.md): A point of a `BlendSpace2D`: an animation at a position.
+- [hrt.animgraph.Edge](api/md/hrt/animgraph/Edge.md): The connection of an input of a node.
+- [hrt.animgraph.EditorProviderContext](api/md/hrt/animgraph/EditorProviderContext.md): The context of the animation preview of the editor.
+- [hrt.animgraph.Macros](api/md/hrt/animgraph/Macros.md): Builds the animation graph nodes from their `@:input` and `@:output` fields.
+- [hrt.animgraph.Node](api/md/hrt/animgraph/Node.md): A node of an animation graph.
+- [hrt.animgraph.NodeAnim](api/md/hrt/animgraph/NodeAnim.md): Plays a single node of an animation graph, for the previews.
+- [hrt.animgraph.NodeInputInfo](api/md/hrt/animgraph/NodeInputInfo.md): An input of a node.
+- [hrt.animgraph.NodeOutputInfo](api/md/hrt/animgraph/NodeOutputInfo.md): An output of a node.
+- [hrt.animgraph.OutputType](api/md/hrt/animgraph/OutputType.md): The type of an input or output of an animation graph node.
+- [hrt.animgraph.Parameter](api/md/hrt/animgraph/Parameter.md): A float parameter of an animation graph, set at runtime with `AnimGraphInstance.setParam`.
+- [hrt.animgraph.Resource](api/md/hrt/animgraph/Resource.md): An animation graph resource (`.animgraph` file).
+- [hrt.animgraph.SerializedEdge](api/md/hrt/animgraph/SerializedEdge.md): A serialized connection between nodes.
+- [hrt.animgraph.Tools](api/md/hrt/animgraph/Tools.md): Animation helpers.
+- [hrt.animgraph.nodes.AnimInfo](api/md/hrt/animgraph/nodes/AnimInfo.md): An animation of a blend space node.
+- [hrt.animgraph.nodes.AnimNode](api/md/hrt/animgraph/nodes/AnimNode.md): An anim node outpus a animation that can be consumed as input parameter by other nodes
+- [hrt.animgraph.nodes.AnimProxy](api/md/hrt/animgraph/nodes/AnimProxy.md): An object creating the children an animation asks for, to read an animation without its model.
+- [hrt.animgraph.nodes.Blend](api/md/hrt/animgraph/nodes/Blend.md): Blends the animations `a` and `b` by `alpha`.
+- [hrt.animgraph.nodes.BlendPerBone](api/md/hrt/animgraph/nodes/BlendPerBone.md): Plays the animation `b` on the bones under `targetBone`, and `a` on the others.
+- [hrt.animgraph.nodes.BlendSpace2D](api/md/hrt/animgraph/nodes/BlendSpace2D.md): Plays a blend space file (`path`) at the position `bsX`, `bsY`.
+- [hrt.animgraph.nodes.BlendSpaceInstancePoint](api/md/hrt/animgraph/nodes/BlendSpaceInstancePoint.md): A point of a blend space node.
+- [hrt.animgraph.nodes.DefaultPose](api/md/hrt/animgraph/nodes/DefaultPose.md): The default pose of the objects and skin joints.
+- [hrt.animgraph.nodes.FloatParameter](api/md/hrt/animgraph/nodes/FloatParameter.md): Outputs the value of a parameter of the graph.
+- [hrt.animgraph.nodes.GetBoneContext](api/md/hrt/animgraph/nodes/GetBoneContext.md): The context of `AnimNode.getBones`.
+- [hrt.animgraph.nodes.GetBoneTransformContext](api/md/hrt/animgraph/nodes/GetBoneTransformContext.md): The context of `AnimNode.getBoneTransform`.
+- [hrt.animgraph.nodes.Input](api/md/hrt/animgraph/nodes/Input.md): Plays an animation file (`path`).
+- [hrt.animgraph.nodes.Output](api/md/hrt/animgraph/nodes/Output.md): The result of this node can be used as an animation by other systems
+- [hrt.impl.BuildTools](api/md/hrt/impl/BuildTools.md): Builds the resources of a project.
+- [hrt.impl.Color](api/md/hrt/impl/Color.md): A color with 8 bits components.
+- [hrt.impl.ColorMode](api/md/hrt/impl/ColorMode.md): A color space, with its conversions.
+- [hrt.impl.ColorSpace](api/md/hrt/impl/ColorSpace.md): Conversions between 8 bits RGB colors (`iRGB`) and other color spaces, stored in `h3d.Vector4`.
+- [hrt.impl.ColorStop](api/md/hrt/impl/ColorStop.md): A color stop of a gradient.
+- [hrt.impl.Editor2DIcon](api/md/hrt/impl/Editor2DIcon.md): A 2D icon following an object in the editor, drawn over the scene.
+- [hrt.impl.EditorCacheData](api/md/hrt/impl/EditorCacheData.md): A cached gradient texture of the editor.
+- [hrt.impl.EditorIcon](api/md/hrt/impl/EditorIcon.md): A 3D icon of an object in the editor, facing the camera, with no rotation or scale.
+- [hrt.impl.EditorTools](api/md/hrt/impl/EditorTools.md): Helpers for the editor icons (editor only).
+- [hrt.impl.Gradient](api/md/hrt/impl/Gradient.md): A color gradient, as stops interpolated in a color space, rendered to textures (cached).
+- [hrt.impl.GradientData](api/md/hrt/impl/GradientData.md): The data of a gradient.
+- [hrt.impl.GradientInterpolation](api/md/hrt/impl/GradientInterpolation.md): The interpolation between the stops of a gradient.
+- [hrt.impl.IconCategory](api/md/hrt/impl/IconCategory.md): A category of editor icons.
+- [hrt.impl.Macros](api/md/hrt/impl/Macros.md): Macros and helpers for the serialization of enums.
+- [hrt.impl.RemoteConsole](api/md/hrt/impl/RemoteConsole.md): A simple socket-based local communication channel (plaintext and unsafe), aim at communicate between 2 programs (e.g.
+- [hrt.impl.RemoteConsoleConnection](api/md/hrt/impl/RemoteConsoleConnection.md): A connection of a `RemoteConsole`.
+- [hrt.impl.RemoteMenuAction](api/md/hrt/impl/RemoteMenuAction.md): An entry of the editor menus registered by the game.
+- [hrt.impl.RemotePrefabAction](api/md/hrt/impl/RemotePrefabAction.md): A message of the remote prefab edition.
+- [hrt.impl.RemotePrefabActionKind](api/md/hrt/impl/RemotePrefabActionKind.md): The kind of a remote prefab message.
+- [hrt.impl.RemotePrefabCallback](api/md/hrt/impl/RemotePrefabCallback.md): Called with the new data of a prefab edited remotely.
+- [hrt.impl.RemoteTools](api/md/hrt/impl/RemoteTools.md): A helper class to use a RemoteConsole in game.
+- [hrt.impl.TextureType](api/md/hrt/impl/TextureType.md): The type of a texture value of a prefab property.
+- [hrt.impl.Utils](api/md/hrt/impl/Utils.md): Helpers for the texture values of prefab properties: a path, or a gradient.
+- [hrt.prefab.Cache](api/md/hrt/prefab/Cache.md): The shared cache of the models, textures and shaders loaded by the prefabs.
+- [hrt.prefab.CascadeParams](api/md/hrt/prefab/CascadeParams.md): The parameters of a shadow cascade.
+- [hrt.prefab.ContextMake](api/md/hrt/prefab/ContextMake.md): The context given to `Prefab.make`: a `ContextShared`, or the parent 2D or 3D object of the instance (converted to a new `ContextShared`).
+- [hrt.prefab.ContextShared](api/md/hrt/prefab/ContextShared.md): The context shared by all the prefabs of a prefab hierarchy (but not by references): the root objects, the current parents during `make`, the source path, and the loading of the resources and baked data.
+- [hrt.prefab.ContextSharedBase](api/md/hrt/prefab/ContextSharedBase.md): The context shared by all the prefabs of a prefab hierarchy (but not by references): the root objects, the current parents during `make`, the source path, and the loading of the resources and baked data.
+- [hrt.prefab.CrashTest](api/md/hrt/prefab/CrashTest.md): Editor debug only prefab that allow to test various crash situations in the editor Should never be loaded in a game
+- [hrt.prefab.CrashTestObject](api/md/hrt/prefab/CrashTestObject.md): The object of a `CrashTest` prefab.
+- [hrt.prefab.CullingContainer](api/md/hrt/prefab/CullingContainer.md): A group of objects hidden when farther than `cullDistance` from the camera (always visible in the editor).
+- [hrt.prefab.CullingContainerObject](api/md/hrt/prefab/CullingContainerObject.md): An object hidden (with its children) when it is farther than a distance from the camera.
+- [hrt.prefab.Curve](api/md/hrt/prefab/Curve.md): An animation curve: keys interpolated over time, used by the FX and the emitters (named `property:component`, such as `scale:x`).
+- [hrt.prefab.CurveBlendMode](api/md/hrt/prefab/CurveBlendMode.md): How a curve gets its values.
+- [hrt.prefab.CurveHandle](api/md/hrt/prefab/CurveHandle.md): A bezier handle of a curve key, relative to the key.
+- [hrt.prefab.CurveKey](api/md/hrt/prefab/CurveKey.md): A key of a curve.
+- [hrt.prefab.CurveKeyMode](api/md/hrt/prefab/CurveKeyMode.md): How a curve is interpolated around a key.
+- [hrt.prefab.CurveKeys](api/md/hrt/prefab/CurveKeys.md): The keys of a curve.
+- [hrt.prefab.Diff](api/md/hrt/prefab/Diff.md): Utility class to get the difference between two dynamics
+- [hrt.prefab.DiffResult](api/md/hrt/prefab/DiffResult.md): The result of a diff between two values.
+- [hrt.prefab.DynamicShader](api/md/hrt/prefab/DynamicShader.md): Applies a shader given by its source path: a `.hx` shader class or a shader graph (`.shgraph`), with its parameters in `props`.
+- [hrt.prefab.EditContext2](api/md/hrt/prefab/EditContext2.md): The context of the inspector of a prefab in the editor (`Prefab.edit2`): the scenes, the editor tools, and the editor services.
+- [hrt.prefab.EditMode](api/md/hrt/prefab/EditMode.md): How a reference can be edited in the editor.
+- [hrt.prefab.GradientFollower](api/md/hrt/prefab/GradientFollower.md): An object following a 3D object, scaled by the perspective (editor only).
+- [hrt.prefab.Inclusion](api/md/hrt/prefab/Inclusion.md): Whether a pass query includes or excludes the passes.
+- [hrt.prefab.Light](api/md/hrt/prefab/Light.md): A PBR light (`h3d.scene.pbr.Light`): point, directional, spot, capsule or rectangle, with its shadows.
+- [hrt.prefab.LightKind](api/md/hrt/prefab/LightKind.md): The type of a light.
+- [hrt.prefab.LightShadows](api/md/hrt/prefab/LightShadows.md): The shadows of a light.
+- [hrt.prefab.Macros](api/md/hrt/prefab/Macros.md): The macros of the prefabs: they generate the serialization (`@:s` fields), copy and clone code of the prefab classes (`buildPrefab`, `buildSerializable`).
+- [hrt.prefab.Material](api/md/hrt/prefab/Material.md): Applies material properties to the materials of the parent object: the material of the same name (or `materialName`), or all of them.
+- [hrt.prefab.MaterialLibrary](api/md/hrt/prefab/MaterialLibrary.md): A library of materials, that `Material` prefabs can reference.
+- [hrt.prefab.MaterialSelector](api/md/hrt/prefab/MaterialSelector.md): Selects material passes of the parent object (by pass name or blend mode), for the prefabs applying changes to the materials.
+- [hrt.prefab.Model](api/md/hrt/prefab/Model.md): A 3D model (`source`), with an optional animation.
+- [hrt.prefab.Object2D](api/md/hrt/prefab/Object2D.md): A prefab with a 2D transform, creating a 2D object (`local2d`).
+- [hrt.prefab.Object3D](api/md/hrt/prefab/Object3D.md): A prefab with a 3D transform, creating a 3D object (`local3d`) in the scene.
+- [hrt.prefab.OverrideProperty](api/md/hrt/prefab/OverrideProperty.md): A property of a referenced material library material overridden by a `Material` prefab.
+- [hrt.prefab.PassQuery](api/md/hrt/prefab/PassQuery.md): A query of material passes, by name.
+- [hrt.prefab.Prefab](api/md/hrt/prefab/Prefab.md): The base class of the prefabs: the serializable nodes of the data edited in Hide (`.prefab`, `.fx`, `.l3d`...
+- [hrt.prefab.PrefabField](api/md/hrt/prefab/PrefabField.md): A serialized field of a prefab type (see `Prefab.getSerializableProps`).
+- [hrt.prefab.PrefabFieldType](api/md/hrt/prefab/PrefabFieldType.md): The type of a serialized prefab field.
+- [hrt.prefab.PrefabInfo](api/md/hrt/prefab/PrefabInfo.md): A registered prefab type.
+- [hrt.prefab.PrefabMeta](api/md/hrt/prefab/PrefabMeta.md): The metadata of a serialized prefab field.
+- [hrt.prefab.PropDef](api/md/hrt/prefab/PropDef.md): A property of a prefab.
+- [hrt.prefab.PropType](api/md/hrt/prefab/PropType.md): The type of a property of a prefab (for the shader parameters and the generic properties editor).
+- [hrt.prefab.Reference](api/md/hrt/prefab/Reference.md): True if the loaded source, or a reference inside it, creates a reference cycle
+- [hrt.prefab.RenderProfile](api/md/hrt/prefab/RenderProfile.md): A prefab containing `RenderProps`, applied to the renderer.
+- [hrt.prefab.RenderProps](api/md/hrt/prefab/RenderProps.md): The properties of the renderer (`h3d.scene.Renderer.props`), by material setup, with the renderer effects (`hrt.prefab.rfx.RendererFX` children).
+- [hrt.prefab.RenderPropsObject](api/md/hrt/prefab/RenderPropsObject.md): The 3D object of a `RenderProps` prefab.
+- [hrt.prefab.Resource](api/md/hrt/prefab/Resource.md): A prefab file resource (`.prefab`, `.fx`, `.l3d`...): `load()` returns its prefab, cached and reloaded when the file changes.
+- [hrt.prefab.SceneEditorAPI](api/md/hrt/prefab/SceneEditorAPI.md): The scene editor API available to the prefabs in the editor.
+- [hrt.prefab.SelectedPass](api/md/hrt/prefab/SelectedPass.md): A pass selected by a `MaterialSelector`.
+- [hrt.prefab.SettingCategory](api/md/hrt/prefab/SettingCategory.md): How an editor setting is shared between the inspectors.
+- [hrt.prefab.Shader](api/md/hrt/prefab/Shader.md): Applies a shader to the materials of the parent object.
+- [hrt.prefab.ShaderDef](api/md/hrt/prefab/ShaderDef.md): A shader loaded by `ContextShared.loadShader`, with the initial values of its parameters.
+- [hrt.prefab.ShaderDefCache](api/md/hrt/prefab/ShaderDefCache.md): The shaders loaded, by path.
+- [hrt.prefab.ShadowSamplingESM](api/md/hrt/prefab/ShadowSamplingESM.md): Exponential shadow map sampling.
+- [hrt.prefab.ShadowSamplingKind](api/md/hrt/prefab/ShadowSamplingKind.md): The sampling of a shadow map.
+- [hrt.prefab.ShadowSamplingMode](api/md/hrt/prefab/ShadowSamplingMode.md): The sampling of a shadow map.
+- [hrt.prefab.ShadowSamplingPCF](api/md/hrt/prefab/ShadowSamplingPCF.md): Percentage closer filtering sampling.
+- [hrt.prefab.TreeChangedResult](api/md/hrt/prefab/TreeChangedResult.md): What a prefab does when a child changed in the editor (see `Prefab.onEditorTreeChanged`).
+- [hrt.prefab.Unknown](api/md/hrt/prefab/Unknown.md): Allow openning prefabs with a type not found in the project, keeping the data unchanged.
+- [hrt.prefab.editor.Props](api/md/hrt/prefab/editor/Props.md): The editor properties of a prefab class, from its metadata.
+- [hrt.prefab.editor.QuickTool](api/md/hrt/prefab/editor/QuickTool.md): A `Tool` defined by callbacks.
+- [hrt.prefab.editor.Tool](api/md/hrt/prefab/editor/Tool.md): An interactive tool of the scene editor (`EditContext2`), like a brush or a gizmo.
+- [hrt.prefab.fx.AdditionalProperies](api/md/hrt/prefab/fx/AdditionalProperies.md): The animated properties of a light, by kind of light.
+- [hrt.prefab.fx.AlignLockAxis](api/md/hrt/prefab/fx/AlignLockAxis.md): The axis locked by the `Axis` align mode.
+- [hrt.prefab.fx.AlignMode](api/md/hrt/prefab/fx/AlignMode.md): How the particles are oriented.
+- [hrt.prefab.fx.AnimEvent](api/md/hrt/prefab/fx/AnimEvent.md): An FX event playing an animation on the first object of the event.
+- [hrt.prefab.fx.BaseFX](api/md/hrt/prefab/fx/BaseFX.md): The common properties of the 3D and 2D FX prefabs.
+- [hrt.prefab.fx.BaseFXTools](api/md/hrt/prefab/fx/BaseFXTools.md): Helpers to build the animations of an FX.
+- [hrt.prefab.fx.Billboard](api/md/hrt/prefab/fx/Billboard.md): Deprecated: use `LookAt`.
+- [hrt.prefab.fx.BillboardObject](api/md/hrt/prefab/fx/BillboardObject.md): Deprecated: use `LookAt`.
+- [hrt.prefab.fx.CustomAnimation](api/md/hrt/prefab/fx/CustomAnimation.md): Animates custom properties with curves in an FX.
+- [hrt.prefab.fx.DebugFXShader](api/md/hrt/prefab/fx/DebugFXShader.md): Draws the FX in a flat color (HSV) for the debug display.
+- [hrt.prefab.fx.Desaturate](api/md/hrt/prefab/fx/Desaturate.md): Desaturates the screen.
+- [hrt.prefab.fx.DesaturateRFX](api/md/hrt/prefab/fx/DesaturateRFX.md): Desaturates the scene for the FX debug display (with a PBR renderer).
+- [hrt.prefab.fx.Emit2DShape](api/md/hrt/prefab/fx/Emit2DShape.md): The shape in which the 2D particles are emitted.
+- [hrt.prefab.fx.EmitShape](api/md/hrt/prefab/fx/EmitShape.md): The shape in which the particles are emitted.
+- [hrt.prefab.fx.EmitType](api/md/hrt/prefab/fx/EmitType.md): When the particles are emitted.
+- [hrt.prefab.fx.Emitter](api/md/hrt/prefab/fx/Emitter.md): A particle emitter of an FX: emits instances of its child prefab (the particle template) with curves for the parameters (children curves named after the parameters).
+- [hrt.prefab.fx.Emitter2D](api/md/hrt/prefab/fx/Emitter2D.md): A 2D particle emitter of an `FX2D`.
+- [hrt.prefab.fx.Emitter2DObject](api/md/hrt/prefab/fx/Emitter2DObject.md): The 2D object of an `Emitter2D`: simulates and renders the particles (with a `h2d.SpriteBatch`).
+- [hrt.prefab.fx.EmitterHelper](api/md/hrt/prefab/fx/EmitterHelper.md): Helpers for the emitter parameters.
+- [hrt.prefab.fx.EmitterMacros](api/md/hrt/prefab/fx/EmitterMacros.md): Builds the parameters of `Emitter` from their `@:param` and `@:instParam` metadata.
+- [hrt.prefab.fx.EmitterObject](api/md/hrt/prefab/fx/EmitterObject.md): The 3D object of an `Emitter`: simulates and renders the particles (with a `h3d.scene.MeshBatch`).
+- [hrt.prefab.fx.Evaluator](api/md/hrt/prefab/fx/Evaluator.md): Evaluates `Value`s, with random values per particle and the FX parameters.
+- [hrt.prefab.fx.Event](api/md/hrt/prefab/fx/Event.md): An event of an FX timeline, played between `time` and `time + duration`.
+- [hrt.prefab.fx.Event3D](api/md/hrt/prefab/fx/Event3D.md): A 3D object event of an FX timeline.
+- [hrt.prefab.fx.EventInstance](api/md/hrt/prefab/fx/EventInstance.md): A playing event.
+- [hrt.prefab.fx.FX](api/md/hrt/prefab/fx/FX.md): A 3D FX: a timeline of animations, particles and events.
+- [hrt.prefab.fx.FX2D](api/md/hrt/prefab/fx/FX2D.md): A 2D FX: a timeline of animations, particles and events.
+- [hrt.prefab.fx.FX2DAnimation](api/md/hrt/prefab/fx/FX2DAnimation.md): The 2D object of an `FX2D`: plays its animations, emitters and events.
+- [hrt.prefab.fx.FXAnimation](api/md/hrt/prefab/fx/FXAnimation.md): The 3D object of an `FX`: plays its animations, emitters, events and sub FX.
+- [hrt.prefab.fx.FXPlayState](api/md/hrt/prefab/fx/FXPlayState.md): What part of the FXAnimation loop is currently playing
+- [hrt.prefab.fx.IEvent](api/md/hrt/prefab/fx/IEvent.md): An event of an FX timeline.
+- [hrt.prefab.fx.InstanceDef](api/md/hrt/prefab/fx/InstanceDef.md): The values of the particle parameters, evaluated for each particle.
+- [hrt.prefab.fx.LookAt](api/md/hrt/prefab/fx/LookAt.md): Makes its children face a target object, or the camera.
+- [hrt.prefab.fx.LookAtObject](api/md/hrt/prefab/fx/LookAtObject.md): The object of a `LookAt`.
+- [hrt.prefab.fx.ObjectAnimation](api/md/hrt/prefab/fx/ObjectAnimation.md): The animated transform, color and visibility of an object of an FX, from the curves of its prefab.
+- [hrt.prefab.fx.Orientation](api/md/hrt/prefab/fx/Orientation.md): The initial orientation of the emitted particles.
+- [hrt.prefab.fx.ParamDef](api/md/hrt/prefab/fx/ParamDef.md): The definition of an emitter parameter.
+- [hrt.prefab.fx.Parameter](api/md/hrt/prefab/fx/Parameter.md): A parameter of an FX, used to blend curves.
+- [hrt.prefab.fx.ParameterType](api/md/hrt/prefab/fx/ParameterType.md): The type of an FX parameter.
+- [hrt.prefab.fx.PartArray](api/md/hrt/prefab/fx/PartArray.md): The storage of the particles.
+- [hrt.prefab.fx.Particle2DInstance](api/md/hrt/prefab/fx/Particle2DInstance.md): A particle of an `Emitter2DObject`.
+- [hrt.prefab.fx.ParticleInstance](api/md/hrt/prefab/fx/ParticleInstance.md): A particle of an `EmitterObject` (internal state of the simulation).
+- [hrt.prefab.fx.ParticleScaling](api/md/hrt/prefab/fx/ParticleScaling.md): Whether the particles are scaled with the parents of the emitter.
+- [hrt.prefab.fx.PerObjectRandom](api/md/hrt/prefab/fx/PerObjectRandom.md): Gives a random value per object of a `Swarm`.
+- [hrt.prefab.fx.RendererFXAnimation](api/md/hrt/prefab/fx/RendererFXAnimation.md): Animates the float properties of a renderer effect with their curves.
+- [hrt.prefab.fx.SMatrix3](api/md/hrt/prefab/fx/SMatrix3.md): A 3x3 matrix of single precision floats.
+- [hrt.prefab.fx.SMatrix4](api/md/hrt/prefab/fx/SMatrix4.md): A 4x3 transform matrix of single precision floats.
+- [hrt.prefab.fx.SVector3](api/md/hrt/prefab/fx/SVector3.md): A vector of 3 single precision floats.
+- [hrt.prefab.fx.SVector4](api/md/hrt/prefab/fx/SVector4.md): A vector of 4 single precision floats.
+- [hrt.prefab.fx.ScreenShaderGraphFXAnimation](api/md/hrt/prefab/fx/ScreenShaderGraphFXAnimation.md): Animates the parameters of a `ScreenShaderGraph` with their curves.
+- [hrt.prefab.fx.ShaderAnimation](api/md/hrt/prefab/fx/ShaderAnimation.md): Animates the parameters of a shader with their curves.
+- [hrt.prefab.fx.ShaderDynAnimation](api/md/hrt/prefab/fx/ShaderDynAnimation.md): Animates the parameters of a `hxsl.DynamicShader` with their curves.
+- [hrt.prefab.fx.ShaderParam](api/md/hrt/prefab/fx/ShaderParam.md): An animated shader parameter.
+- [hrt.prefab.fx.ShaderParams](api/md/hrt/prefab/fx/ShaderParams.md): The animated parameters of a shader.
+- [hrt.prefab.fx.ShaderTarget](api/md/hrt/prefab/fx/ShaderTarget.md): Applies its children shaders and materials to a target object of the FX (set by `FX.setTarget`).
+- [hrt.prefab.fx.ShaderTargetObj](api/md/hrt/prefab/fx/ShaderTargetObj.md): The object of a `ShaderTarget`, child of its target.
+- [hrt.prefab.fx.SimulationSpace](api/md/hrt/prefab/fx/SimulationSpace.md): The space in which the particles are simulated.
+- [hrt.prefab.fx.Single](api/md/hrt/prefab/fx/Single.md): A 32 bits float on HashLink, a `Float` otherwise.
+- [hrt.prefab.fx.SortMode](api/md/hrt/prefab/fx/SortMode.md): How the particles are sorted for rendering.
+- [hrt.prefab.fx.SpriteType](api/md/hrt/prefab/fx/SpriteType.md): The sprite of the 2D particles.
+- [hrt.prefab.fx.SubEmitterKind](api/md/hrt/prefab/fx/SubEmitterKind.md): When a sub emitter (child emitter) is spawned for a particle.
+- [hrt.prefab.fx.SubFX](api/md/hrt/prefab/fx/SubFX.md): Plays a referenced FX as an event of an FX.
+- [hrt.prefab.fx.Swarm](api/md/hrt/prefab/fx/Swarm.md): A swarm of objects (its first visible child, or small boxes) moving toward targets rotating on a sphere around it.
+- [hrt.prefab.fx.SwarmElement](api/md/hrt/prefab/fx/SwarmElement.md): An object of a `Swarm`.
+- [hrt.prefab.fx.SwarmObject](api/md/hrt/prefab/fx/SwarmObject.md): The object of a `Swarm`: simulates the objects at 15 steps per second and renders them (with a `h3d.scene.MeshBatch`).
+- [hrt.prefab.fx.Value](api/md/hrt/prefab/fx/Value.md): An animated value of an FX: constant, curve, random, or combination.
+- [hrt.prefab.fx.Vector](api/md/hrt/prefab/fx/Vector.md): A 2D point.
+- [hrt.prefab.fx.gpuemitter.Align](api/md/hrt/prefab/fx/gpuemitter/Align.md): The orientation of the particles of a `GPUEmitter`.
+- [hrt.prefab.fx.gpuemitter.BaseSimulation](api/md/hrt/prefab/fx/gpuemitter/BaseSimulation.md): The base simulation of the GPU particles: life, speed, size and orientation.
+- [hrt.prefab.fx.gpuemitter.BaseSpawn](api/md/hrt/prefab/fx/gpuemitter/BaseSpawn.md): The base spawn of the GPU particles: life, random value and initial speed.
+- [hrt.prefab.fx.gpuemitter.CameraWrap](api/md/hrt/prefab/fx/gpuemitter/CameraWrap.md): Wraps the particles in the cube around the camera (`Camera` mode).
+- [hrt.prefab.fx.gpuemitter.ComputeUtils](api/md/hrt/prefab/fx/gpuemitter/ComputeUtils.md): The base of the compute shaders of the GPU emitter, with random and matrix helpers.
+- [hrt.prefab.fx.gpuemitter.CubeSpawn](api/md/hrt/prefab/fx/gpuemitter/CubeSpawn.md): Spawns the particles of a GPU emitter in a cube.
+- [hrt.prefab.fx.gpuemitter.CubeSpawnShader](api/md/hrt/prefab/fx/gpuemitter/CubeSpawnShader.md): Spawns the particles in a box.
+- [hrt.prefab.fx.gpuemitter.Data](api/md/hrt/prefab/fx/gpuemitter/Data.md): The parameters of a `GPUEmitterObject`.
+- [hrt.prefab.fx.gpuemitter.DiskSpawn](api/md/hrt/prefab/fx/gpuemitter/DiskSpawn.md): Spawns the particles of a GPU emitter on a horizontal disk.
+- [hrt.prefab.fx.gpuemitter.DiskSpawnShader](api/md/hrt/prefab/fx/gpuemitter/DiskSpawnShader.md): Spawns the particles on a disk.
+- [hrt.prefab.fx.gpuemitter.GPUEmitter](api/md/hrt/prefab/fx/gpuemitter/GPUEmitter.md): A particle emitter simulated on the GPU with compute shaders.
+- [hrt.prefab.fx.gpuemitter.GPUEmitterObject](api/md/hrt/prefab/fx/gpuemitter/GPUEmitterObject.md): The object of a `GPUEmitter` for a particle mesh: a `h3d.scene.MeshBatch` updated on the GPU.
+- [hrt.prefab.fx.gpuemitter.GravitySimulation](api/md/hrt/prefab/fx/gpuemitter/GravitySimulation.md): Applies a gravity to the particles of a GPU emitter.
+- [hrt.prefab.fx.gpuemitter.GravitySimulationShader](api/md/hrt/prefab/fx/gpuemitter/GravitySimulationShader.md): Applies the gravity to the particles.
+- [hrt.prefab.fx.gpuemitter.LocalRotation](api/md/hrt/prefab/fx/gpuemitter/LocalRotation.md): Rotates the particles of a GPU emitter around random axes over their life.
+- [hrt.prefab.fx.gpuemitter.LocalRotationShader](api/md/hrt/prefab/fx/gpuemitter/LocalRotationShader.md): Rotates the particles over their life.
+- [hrt.prefab.fx.gpuemitter.MeshSpawn](api/md/hrt/prefab/fx/gpuemitter/MeshSpawn.md): Spawns the particles of a GPU emitter on the vertices of its child skinned mesh (a sphere if none).
+- [hrt.prefab.fx.gpuemitter.MeshSpawnShader](api/md/hrt/prefab/fx/gpuemitter/MeshSpawnShader.md): Spawns the particles on the vertices of a mesh.
+- [hrt.prefab.fx.gpuemitter.Mode](api/md/hrt/prefab/fx/gpuemitter/Mode.md): The space of the particles of a `GPUEmitter`.
+- [hrt.prefab.fx.gpuemitter.OrbitSpeedSimulation](api/md/hrt/prefab/fx/gpuemitter/OrbitSpeedSimulation.md): Makes the particles of a GPU emitter orbit around an axis through the emitter.
+- [hrt.prefab.fx.gpuemitter.OrbitSpeedSimulationShader](api/md/hrt/prefab/fx/gpuemitter/OrbitSpeedSimulationShader.md): Moves the particles around the emitter.
+- [hrt.prefab.fx.gpuemitter.ParticleShader](api/md/hrt/prefab/fx/gpuemitter/ParticleShader.md): Reads the particle data (life, random value, color) in the rendering of a GPU particle.
+- [hrt.prefab.fx.gpuemitter.PreviousModelViewSimulation](api/md/hrt/prefab/fx/gpuemitter/PreviousModelViewSimulation.md): Stores the previous transform of the particles, for the motion vectors.
+- [hrt.prefab.fx.gpuemitter.RandomColorSpawn](api/md/hrt/prefab/fx/gpuemitter/RandomColorSpawn.md): Gives the particles of a GPU emitter a random color between two colors.
+- [hrt.prefab.fx.gpuemitter.RandomColorSpawnShader](api/md/hrt/prefab/fx/gpuemitter/RandomColorSpawnShader.md): Gives the particles a random color.
+- [hrt.prefab.fx.gpuemitter.RelativeTransformSimulation](api/md/hrt/prefab/fx/gpuemitter/RelativeTransformSimulation.md): Applies a transform (position, scale, rotation, speed) to the particles of a GPU emitter.
+- [hrt.prefab.fx.gpuemitter.RelativeTransformSimulationShader](api/md/hrt/prefab/fx/gpuemitter/RelativeTransformSimulationShader.md): Applies a transform to the particles.
+- [hrt.prefab.fx.gpuemitter.SimulationShader](api/md/hrt/prefab/fx/gpuemitter/SimulationShader.md): A shader prefab added to the simulation of its parent `GPUEmitter`.
+- [hrt.prefab.fx.gpuemitter.SpawnShader](api/md/hrt/prefab/fx/gpuemitter/SpawnShader.md): A shader prefab added to the spawn of its parent `GPUEmitter`.
+- [hrt.prefab.fx.gpuemitter.SpeedMode](api/md/hrt/prefab/fx/gpuemitter/SpeedMode.md): The initial speed of the particles of a `GPUEmitter`.
+- [hrt.prefab.fx.gpuemitter.SphereSpawn](api/md/hrt/prefab/fx/gpuemitter/SphereSpawn.md): Spawns the particles of a GPU emitter in a sphere shell, between two radiuses.
+- [hrt.prefab.fx.gpuemitter.SphereSpawnShader](api/md/hrt/prefab/fx/gpuemitter/SphereSpawnShader.md): Spawns the particles in a sphere.
+- [hrt.prefab.fx.gpuemitter.Template](api/md/hrt/prefab/fx/gpuemitter/Template.md): A child of a `GPUEmitter` used as particle.
+- [hrt.prefab.fx.gpuemitter.TurbulenceSimulation](api/md/hrt/prefab/fx/gpuemitter/TurbulenceSimulation.md): Applies a noise turbulence to the particles of a GPU emitter.
+- [hrt.prefab.fx.gpuemitter.TurbulenceSimulationShader](api/md/hrt/prefab/fx/gpuemitter/TurbulenceSimulationShader.md): Applies a noise turbulence to the speed of the particles.
+- [hrt.prefab.fx.gpuemitter.UpdateParamShader](api/md/hrt/prefab/fx/gpuemitter/UpdateParamShader.md): Updates an animated shader parameter of the particles from the baked animation texture.
+- [hrt.prefab.l2d.Anim2D](api/md/hrt/prefab/l2d/Anim2D.md): A 2D animation from a sprite sheet texture, with frames of a fixed size.
+- [hrt.prefab.l2d.Atlas](api/md/hrt/prefab/l2d/Atlas.md): A 2D animation from the frames of an atlas.
+- [hrt.prefab.l2d.Bitmap](api/md/hrt/prefab/l2d/Bitmap.md): A 2D bitmap of a texture (or a magenta square if none).
+- [hrt.prefab.l2d.Blur](api/md/hrt/prefab/l2d/Blur.md): A blur filter, usable on 2D objects (`makeFilter`) or textures (`apply`).
+- [hrt.prefab.l2d.Flow](api/md/hrt/prefab/l2d/Flow.md): A `h2d.Flow` container.
+- [hrt.prefab.l2d.Gradient](api/md/hrt/prefab/l2d/Gradient.md): A 2D bitmap of a gradient.
+- [hrt.prefab.l2d.NoiseGenerator](api/md/hrt/prefab/l2d/NoiseGenerator.md): Generates a noise texture on the GPU, displayed as a bitmap.
+- [hrt.prefab.l2d.NoiseMode](api/md/hrt/prefab/l2d/NoiseMode.md): The noise of a `NoiseGenerator`.
+- [hrt.prefab.l2d.NoiseShader](api/md/hrt/prefab/l2d/NoiseShader.md): Renders the noise of a `NoiseGenerator`.
+- [hrt.prefab.l2d.Particle2D](api/md/hrt/prefab/l2d/Particle2D.md): Deprecated: use `Emitter2D`.
+- [hrt.prefab.l2d.Particles](api/md/hrt/prefab/l2d/Particles.md): The 2D particles of `Particle2D`, with values animated by FX curves.
+- [hrt.prefab.l2d.RepeatMode](api/md/hrt/prefab/l2d/RepeatMode.md): The tiling of a `NoiseGenerator` texture.
+- [hrt.prefab.l2d.Text](api/md/hrt/prefab/l2d/Text.md): A 2D HTML text, with a signed distance field font.
+- [hrt.prefab.l2d.Tile](api/md/hrt/prefab/l2d/Tile.md): A 2D bitmap of a tile of a texture, in a grid of cells of `size` pixels.
+- [hrt.prefab.l3d.AnimSpeedControl](api/md/hrt/prefab/l3d/AnimSpeedControl.md): Sets the speed of the current animation of its parent object.
+- [hrt.prefab.l3d.BatchData](api/md/hrt/prefab/l3d/BatchData.md): A mesh batch of a `MeshSpray`, for a model.
+- [hrt.prefab.l3d.BillboardObj](api/md/hrt/prefab/l3d/BillboardObj.md): A textured quad facing the camera.
+- [hrt.prefab.l3d.BillboardShader](api/md/hrt/prefab/l3d/BillboardShader.md): Makes the mesh face the camera, with a uniform scale.
+- [hrt.prefab.l3d.Box](api/md/hrt/prefab/l3d/Box.md): A unit box, displayed with a debug color in the editor.
+- [hrt.prefab.l3d.Camera](api/md/hrt/prefab/l3d/Camera.md): A camera position, with its field of view, planes and renderer effects (children), previewable in the editor.
+- [hrt.prefab.l3d.CameraSyncObject](api/md/hrt/prefab/l3d/CameraSyncObject.md): The object of a `Camera`: applies its field of view and planes to the scene camera when enabled.
+- [hrt.prefab.l3d.Constraint](api/md/hrt/prefab/l3d/Constraint.md): Makes an object follow another one (`h3d.scene.Object.follow`).
+- [hrt.prefab.l3d.Decal](api/md/hrt/prefab/l3d/Decal.md): A volume decal: projects textures on the surfaces inside its unit box.
+- [hrt.prefab.l3d.DecalMode](api/md/hrt/prefab/l3d/DecalMode.md): How a `Decal` is rendered.
+- [hrt.prefab.l3d.Environment](api/md/hrt/prefab/l3d/Environment.md): An environment map for PBR lighting, computed from a sky texture and stored next to the prefab.
+- [hrt.prefab.l3d.GameController](api/md/hrt/prefab/l3d/GameController.md): Controls the object with a gamepad in the editor (Start to toggle), with a third person camera.
+- [hrt.prefab.l3d.GenSDF](api/md/hrt/prefab/l3d/GenSDF.md): Renders the signed distance field of a polygon (up to 256 points).
+- [hrt.prefab.l3d.HandleType](api/md/hrt/prefab/l3d/HandleType.md): A handle of the spline edition.
+- [hrt.prefab.l3d.HeightGrid](api/md/hrt/prefab/l3d/HeightGrid.md): A grid primitive for the tiles of a `HeightMap`, displaced by the shader.
+- [hrt.prefab.l3d.HeightMaPTexturePathKind](api/md/hrt/prefab/l3d/HeightMaPTexturePathKind.md): The kind of a texture of a `HeightMap`.
+- [hrt.prefab.l3d.HeightMap](api/md/hrt/prefab/l3d/HeightMap.md): A terrain displaced by height textures, optionally made of tiles.
+- [hrt.prefab.l3d.HeightMapMesh](api/md/hrt/prefab/l3d/HeightMapMesh.md): The object of a `HeightMap`: shows the tiles visible by the camera, created on demand.
+- [hrt.prefab.l3d.HeightMapShader](api/md/hrt/prefab/l3d/HeightMapShader.md): Displaces the grid by the height texture and blends the albedo textures.
+- [hrt.prefab.l3d.HeightMapTile](api/md/hrt/prefab/l3d/HeightMapTile.md): A tile of a `HeightMap`, of size `size`.
+- [hrt.prefab.l3d.Instance](api/md/hrt/prefab/l3d/Instance.md): An instance of a CastleDB line: displays the model (or prefab) referenced by the line in the editor.
+- [hrt.prefab.l3d.InstanceData](api/md/hrt/prefab/l3d/InstanceData.md): The instances of a mesh along a spline.
+- [hrt.prefab.l3d.KitTest](api/md/hrt/prefab/l3d/KitTest.md): A cube prefab with properties of all kinds, to test the editor kit (`hide.kit`).
+- [hrt.prefab.l3d.KitTestTool1](api/md/hrt/prefab/l3d/KitTestTool1.md): An empty tool, to test the editor kit.
+- [hrt.prefab.l3d.KitTestTool2](api/md/hrt/prefab/l3d/KitTestTool2.md): An empty tool, to test the editor kit.
+- [hrt.prefab.l3d.Layer2D](api/md/hrt/prefab/l3d/Layer2D.md): A layer of `Layers2D`: a map of values painted on the ground.
+- [hrt.prefab.l3d.Layer2DRFX](api/md/hrt/prefab/l3d/Layer2DRFX.md): The renderer effect displaying the painted layer.
+- [hrt.prefab.l3d.Layer2DValue](api/md/hrt/prefab/l3d/Layer2DValue.md): A value of a `Layer2D`.
+- [hrt.prefab.l3d.LayerView2DRFXShader](api/md/hrt/prefab/l3d/LayerView2DRFXShader.md): Displays the painted layer over the scene.
+- [hrt.prefab.l3d.Layers2D](api/md/hrt/prefab/l3d/Layers2D.md): Layers of values painted on the ground in the editor (zones, materials...), stored as images next to the prefab.
+- [hrt.prefab.l3d.Layers2DTool](api/md/hrt/prefab/l3d/Layers2DTool.md): The tool painting the layers of a `Layers2D`.
+- [hrt.prefab.l3d.Level3D](api/md/hrt/prefab/l3d/Level3D.md): Alias of Object for compatibility with the old prefab system
+- [hrt.prefab.l3d.ListItem](api/md/hrt/prefab/l3d/ListItem.md): An item of a list, to test the editor kit.
+- [hrt.prefab.l3d.LocalVolumetricLighting](api/md/hrt/prefab/l3d/LocalVolumetricLighting.md): A local volume of fog, in a unit cube scaled by the transform.
+- [hrt.prefab.l3d.LocalVolumetricLightingObject](api/md/hrt/prefab/l3d/LocalVolumetricLightingObject.md): The object of a `LocalVolumetricLighting`: a unit cube rendered from inside or outside.
+- [hrt.prefab.l3d.LocalVolumetricShader](api/md/hrt/prefab/l3d/LocalVolumetricShader.md): Renders a volume of fog by integrating it along the view ray.
+- [hrt.prefab.l3d.MeshGenerator](api/md/hrt/prefab/l3d/MeshGenerator.md): Builds a mesh from models attached to the sockets of each other.
+- [hrt.prefab.l3d.MeshGeneratorRoot](api/md/hrt/prefab/l3d/MeshGeneratorRoot.md): The object of a `MeshGenerator`: syncs only when it moves.
+- [hrt.prefab.l3d.MeshPart](api/md/hrt/prefab/l3d/MeshPart.md): A part of a `MeshGenerator`: a model attached to a socket of its parent part.
+- [hrt.prefab.l3d.MeshSpray](api/md/hrt/prefab/l3d/MeshSpray.md): Places models on the ground with a brush in the editor, rendered with mesh batches (optionally split in cells, or stored in binary).
+- [hrt.prefab.l3d.MeshSprayObject](api/md/hrt/prefab/l3d/MeshSprayObject.md): The object of a `MeshSpray`: renders the meshes with mesh batches.
+- [hrt.prefab.l3d.Particles3D](api/md/hrt/prefab/l3d/Particles3D.md): GPU particles (`h3d.parts.GpuParticles`), loaded from `source` or the saved data.
+- [hrt.prefab.l3d.PointsArray](api/md/hrt/prefab/l3d/PointsArray.md): The storage of the trail points.
+- [hrt.prefab.l3d.Polygon](api/md/hrt/prefab/l3d/Polygon.md): A mesh of a simple shape, or of a custom polygon in the XY plane.
+- [hrt.prefab.l3d.PolygonEditor2](api/md/hrt/prefab/l3d/PolygonEditor2.md): The tool editing the points of a custom polygon.
+- [hrt.prefab.l3d.PolygonEditorHandle2](api/md/hrt/prefab/l3d/PolygonEditorHandle2.md): A handle of a point of the polygon editor.
+- [hrt.prefab.l3d.PrefabSpray](api/md/hrt/prefab/l3d/PrefabSpray.md): Places prefabs on the ground with a brush, in the editor.
+- [hrt.prefab.l3d.PrimCache](api/md/hrt/prefab/l3d/PrimCache.md): The primitives of the shapes, shared by the polygons.
+- [hrt.prefab.l3d.ProjectedDisplay](api/md/hrt/prefab/l3d/ProjectedDisplay.md): Displays a polygon projected on the ground, with a decal.
+- [hrt.prefab.l3d.Set](api/md/hrt/prefab/l3d/Set.md): A set of sources with a spray configuration.
+- [hrt.prefab.l3d.SetGroup](api/md/hrt/prefab/l3d/SetGroup.md): A group of sets.
+- [hrt.prefab.l3d.Shape](api/md/hrt/prefab/l3d/Shape.md): The shape of a `Polygon`.
+- [hrt.prefab.l3d.SignedDistanceField3D](api/md/hrt/prefab/l3d/SignedDistanceField3D.md): Renders a multi-channel signed distance field font.
+- [hrt.prefab.l3d.Socket](api/md/hrt/prefab/l3d/Socket.md): A socket of a model, where a part can be attached: an object named `Socket_<type>` or `Socket_<type>_<name>`.
+- [hrt.prefab.l3d.Source](api/md/hrt/prefab/l3d/Source.md): A model or prefab that can be sprayed.
+- [hrt.prefab.l3d.SplatMode](api/md/hrt/prefab/l3d/SplatMode.md): How the splat maps give the weights of the albedo textures.
+- [hrt.prefab.l3d.Spline](api/md/hrt/prefab/l3d/Spline.md): A 3D curve through points, editable in the editor.
+- [hrt.prefab.l3d.SplineMesh](api/md/hrt/prefab/l3d/SplineMesh.md): A mesh along its parent `Spline`.
+- [hrt.prefab.l3d.SplineMeshObject](api/md/hrt/prefab/l3d/SplineMeshObject.md): The mesh of a `SplineMesh`, with bounds following the spline.
+- [hrt.prefab.l3d.SplineMeshSpawner](api/md/hrt/prefab/l3d/SplineMeshSpawner.md): Repeats its child meshes along its parent `Spline`.
+- [hrt.prefab.l3d.SplineMeshSpawnerObject](api/md/hrt/prefab/l3d/SplineMeshSpawnerObject.md): The object of a `SplineMeshSpawner`.
+- [hrt.prefab.l3d.SplineObject](api/md/hrt/prefab/l3d/SplineObject.md): The object of a `Spline`: invalidates its samples when it moves.
+- [hrt.prefab.l3d.SplinePoint](api/md/hrt/prefab/l3d/SplinePoint.md): A point of a spline.
+- [hrt.prefab.l3d.SplineShape](api/md/hrt/prefab/l3d/SplineShape.md): The interpolation between the points of a spline.
+- [hrt.prefab.l3d.SplineUV](api/md/hrt/prefab/l3d/SplineUV.md): Uses the texture coordinates of the spline mesh.
+- [hrt.prefab.l3d.Spray](api/md/hrt/prefab/l3d/Spray.md): The base of `MeshSpray`: places models or prefabs on the ground with a brush, in the editor.
+- [hrt.prefab.l3d.SprayConfig](api/md/hrt/prefab/l3d/SprayConfig.md): The configuration of the spray brush.
+- [hrt.prefab.l3d.SprayObject](api/md/hrt/prefab/l3d/SprayObject.md): The object of a `Spray`.
+- [hrt.prefab.l3d.SubStruct](api/md/hrt/prefab/l3d/SubStruct.md): A recursive structure, to test the editor kit.
+- [hrt.prefab.l3d.TestAbstractInt](api/md/hrt/prefab/l3d/TestAbstractInt.md): An int enum abstract, to test the editor kit.
+- [hrt.prefab.l3d.TestAbstractString](api/md/hrt/prefab/l3d/TestAbstractString.md): A string enum abstract, to test the editor kit.
+- [hrt.prefab.l3d.TestEnum](api/md/hrt/prefab/l3d/TestEnum.md): An enum, to test the editor kit.
+- [hrt.prefab.l3d.Text3D](api/md/hrt/prefab/l3d/Text3D.md): A text in 3D, with a signed distance field font.
+- [hrt.prefab.l3d.Text3DMesh](api/md/hrt/prefab/l3d/Text3DMesh.md): A text in 3D, laid out by a `h2d.Text`.
+- [hrt.prefab.l3d.Text3DPrimitive](api/md/hrt/prefab/l3d/Text3DPrimitive.md): The primitive of a `Text3DMesh`: the glyphs as quads in the XY plane.
+- [hrt.prefab.l3d.TextureItem](api/md/hrt/prefab/l3d/TextureItem.md): A texture of a `HeightMap`.
+- [hrt.prefab.l3d.Trail](api/md/hrt/prefab/l3d/Trail.md): Use Trails instead of this class
+- [hrt.prefab.l3d.TrailHead](api/md/hrt/prefab/l3d/TrailHead.md): A trail of a `TrailObj` (a struct on HashLink).
+- [hrt.prefab.l3d.TrailObj](api/md/hrt/prefab/l3d/TrailObj.md): The mesh of `Trails`: several trails following positions, built each frame.
+- [hrt.prefab.l3d.TrailOrientation](api/md/hrt/prefab/l3d/TrailOrientation.md): The orientation of the trails.
+- [hrt.prefab.l3d.TrailPoint](api/md/hrt/prefab/l3d/TrailPoint.md): A point of a trail (a struct on HashLink).
+- [hrt.prefab.l3d.Trails](api/md/hrt/prefab/l3d/Trails.md): Trails following the object (or positions given to the `TrailObj`), with a width fading over their lifetime.
+- [hrt.prefab.l3d.TrailsArray](api/md/hrt/prefab/l3d/TrailsArray.md): The storage of the trails.
+- [hrt.prefab.l3d.UVMode](api/md/hrt/prefab/l3d/UVMode.md): How the texture coordinate U goes along the trails.
+- [hrt.prefab.l3d.UVRepeat](api/md/hrt/prefab/l3d/UVRepeat.md): How the texture coordinate U repeats.
+- [hrt.prefab.l3d.WorldProjectedCollider](api/md/hrt/prefab/l3d/WorldProjectedCollider.md): A collider of a polygon projected on the ground.
+- [hrt.prefab.l3d.modellibrary.AtlasShader](api/md/hrt/prefab/l3d/modellibrary/AtlasShader.md): Renders the meshes of a `ModelLibrary` with its texture atlas.
+- [hrt.prefab.l3d.modellibrary.BakedMaterialData](api/md/hrt/prefab/l3d/modellibrary/BakedMaterialData.md): A material of a mesh baked in a `ModelLibrary`.
+- [hrt.prefab.l3d.modellibrary.Batcher](api/md/hrt/prefab/l3d/modellibrary/Batcher.md): Renders meshes of a `ModelLibrary` with a mesh batch per material configuration.
+- [hrt.prefab.l3d.modellibrary.CopyInfo](api/md/hrt/prefab/l3d/modellibrary/CopyInfo.md): A copy of transforms into a mesh batch.
+- [hrt.prefab.l3d.modellibrary.CopyLibraryParams](api/md/hrt/prefab/l3d/modellibrary/CopyLibraryParams.md): Copies the library parameters of the instances into a mesh batch.
+- [hrt.prefab.l3d.modellibrary.CopyModelViews](api/md/hrt/prefab/l3d/modellibrary/CopyModelViews.md): Copies the transforms of the instances into a mesh batch.
+- [hrt.prefab.l3d.modellibrary.CopyUvTransform](api/md/hrt/prefab/l3d/modellibrary/CopyUvTransform.md): Copies the atlas texture coordinates of the instances into a mesh batch.
+- [hrt.prefab.l3d.modellibrary.EmitUnit](api/md/hrt/prefab/l3d/modellibrary/EmitUnit.md): Instances of a mesh, with their transforms in a GPU buffer.
+- [hrt.prefab.l3d.modellibrary.FileSignature](api/md/hrt/prefab/l3d/modellibrary/FileSignature.md): The path and SHA-1 of a file.
+- [hrt.prefab.l3d.modellibrary.GPUBatcher](api/md/hrt/prefab/l3d/modellibrary/GPUBatcher.md): A `Batcher` filled from GPU buffers of transforms, with GPU culling and LOD for large batches.
+- [hrt.prefab.l3d.modellibrary.MaterialSignature](api/md/hrt/prefab/l3d/modellibrary/MaterialSignature.md): The signature of a material.
+- [hrt.prefab.l3d.modellibrary.MeshEmitter](api/md/hrt/prefab/l3d/modellibrary/MeshEmitter.md): Emits the instances of a mesh of a `ModelLibrary` into a `Batcher`.
+- [hrt.prefab.l3d.modellibrary.ModelLibrary](api/md/hrt/prefab/l3d/modellibrary/ModelLibrary.md): Bakes its children models into a single model and texture atlas, to render many instances with few draw calls (see `Batcher`).
+- [hrt.prefab.l3d.modellibrary.ModelLibraryCache](api/md/hrt/prefab/l3d/modellibrary/ModelLibraryCache.md): The loaded data of a `ModelLibrary`, shared by its clones.
+- [hrt.prefab.l3d.modellibrary.ModelSignature](api/md/hrt/prefab/l3d/modellibrary/ModelSignature.md): The signature of a model and its materials.
+- [hrt.prefab.l3d.modellibrary.Signature](api/md/hrt/prefab/l3d/modellibrary/Signature.md): The signature of the sources of a `ModelLibrary`, to know if it must be baked again.
+- [hrt.prefab.pbr.Anisotropy](api/md/hrt/prefab/pbr/Anisotropy.md): Adds anisotropic specular reflections to the materials of its parent `Material` (brushed metal, hair...).
+- [hrt.prefab.pbr.AnisotropyMode](api/md/hrt/prefab/pbr/AnisotropyMode.md): Where the anisotropy of an `Anisotropy` comes from.
+- [hrt.prefab.pbr.LightVolume](api/md/hrt/prefab/pbr/LightVolume.md): A volumetric light around its parent point or spot light, rendered by the `hrt.prefab.rfx.LightVolume` effect.
+- [hrt.prefab.pbr.LightVolumeObject](api/md/hrt/prefab/pbr/LightVolumeObject.md): The mesh of a `LightVolume`, synced with its parent light.
+- [hrt.prefab.pbr.LightVolumeShader](api/md/hrt/prefab/pbr/LightVolumeShader.md): Ray marches the volume lit by a light.
+- [hrt.prefab.pbr.PointLightVolumeShader](api/md/hrt/prefab/pbr/PointLightVolumeShader.md): Ray marches the volume lit by a point light, with its shadows.
+- [hrt.prefab.pbr.SpecularColor](api/md/hrt/prefab/pbr/SpecularColor.md): Sets the specular color of the materials of its parent `Material`.
+- [hrt.prefab.pbr.SpecularColorMode](api/md/hrt/prefab/pbr/SpecularColorMode.md): Where the specular color of a `SpecularColor` comes from.
+- [hrt.prefab.pbr.SpotLightVolumeShader](api/md/hrt/prefab/pbr/SpotLightVolumeShader.md): Ray marches the volume lit by a spot light, with its shadows.
+- [hrt.prefab.rfx.AutoExposure](api/md/hrt/prefab/rfx/AutoExposure.md): Adapts the exposure of the PBR renderer to the direction of the camera relative to the main directional light.
+- [hrt.prefab.rfx.Bloom](api/md/hrt/prefab/rfx/Bloom.md): Adds a glow around the bright pixels.
+- [hrt.prefab.rfx.BloomTonemap](api/md/hrt/prefab/rfx/BloomTonemap.md): Adds the bloom texture in the tonemapping.
+- [hrt.prefab.rfx.Border](api/md/hrt/prefab/rfx/Border.md): Draws a colored border around the screen.
+- [hrt.prefab.rfx.BorderShader](api/md/hrt/prefab/rfx/BorderShader.md): Draws a colored border around the screen.
+- [hrt.prefab.rfx.ChromaticAberration](api/md/hrt/prefab/rfx/ChromaticAberration.md): Shifts the red and blue channels toward the screen borders, as a lens would.
+- [hrt.prefab.rfx.ChromaticAberrationShader](api/md/hrt/prefab/rfx/ChromaticAberrationShader.md): Shifts the red and blue channels toward the screen borders.
+- [hrt.prefab.rfx.CloudShadow](api/md/hrt/prefab/rfx/CloudShadow.md): Projects the shadows of scrolling clouds with the main directional light.
+- [hrt.prefab.rfx.ColorGrading](api/md/hrt/prefab/rfx/ColorGrading.md): Transforms the colors with a lookup table texture, in the tonemapping.
+- [hrt.prefab.rfx.ColorGradingFunc](api/md/hrt/prefab/rfx/ColorGradingFunc.md): Applies a color lookup table.
+- [hrt.prefab.rfx.ColorGradingTonemap](api/md/hrt/prefab/rfx/ColorGradingTonemap.md): Applies the lookup table in the tonemapping.
+- [hrt.prefab.rfx.ColorGradingTonemapBlend](api/md/hrt/prefab/rfx/ColorGradingTonemapBlend.md): Applies a blend of two lookup tables in the tonemapping, for transitions.
+- [hrt.prefab.rfx.Configurator](api/md/hrt/prefab/rfx/Configurator.md): Runs a script each frame to change properties of the renderer and prefabs, depending on variables.
+- [hrt.prefab.rfx.ConfiguratorInterp](api/md/hrt/prefab/rfx/ConfiguratorInterp.md): The script interpreter of a `Configurator`: remembers the fields it changes, to restore them after the frame.
+- [hrt.prefab.rfx.DirLightWithClouds](api/md/hrt/prefab/rfx/DirLightWithClouds.md): A directional light attenuated by a scrolling cloud texture.
+- [hrt.prefab.rfx.DistanceBlur](api/md/hrt/prefab/rfx/DistanceBlur.md): Blurs the near and far parts of the screen (depth of field).
+- [hrt.prefab.rfx.DistanceBlurShader](api/md/hrt/prefab/rfx/DistanceBlurShader.md): Blends the blurred screen depending on the distance.
+- [hrt.prefab.rfx.Distortion](api/md/hrt/prefab/rfx/Distortion.md): Distorts the screen with the objects drawn in the `distortion` pass.
+- [hrt.prefab.rfx.DistortionTonemap](api/md/hrt/prefab/rfx/DistortionTonemap.md): Offsets the texture coordinates of the tonemapping by the distortion map.
+- [hrt.prefab.rfx.DualFilterDown](api/md/hrt/prefab/rfx/DualFilterDown.md): Downscales the bloom (dual filtering).
+- [hrt.prefab.rfx.DualFilterUp](api/md/hrt/prefab/rfx/DualFilterUp.md): Upscales the bloom (dual filtering).
+- [hrt.prefab.rfx.FrustumJitter](api/md/hrt/prefab/rfx/FrustumJitter.md): Cycles through the sub-pixel offsets of a pattern, to jitter the camera frustum each frame (temporal anti-aliasing).
+- [hrt.prefab.rfx.GenFog](api/md/hrt/prefab/rfx/GenFog.md): A fog depending on the distance and the height, with a color gradient and a light scattering toward the shadow light.
+- [hrt.prefab.rfx.GenFogBlendShader](api/md/hrt/prefab/rfx/GenFogBlendShader.md): Renders a blend of two `GenFog` fogs, for transitions.
+- [hrt.prefab.rfx.GenFogFunc](api/md/hrt/prefab/rfx/GenFogFunc.md): The functions computing the fog of `GenFog`.
+- [hrt.prefab.rfx.GenFogNoise](api/md/hrt/prefab/rfx/GenFogNoise.md): The noise displacing the fog.
+- [hrt.prefab.rfx.GenFogRenderMode](api/md/hrt/prefab/rfx/GenFogRenderMode.md): When the fog of `GenFog` is rendered.
+- [hrt.prefab.rfx.GenFogShader](api/md/hrt/prefab/rfx/GenFogShader.md): Renders the fog of `GenFog`.
+- [hrt.prefab.rfx.HierarchicalSSR](api/md/hrt/prefab/rfx/HierarchicalSSR.md): Hierarchical screen space reflections (`h3d.pass.SSR`).
+- [hrt.prefab.rfx.KuwaharaFilter](api/md/hrt/prefab/rfx/KuwaharaFilter.md): A Kuwahara filter, giving a painting look, with an opacity depending on the distance.
+- [hrt.prefab.rfx.KuwaharaShader](api/md/hrt/prefab/rfx/KuwaharaShader.md): Applies a Kuwahara filter (painting effect), depending on the distance.
+- [hrt.prefab.rfx.LightVolume](api/md/hrt/prefab/rfx/LightVolume.md): Renders the light volumes (`hrt.prefab.pbr.LightVolume`) drawn in the `lightVolume` pass.
+- [hrt.prefab.rfx.Outline](api/md/hrt/prefab/rfx/Outline.md): Draws an outline around the objects drawn in the `highlight` passes.
+- [hrt.prefab.rfx.Pattern](api/md/hrt/prefab/rfx/Pattern.md): A pattern of sub-pixel offsets of the camera, for temporal anti-aliasing.
+- [hrt.prefab.rfx.Refraction](api/md/hrt/prefab/rfx/Refraction.md): Renders the objects drawn in the `refraction` pass with a refraction of the scene behind them.
+- [hrt.prefab.rfx.RefractionShader](api/md/hrt/prefab/rfx/RefractionShader.md): Renders the refracting surfaces, sampling the screen displaced by their normal.
+- [hrt.prefab.rfx.RendererFX](api/md/hrt/prefab/rfx/RendererFX.md): The base of the renderer effect prefabs: a `h3d.impl.RendererFX` added to the renderer.
+- [hrt.prefab.rfx.SSR](api/md/hrt/prefab/rfx/SSR.md): Screen space reflections, on the surfaces with a low roughness (or marked by the `ssrNormalMask` pass).
+- [hrt.prefab.rfx.SSRShader](api/md/hrt/prefab/rfx/SSRShader.md): Ray marches the reflections in screen space.
+- [hrt.prefab.rfx.Sao](api/md/hrt/prefab/rfx/Sao.md): Scalable ambient occlusion: a screen space ambient occlusion, combined with the material occlusion.
+- [hrt.prefab.rfx.SaoBlendMode](api/md/hrt/prefab/rfx/SaoBlendMode.md): How the screen space occlusion is combined with the material occlusion.
+- [hrt.prefab.rfx.SaoMerge](api/md/hrt/prefab/rfx/SaoMerge.md): Combines the screen space occlusion with the material occlusion.
+- [hrt.prefab.rfx.ScreenShaderGraph](api/md/hrt/prefab/rfx/ScreenShaderGraph.md): A screen effect made with a shader graph (`source`).
+- [hrt.prefab.rfx.ScreenShaderGraphMode](api/md/hrt/prefab/rfx/ScreenShaderGraphMode.md): When a `ScreenShaderGraph` is rendered.
+- [hrt.prefab.rfx.Sharpen](api/md/hrt/prefab/rfx/Sharpen.md): Sharpens the screen.
+- [hrt.prefab.rfx.SharpenShader](api/md/hrt/prefab/rfx/SharpenShader.md): Sharpens the screen.
+- [hrt.prefab.rfx.TemporalBloom](api/md/hrt/prefab/rfx/TemporalBloom.md): A bloom with dual filtering and a temporal filter, more stable than `Bloom`.
+- [hrt.prefab.rfx.TemporalFiltering](api/md/hrt/prefab/rfx/TemporalFiltering.md): Temporal anti-aliasing: jitters the camera each frame and blends with the previous frames.
+- [hrt.prefab.rfx.TemporalFilteringShader](api/md/hrt/prefab/rfx/TemporalFilteringShader.md): Blends the frame with the previous ones.
+- [hrt.prefab.rfx.Threshold](api/md/hrt/prefab/rfx/Threshold.md): Keeps the bright pixels, with a temporal filter.
+- [hrt.prefab.rfx.Vignetting](api/md/hrt/prefab/rfx/Vignetting.md): Colors the screen borders.
+- [hrt.prefab.rfx.VignettingShader](api/md/hrt/prefab/rfx/VignettingShader.md): Colors the screen borders.
+- [hrt.prefab.rfx.VolumetricLighting](api/md/hrt/prefab/rfx/VolumetricLighting.md): A volumetric fog lit by the lights (with their shadows), computed by ray marching at half resolution.
+- [hrt.prefab.rfx.VolumetricLightingMode](api/md/hrt/prefab/rfx/VolumetricLightingMode.md): The lights of `VolumetricLighting`.
+- [hrt.prefab.rfx.VolumetricLightingShader](api/md/hrt/prefab/rfx/VolumetricLightingShader.md): Ray marches the fog and the lights of `VolumetricLighting`.
+- [hrt.prefab.terrain.Direction](api/md/hrt/prefab/terrain/Direction.md): A direction in the grid of tiles (not used).
+- [hrt.prefab.terrain.NormalBake](api/md/hrt/prefab/terrain/NormalBake.md): Computes a normal map from a height map.
+- [hrt.prefab.terrain.PackWeight](api/md/hrt/prefab/terrain/PackWeight.md): Packs the weight textures of the surfaces into an index map and a packed weight texture (the strongest surfaces of each pixel).
+- [hrt.prefab.terrain.Surface](api/md/hrt/prefab/terrain/Surface.md): A material of the terrain: textures with their placement and height blending.
+- [hrt.prefab.terrain.SurfaceArray](api/md/hrt/prefab/terrain/SurfaceArray.md): The textures of all the surfaces, in texture arrays, with their parameters.
+- [hrt.prefab.terrain.SurfaceProps](api/md/hrt/prefab/terrain/SurfaceProps.md): The serialized properties of a surface.
+- [hrt.prefab.terrain.Terrain](api/md/hrt/prefab/terrain/Terrain.md): A terrain made of tiles, with height maps and painted surfaces, editable in the editor.
+- [hrt.prefab.terrain.TerrainCopy](api/md/hrt/prefab/terrain/TerrainCopy.md): Copies a texture into a part of another, to resize the tiles.
+- [hrt.prefab.terrain.TerrainMesh](api/md/hrt/prefab/terrain/TerrainMesh.md): The object of a `Terrain`: its tiles and surfaces.
+- [hrt.prefab.terrain.TerrainResize](api/md/hrt/prefab/terrain/TerrainResize.md): Resizes the tiles of a terrain, resampling their textures.
+- [hrt.prefab.terrain.Tile](api/md/hrt/prefab/terrain/Tile.md): A tile of a terrain, with its height map, normal map and surface weight maps.
+- [hrt.prefab.terrain.UnpackWeight](api/md/hrt/prefab/terrain/UnpackWeight.md): Extracts the weight texture of a surface from the index map and the packed weight texture.
+- [hrt.prefab.vlm.BoundsClipping](api/md/hrt/prefab/vlm/BoundsClipping.md): Clips the probe lighting to its bounds.
+- [hrt.prefab.vlm.BoundsFade](api/md/hrt/prefab/vlm/BoundsFade.md): Fades the probe lighting near its bounds.
+- [hrt.prefab.vlm.DebugView](api/md/hrt/prefab/vlm/DebugView.md): Displays the environment of a probe on its preview spheres.
+- [hrt.prefab.vlm.LightProbe](api/md/hrt/prefab/vlm/LightProbe.md): A local environment lighting in a volume (its unit box), from a texture or a capture of the scene.
+- [hrt.prefab.vlm.LightProbeObject](api/md/hrt/prefab/vlm/LightProbeObject.md): The mesh of a `LightProbe`: applies its indirect lighting to the pixels inside it.
+- [hrt.prefab.vlm.ProbeBaker](api/md/hrt/prefab/vlm/ProbeBaker.md): Captures the environment around a position and computes its spherical harmonics, for the volumetric lightmaps.
+- [hrt.prefab.vlm.ProbeFadeMode](api/md/hrt/prefab/vlm/ProbeFadeMode.md): The fade of a `LightProbe` near its bounds.
+- [hrt.prefab.vlm.ProbeMode](api/md/hrt/prefab/vlm/ProbeMode.md): Where the environment of a `LightProbe` comes from.
+- [hrt.prefab.vlm.Shape](api/md/hrt/prefab/vlm/Shape.md): The shape of a `LightProbe`.
+- [hrt.prefab.vlm.SphericalHarmonic](api/md/hrt/prefab/vlm/SphericalHarmonic.md): The spherical harmonic coefficients of a color.
+- [hrt.prefab.vlm.VolumetricLightmap](api/md/hrt/prefab/vlm/VolumetricLightmap.md): A volumetric lightmap: a grid of light probes, baked as spherical harmonics in the editor, giving the indirect lighting inside its volume.
+- [hrt.prefab.vlm.VolumetricMesh](api/md/hrt/prefab/vlm/VolumetricMesh.md): The mesh of a `VolumetricLightmap`: applies the lighting of its probes to the pixels inside its unit box.
+- [hrt.shader.AnisotropicForward](api/md/hrt/shader/AnisotropicForward.md): The PBR forward lighting with anisotropic specular reflections.
+- [hrt.shader.BaseEmitter](api/md/hrt/shader/BaseEmitter.md): The base shader of the particles of an emitter: gives their life, lifetime and random value, and the billboard orientation.
+- [hrt.shader.BaseTrails](api/md/hrt/shader/BaseTrails.md): Computes the texture coordinates of the trails (stretch and repeat).
+- [hrt.shader.Bloom](api/md/hrt/shader/Bloom.md): Keeps the pixels brighter than a threshold, for the bloom.
+- [hrt.shader.Brush](api/md/hrt/shader/Brush.md): Displays the terrain brush.
+- [hrt.shader.ComputeSH](api/md/hrt/shader/ComputeSH.md): Computes the spherical harmonics of an environment cube map.
+- [hrt.shader.CurvedNormal](api/md/hrt/shader/CurvedNormal.md): Curves the normals of a flat mesh, as if it was a sphere cap.
+- [hrt.shader.DebugDir](api/md/hrt/shader/DebugDir.md): Displays the anisotropy direction as a color.
+- [hrt.shader.DisplaySH](api/md/hrt/shader/DisplaySH.md): Displays the irradiance of spherical harmonics.
+- [hrt.shader.DissolveBurn](api/md/hrt/shader/DissolveBurn.md): Dissolves the surface with a noise texture, with a burning edge color.
+- [hrt.shader.EmissiveMult](api/md/hrt/shader/EmissiveMult.md): Multiplies the emissive.
+- [hrt.shader.FlatValue](api/md/hrt/shader/FlatValue.md): Gives a constant anisotropy intensity and direction.
+- [hrt.shader.FlowmapValue](api/md/hrt/shader/FlowmapValue.md): Gives the anisotropy direction from a flow map.
+- [hrt.shader.FrequencyValue](api/md/hrt/shader/FrequencyValue.md): Gives a constant anisotropy direction, rotated by a noise along the texture coordinates.
+- [hrt.shader.GradientFlat](api/md/hrt/shader/GradientFlat.md): Blends the color with a gradient texture along the texture coordinates.
+- [hrt.shader.GradientMap](api/md/hrt/shader/GradientMap.md): Replaces the color with a gradient indexed by its luminance (or alpha).
+- [hrt.shader.GradientMapLife](api/md/hrt/shader/GradientMapLife.md): Colors the particles with a gradient over their life.
+- [hrt.shader.HeightGradient](api/md/hrt/shader/HeightGradient.md): Colors the surface with a gradient along a direction (height).
+- [hrt.shader.MaskColorAlpha](api/md/hrt/shader/MaskColorAlpha.md): Tints the surface with a color through a mask texture.
+- [hrt.shader.MeshWave](api/md/hrt/shader/MeshWave.md): Deforms a mesh with waves along an axis.
+- [hrt.shader.NoiseTextureValue](api/md/hrt/shader/NoiseTextureValue.md): Gives the anisotropy intensity and direction from textures.
+- [hrt.shader.ParticleColorLife](api/md/hrt/shader/ParticleColorLife.md): Multiplies the color of the particles by a gradient over their life.
+- [hrt.shader.ParticleColorRandom](api/md/hrt/shader/ParticleColorRandom.md): Multiplies the color of the particles by a random color of a gradient.
+- [hrt.shader.ParticleFade](api/md/hrt/shader/ParticleFade.md): Fades the particles in and out over their life.
+- [hrt.shader.ParticleForward](api/md/hrt/shader/ParticleForward.md): The PBR forward lighting of the particles, with a cheap normal basis.
+- [hrt.shader.ParticleRandomMesh](api/md/hrt/shader/ParticleRandomMesh.md): Shows a random cell of a mesh made of several variations along an axis, per particle.
+- [hrt.shader.ParticleRandomMeshAxis](api/md/hrt/shader/ParticleRandomMeshAxis.md): The axis along which `ParticleRandomMesh` picks a cell.
+- [hrt.shader.PbrShader](api/md/hrt/shader/PbrShader.md): The base of the PBR screen shaders: reads the depth, occlusion and HDR maps.
+- [hrt.shader.PreviewShaderAlpha](api/md/hrt/shader/PreviewShaderAlpha.md): Shader that displays a grid background on 2d elements where they are transparent to help visualize the alpha channel.
+- [hrt.shader.Refraction](api/md/hrt/shader/Refraction.md): Makes the material refract the scene behind it (rendered by the `hrt.prefab.rfx.Refraction` effect).
+- [hrt.shader.RefractionPropsShader](api/md/hrt/shader/RefractionPropsShader.md): Sets the refraction parameters of a surface.
+- [hrt.shader.SDF](api/md/hrt/shader/SDF.md): Renders a signed distance field texture, antialiased.
+- [hrt.shader.SpecularColor](api/md/hrt/shader/SpecularColor.md): Applies the specular color and tint to the PBR lighting.
+- [hrt.shader.SpecularColorAlbedo](api/md/hrt/shader/SpecularColorAlbedo.md): Sets the specular color to the albedo.
+- [hrt.shader.SpecularColorFlat](api/md/hrt/shader/SpecularColorFlat.md): Sets the specular color to a constant.
+- [hrt.shader.SpecularColorTexture](api/md/hrt/shader/SpecularColorTexture.md): Sets the specular color from a texture.
+- [hrt.shader.Spinner](api/md/hrt/shader/Spinner.md): Draws animated trails along a shape (signed distance field).
+- [hrt.shader.Terrain](api/md/hrt/shader/Terrain.md): Renders a terrain tile: displacement by the height map, and blending of the surfaces by their weights.
+- [hrt.shader.TextureMult](api/md/hrt/shader/TextureMult.md): Multiplies the color by a texture.
+- [hrt.shader.TextureRotate](api/md/hrt/shader/TextureRotate.md): Rotates (and flips) the texture coordinates.
+- [hrt.shader.UVDebug](api/md/hrt/shader/UVDebug.md): Displays the texture coordinates as colors.
+- [hrt.shader.VertexValue](api/md/hrt/shader/VertexValue.md): Gives the anisotropy direction from the vertex data.
+- [hrt.shader.VolumetricLightmap](api/md/hrt/shader/VolumetricLightmap.md): Applies the irradiance of a volumetric lightmap, interpolated between its probes.
+- [hrt.shader.WireframeOverlay](api/md/hrt/shader/WireframeOverlay.md): Draws an overlay of the mesh in a flat color.
+- [hrt.shader.WireframeOverlayShader](api/md/hrt/shader/WireframeOverlayShader.md): Draws the mesh slightly inflated, in a flat color.
+- [hrt.shgraph.AliasInfo](api/md/hrt/shgraph/AliasInfo.md): Another entry of a node in the node menu.
+- [hrt.shgraph.AlphaPreview](api/md/hrt/shgraph/AlphaPreview.md): Displays the transparency of a node preview on a checkerboard.
+- [hrt.shgraph.AngleUnit](api/md/hrt/shgraph/AngleUnit.md): The unit of an angle input of a node.
+- [hrt.shgraph.ArrayUtils](api/md/hrt/shgraph/ArrayUtils.md): Macros on arrays.
+- [hrt.shgraph.AstTools](api/md/hrt/shgraph/AstTools.md): Helpers to build HXSL expressions (`hxsl.Ast`).
+- [hrt.shgraph.CacheEntry](api/md/hrt/shgraph/CacheEntry.md): The parsed HXSL code of a `ShaderNodeHxsl` node class.
+- [hrt.shgraph.Connection](api/md/hrt/shgraph/Connection.md): The connection of an input of a node.
+- [hrt.shgraph.CustomSerializer](api/md/hrt/shgraph/CustomSerializer.md): A HXSL serializer keeping the variable ids, used to read the code of the nodes.
+- [hrt.shgraph.CustomVarChooser](api/md/hrt/shgraph/CustomVarChooser.md): A component choosing the name and type of a custom variable (editor only).
+- [hrt.shgraph.Domain](api/md/hrt/shgraph/Domain.md): The shader function of a graph.
+- [hrt.shgraph.Edge](api/md/hrt/shgraph/Edge.md): A serialized connection between an output and an input.
+- [hrt.shgraph.ExternVarDef](api/md/hrt/shgraph/ExternVarDef.md): An external variable of the generated shader.
+- [hrt.shgraph.FunctionCache](api/md/hrt/shgraph/FunctionCache.md): A function of a `ShaderNodeHxsl` node.
+- [hrt.shgraph.Functions](api/md/hrt/shgraph/Functions.md): HXSL functions shared by the nodes (`random`).
+- [hrt.shgraph.Global](api/md/hrt/shgraph/Global.md): A global variable available to the shader graph nodes (see `Variables.Globals`).
+- [hrt.shgraph.GlobalInfo](api/md/hrt/shgraph/GlobalInfo.md): The definition of a global variable.
+- [hrt.shgraph.Graph](api/md/hrt/shgraph/Graph.md): The graph of a domain of a `ShaderGraph`: its nodes and their connections.
+- [hrt.shgraph.InputInfo](api/md/hrt/shgraph/InputInfo.md): An input of a node.
+- [hrt.shgraph.InputKind](api/md/hrt/shgraph/InputKind.md): The kind of a `ShaderInput`.
+- [hrt.shgraph.Macros](api/md/hrt/shgraph/Macros.md): Builds the shader graph nodes: parses the HXSL code (`SRC`) of `ShaderNodeHxsl` nodes and registers the nodes.
+- [hrt.shgraph.NodeGenContext](api/md/hrt/shgraph/NodeGenContext.md): The context of the generation of the nodes of a graph: gives them their inputs and the global variables, and collects their expressions and outputs.
+- [hrt.shgraph.NodeGenContextSubGraph](api/md/hrt/shgraph/NodeGenContextSubGraph.md): The generation context of a sub graph: its globals become the inputs and outputs of the `SubGraph` node.
+- [hrt.shgraph.Operation](api/md/hrt/shgraph/Operation.md): The base of the math operation nodes.
+- [hrt.shgraph.OutputInfo](api/md/hrt/shgraph/OutputInfo.md): An output of a node.
+- [hrt.shgraph.Parameter](api/md/hrt/shgraph/Parameter.md): A parameter of a shader graph: a shader parameter editable in the materials.
+- [hrt.shgraph.Random](api/md/hrt/shgraph/Random.md): The shader graph node "Math" (Channel): a random value between `min` and `max`.
+- [hrt.shgraph.SType](api/md/hrt/shgraph/SType.md): A type of the old shader graph nodes.
+- [hrt.shgraph.SgHxslVar](api/md/hrt/shgraph/SgHxslVar.md): The role of a variable in the HXSL code of a node (`ShaderNodeHxsl`), from its metadata.
+- [hrt.shgraph.SgType](api/md/hrt/shgraph/SgType.md): The type of an input or output of a shader graph node.
+- [hrt.shgraph.ShaderConst](api/md/hrt/shgraph/ShaderConst.md): A node with a constant name (no output).
+- [hrt.shgraph.ShaderCustomGlobal](api/md/hrt/shgraph/ShaderCustomGlobal.md): The shader graph node "Custom Global" (Input): reads a shader global by name.
+- [hrt.shgraph.ShaderDefInput](api/md/hrt/shgraph/ShaderDefInput.md): The default value of a node input.
+- [hrt.shgraph.ShaderException](api/md/hrt/shgraph/ShaderException.md): An error of a node of a shader graph.
+- [hrt.shgraph.ShaderGlobalInput](api/md/hrt/shgraph/ShaderGlobalInput.md): The shader graph node "Global" (Input): reads a global (time, pixel size, camera position, screen shader source).
+- [hrt.shgraph.ShaderGraph](api/md/hrt/shgraph/ShaderGraph.md): A shader made with nodes in the editor (`.shgraph` file): a vertex and a fragment graph, compiled to HXSL.
+- [hrt.shgraph.ShaderGraphCacheEntry](api/md/hrt/shgraph/ShaderGraphCacheEntry.md): A compiled shader graph in the cache.
+- [hrt.shgraph.ShaderGraphGenContext](api/md/hrt/shgraph/ShaderGraphGenContext.md): Generates the HXSL expression of a graph, by sorting and generating its nodes.
+- [hrt.shgraph.ShaderGraphVariable](api/md/hrt/shgraph/ShaderGraphVariable.md): A local variable of a shader graph, read and written by the `VarRead` and `VarWrite` nodes.
+- [hrt.shgraph.ShaderInput](api/md/hrt/shgraph/ShaderInput.md): The shader graph node "Inputs" (Input): reads a shader input of Heaps (see `availableInputs`).
+- [hrt.shgraph.ShaderNode](api/md/hrt/shgraph/ShaderNode.md): A node of a shader graph.
+- [hrt.shgraph.ShaderNodeDef](api/md/hrt/shgraph/ShaderNodeDef.md): The HXSL definition of a node.
+- [hrt.shgraph.ShaderNodeDefInVar](api/md/hrt/shgraph/ShaderNodeDefInVar.md): An input of a node definition.
+- [hrt.shgraph.ShaderNodeDefOutVar](api/md/hrt/shgraph/ShaderNodeDefOutVar.md): An output of a node definition.
+- [hrt.shgraph.ShaderNodeHxsl](api/md/hrt/shgraph/ShaderNodeHxsl.md): A node written in HXSL (`static var SRC`), its inputs and outputs being the variables with `@sginput` and `@sgoutput` metadata.
+- [hrt.shgraph.ShaderOutput](api/md/hrt/shgraph/ShaderOutput.md): The shader graph node "Outputs" (Output): writes a shader output (see `availableOutputs`).
+- [hrt.shgraph.ShaderParam](api/md/hrt/shgraph/ShaderParam.md): The shader graph node "Parameter": reads a parameter of the graph.
+- [hrt.shgraph.ShaderParticleInputs](api/md/hrt/shgraph/ShaderParticleInputs.md): The shader graph node "Particle Inputs" (Input): reads a particle input (see `availableInputs`).
+- [hrt.shgraph.ShaderType](api/md/hrt/shgraph/ShaderType.md): Conversions between `SType` and HXSL types.
+- [hrt.shgraph.VariableDecl](api/md/hrt/shgraph/VariableDecl.md): A variable available as a node input or output.
+- [hrt.shgraph.VariableKind](api/md/hrt/shgraph/VariableKind.md): The kind of a global variable.
+- [hrt.shgraph.Variables](api/md/hrt/shgraph/Variables.md): The global variables of the shader graphs.
+- [hrt.shgraph.nodes.Abs](api/md/hrt/shgraph/nodes/Abs.md): The shader graph node "Abs" (Math): the output is the result of |A|.
+- [hrt.shgraph.nodes.Acos](api/md/hrt/shgraph/nodes/Acos.md): The shader graph node "Arc Cosinus" (Math): the output is the arc cosinus of A.
+- [hrt.shgraph.nodes.Add](api/md/hrt/shgraph/nodes/Add.md): The shader graph node "Add" (Math): the output is the result of A + B.
+- [hrt.shgraph.nodes.AlphaOver](api/md/hrt/shgraph/nodes/AlphaOver.md): The shader graph node "Alpha Over" (Channel): blends between A and B based on A alpha * opacity.
+- [hrt.shgraph.nodes.AlphaPreview](api/md/hrt/shgraph/nodes/AlphaPreview.md): Displays the transparency of a node preview on a checkerboard.
+- [hrt.shgraph.nodes.Asin](api/md/hrt/shgraph/nodes/Asin.md): The shader graph node "Arc Sinus" (Math): the output is the arc sinus of A.
+- [hrt.shgraph.nodes.Atan](api/md/hrt/shgraph/nodes/Atan.md): The shader graph node "Arc Tangent" (Math): the output is the arc tangent of A.
+- [hrt.shgraph.nodes.Atan2](api/md/hrt/shgraph/nodes/Atan2.md): The shader graph node "Arc Tangent 2" (Math): the output is the arc tangent of a.y / a.x.
+- [hrt.shgraph.nodes.AutoAlpha](api/md/hrt/shgraph/nodes/AutoAlpha.md): The shader graph node "Auto Alpha" (Channel): set the alpha of the given vector to max(rgb) * scale.
+- [hrt.shgraph.nodes.BandMask](api/md/hrt/shgraph/nodes/BandMask.md): The shader graph node "Band Mask" (UV): returns 1 if value is within the band indexed.
+- [hrt.shgraph.nodes.BoolConst](api/md/hrt/shgraph/nodes/BoolConst.md): The shader graph node "Const Bool" (Property): boolean input (static).
+- [hrt.shgraph.nodes.CameraToScreen](api/md/hrt/shgraph/nodes/CameraToScreen.md): The shader graph node "CameraToScreen" (Property): transform a position from camera space to screen space.
+- [hrt.shgraph.nodes.CameraToWorld](api/md/hrt/shgraph/nodes/CameraToWorld.md): The shader graph node "CameraToWorld" (Property): transform a position from camera space to world space.
+- [hrt.shgraph.nodes.Ceil](api/md/hrt/shgraph/nodes/Ceil.md): The shader graph node "Ceil" (Math): the nearest integer greater than or equal to X.
+- [hrt.shgraph.nodes.Clamp](api/md/hrt/shgraph/nodes/Clamp.md): The shader graph node "Clamp" (Math): limits value between min and max.
+- [hrt.shgraph.nodes.Color](api/md/hrt/shgraph/nodes/Color.md): The shader graph node "Const Color" (Property): color property (static).
+- [hrt.shgraph.nodes.Combine](api/md/hrt/shgraph/nodes/Combine.md): The shader graph node "Combine" (Channel): create a vector of size 4 from 4 floats.
+- [hrt.shgraph.nodes.CombineAlpha](api/md/hrt/shgraph/nodes/CombineAlpha.md): The shader graph node "Combine Alpha" (Channel): create a vector of size 4 from a RGB and an Alpha float.
+- [hrt.shgraph.nodes.Comment](api/md/hrt/shgraph/nodes/Comment.md): The shader graph node "Comment" (Comment): a box that allows you to comment your graph.
+- [hrt.shgraph.nodes.Cond](api/md/hrt/shgraph/nodes/Cond.md): The shader graph node "Condition" (Condition): create a custom condition between two inputs.
+- [hrt.shgraph.nodes.Contrast](api/md/hrt/shgraph/nodes/Contrast.md): The shader graph node "Contrast" (Math): adjusts the contrast of input by the amount given, around the pivot value.
+- [hrt.shgraph.nodes.Cos](api/md/hrt/shgraph/nodes/Cos.md): The shader graph node "Cosinus" (Math): the output is the cosinus of A.
+- [hrt.shgraph.nodes.Cross](api/md/hrt/shgraph/nodes/Cross.md): The shader graph node "Cross" (Math): the output is the cross product of a and b.
+- [hrt.shgraph.nodes.DecalProjection](api/md/hrt/shgraph/nodes/DecalProjection.md): The shader graph node "Decal Projection" (UV): compute decal projection.
+- [hrt.shgraph.nodes.Deg2Rad](api/md/hrt/shgraph/nodes/Deg2Rad.md): The shader graph node "Deg to Rad" (Math): convert an angle in degree to an angle in radians.
+- [hrt.shgraph.nodes.Dissolve](api/md/hrt/shgraph/nodes/Dissolve.md): The shader graph node "Dissolve" (Math): dissolve input.
+- [hrt.shgraph.nodes.Distance](api/md/hrt/shgraph/nodes/Distance.md): The shader graph node "Distance" (Math): the distance between A and B.
+- [hrt.shgraph.nodes.Divide](api/md/hrt/shgraph/nodes/Divide.md): The shader graph node "Divide" (Math): the output is the result of A / B.
+- [hrt.shgraph.nodes.Dot](api/md/hrt/shgraph/nodes/Dot.md): The shader graph node "Dot" (Math): the output is the dot product of a and b.
+- [hrt.shgraph.nodes.Exp](api/md/hrt/shgraph/nodes/Exp.md): The shader graph node "Exp" (Math): the output is the result of exp(x).
+- [hrt.shgraph.nodes.Flipbook](api/md/hrt/shgraph/nodes/Flipbook.md): The shader graph node "Flipbook" (UV): animate UV by as a flipbook animation.
+- [hrt.shgraph.nodes.FloatConst](api/md/hrt/shgraph/nodes/FloatConst.md): The shader graph node "Const Value" (Property): number input (static).
+- [hrt.shgraph.nodes.Floor](api/md/hrt/shgraph/nodes/Floor.md): The shader graph node "Floor" (Math): the nearest integer less than or equal to X.
+- [hrt.shgraph.nodes.Fract](api/md/hrt/shgraph/nodes/Fract.md): The shader graph node "Fract" (Math): the fractional part of X.
+- [hrt.shgraph.nodes.Fresnel](api/md/hrt/shgraph/nodes/Fresnel.md): The shader graph node "Fresnel" (Math): fresnel input.
+- [hrt.shgraph.nodes.FrontFacing](api/md/hrt/shgraph/nodes/FrontFacing.md): The shader graph node "Front facing" (Property): tells if pixel is front or back facing.
+- [hrt.shgraph.nodes.IfCondition](api/md/hrt/shgraph/nodes/IfCondition.md): The shader graph node "If" (Condition): return the correct input according to the condition.
+- [hrt.shgraph.nodes.InvLerp](api/md/hrt/shgraph/nodes/InvLerp.md): The shader graph node "InvLerp" (Math): inverse linear interpolation : returns a value between 0 and 1 that indicated where value lies between A and B (0 <= A, 1 >= B).
+- [hrt.shgraph.nodes.Invert](api/md/hrt/shgraph/nodes/Invert.md): The shader graph node "Invert" (Math): the output is 1 - in.
+- [hrt.shgraph.nodes.Length](api/md/hrt/shgraph/nodes/Length.md): The shader graph node "Length" (Math): the length of A.
+- [hrt.shgraph.nodes.LinearDepth](api/md/hrt/shgraph/nodes/LinearDepth.md): The shader graph node "Linear Depth" (Property): linearize depth.
+- [hrt.shgraph.nodes.Log](api/md/hrt/shgraph/nodes/Log.md): The shader graph node "Log" (Math): the output is the result of log(x).
+- [hrt.shgraph.nodes.Luminance](api/md/hrt/shgraph/nodes/Luminance.md): The shader graph node "Luminance" (Math): the output is the luminance of the rgb color.
+- [hrt.shgraph.nodes.MainLightColor](api/md/hrt/shgraph/nodes/MainLightColor.md): The shader graph node "MainLightColor" (Property): get the main light color.
+- [hrt.shgraph.nodes.MainLightDirection](api/md/hrt/shgraph/nodes/MainLightDirection.md): The shader graph node "MainLightDirection" (Property): get the main light direction.
+- [hrt.shgraph.nodes.Max](api/md/hrt/shgraph/nodes/Max.md): The shader graph node "Max" (Math): the output is the maximum between A and B.
+- [hrt.shgraph.nodes.Min](api/md/hrt/shgraph/nodes/Min.md): The shader graph node "Min" (Math): the output is the minimum between A and B.
+- [hrt.shgraph.nodes.Mix](api/md/hrt/shgraph/nodes/Mix.md): The shader graph node "Mix" (Math): linear interpolation between A and B using Mix.
+- [hrt.shgraph.nodes.Mod](api/md/hrt/shgraph/nodes/Mod.md): The shader graph node "Modulo" (Math): the output is the result of X modulo MOD.
+- [hrt.shgraph.nodes.Multiply](api/md/hrt/shgraph/nodes/Multiply.md): The shader graph node "Multiply" (Math): the output is the result of A * B.
+- [hrt.shgraph.nodes.NormalMap](api/md/hrt/shgraph/nodes/NormalMap.md): The shader graph node "Normal map" (Math): returns normal in world space using a normal map.
+- [hrt.shgraph.nodes.NormalStrength](api/md/hrt/shgraph/nodes/NormalStrength.md): The shader graph node "Normal Strength" (Math): adjusts the strength of a tangent space normal.
+- [hrt.shgraph.nodes.Normalize](api/md/hrt/shgraph/nodes/Normalize.md): The shader graph node "Normalize" (Math): the output is the result of normalize(x).
+- [hrt.shgraph.nodes.ObjectPos](api/md/hrt/shgraph/nodes/ObjectPos.md): The shader graph node "ObjectPos" (Property): returns the position of the object (in world space).
+- [hrt.shgraph.nodes.ObjectScale](api/md/hrt/shgraph/nodes/ObjectScale.md): The shader graph node "ObjectScale" (Property): returns the scale of the object.
+- [hrt.shgraph.nodes.ObjectToTangent](api/md/hrt/shgraph/nodes/ObjectToTangent.md): The shader graph node "ObjectToTangent" (Property): transform a direction from object space to tangent space.
+- [hrt.shgraph.nodes.ObjectToWorld](api/md/hrt/shgraph/nodes/ObjectToWorld.md): The shader graph node "ObjectToWorld" (Property): transform a position from object space to world space.
+- [hrt.shgraph.nodes.OneMinus](api/md/hrt/shgraph/nodes/OneMinus.md): The shader graph node "One minus" (Math): returns 1 - a.
+- [hrt.shgraph.nodes.Parallax](api/md/hrt/shgraph/nodes/Parallax.md): The shader graph node "Parallax" (UV): parallaxed uv offset.
+- [hrt.shgraph.nodes.PolarCoordinates](api/md/hrt/shgraph/nodes/PolarCoordinates.md): The shader graph node "Polar Coordinates" (UV): convert UV in carthesian coordinates to polar coordinates UV.
+- [hrt.shgraph.nodes.Pow](api/md/hrt/shgraph/nodes/Pow.md): The shader graph node "Power" (Math): the output is the result of x ^ b.
+- [hrt.shgraph.nodes.Preview](api/md/hrt/shgraph/nodes/Preview.md): The shader graph node "Preview" (Output): displays its input, to debug.
+- [hrt.shgraph.nodes.Project](api/md/hrt/shgraph/nodes/Project.md): The shader graph node "Project" (Math): project the given world space vector into view space.
+- [hrt.shgraph.nodes.Rad2Deg](api/md/hrt/shgraph/nodes/Rad2Deg.md): The shader graph node "Rad to Deg" (Math): convert an angle in rad to an angle in degrees.
+- [hrt.shgraph.nodes.Random](api/md/hrt/shgraph/nodes/Random.md): The shader graph node "Random" (Math): gives a random number from a vec2 seed.
+- [hrt.shgraph.nodes.Random2D](api/md/hrt/shgraph/nodes/Random2D.md): The shader graph node "Random2D" (Math): gives a random vec2 from a vec2 seed.
+- [hrt.shgraph.nodes.Random3D](api/md/hrt/shgraph/nodes/Random3D.md): The shader graph node "Random3D" (Math): gives a random vec3 from a vec2 seed.
+- [hrt.shgraph.nodes.Remap](api/md/hrt/shgraph/nodes/Remap.md): The shader graph node "Remap" (Math): remap value in range [inMin, inMax] to range [outMin, outMax].
+- [hrt.shgraph.nodes.Reroute](api/md/hrt/shgraph/nodes/Reroute.md): Base class for the reroute nodes : forward its input to its output unchanged.
+- [hrt.shgraph.nodes.RerouteBool](api/md/hrt/shgraph/nodes/RerouteBool.md): The shader graph node "Reroute Bool" (Other): forwards a bool unchanged.
+- [hrt.shgraph.nodes.RerouteFloat](api/md/hrt/shgraph/nodes/RerouteFloat.md): The shader graph node "Reroute Float" (Other): forwards a float or vector unchanged.
+- [hrt.shgraph.nodes.RerouteInt](api/md/hrt/shgraph/nodes/RerouteInt.md): The shader graph node "Reroute Int" (Other): forwards an int unchanged.
+- [hrt.shgraph.nodes.RerouteSampler](api/md/hrt/shgraph/nodes/RerouteSampler.md): The shader graph node "Reroute Sampler" (Other): forwards a texture unchanged.
+- [hrt.shgraph.nodes.Rotate](api/md/hrt/shgraph/nodes/Rotate.md): The shader graph node "Rotate" (UV): rotate UV around Center by Rotation radians.
+- [hrt.shgraph.nodes.RotateAboutAxis](api/md/hrt/shgraph/nodes/RotateAboutAxis.md): The shader graph node "RotateAboutAxis" (Math): rotate position around normalized rotation axis by Rotation angle.
+- [hrt.shgraph.nodes.Sampler](api/md/hrt/shgraph/nodes/Sampler.md): The shader graph node "Sample Texture 2D" (Property): get color from texture and UV.
+- [hrt.shgraph.nodes.Saturate](api/md/hrt/shgraph/nodes/Saturate.md): The shader graph node "Saturate" (Math): saturate input A.
+- [hrt.shgraph.nodes.SceneDepth](api/md/hrt/shgraph/nodes/SceneDepth.md): The shader graph node "Scene Depth" (Property): read depth behind current pixel.
+- [hrt.shgraph.nodes.SceneDepthToWorld](api/md/hrt/shgraph/nodes/SceneDepthToWorld.md): The shader graph node "SceneDepthToWorld" (Property): transform a scene depth to a world space position.
+- [hrt.shgraph.nodes.SceneNormal](api/md/hrt/shgraph/nodes/SceneNormal.md): The shader graph node "Scene Normal" (Property): get scene normal behind current pixel.
+- [hrt.shgraph.nodes.ScenePos](api/md/hrt/shgraph/nodes/ScenePos.md): The shader graph node "Scene Pos" (Property): get scene position behind current pixel.
+- [hrt.shgraph.nodes.ScreenToWorld](api/md/hrt/shgraph/nodes/ScreenToWorld.md): The shader graph node "ScreenToWorld" (Property): transform a position from screen space to world space.
+- [hrt.shgraph.nodes.ShaderVar](api/md/hrt/shgraph/nodes/ShaderVar.md): The base of the nodes reading or writing a local variable of the graph.
+- [hrt.shgraph.nodes.Sign](api/md/hrt/shgraph/nodes/Sign.md): The shader graph node "Sign" (Math): returns 1.0 if a[i] is positive, -1.0 otherwise.
+- [hrt.shgraph.nodes.SimpleNoise](api/md/hrt/shgraph/nodes/SimpleNoise.md): A gradient noise node (disabled).
+- [hrt.shgraph.nodes.Sin](api/md/hrt/shgraph/nodes/Sin.md): The shader graph node "Sinus" (Math): the output is the sinus of A.
+- [hrt.shgraph.nodes.SmoothStep](api/md/hrt/shgraph/nodes/SmoothStep.md): The shader graph node "Smooth Step" (Math): the smooth Hermite interpolation of `fact` between the edges A and B (`smoothstep`).
+- [hrt.shgraph.nodes.Split](api/md/hrt/shgraph/nodes/Split.md): The shader graph node "Split" (Channel): split all components of a vector into floats.
+- [hrt.shgraph.nodes.Sqrt](api/md/hrt/shgraph/nodes/Sqrt.md): The shader graph node "Square Root" (Math): the output is the squre root A.
+- [hrt.shgraph.nodes.SquareWave](api/md/hrt/shgraph/nodes/SquareWave.md): The shader graph node "Square Wave" (Math): a square wave of period 1 oscilating between -1 and 1.
+- [hrt.shgraph.nodes.Step](api/md/hrt/shgraph/nodes/Step.md): The shader graph node "Step" (Math): generate a step function by comparing a[i] to edge[i].
+- [hrt.shgraph.nodes.StripAlpha](api/md/hrt/shgraph/nodes/StripAlpha.md): The shader graph node "Strip Alpha" (Channel): separate the rgb and a components of an rgba vector.
+- [hrt.shgraph.nodes.SubGraph](api/md/hrt/shgraph/nodes/SubGraph.md): The shader graph node "SubGraph": include a subgraph.
+- [hrt.shgraph.nodes.Subtract](api/md/hrt/shgraph/nodes/Subtract.md): The shader graph node "Subtract" (Math): the output is the result of A - B.
+- [hrt.shgraph.nodes.Tan](api/md/hrt/shgraph/nodes/Tan.md): The shader graph node "Tangent" (Math): the output is the tangent of A.
+- [hrt.shgraph.nodes.TangentToObject](api/md/hrt/shgraph/nodes/TangentToObject.md): The shader graph node "TangentToObject" (Property): transform a direction from tangent space to object space.
+- [hrt.shgraph.nodes.TangentToWorld](api/md/hrt/shgraph/nodes/TangentToWorld.md): The shader graph node "TangentToWorld" (Property): transform a direction from tangent space to world space.
+- [hrt.shgraph.nodes.TexFilter](api/md/hrt/shgraph/nodes/TexFilter.md): The filter of the `Sampler` node.
+- [hrt.shgraph.nodes.TexWrap](api/md/hrt/shgraph/nodes/TexWrap.md): The wrapping of the `Sampler` node.
+- [hrt.shgraph.nodes.Text](api/md/hrt/shgraph/nodes/Text.md): The shader graph node "Text" (Other): only UI, to add text.
+- [hrt.shgraph.nodes.TilingAndOffset](api/md/hrt/shgraph/nodes/TilingAndOffset.md): The shader graph node "Tiling and Offset" (UV): tiles and offsets the value of input UV by the inputs Tiling and Offset respectively.
+- [hrt.shgraph.nodes.TriangleWave](api/md/hrt/shgraph/nodes/TriangleWave.md): The shader graph node "Triangle Wave" (Math): a triangle wave of period 1 oscilating between -1 and 1.
+- [hrt.shgraph.nodes.TriplanarMode](api/md/hrt/shgraph/nodes/TriplanarMode.md): The space of the triplanar mapping.
+- [hrt.shgraph.nodes.TriplanarNormalMap](api/md/hrt/shgraph/nodes/TriplanarNormalMap.md): The shader graph node "Triplanar normal map" (Math): sample a normal map using triplanar params.
+- [hrt.shgraph.nodes.TriplanarParams](api/md/hrt/shgraph/nodes/TriplanarParams.md): The shader graph node "Triplanar params" (Math): returns parameters useful to sample a texture using triplanar mapping.
+- [hrt.shgraph.nodes.TriplanarSampler](api/md/hrt/shgraph/nodes/TriplanarSampler.md): The shader graph node "Triplanar sampler" (Math): sample a texture using triplanar params.
+- [hrt.shgraph.nodes.UVScroll](api/md/hrt/shgraph/nodes/UVScroll.md): The shader graph node "UV Scroll" (UV): scroll UV according to U & V speed.
+- [hrt.shgraph.nodes.UnpackNormal](api/md/hrt/shgraph/nodes/UnpackNormal.md): The shader graph node "Unpack Normal" (Channel): unpacks a normal stored in a color.
+- [hrt.shgraph.nodes.UvToScreen](api/md/hrt/shgraph/nodes/UvToScreen.md): The shader graph node "UV To Screen" (UV): converts texture coordinates to screen coordinates (`-1` to `1`).
+- [hrt.shgraph.nodes.VarRead](api/md/hrt/shgraph/nodes/VarRead.md): The shader graph node "Var Read" (Variables): read a value from a local variable.
+- [hrt.shgraph.nodes.VarWrite](api/md/hrt/shgraph/nodes/VarWrite.md): The shader graph node "Var Write" (Variables): write a value to a local variable.
+- [hrt.shgraph.nodes.Vec2](api/md/hrt/shgraph/nodes/Vec2.md): The shader graph node "Vec2" (Channel): create a vector of size 2 from 2 floats.
+- [hrt.shgraph.nodes.Vec3](api/md/hrt/shgraph/nodes/Vec3.md): The shader graph node "Vec3" (Channel): create a vector of size 3 from 3 floats.
+- [hrt.shgraph.nodes.Vec4](api/md/hrt/shgraph/nodes/Vec4.md): The shader graph node "Vec4" (Channel): create a vector of size 4 from 4 floats.
+- [hrt.shgraph.nodes.WorldToCamera](api/md/hrt/shgraph/nodes/WorldToCamera.md): The shader graph node "WorldToCamera" (Property): transform a position from world space to camera space.
+- [hrt.shgraph.nodes.WorldToObject](api/md/hrt/shgraph/nodes/WorldToObject.md): The shader graph node "WorldToObject" (Property): transform a position from world space to object space.
+- [hrt.shgraph.nodes.WorldToScreen](api/md/hrt/shgraph/nodes/WorldToScreen.md): The shader graph node "WorldToScreen" (Property): transform a position from world space to screen space.
+- [hrt.shgraph.nodes.WorldToTangent](api/md/hrt/shgraph/nodes/WorldToTangent.md): The shader graph node "WorldToTangent" (Property): transform a direction from world space to tangent space.
+- [hrt.texgraph.AliasInfo](api/md/hrt/texgraph/AliasInfo.md): Another entry of a node in the node menu.
+- [hrt.texgraph.Connection](api/md/hrt/texgraph/Connection.md): The connection of an input of a node.
+- [hrt.texgraph.Edge](api/md/hrt/texgraph/Edge.md): A serialized connection between an output and an input.
+- [hrt.texgraph.Macros](api/md/hrt/texgraph/Macros.md): Registers the graph nodes.
+- [hrt.texgraph.TexGraph](api/md/hrt/texgraph/TexGraph.md): A texture made with nodes in the editor (`.texgraph` file): generates textures on the GPU.
+- [hrt.texgraph.TexNode](api/md/hrt/texgraph/TexNode.md): A node of a texture graph.
+- [hrt.texgraph.nodes.Blur](api/md/hrt/texgraph/nodes/Blur.md): The texture graph node "Blur" (Math): blur texture.
+- [hrt.texgraph.nodes.BnWSpotsNoise](api/md/hrt/texgraph/nodes/BnWSpotsNoise.md): The texture graph node "BnW Spots Noise" (Texture generation): black and white spots noise texture.
+- [hrt.texgraph.nodes.BnWSpotsNoiseShader](api/md/hrt/texgraph/nodes/BnWSpotsNoiseShader.md): Renders black and white spots noise.
+- [hrt.texgraph.nodes.Comment](api/md/hrt/texgraph/nodes/Comment.md): The texture graph node "Comment" (Comment): a box that allows you to comment your graph.
+- [hrt.texgraph.nodes.Disc](api/md/hrt/texgraph/nodes/Disc.md): The texture graph node "Disc" (Texture generation): basic disc texture.
+- [hrt.texgraph.nodes.Multiply](api/md/hrt/texgraph/nodes/Multiply.md): The texture graph node "Multiply" (Math): the output is the result of the inputs multiplied.
+- [hrt.texgraph.nodes.MultiplyShader](api/md/hrt/texgraph/nodes/MultiplyShader.md): Multiplies two textures.
+- [hrt.texgraph.nodes.RGBAMerge](api/md/hrt/texgraph/nodes/RGBAMerge.md): The texture graph node "RGBA Merge" (Channel): merges 4 grayscale images into a RGBA image.
+- [hrt.texgraph.nodes.RGBAMergeShader](api/md/hrt/texgraph/nodes/RGBAMergeShader.md): Merges four grayscale textures in the channels of a texture.
+- [hrt.texgraph.nodes.RGBASplit](api/md/hrt/texgraph/nodes/RGBASplit.md): The texture graph node "RGBA Split" (Channel): separates a RGBA image into 4 grayscale images.
+- [hrt.texgraph.nodes.RGBASplitShader](api/md/hrt/texgraph/nodes/RGBASplitShader.md): Extracts a channel of a texture as a grayscale texture.
+- [hrt.texgraph.nodes.TexOutput](api/md/hrt/texgraph/nodes/TexOutput.md): The texture graph node "Outputs" (Output): parameters outputs.
+- [hrt.texgraph.nodes.WhiteNoise](api/md/hrt/texgraph/nodes/WhiteNoise.md): The texture graph node "White Noise" (Texture generation): white noise texture.
+- [hrt.texgraph.nodes.WhiteNoiseShader](api/md/hrt/texgraph/nodes/WhiteNoiseShader.md): Renders white noise.
+- [hrt.tools.Action](api/md/hrt/tools/Action.md): An action: applies it, or reverts it if `isUndo`.
+- [hrt.tools.CdbUtils](api/md/hrt/tools/CdbUtils.md): CastleDB helpers.
+- [hrt.tools.ClassUtils](api/md/hrt/tools/ClassUtils.md): Class hierarchy helpers.
+- [hrt.tools.Delayer](api/md/hrt/tools/Delayer.md): A class that allow queueing operations on a given Item type and ensuring that only one `callback` will be called on the given item per frame.
+- [hrt.tools.EditMode](api/md/hrt/tools/EditMode.md): The mode of a `Gizmo`.
+- [hrt.tools.ForwardConfig](api/md/hrt/tools/ForwardConfig.md): The options of `@:forwardDecls`.
+- [hrt.tools.ForwardDecls](api/md/hrt/tools/ForwardDecls.md): Runs `Macros.forward` on implementing classes.
+- [hrt.tools.GenToManagerCommand](api/md/hrt/tools/GenToManagerCommand.md): A message of the thumbnail generator to the file manager.
+- [hrt.tools.GenToManagerSuccessMessage](api/md/hrt/tools/GenToManagerSuccessMessage.md): A generated thumbnail.
+- [hrt.tools.Gizmo](api/md/hrt/tools/Gizmo.md): A 3D gizmo to move, rotate and scale objects in the editor.
+- [hrt.tools.GraphicsTools](api/md/hrt/tools/GraphicsTools.md): Static extension for h3d.scene.Graphics
+- [hrt.tools.Grid](api/md/hrt/tools/Grid.md): An infinite-looking grid on the XY plane, for the editor.
+- [hrt.tools.GridShader](api/md/hrt/tools/GridShader.md): Draws the lines of the grid, fading with the distance.
+- [hrt.tools.Handle](api/md/hrt/tools/Handle.md): A handle of a `Gizmo`.
+- [hrt.tools.Left](api/md/hrt/tools/Left.md): The element of the one side of a `OneToMany`.
+- [hrt.tools.Macros](api/md/hrt/tools/Macros.md): Build macros of the tools.
+- [hrt.tools.ManagerToGenCommand](api/md/hrt/tools/ManagerToGenCommand.md): A message of the file manager to the thumbnail generator.
+- [hrt.tools.MapUtils](api/md/hrt/tools/MapUtils.md): Map helpers.
+- [hrt.tools.MathUtils](api/md/hrt/tools/MathUtils.md): Math helpers.
+- [hrt.tools.OneToMany](api/md/hrt/tools/OneToMany.md): Represent a collection of One -> Many relationship, i.e Multiple `Right` elements can point to an unique `Left` element.
+- [hrt.tools.Path](api/md/hrt/tools/Path.md): The path to a CastleDB cell.
+- [hrt.tools.PathPart](api/md/hrt/tools/PathPart.md): A part of the path to a CastleDB cell.
+- [hrt.tools.ProcessAsync](api/md/hrt/tools/ProcessAsync.md): Run a process asynchronously, calling the given callback once the execution of the process has been completed
+- [hrt.tools.Right](api/md/hrt/tools/Right.md): The element of the many side of a `OneToMany`.
+- [hrt.tools.RotateAxisShader](api/md/hrt/tools/RotateAxisShader.md): Displays the rotation rings.
+- [hrt.tools.RotateSphereShader](api/md/hrt/tools/RotateSphereShader.md): Displays the rotation sphere.
+- [hrt.tools.Undo](api/md/hrt/tools/Undo.md): An undo history of actions.
+- [hrt.tools.ViewportAxis](api/md/hrt/tools/ViewportAxis.md): Displays the orientation of the camera as axes in a corner of the view, clickable to align the camera.
+- [hrt.ui.HuiSelectOption](api/md/hrt/ui/HuiSelectOption.md): An option of a select.
+- [hrt.ui.MenuIcon](api/md/hrt/ui/MenuIcon.md): The icon of a menu item: a path in JS, an image otherwise.
+- [hrt.ui.MenuItem](api/md/hrt/ui/MenuItem.md): An item of a menu.
+
+## hide
+
+- [hide.Config](api/md/hide/Config.md): A `props.json` configuration file, merged over its parent configuration.
+- [hide.ConfigDef](api/md/hide/ConfigDef.md): The content of a `props.json` file.
+- [hide.CustomLoader](api/md/hide/CustomLoader.md): A resource loader caching the resources in the engine resource cache.
+- [hide.Element](api/md/hide/Element.md): A jQuery element (`Dynamic` on HashLink).
+- [hide.Event](api/md/hide/Event.md): A jQuery event (`Dynamic` on HashLink).
+- [hide.Extension](api/md/hide/Extension.md): The registry of the views opening each file extension.
+- [hide.ExtensionDesc](api/md/hide/ExtensionDesc.md): A registered file extension.
+- [hide.ExtensionOptions](api/md/hide/ExtensionOptions.md): The options of a file extension.
+- [hide.FilterPathContext](api/md/hide/FilterPathContext.md): The context passed to the `Ide.filterPaths` callbacks, to change the file paths found in the project data.
+- [hide.HTMLElement](api/md/hide/HTMLElement.md): An HTML element (`Dynamic` on HashLink).
+- [hide.HideGlobalConfig](api/md/hide/HideGlobalConfig.md): The global settings of the editor, per user (the `hide` field of the global `props.json`).
+- [hide.HideProjectConfig](api/md/hide/HideProjectConfig.md): The settings of the IDE for a project.
+- [hide.Ide](api/md/hide/Ide.md): The HIDE editor application: project, windows, views, layout, menus, dialogs and clipboard.
+- [hide.IdeCache](api/md/hide/IdeCache.md): A cache of the IDE stored in the engine resource cache.
+- [hide.LayoutState](api/md/hide/LayoutState.md): A saved layout of the IDE.
+- [hide.MaterialSetup](api/md/hide/MaterialSetup.md): The material setup of the editor (forward renderer).
+- [hide.MessageKind](api/md/hide/MessageKind.md): The kind of a message shown by `Ide.globalMessage`.
+- [hide.PbrRenderer](api/md/hide/PbrRenderer.md): The PBR renderer of the editor: renders the `highlight` passes and the `ui` overlay pass.
+- [hide.PbrSetup](api/md/hide/PbrSetup.md): The PBR material setup of the editor.
+- [hide.Renderer](api/md/hide/Renderer.md): The forward renderer of the editor, with the editor passes.
+- [hide.ScreenOutline](api/md/hide/ScreenOutline.md): Draws the outline of the highlighted objects.
+- [hide.comp.Button](api/md/hide/comp/Button.md): A button with a label, and a dropdown arrow if `hasDropdown`.
+- [hide.comp.CameraControllerEditor](api/md/hide/comp/CameraControllerEditor.md): The popup editing the camera controller and its settings of a scene editor.
+- [hide.comp.Choice](api/md/hide/comp/Choice.md): A choice of a dropdown.
+- [hide.comp.CodeEditor](api/md/hide/comp/CodeEditor.md): A code editor component (Monaco), with completion and error display.
+- [hide.comp.ColorBox](api/md/hide/comp/ColorBox.md): Displays a color with its alpha component.
+- [hide.comp.ColorPicker](api/md/hide/comp/ColorPicker.md): A color picker popup, with a saturation and value area, a hue slider, component sliders in several color modes and a hex code.
+- [hide.comp.ColorSlider](api/md/hide/comp/ColorSlider.md): A 1D or 2D color slider drawn on a canvas.
+- [hide.comp.ColorSliderComponent](api/md/hide/comp/ColorSliderComponent.md): A row of the color picker sliders.
+- [hide.comp.Component](api/md/hide/comp/Component.md): The base class of the editor HTML components.
+- [hide.comp.ContentEditable](api/md/hide/comp/ContentEditable.md): An editable text element: Enter or focus loss validates, Escape cancels.
+- [hide.comp.ContextMenu](api/md/hide/comp/ContextMenu.md): A context menu, or a dropdown, made of `MenuItem`s, with an optional search.
+- [hide.comp.ContextMenuItem](api/md/hide/comp/ContextMenuItem.md): Deprecated: use `hrt.ui.HuiMenu.MenuItem`.
+- [hide.comp.CurveEditor](api/md/hide/comp/CurveEditor.md): The curve editor component: edits the keys and handles of several curves in an SVG view.
+- [hide.comp.CurveEditorComponent](api/md/hide/comp/CurveEditorComponent.md): A component drawn over the curve editor (events, overview).
+- [hide.comp.CurveKey](api/md/hide/comp/CurveKey.md): A key of a curve.
+- [hide.comp.CurvePopup](api/md/hide/comp/CurvePopup.md): A popup with a curve editor.
+- [hide.comp.CustomEditor](api/md/hide/comp/CustomEditor.md): A custom editor displayed over the scene, for a kind of prefab.
+- [hide.comp.CustomPivot](api/md/hide/comp/CustomPivot.md): A custom pivot of the gizmo.
+- [hide.comp.DataOverride](api/md/hide/comp/DataOverride.md): A value of the CDB line set in the preview prefab.
+- [hide.comp.DetachablePanel](api/md/hide/comp/DetachablePanel.md): A panel that can be detached from the layout and floated over the view, then moved and resized.
+- [hide.comp.DomkitChecker](api/md/hide/comp/DomkitChecker.md): Checks domkit markup and style sheets against the components of the project.
+- [hide.comp.DomkitEditor](api/md/hide/comp/DomkitEditor.md): A code editor for domkit markup or style sheets, checking them as they are edited.
+- [hide.comp.DomkitEditorKind](api/md/hide/comp/DomkitEditorKind.md): The language of a domkit editor.
+- [hide.comp.DropFlag](api/md/hide/comp/DropFlag.md): Where an item can be dropped on a target.
+- [hide.comp.DropFlags](api/md/hide/comp/DropFlags.md): A set of `DropFlag`.
+- [hide.comp.DropOperation](api/md/hide/comp/DropOperation.md): Where an item is dropped relative to the target.
+- [hide.comp.Dropdown](api/md/hide/comp/Dropdown.md): A dropdown list with a search filter.
+- [hide.comp.EventMoveMode](api/md/hide/comp/EventMoveMode.md): How the events are changed by a drag.
+- [hide.comp.EventMoving](api/md/hide/comp/EventMoving.md): A drag of FX events in the curve editor.
+- [hide.comp.EventsEditor](api/md/hide/comp/EventsEditor.md): Shows and edits the FX events in the curve editor.
+- [hide.comp.ExpRange](api/md/hide/comp/ExpRange.md): A slider with an exponential scale (base 10).
+- [hide.comp.FancyArray](api/md/hide/comp/FancyArray.md): A list component of collapsible items that can be added, removed, renamed and reordered by drag and drop.
+- [hide.comp.FancyClosable](api/md/hide/comp/FancyClosable.md): A container that is hidden by default and that can appear scrolling down from the top, like for a search bar
+- [hide.comp.FancyGallery](api/md/hide/comp/FancyGallery.md): A virtualized grid of item thumbnails with zoom levels, selection, renaming and drag and drop.
+- [hide.comp.FancyItemState](api/md/hide/comp/FancyItemState.md): The saved state of a `FancyArray` item.
+- [hide.comp.FancySearch](api/md/hide/comp/FancySearch.md): A search bar component.
+- [hide.comp.FancyTooltip](api/md/hide/comp/FancyTooltip.md): A tooltip popover shown at a position.
+- [hide.comp.FancyTree](api/md/hide/comp/FancyTree.md): A tree view component of items of any type, with lazy loading, search, multiple selection, renaming, buttons and drag and drop.
+- [hide.comp.FileSelect](api/md/hide/comp/FileSelect.md): A file selection input with a file chooser, a context menu and drag and drop.
+- [hide.comp.FileSelect2](api/md/hide/comp/FileSelect2.md): A file selection component with a preview, a file chooser, a context menu and drag and drop.
+- [hide.comp.FilterFlag](api/md/hide/comp/FilterFlag.md): The search state of a tree item.
+- [hide.comp.FilterFlags](api/md/hide/comp/FilterFlags.md): A set of `FilterFlag`.
+- [hide.comp.GalleryItemData](api/md/hide/comp/GalleryItemData.md): The internal data of a gallery item.
+- [hide.comp.GalleryRefreshFlag](api/md/hide/comp/GalleryRefreshFlag.md): What a gallery refresh must update.
+- [hide.comp.GalleryRefreshFlags](api/md/hide/comp/GalleryRefreshFlags.md): A set of `GalleryRefreshFlag`.
+- [hide.comp.GlobalSeek](api/md/hide/comp/GlobalSeek.md): A search dialog going to a CDB sheet or line.
+- [hide.comp.GlobalsDef](api/md/hide/comp/GlobalsDef.md): The `script.api` config: the API of the scripts, by document name pattern.
+- [hide.comp.GradientBox](api/md/hide/comp/GradientBox.md): Displays a gradient.
+- [hide.comp.GradientEditor](api/md/hide/comp/GradientEditor.md): A gradient editor popup: stops, colors, interpolation and resolution settings, and an optional prefab preview.
+- [hide.comp.GradientView](api/md/hide/comp/GradientView.md): Draws a gradient on a canvas.
+- [hide.comp.GroupMap](api/md/hide/comp/GroupMap.md): The field groups of a properties editor, by name, with their copy and paste functions.
+- [hide.comp.HelpPopup](api/md/hide/comp/HelpPopup.md): The popup listing the shortcuts of the editor.
+- [hide.comp.HideSceneEditorAPI](api/md/hide/comp/HideSceneEditorAPI.md): The `hrt.prefab.SceneEditorAPI` of a `SceneEditor`.
+- [hide.comp.IconVisibilityPopup](api/md/hide/comp/IconVisibilityPopup.md): The popup choosing the categories of editor icons displayed.
+- [hide.comp.JsTools](api/md/hide/comp/JsTools.md): HTML helpers.
+- [hide.comp.LayoutDirection](api/md/hide/comp/LayoutDirection.md): The direction a panel is resized in.
+- [hide.comp.MenuOptions](api/md/hide/comp/MenuOptions.md): The options of a context menu.
+- [hide.comp.Modal](api/md/hide/comp/Modal.md): A modal dialog stopping the events to the page.
+- [hide.comp.Modal2](api/md/hide/comp/Modal2.md): A modal popover with a title bar and a close button.
+- [hide.comp.MultiRange](api/md/hide/comp/MultiRange.md): Several sliders editing a vector of values, which can be linked to keep them uniform.
+- [hide.comp.Options](api/md/hide/comp/Options.md): The options of a `Button`.
+- [hide.comp.OverviewEditor](api/md/hide/comp/OverviewEditor.md): The overview of the keys of all the curves, above the curve editor.
+- [hide.comp.Params](api/md/hide/comp/Params.md): The options of a `FancyTree`.
+- [hide.comp.Popup](api/md/hide/comp/Popup.md): A popup that closes when clicking outside of it.
+- [hide.comp.PopupPosition](api/md/hide/comp/PopupPosition.md): Where a popup opens relative to its anchor.
+- [hide.comp.Preview2DCamController](api/md/hide/comp/Preview2DCamController.md): A simple pan and zoom controller for 2D previews.
+- [hide.comp.PreviewCamController](api/md/hide/comp/PreviewCamController.md): A simple orbit camera controller for previews.
+- [hide.comp.PreviewSettings](api/md/hide/comp/PreviewSettings.md): A gradient preview of the `cdb.gradientCustomPreviews` config: shows a prefab using the edited gradient.
+- [hide.comp.PropsEditor](api/md/hide/comp/PropsEditor.md): The properties panel component: binds the inputs of an HTML description (`field` attributes) to the fields of an object, with undo, sections, groups and multi-edition.
+- [hide.comp.PropsField](api/md/hide/comp/PropsField.md): An input of a properties editor bound to a field of an object.
+- [hide.comp.RadialMenu](api/md/hide/comp/RadialMenu.md): A circular menu opened around a point.
+- [hide.comp.RadialMenuItem](api/md/hide/comp/RadialMenuItem.md): An item of a radial menu.
+- [hide.comp.Range](api/md/hide/comp/Range.md): A slider with a number input, reset, copy and paste.
+- [hide.comp.RefreshFlag](api/md/hide/comp/RefreshFlag.md): What a tree refresh must update.
+- [hide.comp.RefreshFlags](api/md/hide/comp/RefreshFlags.md): A set of `RefreshFlag`.
+- [hide.comp.RefreshMode](api/md/hide/comp/RefreshMode.md): How the scene is refreshed.
+- [hide.comp.RenderPropsPopup](api/md/hide/comp/RenderPropsPopup.md): The popup choosing the render props of the scene.
+- [hide.comp.ResizablePanel](api/md/hide/comp/ResizablePanel.md): A panel resized with a splitter.
+- [hide.comp.ResizeObserver](api/md/hide/comp/ResizeObserver.md): The browser `ResizeObserver` API.
+- [hide.comp.RulerTool](api/md/hide/comp/RulerTool.md): A tool measuring the distance between two points of the scene.
+- [hide.comp.SVG](api/md/hide/comp/SVG.md): An SVG element component, with helpers creating its shapes.
+- [hide.comp.Scene](api/md/hide/comp/Scene.md): The 3D/2D scene component of the editor: a canvas with its own engine, `s3d`, `s2d`, loading of models, animations and textures, and render props.
+- [hide.comp.SceneEditor](api/md/hide/comp/SceneEditor.md): The editor of a prefab scene: the 3D/2D view with its camera and gizmo, the prefab tree, the properties panel, selection, undo, snapping and drag and drop.
+- [hide.comp.SceneEditorContext](api/md/hide/comp/SceneEditorContext.md): The edit context of the selected prefabs in a `SceneEditor`.
+- [hide.comp.ScenePreview](api/md/hide/comp/ScenePreview.md): A Scene that is specialised to load one prefab or mesh for preview.
+- [hide.comp.ScenePreviewSettings](api/md/hide/comp/ScenePreviewSettings.md): The saved settings of a `ScenePreview`.
+- [hide.comp.ScriptCache](api/md/hide/comp/ScriptCache.md): The cache of the script check results and of the API types, stored in the local storage.
+- [hide.comp.ScriptChecker](api/md/hide/comp/ScriptChecker.md): Type checks hscript scripts against the API configured in `script.api` for their document name.
+- [hide.comp.ScriptEditor](api/md/hide/comp/ScriptEditor.md): A code editor for hscript scripts, checking them as they are edited.
+- [hide.comp.SearchMode](api/md/hide/comp/SearchMode.md): The search of a context menu.
+- [hide.comp.SearchQuery](api/md/hide/comp/SearchQuery.md): The words of a search.
+- [hide.comp.SearchRanges](api/md/hide/comp/SearchRanges.md): Ranges of a text matching a search: start and end positions, in pairs.
+- [hide.comp.SeekMode](api/md/hide/comp/SeekMode.md): What the global seek searches.
+- [hide.comp.Select](api/md/hide/comp/Select.md): A searchable choice among a list, with copy and paste.
+- [hide.comp.SelectMode](api/md/hide/comp/SelectMode.md): How a selection updates the tree and the undo history.
+- [hide.comp.Shape](api/md/hide/comp/Shape.md): A collision shape edited by the `ShapeEditor`.
+- [hide.comp.ShapeEditor](api/md/hide/comp/ShapeEditor.md): Edits a list of shapes in the properties panel and the scene.
+- [hide.comp.ShapeEditorOptions](api/md/hide/comp/ShapeEditorOptions.md): The options of a `ShapeEditor`.
+- [hide.comp.Side](api/md/hide/comp/Side.md): The side a detachable panel is resized from.
+- [hide.comp.SliderGroup](api/md/hide/comp/SliderGroup.md): A group of color sliders sharing a value.
+- [hide.comp.SnapSettingsPopup](api/md/hide/comp/SnapSettingsPopup.md): The popup editing the snap settings.
+- [hide.comp.SplitterPosition](api/md/hide/comp/SplitterPosition.md): Where the splitter of a resizable panel is.
+- [hide.comp.Tabs](api/md/hide/comp/Tabs.md): A tabs component: each `.tab` child element is a tab.
+- [hide.comp.TagInfo](api/md/hide/comp/TagInfo.md): A tag of the prefabs, colored in the tree.
+- [hide.comp.TextureChoice](api/md/hide/comp/TextureChoice.md): Edits a texture value: a texture file or a gradient.
+- [hide.comp.TextureChoice2](api/md/hide/comp/TextureChoice2.md): Edits a texture value: a texture file or a gradient (with `TextureSelect2`).
+- [hide.comp.TextureSelect](api/md/hide/comp/TextureSelect.md): A texture file selection with a preview.
+- [hide.comp.TextureSelect2](api/md/hide/comp/TextureSelect2.md): A texture file selection with a preview (`FileSelect2` version).
+- [hide.comp.TileSelector](api/md/hide/comp/TileSelector.md): Selects a tile (or a rectangle of tiles) in a tileset image.
+- [hide.comp.ToolDef](api/md/hide/comp/ToolDef.md): The definition of a tool, for `Toolbar.makeToolbar`.
+- [hide.comp.ToolMenu](api/md/hide/comp/ToolMenu.md): A dropdown menu of a toolbar.
+- [hide.comp.ToolSelect](api/md/hide/comp/ToolSelect.md): A select of a toolbar.
+- [hide.comp.ToolToggle](api/md/hide/comp/ToolToggle.md): A toggle button of a toolbar.
+- [hide.comp.ToolType](api/md/hide/comp/ToolType.md): The kind of a toolbar tool.
+- [hide.comp.Toolbar](api/md/hide/comp/Toolbar.md): A toolbar component of buttons, toggles, sliders, colors, selects and menus, in groups.
+- [hide.comp.Tree](api/md/hide/comp/Tree.md): A tree of the scene editor.
+- [hide.comp.TreeButton](api/md/hide/comp/TreeButton.md): A button shown on the tree items.
+- [hide.comp.TreeItemData](api/md/hide/comp/TreeItemData.md): The internal data of a tree item.
+- [hide.comp.ViewModePopup](api/md/hide/comp/ViewModePopup.md): The popup choosing the debug view mode of the renderer (albedo, normals, UV checker...).
+- [hide.comp.ViewportOverlaysPopup](api/md/hide/comp/ViewportOverlaysPopup.md): The popup choosing the overlays displayed in the viewport.
+- [hide.comp.cdb.Cell](api/md/hide/comp/cdb/Cell.md): A cell of a CDB table: displays and edits the value of a column of a line.
+- [hide.comp.cdb.Cursor](api/md/hide/comp/cdb/Cursor.md): The cursor and selection of a CDB editor, with the history of the positions.
+- [hide.comp.cdb.CursorState](api/md/hide/comp/cdb/CursorState.md): A saved cursor position.
+- [hide.comp.cdb.DataFiles](api/md/hide/comp/cdb/DataFiles.md): The CastleDB sheets whose lines come from prefab files (`dataFiles` sheet property).
+- [hide.comp.cdb.DataProps](api/md/hide/comp/cdb/DataProps.md): Where a line of a CastleDB sheet with data files comes from.
+- [hide.comp.cdb.Direction](api/md/hide/comp/cdb/Direction.md): A horizontal direction.
+- [hide.comp.cdb.DisplayMode](api/md/hide/comp/cdb/DisplayMode.md): How a CDB table is displayed.
+- [hide.comp.cdb.Editor](api/md/hide/comp/cdb/Editor.md): The CastleDB editor component: shows and edits a sheet of the database, with cursor, undo, clipboard, search and filters.
+- [hide.comp.cdb.EditorApi](api/md/hide/comp/cdb/EditorApi.md): The data access of a CDB editor.
+- [hide.comp.cdb.EditorColumnProps](api/md/hide/comp/cdb/EditorColumnProps.md): The editor properties of a CDB column.
+- [hide.comp.cdb.EditorSheetProps](api/md/hide/comp/cdb/EditorSheetProps.md): The editor properties of a CDB sheet.
+- [hide.comp.cdb.FilterFlag](api/md/hide/comp/cdb/FilterFlag.md): A kind of line shown by the editor filters.
+- [hide.comp.cdb.FilterFlags](api/md/hide/comp/cdb/FilterFlags.md): A set of `FilterFlag`.
+- [hide.comp.cdb.Formula](api/md/hide/comp/cdb/Formula.md): A CDB formula: a function of the formulas file computing a number column from a line.
+- [hide.comp.cdb.Formulas](api/md/hide/comp/cdb/Formulas.md): The formulas of a CDB editor, loaded from the `cdb.formulasFile` hscript file.
+- [hide.comp.cdb.FormulasView](api/md/hide/comp/cdb/FormulasView.md): The script view of the formulas file, with the sheet types for the checker.
+- [hide.comp.cdb.Line](api/md/hide/comp/cdb/Line.md): A line of a CDB table.
+- [hide.comp.cdb.ModalColumnForm](api/md/hide/comp/cdb/ModalColumnForm.md): The form creating or editing a CDB column.
+- [hide.comp.cdb.ObjEditor](api/md/hide/comp/cdb/ObjEditor.md): A CDB editor of one object (all its properties) of a sheet type, stored in a file.
+- [hide.comp.cdb.OptionalBackup](api/md/hide/comp/cdb/OptionalBackup.md): The empty optional values removed by `Editor.cleanupOptionalLines`, to restore them.
+- [hide.comp.cdb.ScriptTable](api/md/hide/comp/cdb/ScriptTable.md): The sub table of a script cell: a script editor.
+- [hide.comp.cdb.Selection](api/md/hide/comp/cdb/Selection.md): A rectangle of selected cells.
+- [hide.comp.cdb.Separator](api/md/hide/comp/cdb/Separator.md): A separator of a CDB table: a collapsible titled group of lines, which can be nested.
+- [hide.comp.cdb.SheetAccess](api/md/hide/comp/cdb/SheetAccess.md): The access to a sheet given to the formulas, as a global named after the sheet type.
+- [hide.comp.cdb.SubTable](api/md/hide/comp/cdb/SubTable.md): The table of a list, properties or polymorphic cell, shown under its line.
+- [hide.comp.cdb.Table](api/md/hide/comp/cdb/Table.md): A table of a CDB editor, showing the lines of a sheet.
+- [hide.comp.cdb.UndoSheet](api/md/hide/comp/cdb/UndoSheet.md): A sheet shown in the editor, as stored in the undo state.
+- [hide.comp.cdb.UndoState](api/md/hide/comp/cdb/UndoState.md): A state of the editor saved in the undo history.
+- [hide.comp.cdb.ValidationFunction](api/md/hide/comp/cdb/ValidationFunction.md): A line validation function of the formulas file: a function whose name starts with `validate`.
+- [hide.comp.cdb.ValidationResult](api/md/hide/comp/cdb/ValidationResult.md): The result of a line validation function.
+- [hide.kit.Bitflag](api/md/hide/kit/Bitflag.md): A checkbox editing a bit of an integer.
+- [hide.kit.Block](api/md/hide/kit/Block.md): A container whose children are added to its parent.
+- [hide.kit.BuildExprArgs](api/md/hide/kit/BuildExprArgs.md): The arguments of the generation of the elements of a markup.
+- [hide.kit.Button](api/md/hide/kit/Button.md): A button.
+- [hide.kit.CDB](api/md/hide/kit/CDB.md): Edits the CastleDB properties of the prefab (editor only).
+- [hide.kit.Category](api/md/hide/kit/Category.md): A collapsible category, whose open state is saved.
+- [hide.kit.ChangeParams](api/md/hide/kit/ChangeParams.md): A change of a value of the kit, recorded for the undo.
+- [hide.kit.Checkbox](api/md/hide/kit/Checkbox.md): A checkbox.
+- [hide.kit.Color](api/md/hide/kit/Color.md): A color picker, editing an integer (or a vector or array with `vec` or `arr`).
+- [hide.kit.Curve](api/md/hide/kit/Curve.md): A curve editor.
+- [hide.kit.Element](api/md/hide/kit/Element.md): An element of the property editor kit (`hide.kit`), built with `ctx.build(<markup/>)` in `Prefab.edit2`.
+- [hide.kit.EntriesOrStrings](api/md/hide/kit/EntriesOrStrings.md): The entries of a select, or strings used as values and labels.
+- [hide.kit.File](api/md/hide/kit/File.md): A file selector.
+- [hide.kit.Gradient](api/md/hide/kit/Gradient.md): A gradient editor.
+- [hide.kit.ImageButton](api/md/hide/kit/ImageButton.md): A button with an icon and no label.
+- [hide.kit.Input](api/md/hide/kit/Input.md): A text input.
+- [hide.kit.KitColor](api/md/hide/kit/KitColor.md): A color of the kit.
+- [hide.kit.KitListHeader](api/md/hide/kit/KitListHeader.md): The header line of a list item.
+- [hide.kit.KitRoot](api/md/hide/kit/KitRoot.md): The root of the properties of a prefab, with copy and paste of the values.
+- [hide.kit.Line](api/md/hide/kit/Line.md): A line, with a label and content.
+- [hide.kit.List](api/md/hide/kit/List.md): An editable list of items, with add, remove and reorder.
+- [hide.kit.Macros](api/md/hide/kit/Macros.md): Builds the kit elements from the markup of `ctx.build`.
+- [hide.kit.Matlib](api/md/hide/kit/Matlib.md): Selects a material of a material library.
+- [hide.kit.NativeElement](api/md/hide/kit/NativeElement.md): A native element of the kit.
+- [hide.kit.NativeElementType](api/md/hide/kit/NativeElementType.md): The native element: an HTML element in JS, an `h2d.Object` otherwise.
+- [hide.kit.Object3dRef](api/md/hide/kit/Object3dRef.md): Allow the user to reference an object in the h3d scene
+- [hide.kit.Range](api/md/hide/kit/Range.md): A slider with a minimum and maximum.
+- [hide.kit.Select](api/md/hide/kit/Select.md): A dropdown select.
+- [hide.kit.SelectEntry](api/md/hide/kit/SelectEntry.md): An entry of a select.
+- [hide.kit.Separator](api/md/hide/kit/Separator.md): A separator line.
+- [hide.kit.Slider](api/md/hide/kit/Slider.md): A number slider.
+- [hide.kit.SliderGroup](api/md/hide/kit/SliderGroup.md): A line of sliders that can be locked together.
+- [hide.kit.Spacer](api/md/hide/kit/Spacer.md): An empty space.
+- [hide.kit.Text](api/md/hide/kit/Text.md): A text.
+- [hide.kit.Texture](api/md/hide/kit/Texture.md): A texture selector (a file or a gradient).
+- [hide.kit.Widget](api/md/hide/kit/Widget.md): Base class for all hide elements that manipulate a Value, like sliders, inputs etc...
+- [hide.prefab.ColorState](api/md/hide/prefab/ColorState.md): The highlight state of a polygon point.
+- [hide.prefab.ContextShared](api/md/hide/prefab/ContextShared.md): The shared context of the prefabs in the editor: adds the scene editor and scene.
+- [hide.prefab.Edge](api/md/hide/prefab/Edge.md): An edge of the edited polygon.
+- [hide.prefab.EditContext](api/md/hide/prefab/EditContext.md): The context of the prefab edition: scene, properties panel, undo and updates.
+- [hide.prefab.HideJsEditContext2](api/md/hide/prefab/HideJsEditContext2.md): The `EditContext2` of the HIDE editor, wrapping an `EditContext`.
+- [hide.prefab.HideProps](api/md/hide/prefab/HideProps.md): The editor properties of a prefab class, returned by `Prefab.getHideProps`.
+- [hide.prefab.MovablePoint](api/md/hide/prefab/MovablePoint.md): A movable point handle of the polygon editor.
+- [hide.prefab.PolygonEditor](api/md/hide/prefab/PolygonEditor.md): The editor of a polygon prefab: moves, adds and deletes its points in the scene.
+- [hide.prefab.SphereHandle](api/md/hide/prefab/SphereHandle.md): A point handle keeping a constant size on screen.
+- [hide.prefab.propsEditor.AnyPropsEditor](api/md/hide/prefab/propsEditor/AnyPropsEditor.md): Edits the properties of a `hxd.impl.AnyProps` object (materials, renderers...).
+- [hide.prefab.propsEditor.Material](api/md/hide/prefab/propsEditor/Material.md): Edits the properties of a `h3d.mat.Material`.
+- [hide.prefab.propsEditor.PbrMaterial](api/md/hide/prefab/propsEditor/PbrMaterial.md): Edits the properties of a `h3d.mat.PbrMaterial`.
+- [hide.prefab.propsEditor.PbrRenderer](api/md/hide/prefab/propsEditor/PbrRenderer.md): Edits the properties of a `h3d.scene.pbr.Renderer`.
+- [hide.prefab.terrain.AlphaMult](api/md/hide/prefab/terrain/AlphaMult.md): Multiplies the alpha by `amount`.
+- [hide.prefab.terrain.Brush](api/md/hide/prefab/terrain/Brush.md): A terrain brush: a texture stamped along the stroke.
+- [hide.prefab.terrain.BrushMode](api/md/hide/prefab/terrain/BrushMode.md): The mode and modifiers of a terrain brush.
+- [hide.prefab.terrain.BrushPreview](api/md/hide/prefab/terrain/BrushPreview.md): Shows the brush on the terrain as a decal.
+- [hide.prefab.terrain.ClampWeight](api/md/hide/prefab/terrain/ClampWeight.md): Terrain painting shader: where more than 3 surfaces are painted, removes the one with the smallest weight (except the base surface).
+- [hide.prefab.terrain.CustomRenderer](api/md/hide/prefab/terrain/CustomRenderer.md): A renderer drawing only one pass, used by the terrain editor.
+- [hide.prefab.terrain.CustomUV](api/md/hide/prefab/terrain/CustomUV.md): Terrain editor shader: outputs the UV and tile index of the terrain, to pick the position under the mouse.
+- [hide.prefab.terrain.GenerateIndex](api/md/hide/prefab/terrain/GenerateIndex.md): Terrain painting shader: computes the surface index map from the weight maps.
+- [hide.prefab.terrain.LockAxe](api/md/hide/prefab/terrain/LockAxe.md): The axis the stroke is locked to.
+- [hide.prefab.terrain.Mode](api/md/hide/prefab/terrain/Mode.md): The action of a terrain brush.
+- [hide.prefab.terrain.NormalizeWeight](api/md/hide/prefab/terrain/NormalizeWeight.md): Terrain painting shader: normalizes the surface weights.
+- [hide.prefab.terrain.RenderMode](api/md/hide/prefab/terrain/RenderMode.md): The debug render mode of the terrain editor.
+- [hide.prefab.terrain.SetHeight](api/md/hide/prefab/terrain/SetHeight.md): Terrain sculpting shader: moves the height towards a target height with the stroke strength.
+- [hide.prefab.terrain.SmoothHeight](api/md/hide/prefab/terrain/SmoothHeight.md): Terrain sculpting shader: moves the height towards the average of its neighbors with the stroke strength.
+- [hide.prefab.terrain.StrokeBuffer](api/md/hide/prefab/terrain/StrokeBuffer.md): A render target accumulating a brush stroke on one terrain tile.
+- [hide.prefab.terrain.StrokeBufferArray](api/md/hide/prefab/terrain/StrokeBufferArray.md): The stroke buffers of the tiles touched by a stroke.
+- [hide.prefab.terrain.SwapIndex](api/md/hide/prefab/terrain/SwapIndex.md): Terrain shader: replaces surface indexes in the surface index map.
+- [hide.prefab.terrain.TerrainEditor](api/md/hide/prefab/terrain/TerrainEditor.md): The editor of a terrain prefab: sculpts the heights, paints the surfaces and deletes the tiles with brushes.
+- [hide.prefab.terrain.TerrainRevertData](api/md/hide/prefab/terrain/TerrainRevertData.md): The undo data of a surface change.
+- [hide.prefab.terrain.TileRevertData](api/md/hide/prefab/terrain/TileRevertData.md): The undo data of a tile change: its maps before and after.
+- [hide.tools.ArrayExtensions](api/md/hide/tools/ArrayExtensions.md): Static extensions of arrays, used with `using hide.tools.Extensions`.
+- [hide.tools.ArrayExtensions_append_hrt_ui_MenuItem](api/md/hide/tools/ArrayExtensions_append_hrt_ui_MenuItem.md)
+- [hide.tools.ArrayExtensions_bubbleSort_sortAsc_T](api/md/hide/tools/ArrayExtensions_bubbleSort_sortAsc_T.md)
+- [hide.tools.ArrayExtensions_bubbleSort_sortDesc_T](api/md/hide/tools/ArrayExtensions_bubbleSort_sortDesc_T.md)
+- [hide.tools.ArrayExtensions_pickWeightIndex_pickWeight_T](api/md/hide/tools/ArrayExtensions_pickWeightIndex_pickWeight_T.md)
+- [hide.tools.CachedShader](api/md/hide/tools/CachedShader.md): A shader loaded by the `ShaderLoader`.
+- [hide.tools.CdbAccess](api/md/hide/tools/CdbAccess.md): Typed access to the lines of a CastleDB sheet, by id.
+- [hide.tools.Delayer](api/md/hide/tools/Delayer.md): Calls a function once per queued item on the next animation frame, ignoring duplicates.
+- [hide.tools.DragAndDrop](api/md/hide/tools/DragAndDrop.md): Drag and drop between HTML elements of the editor, with a thumbnail and native drops support.
+- [hide.tools.DragData](api/md/hide/tools/DragData.md): The state of a drag and drop operation.
+- [hide.tools.DragElement](api/md/hide/tools/DragElement.md): An element registered as draggable.
+- [hide.tools.DragEvent](api/md/hide/tools/DragEvent.md): An event sent to a draggable element.
+- [hide.tools.DropEvent](api/md/hide/tools/DropEvent.md): An event sent to a drop target.
+- [hide.tools.DropTarget](api/md/hide/tools/DropTarget.md): An element registered as a drop target.
+- [hide.tools.DropTargetValidity](api/md/hide/tools/DropTargetValidity.md): Tells if the hovered drop target accepts the drag.
+- [hide.tools.Extensions](api/md/hide/tools/Extensions.md): Static extensions of points, vectors, matrices, maps and arrays, used with `using hide.tools.Extensions`.
+- [hide.tools.FileEntry](api/md/hide/tools/FileEntry.md): A file or directory of the project resources, kept up to date by the `FileManager`.
+- [hide.tools.FileKind](api/md/hide/tools/FileKind.md): The kind of a file entry.
+- [hide.tools.FileManager](api/md/hide/tools/FileManager.md): Class that handle parsing and maintaining the state of the project files, and generate miniatures for them on demand
+- [hide.tools.FileWatchEvent](api/md/hide/tools/FileWatchEvent.md): A watch of a file.
+- [hide.tools.FileWatcher](api/md/hide/tools/FileWatcher.md): Watches files and calls functions when they change.
+- [hide.tools.GenToManagerCommand](api/md/hide/tools/GenToManagerCommand.md): A message from the thumbnail generator to the file manager.
+- [hide.tools.GenToManagerSuccessMessage](api/md/hide/tools/GenToManagerSuccessMessage.md): The message sent when a thumbnail was rendered.
+- [hide.tools.IdeData](api/md/hide/tools/IdeData.md): The data of the editor shared by the JS and HL editors: project paths, configurations, database and files.
+- [hide.tools.Macros](api/md/hide/tools/Macros.md): Macros of the editor tools.
+- [hide.tools.ManagerToGenCommand](api/md/hide/tools/ManagerToGenCommand.md): A message from the file manager to the thumbnail generator.
+- [hide.tools.MemDump](api/md/hide/tools/MemDump.md): GPU memory dump.
+- [hide.tools.MessageHandler](api/md/hide/tools/MessageHandler.md): Handle recieving messages separated by `\n` characters by a socket, correctly buffering the data
+- [hide.tools.MiniatureReadyCallback](api/md/hide/tools/MiniatureReadyCallback.md): Called with the path of a rendered thumbnail.
+- [hide.tools.OnDragEventResult](api/md/hide/tools/OnDragEventResult.md): The result of a drag event.
+- [hide.tools.RenderInfo](api/md/hide/tools/RenderInfo.md): A thumbnail to render.
+- [hide.tools.RenderWindowManager](api/md/hide/tools/RenderWindowManager.md): Opens the hidden window rendering the thumbnails.
+- [hide.tools.RenderWindowState](api/md/hide/tools/RenderWindowState.md): The state of the thumbnail generator window.
+- [hide.tools.ShaderLoader](api/md/hide/tools/ShaderLoader.md): Loads and compiles HXSL shaders from their source files (in the `haxe.classPath` of the configuration), reloaded when they change.
+- [hide.tools.ThumbnailGenerator](api/md/hide/tools/ThumbnailGenerator.md): Renders the file thumbnails in a hidden window, on requests from the `FileManager` through a socket.
+- [hide.tools.VCSStatus](api/md/hide/tools/VCSStatus.md): The version control status of a file.
+- [hide.ui.DisplayPosition](api/md/hide/ui/DisplayPosition.md): Where a view is opened in the layout.
+- [hide.ui.Entry](api/md/hide/ui/Entry.md): A registered shortcut action.
+- [hide.ui.EntryDoc](api/md/hide/ui/EntryDoc.md): The description of a shortcut, for the shortcuts list.
+- [hide.ui.HistoryElement](api/md/hide/ui/HistoryElement.md): A change recorded in an `UndoHistory`.
+- [hide.ui.Keys](api/md/hide/ui/Keys.md): The keyboard shortcuts of an element: actions registered by name, triggered by the `key.<name>` config entries.
+- [hide.ui.Menu](api/md/hide/ui/Menu.md): The native menu bar built from an HTML menu description.
+- [hide.ui.QueryHelper](api/md/hide/ui/QueryHelper.md): A shortcut to create elements: `J(...)` is `new hide.Element(...)`.
+- [hide.ui.UndoHistory](api/md/hide/ui/UndoHistory.md): The undo and redo history of a view.
+- [hide.ui.View](api/md/hide/ui/View.md): The base class of the IDE views (tabs): state, config, keys, undo, clipboard, file watches and layout container.
+- [hide.ui.ViewOptions](api/md/hide/ui/ViewOptions.md): The options of a view class, given to `View.register`.
+- [hide.view.About](api/md/hide/view/About.md): The about view.
+- [hide.view.AddNodeMenuEntry](api/md/hide/view/AddNodeMenuEntry.md): An entry of the add node menu.
+- [hide.view.CamController](api/md/hide/view/CamController.md): The default orbit camera controller.
+- [hide.view.CameraControllerBase](api/md/hide/view/CameraControllerBase.md): The base of the scene editor camera controllers, with their saved settings.
+- [hide.view.CdbCustomTypes](api/md/hide/view/CdbCustomTypes.md): The view editing the CastleDB custom types as code.
+- [hide.view.CdbFavorites](api/md/hide/view/CdbFavorites.md): The view listing the CDB favorites.
+- [hide.view.CdbTable](api/md/hide/view/CdbTable.md): The CastleDB view: the sheets of the database in tabs, with categories.
+- [hide.view.CollisionSettings](api/md/hide/view/CollisionSettings.md): The collision settings of a model in the model view, from the conversion rules.
+- [hide.view.CopySelectionData](api/md/hide/view/CopySelectionData.md): The copied nodes and edges.
+- [hide.view.DevTools](api/md/hide/view/DevTools.md): A view embedding the Chrome developer tools, to open a profile file.
+- [hide.view.DomkitLess](api/md/hide/view/DomkitLess.md): The view of domkit style sheets (`.less` files).
+- [hide.view.DomkitStudio](api/md/hide/view/DomkitStudio.md): The domkit studio view: browses the domkit components of the project and edits their markup and style.
+- [hide.view.Edge](api/md/hide/view/Edge.md): An edge between 2 nodes.
+- [hide.view.EdgeState](api/md/hide/view/EdgeState.md): The edge creation mode of the graph editor.
+- [hide.view.FPSController](api/md/hide/view/FPSController.md): A first person camera controller.
+- [hide.view.FX2DEditor](api/md/hide/view/FX2DEditor.md): The 2D FX editor view (`.fx2d` files).
+- [hide.view.FXEditContext](api/md/hide/view/FXEditContext.md): The edit context of the FX editor.
+- [hide.view.FXEditor](api/md/hide/view/FXEditor.md): The FX editor view (`.fx` files): scene, prefab tree, properties and timeline with curves and events.
+- [hide.view.FavoriteEntry](api/md/hide/view/FavoriteEntry.md): A favorite of the file browser.
+- [hide.view.FileBrowser](api/md/hide/view/FileBrowser.md): The file browser view: tree and thumbnails of the resources, with favorites, search and version control status.
+- [hide.view.FileBrowserState](api/md/hide/view/FileBrowserState.md): The saved state of the file browser.
+- [hide.view.FileView](api/md/hide/view/FileView.md): The base of the views editing a file (`state.path`): watches the file, tracks modifications and saves.
+- [hide.view.FiltersPopup](api/md/hide/view/FiltersPopup.md): The popup choosing the shown kinds of objects in the prefab view.
+- [hide.view.FlightController](api/md/hide/view/FlightController.md): A flight camera controller, with smoothed moves.
+- [hide.view.GenericGraphEditor](api/md/hide/view/GenericGraphEditor.md): A base file view for the graph editors, holding a `GraphEditor`.
+- [hide.view.GraphEditor](api/md/hide/view/GraphEditor.md): A generic node graph editor component, editing an `IGraphEditor` (shader graphs, texture graphs, animation graphs).
+- [hide.view.GraphNodeInfo](api/md/hide/view/GraphNodeInfo.md): The description of a node shown by the `GraphEditor`.
+- [hide.view.Gym](api/md/hide/view/Gym.md): A test view showing the editor UI components (buttons, toolbars...) and offscreen rendering tests.
+- [hide.view.IGraphEditor](api/md/hide/view/IGraphEditor.md): The graph data edited by a `GraphEditor`: nodes, edges, add menu, serialization and undo.
+- [hide.view.IGraphNode](api/md/hide/view/IGraphNode.md): A node edited by the `GraphEditor`.
+- [hide.view.Image](api/md/hide/view/Image.md): The image view: shows a texture and edits its compression settings.
+- [hide.view.Layout](api/md/hide/view/Layout.md): The layout of the file browser.
+- [hide.view.MSDFView](api/md/hide/view/MSDFView.md): The view of SVG files as multi-channel signed distance fields.
+- [hide.view.MSDFViewMode](api/md/hide/view/MSDFViewMode.md): What the MSDF view shows.
+- [hide.view.MemProfiler](api/md/hide/view/MemProfiler.md): The HashLink memory profiler view: loads a `.hl` file and memory dumps, and shows the memory used by type, with their parents and roots.
+- [hide.view.MemProfilerInspectView](api/md/hide/view/MemProfilerInspectView.md): The inspect tab of the memory profiler: the parents and roots of the blocks of a type.
+- [hide.view.MemProfilerSearchBar](api/md/hide/view/MemProfilerSearchBar.md): The type search bar of the memory profiler, with a history.
+- [hide.view.MemProfilerSummaryView](api/md/hide/view/MemProfilerSummaryView.md): The summary tab of the memory profiler: memory used by type.
+- [hide.view.MemProfilerTable](api/md/hide/view/MemProfilerTable.md): A table of block statistics of the memory profiler.
+- [hide.view.MemProfilerTableLine](api/md/hide/view/MemProfilerTableLine.md): A line of a memory profiler table.
+- [hide.view.Model](api/md/hide/view/Model.md): The model view (`.fbx` and `.hmd` files): scene, objects tree, materials, animations and collision settings.
+- [hide.view.ModelSceneEditor](api/md/hide/view/ModelSceneEditor.md): The scene editor of the model view.
+- [hide.view.NodeInput](api/md/hide/view/NodeInput.md): An input of a graph node.
+- [hide.view.NodeOutput](api/md/hide/view/NodeOutput.md): An output of a graph node.
+- [hide.view.OrthoController](api/md/hide/view/OrthoController.md): An orthographic camera controller.
+- [hide.view.Particles2D](api/md/hide/view/Particles2D.md): The 2D particles view (`json.particles2D` files).
+- [hide.view.Particles3D](api/md/hide/view/Particles3D.md): The 3D particles view (`json.particles3D` files).
+- [hide.view.PinShape](api/md/hide/view/PinShape.md): The shape of a node pin.
+- [hide.view.Prefab](api/md/hide/view/Prefab.md): The prefab view (`.prefab`, `.l3d`, `.matlib` and `.rp` files): scene, prefab tree and properties.
+- [hide.view.PrefabSceneEditor](api/md/hide/view/PrefabSceneEditor.md): The scene editor of the prefab view.
+- [hide.view.PreviewShaderAlpha](api/md/hide/view/PreviewShaderAlpha.md): Shows the alpha of a preview by blending its color over a checkerboard.
+- [hide.view.PropTrackDef](api/md/hide/view/PropTrackDef.md): A property that can be animated with a curve track.
+- [hide.view.RefViewer](api/md/hide/view/RefViewer.md): The view listing the references to an element, or the unreferenced elements.
+- [hide.view.Reference](api/md/hide/view/Reference.md): The references found in a file.
+- [hide.view.RemoteConsoleCommand](api/md/hide/view/RemoteConsoleCommand.md): A group of command controls of a remote console panel.
+- [hide.view.RemoteConsoleCommandCustom](api/md/hide/view/RemoteConsoleCommandCustom.md): The custom controls: raw and console commands typed by the user.
+- [hide.view.RemoteConsoleCommandHL](api/md/hide/view/RemoteConsoleCommandHL.md): The HashLink controls: garbage collection, memory dumps, live objects, CPU and allocation profiling.
+- [hide.view.RemoteConsoleCommandHeaps](api/md/hide/view/RemoteConsoleCommandHeaps.md): The Heaps controls: GPU allocation tracking, scene profiling and resources.
+- [hide.view.RemoteConsolePanel](api/md/hide/view/RemoteConsolePanel.md): A panel of the remote console view: the logs and command controls of a connection.
+- [hide.view.RemoteConsoleSubCommandDump](api/md/hide/view/RemoteConsoleSubCommandDump.md): A dump control: asks the game for a dump file, then exports or opens it.
+- [hide.view.RemoteConsoleView](api/md/hide/view/RemoteConsoleView.md): props.json configuration (all fields are optional): ```json "remoteconsole": {     "host": "127.0.0.1",     "port": 40001,     "disableAutoStartServer": false,     "commands": [         "hashlink",         "custom"   ...
+- [hide.view.Result](api/md/hide/view/Result.md): A reference.
+- [hide.view.Script](api/md/hide/view/Script.md): The code view (`js`, `hx`, `xml`, `html` and `json` files).
+- [hide.view.Section](api/md/hide/view/Section.md): A prefab and its curves and events, shown as a section of the curve editor.
+- [hide.view.SelectionUndoSave](api/md/hide/view/SelectionUndoSave.md): The selection change of a rectangle selection, for the undo.
+- [hide.view.Sound](api/md/hide/view/Sound.md): The sound view (`wav`, `mp3` and `ogg` files).
+- [hide.view.UndoBuffer](api/md/hide/view/UndoBuffer.md): A list of operations undone and redone together.
+- [hide.view.UndoFn](api/md/hide/view/UndoFn.md): A reversible operation: applies it, or reverts it if `isUndo`.
+- [hide.view.Unknown](api/md/hide/view/Unknown.md): The view replacing a view whose class is not found.
+- [hide.view.ViewMode](api/md/hide/view/ViewMode.md): What the image view shows.
+- [hide.view.animgraph.AnimGraphEditor](api/md/hide/view/animgraph/AnimGraphEditor.md): The animation graph editor view (`.animgraph` files): graph, parameters and animated model preview.
+- [hide.view.animgraph.AnimGraphEditorPreviewState](api/md/hide/view/animgraph/AnimGraphEditorPreviewState.md): The saved preview settings of the animation graph editor.
+- [hide.view.animgraph.AnimList](api/md/hide/view/animgraph/AnimList.md): A filterable list of animation files, draggable to the graph.
+- [hide.view.animgraph.AnimPicker](api/md/hide/view/animgraph/AnimPicker.md): A dropdown button choosing an animation.
+- [hide.view.animgraph.BlendSpace2DEditor](api/md/hide/view/animgraph/BlendSpace2DEditor.md): The 2D blend space editor view (`.bs2d` files): the animation points and a preview.
+- [hide.view.animgraph.BlendSpacePreviewState](api/md/hide/view/animgraph/BlendSpacePreviewState.md): The saved preview settings of the blend space editor.
+- [hide.view.l3d.CameraController2D](api/md/hide/view/l3d/CameraController2D.md): A 2D camera controller: pans with the mouse and zooms with the wheel, with inertia.
+- [hide.view.l3d.Gizmo2D](api/md/hide/view/l3d/Gizmo2D.md): The 2D transform gizmo: moves, scales and rotates the selected 2D objects.
+- [hide.view.l3d.LightProbeBaker](api/md/hide/view/l3d/LightProbeBaker.md): Bakes the light probes of a volumetric lightmap by rendering cube maps of the scene.
+- [hide.view.l3d.ProbeBakerProcess](api/md/hide/view/l3d/ProbeBakerProcess.md): Bakes a volumetric lightmap over several frames.
+- [hide.view.l3d.Transform2D](api/md/hide/view/l3d/Transform2D.md): A transformation of the 2D gizmo.
+- [hide.view.settings.Categorie](api/md/hide/view/settings/Categorie.md): A category of a settings view.
+- [hide.view.settings.Filter](api/md/hide/view/settings/Filter.md): Shows only the settings files with an entry.
+- [hide.view.settings.LocalSetting](api/md/hide/view/settings/LocalSetting.md): A `props.json` file of the project.
+- [hide.view.settings.ProjectSettings](api/md/hide/view/settings/ProjectSettings.md): The project settings view: lists the `props.json` files of the project and edits their material libraries, render props and conversion settings.
+- [hide.view.settings.Settings](api/md/hide/view/settings/Settings.md): The base of the settings views: a list of categories of settings.
+- [hide.view.settings.UserSettings](api/md/hide/view/settings/UserSettings.md): The user settings view.
+- [hide.view.shadereditor.Box](api/md/hide/view/shadereditor/Box.md): The SVG box of a node in the `GraphEditor`: header, pins, properties and preview.
+- [hide.view.shadereditor.ClassRepoEntry](api/md/hide/view/shadereditor/ClassRepoEntry.md): A node class shown in the add node menu.
+- [hide.view.shadereditor.HxslType](api/md/hide/view/shadereditor/HxslType.md): An HXSL type.
+- [hide.view.shadereditor.NodeInfo](api/md/hide/view/shadereditor/NodeInfo.md): The name, description and key of a node.
+- [hide.view.shadereditor.PreviewSettings](api/md/hide/view/shadereditor/PreviewSettings.md): The settings of the mesh preview, saved in the display state.
+- [hide.view.shadereditor.PreviewShaderBase](api/md/hide/view/shadereditor/PreviewShaderBase.md): The base shader of the node previews: sets default values for the variables the nodes can read (positions, normals, particle values, material values).
+- [hide.view.shadereditor.SavedClipboard](api/md/hide/view/shadereditor/SavedClipboard.md): The nodes and edges copied to the clipboard.
+- [hide.view.shadereditor.ShaderEditor](api/md/hide/view/shadereditor/ShaderEditor.md): The shader graph editor view (`.shgraph` files): graph, parameters, variables and mesh preview.
+- [hide.view.textureeditor.TextureEditor](api/md/hide/view/textureeditor/TextureEditor.md): The texture graph editor view (`.texgraph` files): graph, parameters and preview of the generated textures.

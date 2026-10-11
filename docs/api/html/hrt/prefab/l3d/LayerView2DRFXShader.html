@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en"><!-- use theme color or fallback -->
+<!--use textcolor from settings, otherwise create a contrasting color to theme color-->
+<head><meta charset="utf-8"/><link href="../../../bootstrap/css/bootstrap.min.css" rel="stylesheet"/><link href="../../../bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet"/><link href="../../../bootstrap/css/bootstrap-select.min.css" rel="stylesheet"/><link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700,700italic,400italic" rel="stylesheet" type="text/css"/><link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600,600italic,400" rel="stylesheet" type="text/css"/><link href="https://netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.css" rel="stylesheet" type="text/css"/><script src="../../../jquery-3.6.0.min.js"></script><script src="../../../bootstrap/js/bootstrap.min.js"></script><script src="../../../bootstrap/js/bootstrap-select.min.js"></script><link href="../../../styles.css" rel="stylesheet"/><link href="../../../extra-styles.css" rel="stylesheet"/><link href="../../../haxe-nav.css" rel="stylesheet"/><link href="../../../dark-mode.css" rel="stylesheet"/><script>var dox = {rootPath: "../../../",platforms: ["hide_js","hide_hrt"]};</script><script src="../../../nav.js"></script><script src="../../../index.js"></script><link rel="icon" href="../../../favicon.ico" type="image/x-icon"/><title>hrt.prefab.l3d.LayerView2DRFXShader - Hide API</title><meta name="description" content="Displays the painted layer over the scene."/></head><body><script>/* Here to prevent flash of unstyled content */let systemDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;if ((!localStorage.theme && systemDarkMode) || localStorage.theme == "dark") {document.body.style.backgroundColor = "#111";document.body.style.opacity = "0";document.addEventListener("DOMContentLoaded", function(event) {toggleTheme();document.body.style.backgroundColor = "";document.body.style.opacity = "";});}</script><style>
+.navbar .brand {
+	display: inline-block;
+	float: none;
+	text-shadow: 0 0 0 transparent;
+}
+</style><nav class="nav"><div class="navbar"><div class="navbar-inner" style="background:#FAFAFA; border-bottom:1px solid rgba(0,0,0,.09)"><div class="container"><a class="brand" style="color:#000000" href="../../../">Hide API</a><a href="#" id="theme-toggle" class="brand" style="color:#000000" onclick="toggleTheme()" title="Toggle Dark Mode"><i class="fa fa-moon-o"></i></a></div></div></div></nav><div class="container main-content"><div class="row-fluid"><div class="span3"><div class="well sidebar-nav"><form class="form-search" id="searchForm"><div class="input-prepend input-block-level"><span class="add-on"><i class="fa fa-search"></i></span><input id="search" type="text" placeholder="Filter (Ctrl+P)" autocomplete="off"/></div></form><div class="dropdown"><select id="select-platform" class="selectpicker" title="Filter by platform" data-width="100%"><option value="all" selected="selected">All Platforms</option><option>hide_js</option><option>hide_hrt</option></select></div></div><div class="well sidebar-nav" id="explorer"><div id="nav"></div></div></div><div class="span9"><div class="page-header"><span class="viewsource"><a href="https://github.com/HeapsIO/hide/blob/master/hrt/prefab/l3d/Layers2D.hx" class="btn btn-medium"><i class="fa fa-eye"></i> View source</a></span><h1><small>class</small> LayerView2DRFXShader</h1><h4><small>package <a href="../../../hrt/prefab/l3d/index.html">hrt.prefab.l3d</a></small></h4><h4><small>extends <span class="type">ScreenShader</span></small></h4>    <h4><small>import <a href="../../../hrt/prefab/l3d/Layers2D.html">hrt.prefab.l3d.Layers2D</a></small></h4><span class="label label-meta label-meta-directlyUsed" title="Marks types that are directly referenced by non-extern code.">@:directlyUsed</span><span class="label label-meta label-meta-src" title="">@:src({
+	@param var layerAlpha:Float;
+	@param var worldSize:Float;
+	@param var offsetX:Float;
+	@param var offsetY:Float;
+	@param var collideMap:Sampler2D;
+	@const var collideEnable:Bool;
+	@param var collideMask:Vec4;
+	@param var collideScale:Float;
+	@const var layerEnable:Bool;
+	@param var layerMap:Sampler2D;
+	@param var layerScale:Float;
+	@param var colors:Sampler2D;
+	@param var nbColorsIndexes:Int;
+	@param var curFrame:Sampler2D;
+	@param var cameraInverseViewProj:Mat4;
+	@const var PACKED_DEPTH:Bool;
+	@param var depthChannel:Channel;
+	@param var depthTexture:Sampler2D;
+	@const var highlightNoPixels:Bool;
+	@param var highlightColor:Vec4;
+	var isSky:Bool;
+	function getPixelPosition(uv:Vec2):Vec3 {
+		var d = PACKED_DEPTH ? unpack(depthTexture.get(uv)) : depthChannel.get(uv).r;
+		var tmp = vec4(uvToScreen(uv), d, 1) * cameraInverseViewProj;
+		tmp.xyz /= tmp.w;
+		isSky = d == 1.0;
+		return tmp.xyz;
+	};
+	function floatToInt(v:Float):Int {
+		return int(v * 255);
+	};
+	function fragment() {
+		var curColor = curFrame.get(calculatedUV);
+		pixelColor = curColor;
+		var curPos = getPixelPosition(calculatedUV).xy;
+		curPos.x -= offsetX;
+		curPos.y -= offsetY;
+		var collide = false;
+		if (collideEnable) {
+			var tex = collideMap.get(floor(curPos / collideScale) * collideScale / worldSize);
+			if ((tex.rgb - collideMask.rgb).length() &lt; 1e-3) collide = true;
+		};
+		if (layerEnable) {
+			var layer = layerMap.get(floor(curPos / layerScale) * layerScale / worldSize);
+			var index = floatToInt(layer.r);
+			if (index &gt; 0) pixelColor.rgba = colors.get(vec2((index + 0.5) / nbColorsIndexes, 0.5)) else if (!collide &amp;&amp; highlightNoPixels) pixelColor.rgba = highlightColor;
+		};
+		if (collide) pixelColor = mix(mix(curColor, collideMask, 0.5), pixelColor, layerAlpha / 2) else pixelColor = mix(curColor, pixelColor, layerAlpha);
+	};
+})</span><span class="label label-meta label-meta-build" title="Builds a class or enum from a macro.">@:build(hxsl.Macros.buildShader())</span><span class="label label-meta label-meta-autoBuild" title="Extends `@:build` metadata to all extending and implementing classes.">@:autoBuild(hxsl.Macros.buildShader())</span><hr/><p class="availability"><em>Available on  all platforms</em></p></div><div class="body"><div class="doc doc-main"><p>Displays the painted layer over the scene.</p></div><h3 class="section">Constructor</h3><div class="fields"><div class="field "><a name="new"></a><h3 class="anchor"><code><a href="#new"><span class="identifier">new</span></a>()</code></h3><div class="doc"><p></p></div></div></div><h3 class="section">Variables</h3><div class="fields"><div class="field "><a name="PACKED_DEPTH"></a><h3 class="anchor"><code><a href="#PACKED_DEPTH"><span class="identifier">PACKED_DEPTH</span></a>:<span class="type">Bool</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="cameraInverseViewProj"></a><h3 class="anchor"><code><a href="#cameraInverseViewProj"><span class="identifier">cameraInverseViewProj</span></a>:<span class="type">Matrix</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="collideEnable"></a><h3 class="anchor"><code><a href="#collideEnable"><span class="identifier">collideEnable</span></a>:<span class="type">Bool</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="collideMap"></a><h3 class="anchor"><code><a href="#collideMap"><span class="identifier">collideMap</span></a>:<span class="type">Texture</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="collideMask"></a><h3 class="anchor"><code><a href="#collideMask"><span class="identifier">collideMask</span></a>:<span class="type">Vec4</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="collideScale"></a><h3 class="anchor"><code><a href="#collideScale"><span class="identifier">collideScale</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="colors"></a><h3 class="anchor"><code><a href="#colors"><span class="identifier">colors</span></a>:<span class="type">Texture</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="curFrame"></a><h3 class="anchor"><code><a href="#curFrame"><span class="identifier">curFrame</span></a>:<span class="type">Texture</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="depthChannel"></a><h3 class="anchor"><code><a href="#depthChannel"><span class="identifier">depthChannel</span></a>:<span class="type">TextureChannel</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="depthChannelChannel"></a><h3 class="anchor"><code><a href="#depthChannelChannel"><span class="identifier">depthChannelChannel</span></a>:<span class="type">Channel</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="depthTexture"></a><h3 class="anchor"><code><a href="#depthTexture"><span class="identifier">depthTexture</span></a>:<span class="type">Texture</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="highlightColor"></a><h3 class="anchor"><code><a href="#highlightColor"><span class="identifier">highlightColor</span></a>:<span class="type">Vec4</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="highlightNoPixels"></a><h3 class="anchor"><code><a href="#highlightNoPixels"><span class="identifier">highlightNoPixels</span></a>:<span class="type">Bool</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="layerAlpha"></a><h3 class="anchor"><code><a href="#layerAlpha"><span class="identifier">layerAlpha</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="layerEnable"></a><h3 class="anchor"><code><a href="#layerEnable"><span class="identifier">layerEnable</span></a>:<span class="type">Bool</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="layerMap"></a><h3 class="anchor"><code><a href="#layerMap"><span class="identifier">layerMap</span></a>:<span class="type">Texture</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="layerScale"></a><h3 class="anchor"><code><a href="#layerScale"><span class="identifier">layerScale</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="nbColorsIndexes"></a><h3 class="anchor"><code><a href="#nbColorsIndexes"><span class="identifier">nbColorsIndexes</span></a>:<span class="type">Int</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="offsetX"></a><h3 class="anchor"><code><a href="#offsetX"><span class="identifier">offsetX</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="offsetY"></a><h3 class="anchor"><code><a href="#offsetY"><span class="identifier">offsetY</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="worldSize"></a><h3 class="anchor"><code><a href="#worldSize"><span class="identifier">worldSize</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div></div><h3 class="section">Methods</h3><div class="fields"></div>  </div></div></div></div><footer class="section site-footer" style="background:#FAFAFA"><div class="container"><div class="copyright"><p style="color:#000000">&copy; 2026 &nbsp;</p></div></div></footer><script src="../../../highlighter.js"></script><link href="../../../highlighter.css" rel="stylesheet"/></body></html>

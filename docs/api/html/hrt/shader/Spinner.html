@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en"><!-- use theme color or fallback -->
+<!--use textcolor from settings, otherwise create a contrasting color to theme color-->
+<head><meta charset="utf-8"/><link href="../../bootstrap/css/bootstrap.min.css" rel="stylesheet"/><link href="../../bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet"/><link href="../../bootstrap/css/bootstrap-select.min.css" rel="stylesheet"/><link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700,700italic,400italic" rel="stylesheet" type="text/css"/><link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600,600italic,400" rel="stylesheet" type="text/css"/><link href="https://netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.css" rel="stylesheet" type="text/css"/><script src="../../jquery-3.6.0.min.js"></script><script src="../../bootstrap/js/bootstrap.min.js"></script><script src="../../bootstrap/js/bootstrap-select.min.js"></script><link href="../../styles.css" rel="stylesheet"/><link href="../../extra-styles.css" rel="stylesheet"/><link href="../../haxe-nav.css" rel="stylesheet"/><link href="../../dark-mode.css" rel="stylesheet"/><script>var dox = {rootPath: "../../",platforms: ["hide_js","hide_hrt"]};</script><script src="../../nav.js"></script><script src="../../index.js"></script><link rel="icon" href="../../favicon.ico" type="image/x-icon"/><title>hrt.shader.Spinner - Hide API</title><meta name="description" content="Draws animated trails along a shape (signed distance field)."/></head><body><script>/* Here to prevent flash of unstyled content */let systemDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;if ((!localStorage.theme && systemDarkMode) || localStorage.theme == "dark") {document.body.style.backgroundColor = "#111";document.body.style.opacity = "0";document.addEventListener("DOMContentLoaded", function(event) {toggleTheme();document.body.style.backgroundColor = "";document.body.style.opacity = "";});}</script><style>
+.navbar .brand {
+	display: inline-block;
+	float: none;
+	text-shadow: 0 0 0 transparent;
+}
+</style><nav class="nav"><div class="navbar"><div class="navbar-inner" style="background:#FAFAFA; border-bottom:1px solid rgba(0,0,0,.09)"><div class="container"><a class="brand" style="color:#000000" href="../../">Hide API</a><a href="#" id="theme-toggle" class="brand" style="color:#000000" onclick="toggleTheme()" title="Toggle Dark Mode"><i class="fa fa-moon-o"></i></a></div></div></div></nav><div class="container main-content"><div class="row-fluid"><div class="span3"><div class="well sidebar-nav"><form class="form-search" id="searchForm"><div class="input-prepend input-block-level"><span class="add-on"><i class="fa fa-search"></i></span><input id="search" type="text" placeholder="Filter (Ctrl+P)" autocomplete="off"/></div></form><div class="dropdown"><select id="select-platform" class="selectpicker" title="Filter by platform" data-width="100%"><option value="all" selected="selected">All Platforms</option><option>hide_js</option><option>hide_hrt</option></select></div></div><div class="well sidebar-nav" id="explorer"><div id="nav"></div></div></div><div class="span9"><div class="page-header"><span class="viewsource"><a href="https://github.com/HeapsIO/hide/blob/master/hrt/shader/Spinner.hx" class="btn btn-medium"><i class="fa fa-eye"></i> View source</a></span><h1><small>class</small> Spinner</h1><h4><small>package <a href="../../hrt/shader/index.html">hrt.shader</a></small></h4><h4><small>extends <span class="type">Shader</span></small></h4>    <span class="label label-meta label-meta-directlyUsed" title="Marks types that are directly referenced by non-extern code.">@:directlyUsed</span><span class="label label-meta label-meta-src" title="">@:src({
+	var pixelColor:Vec4;
+	@param var shapeSDF:Sampler2D;
+	@param var trailTexture:Sampler2D;
+	@param var scaleX:Float = 1.0;
+	@param var scaleY:Float = 1.0;
+	@param var scaleTime:Float = 1.0;
+	@param var timeOffset:Float = 0.0;
+	@const var correctTextureNormals:Bool = false;
+	@param var numTrails:Float = 3;
+	@const var useTimeTexture:Bool = false;
+	@param var timeTexture:Sampler2D;
+	@const var debugShowShape:Bool = false;
+	@global var global:{ var time : Float};
+	var calculatedUV:Vec2;
+	function dist(uv:Vec2):Float {
+		var c = shapeSDF.get(uv);
+		return max(min(c.r, c.b), min(max(c.r, c.g), c.b)) - 0.5;
+	};
+	function fragment() {
+		var uv = calculatedUV;
+		var sdf = dist(uv);
+		var uvSurface = calculatedUV - vec2(0.5);
+		if (correctTextureNormals) {
+			var dd = vec3(1.0 / shapeSDF.size().x, 1.0 / shapeSDF.size().y, 0.0);
+			var norm = normalize(vec2(dist(uv + dd.xz) - dist(uv - dd.xz), dist(uv + dd.zy) - dist(uv - dd.zy)));
+			uvSurface -= norm * sdf * 0.25;
+		};
+		var g = useTimeTexture ? timeTexture.get(uv).r : atan(uvSurface.y, uvSurface.x) / (2 * 3.1415) + 0.5;
+		var trueTime = global.time * scaleTime + timeOffset;
+		var t = g - mod(trueTime, 1.0);
+		t = 1.0 - mod(t, 1.0);
+		t = mod(t * numTrails, 1.0);
+		var uvLocal = vec2(1.0 - t, ((scaleY - sdf) / scaleY) / 2.0);
+		uvLocal.x = 1.0 - (1.0 - uvLocal.x) / scaleX;
+		uvLocal = clamp(uvLocal, vec2(0.01), vec2(1.0));
+		var trail = trailTexture.get(uvLocal);
+		if (debugShowShape) {
+			pixelColor = mix(trail, vec4(1.0), 1.0 - smoothstep(0.0, 0.01, abs(sdf)));
+		} else {
+			pixelColor = trail;
+		};
+	};
+})</span><span class="label label-meta label-meta-build" title="Builds a class or enum from a macro.">@:build(hxsl.Macros.buildShader())</span><span class="label label-meta label-meta-autoBuild" title="Extends `@:build` metadata to all extending and implementing classes.">@:autoBuild(hxsl.Macros.buildShader())</span><hr/><p class="availability"><em>Available on  all platforms</em></p></div><div class="body"><div class="doc doc-main"><p>Draws animated trails along a shape (signed distance field).</p></div><h3 class="section">Constructor</h3><div class="fields"><div class="field "><a name="new"></a><h3 class="anchor"><code><a href="#new"><span class="identifier">new</span></a>()</code></h3><div class="doc"><p></p></div></div></div><h3 class="section">Variables</h3><div class="fields"><div class="field "><a name="correctTextureNormals"></a><h3 class="anchor"><code><a href="#correctTextureNormals"><span class="identifier">correctTextureNormals</span></a>:<span class="type">Bool</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="debugShowShape"></a><h3 class="anchor"><code><a href="#debugShowShape"><span class="identifier">debugShowShape</span></a>:<span class="type">Bool</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="numTrails"></a><h3 class="anchor"><code><a href="#numTrails"><span class="identifier">numTrails</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="scaleTime"></a><h3 class="anchor"><code><a href="#scaleTime"><span class="identifier">scaleTime</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="scaleX"></a><h3 class="anchor"><code><a href="#scaleX"><span class="identifier">scaleX</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="scaleY"></a><h3 class="anchor"><code><a href="#scaleY"><span class="identifier">scaleY</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="shapeSDF"></a><h3 class="anchor"><code><a href="#shapeSDF"><span class="identifier">shapeSDF</span></a>:<span class="type">Texture</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="timeOffset"></a><h3 class="anchor"><code><a href="#timeOffset"><span class="identifier">timeOffset</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="timeTexture"></a><h3 class="anchor"><code><a href="#timeTexture"><span class="identifier">timeTexture</span></a>:<span class="type">Texture</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="trailTexture"></a><h3 class="anchor"><code><a href="#trailTexture"><span class="identifier">trailTexture</span></a>:<span class="type">Texture</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="useTimeTexture"></a><h3 class="anchor"><code><a href="#useTimeTexture"><span class="identifier">useTimeTexture</span></a>:<span class="type">Bool</span></code></h3><div class="doc"><p></p></div></div></div><h3 class="section">Methods</h3><div class="fields"></div>  </div></div></div></div><footer class="section site-footer" style="background:#FAFAFA"><div class="container"><div class="copyright"><p style="color:#000000">&copy; 2026 &nbsp;</p></div></div></footer><script src="../../highlighter.js"></script><link href="../../highlighter.css" rel="stylesheet"/></body></html>

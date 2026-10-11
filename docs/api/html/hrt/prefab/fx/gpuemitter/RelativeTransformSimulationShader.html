@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en"><!-- use theme color or fallback -->
+<!--use textcolor from settings, otherwise create a contrasting color to theme color-->
+<head><meta charset="utf-8"/><link href="../../../../bootstrap/css/bootstrap.min.css" rel="stylesheet"/><link href="../../../../bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet"/><link href="../../../../bootstrap/css/bootstrap-select.min.css" rel="stylesheet"/><link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700,700italic,400italic" rel="stylesheet" type="text/css"/><link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600,600italic,400" rel="stylesheet" type="text/css"/><link href="https://netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.css" rel="stylesheet" type="text/css"/><script src="../../../../jquery-3.6.0.min.js"></script><script src="../../../../bootstrap/js/bootstrap.min.js"></script><script src="../../../../bootstrap/js/bootstrap-select.min.js"></script><link href="../../../../styles.css" rel="stylesheet"/><link href="../../../../extra-styles.css" rel="stylesheet"/><link href="../../../../haxe-nav.css" rel="stylesheet"/><link href="../../../../dark-mode.css" rel="stylesheet"/><script>var dox = {rootPath: "../../../../",platforms: ["hide_js","hide_hrt"]};</script><script src="../../../../nav.js"></script><script src="../../../../index.js"></script><link rel="icon" href="../../../../favicon.ico" type="image/x-icon"/><title>hrt.prefab.fx.gpuemitter.RelativeTransformSimulationShader - Hide API</title><meta name="description" content="Applies a transform to the particles."/></head><body><script>/* Here to prevent flash of unstyled content */let systemDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;if ((!localStorage.theme && systemDarkMode) || localStorage.theme == "dark") {document.body.style.backgroundColor = "#111";document.body.style.opacity = "0";document.addEventListener("DOMContentLoaded", function(event) {toggleTheme();document.body.style.backgroundColor = "";document.body.style.opacity = "";});}</script><style>
+.navbar .brand {
+	display: inline-block;
+	float: none;
+	text-shadow: 0 0 0 transparent;
+}
+</style><nav class="nav"><div class="navbar"><div class="navbar-inner" style="background:#FAFAFA; border-bottom:1px solid rgba(0,0,0,.09)"><div class="container"><a class="brand" style="color:#000000" href="../../../../">Hide API</a><a href="#" id="theme-toggle" class="brand" style="color:#000000" onclick="toggleTheme()" title="Toggle Dark Mode"><i class="fa fa-moon-o"></i></a></div></div></div></nav><div class="container main-content"><div class="row-fluid"><div class="span3"><div class="well sidebar-nav"><form class="form-search" id="searchForm"><div class="input-prepend input-block-level"><span class="add-on"><i class="fa fa-search"></i></span><input id="search" type="text" placeholder="Filter (Ctrl+P)" autocomplete="off"/></div></form><div class="dropdown"><select id="select-platform" class="selectpicker" title="Filter by platform" data-width="100%"><option value="all" selected="selected">All Platforms</option><option>hide_js</option><option>hide_hrt</option></select></div></div><div class="well sidebar-nav" id="explorer"><div id="nav"></div></div></div><div class="span9"><div class="page-header"><span class="viewsource"><a href="https://github.com/HeapsIO/hide/blob/master/hrt/prefab/fx/gpuemitter/RelativeTransformSimulation.hx" class="btn btn-medium"><i class="fa fa-eye"></i> View source</a></span><h1><small>class</small> RelativeTransformSimulationShader</h1><h4><small>package <a href="../../../../hrt/prefab/fx/gpuemitter/index.html">hrt.prefab.fx.gpuemitter</a></small></h4><h4><small>extends <a class="type" title="hrt.prefab.fx.gpuemitter.ComputeUtils - The base of the compute shaders of the GPU emitter, with random and matrix helpers." href="../../../../hrt/prefab/fx/gpuemitter/ComputeUtils.html">ComputeUtils</a></small></h4>    <h4><small>import <a href="../../../../hrt/prefab/fx/gpuemitter/RelativeTransformSimulation.html">hrt.prefab.fx.gpuemitter.RelativeTransformSimulation</a></small></h4><span class="label label-meta label-meta-directlyUsed" title="Marks types that are directly referenced by non-extern code.">@:directlyUsed</span><span class="label label-meta label-meta-src" title="">@:src({
+	@const(511) var CURVE_MASK:Int;
+	@param var x:Float;
+	@param var y:Float;
+	@param var z:Float;
+	@param var scaleX:Float;
+	@param var scaleY:Float;
+	@param var scaleZ:Float;
+	@param var rotX:Float;
+	@param var rotY:Float;
+	@param var rotZ:Float;
+	@param var speedX:Float;
+	@param var speedY:Float;
+	@param var speedZ:Float;
+	@param var curveTexture:Sampler2D;
+	var life:Float;
+	var lifeTime:Float;
+	var relativeTransform:Mat4;
+	var dt:Float;
+	function hasBit(n:Int):Bool {
+		return (CURVE_MASK &amp; (1 &lt;&lt; n)) != 0;
+	};
+	function getCurve(n:Int, l:Float):Float {
+		var c = 0.0;
+		if (CURVE_MASK != 0) c = curveTexture.getLod(vec2(l / lifeTime, (n + 0.5) / 9.0), 0.0).r;
+		return c;
+	};
+	function getDiff(n:Int):Float {
+		return getCurve(n, life + dt) - getCurve(n, life);
+	};
+	function main() {
+		var justAlive = life &lt;= 0.0;
+		var translation = justAlive ? vec3(x, y, z) : vec3(0.0);
+		var scale = vec3(scaleX, scaleY, scaleZ);
+		var rotation = vec3(rotX, rotY, rotZ);
+		var speed = vec3(speedX, speedY, speedZ);
+		if (hasBit(0)) translation.x = justAlive ? getCurve(0, life) : getDiff(0);
+		if (hasBit(1)) translation.y = justAlive ? getCurve(1, life) : getDiff(1);
+		if (hasBit(2)) translation.z = justAlive ? getCurve(2, life) : getDiff(2);
+		if (hasBit(3)) scale.x = getCurve(3, life);
+		if (hasBit(4)) scale.y = getCurve(4, life);
+		if (hasBit(5)) scale.z = getCurve(5, life);
+		if (hasBit(6)) rotation.x = getCurve(6, life);
+		if (hasBit(7)) rotation.y = getCurve(7, life);
+		if (hasBit(8)) rotation.z = getCurve(8, life);
+		var shaderTRS = scaleMatrix(scale) * translationMatrix(translation) * translationMatrix(speed);
+		relativeTransform = relativeTransform * shaderTRS;
+	};
+})</span><span class="label label-meta label-meta-build" title="Builds a class or enum from a macro.">@:build(hxsl.Macros.buildShader())</span><span class="label label-meta label-meta-autoBuild" title="Extends `@:build` metadata to all extending and implementing classes.">@:autoBuild(hxsl.Macros.buildShader())</span><hr/><p class="availability"><em>Available on  all platforms</em></p></div><div class="body"><div class="doc doc-main"><p>Applies a transform to the particles.</p></div><h3 class="section">Constructor</h3><div class="fields"><div class="field "><a name="new"></a><h3 class="anchor"><code><a href="#new"><span class="identifier">new</span></a>()</code></h3><div class="doc"><p></p></div></div></div><h3 class="section">Variables</h3><div class="fields"><div class="field "><a name="CURVE_MASK"></a><h3 class="anchor"><code><a href="#CURVE_MASK"><span class="identifier">CURVE_MASK</span></a>:<span class="type">Int</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="curveTexture"></a><h3 class="anchor"><code><a href="#curveTexture"><span class="identifier">curveTexture</span></a>:<span class="type">Texture</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="rotX"></a><h3 class="anchor"><code><a href="#rotX"><span class="identifier">rotX</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="rotY"></a><h3 class="anchor"><code><a href="#rotY"><span class="identifier">rotY</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="rotZ"></a><h3 class="anchor"><code><a href="#rotZ"><span class="identifier">rotZ</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="scaleX"></a><h3 class="anchor"><code><a href="#scaleX"><span class="identifier">scaleX</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="scaleY"></a><h3 class="anchor"><code><a href="#scaleY"><span class="identifier">scaleY</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="scaleZ"></a><h3 class="anchor"><code><a href="#scaleZ"><span class="identifier">scaleZ</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="speedX"></a><h3 class="anchor"><code><a href="#speedX"><span class="identifier">speedX</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="speedY"></a><h3 class="anchor"><code><a href="#speedY"><span class="identifier">speedY</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="speedZ"></a><h3 class="anchor"><code><a href="#speedZ"><span class="identifier">speedZ</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="x"></a><h3 class="anchor"><code><a href="#x"><span class="identifier">x</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="y"></a><h3 class="anchor"><code><a href="#y"><span class="identifier">y</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="z"></a><h3 class="anchor"><code><a href="#z"><span class="identifier">z</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div></div><h3 class="section">Methods</h3><div class="fields"></div>  <div class="inherited-fields well"><h3 class="section">Inherited Variables</h3><div class="fields"><div style="display:none"></div></div><h3 class="section">Inherited Methods</h3><div class="fields"><h4><a href="#" class="expand-button"><i class="fa fa-arrow-circle-o-right"></i></a> Defined by <a class="type" title="hrt.prefab.fx.gpuemitter.ComputeUtils - The base of the compute shaders of the GPU emitter, with random and matrix helpers." href="../../../../hrt/prefab/fx/gpuemitter/ComputeUtils.html">ComputeUtils</a></h4><div style="display:none"><div class="field "><a name="onDispatch"></a><h3 class="anchor"><code><a href="#onDispatch"><span class="identifier">onDispatch</span></a>(<span style="white-space:nowrap">emitter:<a class="type" title="hrt.prefab.fx.gpuemitter.GPUEmitterObject - The object of a GPUEmitter for a particle mesh: a h3d." href="../../../../hrt/prefab/fx/gpuemitter/GPUEmitterObject.html">GPUEmitterObject</a></span>):<span class="type">Void</span></code></h3><div class="doc"><p>Called before the compute dispatch, to update parameters.</p></div></div></div></div></div></div></div></div></div><footer class="section site-footer" style="background:#FAFAFA"><div class="container"><div class="copyright"><p style="color:#000000">&copy; 2026 &nbsp;</p></div></div></footer><script src="../../../../highlighter.js"></script><link href="../../../../highlighter.css" rel="stylesheet"/></body></html>

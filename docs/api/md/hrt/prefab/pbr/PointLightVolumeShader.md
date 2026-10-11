@@ -1,0 +1,59 @@
+# hrt.prefab.pbr.PointLightVolumeShader
+
+**class** · package [`hrt.prefab.pbr`](README.md) · module `hrt.prefab.pbr.LightVolume` · source [`hrt/prefab/pbr/LightVolume.hx`](../../../../../../hrt/prefab/pbr/LightVolume.hx)
+
+Extends: [`hrt.prefab.pbr.LightVolumeShader`](LightVolumeShader.md) → `hxsl.Shader`
+
+Ray marches the volume lit by a point light, with its shadows.
+
+## Constructor
+
+### new
+
+```haxe
+function new():Void
+```
+
+## Variables
+
+### shadowMap
+
+```haxe
+var shadowMap(get, set):hxsl.Texture
+```
+
+## Methods
+
+### updateConstants
+
+```haxe
+override function updateConstants(globals:hxsl.Globals):Void
+```
+
+### getParamValue
+
+```haxe
+override function getParamValue(index:Int):Dynamic
+```
+
+### getParamFloatValue
+
+```haxe
+override function getParamFloatValue(index:Int):Float
+```
+
+### writeParam
+
+```haxe
+override function writeParam(index:Int, type:hxsl.Type, out:hxsl.ShaderParamBuffer, pos:Int):Void
+```
+
+### clone
+
+```haxe
+override function clone():hxsl.Shader
+```
+
+## Inherited members
+
+- from [`hrt.prefab.pbr.LightVolumeShader`](LightVolumeShader.md): `ditheringNoise`, `ditheringIntensity`, `targetSize`, `ditheringSize`, `USE_DITHERING`, `lightPos`, `lightColor`, `opacity`, `range`, `fallOff`, `steps`, `HAS_SHADOW`, `updateConstants`, `getParamValue`, `getParamFloatValue`, `setParamIndexValue`, `setParamIndexFloatValue`, `writeParam`, `clone`

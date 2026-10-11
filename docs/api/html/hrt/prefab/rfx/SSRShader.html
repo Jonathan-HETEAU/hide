@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en"><!-- use theme color or fallback -->
+<!--use textcolor from settings, otherwise create a contrasting color to theme color-->
+<head><meta charset="utf-8"/><link href="../../../bootstrap/css/bootstrap.min.css" rel="stylesheet"/><link href="../../../bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet"/><link href="../../../bootstrap/css/bootstrap-select.min.css" rel="stylesheet"/><link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700,700italic,400italic" rel="stylesheet" type="text/css"/><link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600,600italic,400" rel="stylesheet" type="text/css"/><link href="https://netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.css" rel="stylesheet" type="text/css"/><script src="../../../jquery-3.6.0.min.js"></script><script src="../../../bootstrap/js/bootstrap.min.js"></script><script src="../../../bootstrap/js/bootstrap-select.min.js"></script><link href="../../../styles.css" rel="stylesheet"/><link href="../../../extra-styles.css" rel="stylesheet"/><link href="../../../haxe-nav.css" rel="stylesheet"/><link href="../../../dark-mode.css" rel="stylesheet"/><script>var dox = {rootPath: "../../../",platforms: ["hide_js","hide_hrt"]};</script><script src="../../../nav.js"></script><script src="../../../index.js"></script><link rel="icon" href="../../../favicon.ico" type="image/x-icon"/><title>hrt.prefab.rfx.SSRShader - Hide API</title><meta name="description" content="Ray marches the reflections in screen space."/></head><body><script>/* Here to prevent flash of unstyled content */let systemDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;if ((!localStorage.theme && systemDarkMode) || localStorage.theme == "dark") {document.body.style.backgroundColor = "#111";document.body.style.opacity = "0";document.addEventListener("DOMContentLoaded", function(event) {toggleTheme();document.body.style.backgroundColor = "";document.body.style.opacity = "";});}</script><style>
+.navbar .brand {
+	display: inline-block;
+	float: none;
+	text-shadow: 0 0 0 transparent;
+}
+</style><nav class="nav"><div class="navbar"><div class="navbar-inner" style="background:#FAFAFA; border-bottom:1px solid rgba(0,0,0,.09)"><div class="container"><a class="brand" style="color:#000000" href="../../../">Hide API</a><a href="#" id="theme-toggle" class="brand" style="color:#000000" onclick="toggleTheme()" title="Toggle Dark Mode"><i class="fa fa-moon-o"></i></a></div></div></div></nav><div class="container main-content"><div class="row-fluid"><div class="span3"><div class="well sidebar-nav"><form class="form-search" id="searchForm"><div class="input-prepend input-block-level"><span class="add-on"><i class="fa fa-search"></i></span><input id="search" type="text" placeholder="Filter (Ctrl+P)" autocomplete="off"/></div></form><div class="dropdown"><select id="select-platform" class="selectpicker" title="Filter by platform" data-width="100%"><option value="all" selected="selected">All Platforms</option><option>hide_js</option><option>hide_hrt</option></select></div></div><div class="well sidebar-nav" id="explorer"><div id="nav"></div></div></div><div class="span9"><div class="page-header"><span class="viewsource"><a href="https://github.com/HeapsIO/hide/blob/master/hrt/prefab/rfx/SSR.hx" class="btn btn-medium"><i class="fa fa-eye"></i> View source</a></span><h1><small>class</small> SSRShader</h1><h4><small>package <a href="../../../hrt/prefab/rfx/index.html">hrt.prefab.rfx</a></small></h4><h4><small>extends <span class="type">ScreenShader</span></small></h4>    <h4><small>import <a href="../../../hrt/prefab/rfx/SSR.html">hrt.prefab.rfx.SSR</a></small></h4><span class="label label-meta label-meta-directlyUsed" title="Marks types that are directly referenced by non-extern code.">@:directlyUsed</span><span class="label label-meta label-meta-src" title="">@:src({
+	@param var depthBuffer:Sampler2D;
+	@global var camera:{ var position : Vec3; var zNear : Float; var zFar : Float};
+	@const var USE_MASK:Bool;
+	@const var USE_ROUGHNESS:Bool;
+	@const var CHECK_ANGLE:Bool;
+	@param var ssrNormalMask:Sampler2D;
+	@param var texSize:Vec2;
+	@param var hdrMap:Sampler2D;
+	@param var roughnessMap:Sampler2D;
+	@param var normalMap:Sampler2D;
+	@param var cameraView:Mat4;
+	@param var cameraInverseView:Mat4;
+	@param var cameraProj:Mat4;
+	@param var cameraInverseProj:Mat4;
+	@param var cameraPos:Vec3;
+	@param var intensity:Float;
+	@param var colorMul:Float;
+	@param var thickness:Float;
+	@param var maxRoughness:Float;
+	@param var minCosAngle:Float;
+	@param var rayMarchingResolution:Float;
+	@param var frustum:Buffer&lt;Vec4,6&gt;;
+	@param var vignettingRadius:Float;
+	@param var vignettingSoftness:Float;
+	@param var depthBufferPrecision:Float;
+	var screenDepth:Float;
+	function reflectedRay(ray:Vec3, normal:Vec3):Vec3 {
+		return ray - 2.0 * dot(ray, normal) * normal;
+	};
+	function getViewPos(uv:Vec2):Vec4 {
+		screenDepth = depthBuffer.getLod(uv, 0).r;
+		var ruv = vec4(uvToScreen(uv), screenDepth, 1);
+		var vpos = ruv * cameraInverseProj;
+		return vpos / vpos.w;
+	};
+	function intersectViewRayWithFrustum(start:Vec3, dir:Vec3):Vec3 {
+		var wStart = vec4(start, 1.0) * cameraInverseView;
+		wStart /= wStart.w;
+		var wDir = normalize(dir * cameraInverseView.mat3());
+		var minT = 1000000.0;
+		for (i  in  0 ... 6) {
+			var plane = frustum[i];
+			var num = plane.w - (plane.x * wStart.x + plane.y * wStart.y + plane.z * wStart.z);
+			var denom = plane.x * wDir.x + plane.y * wDir.y + plane.z * wDir.z;
+			var t = num / denom;
+			if (denom != 0.0 &amp;&amp; t &gt; 0.0) minT = min(minT, t);
+		};
+		var wEnd = wStart.xyz + wDir * minT;
+		var vEnd = vec4(wEnd, 1.0) * cameraView;
+		return vEnd.xyz / vEnd.w;
+	};
+	function scaledThickness(z:Float):Float {
+		var t = thickness * camera.zNear * depthBufferPrecision;
+		return t * z * z / (depthBufferPrecision * camera.zNear - z);
+	};
+	function fragment() {
+		var intensityFactor = 0.0;
+		var normal = vec3(0.0);
+		if (USE_ROUGHNESS) {
+			intensityFactor = 1 - smoothstep(0.0, maxRoughness, roughnessMap.get(calculatedUV).g);
+			normal = normalMap.get(calculatedUV).rgb;
+		};
+		if (USE_MASK) {
+			var normalMask = ssrNormalMask.get(calculatedUV);
+			normal = mix(normal, normalMask.rgb, normalMask.a);
+			intensityFactor = mix(intensityFactor, 1.0, normalMask.a);
+		};
+		if (intensityFactor &lt;= 0) discard;
+		if (normal.dot(normal) &lt;= 0) discard;
+		var positionFrom = getViewPos(calculatedUV);
+		var camDir = normalize(positionFrom.xyz);
+		var viewNormal = normalize(normal * cameraView.mat3());
+		var reflectedRay = reflectedRay(camDir, viewNormal);
+		reflectedRay = normalize(reflectedRay);
+		var positionTo = intersectViewRayWithFrustum(positionFrom.xyz, reflectedRay);
+		var startFrag = calculatedUV * texSize;
+		var roundStartFrag = roundEven(startFrag);
+		var endFrag = vec4(positionTo, 1.0) * cameraProj;
+		endFrag.xyz /= endFrag.w;
+		endFrag.xy = screenToUv(endFrag.xy);
+		endFrag.xy *= texSize;
+		var roundEndFrag = roundEven(endFrag);
+		if (roundStartFrag.x == roundEndFrag.x &amp;&amp; roundStartFrag.y == roundEndFrag.y) discard;
+		var ray = endFrag.xy - startFrag.xy;
+		var rayLength = length(ray);
+		var stepCount = ceil(rayLength * rayMarchingResolution);
+		var increment = ray / stepCount;
+		var frag = startFrag.xy + increment;
+		var uv = frag / texSize;
+		var angleCorrection = 1.0 / abs(dot(camDir, viewNormal));
+		var iStepCount = int(ceil(min(stepCount, length(texSize)) / 4));
+		var hit = 0;
+		var hitDepthRatio = 0.0;
+		for (curStep  in  0 ... iStepCount) {
+			var results:Array&lt;Bool,4&gt; = [false, false, false, false];
+			var depthRatio:Array&lt;Float,4&gt; = [0.0, 0.0, 0.0, 0.0];
+			@unroll for (i  in  0 ... 4) {
+				var curPos = getViewPos(uv);
+				var viewDistance = (positionFrom.z * positionTo.z) / mix(positionTo.z, positionFrom.z, float(curStep * 4 + i + 1) / stepCount);
+				var depth = viewDistance - curPos.z;
+				var t = scaledThickness(curPos.z) * angleCorrection;
+				results[i] = depth &gt;= 0.0 &amp;&amp; depth &lt; t &amp;&amp; screenDepth &lt; 1;
+				depthRatio[i] = 1.0 - saturate(depth / t);
+				frag += increment;
+				uv = frag / texSize;
+			};
+			if (results[0] || results[1] || results[2] || results[3]) {
+				hit = 1;
+				for (j  in  0 ... 4) {
+					if (results[j]) {
+						uv = (frag - (increment * (4 - j))) / texSize;
+						hitDepthRatio = depthRatio[j];
+						break;
+					};
+				};
+				break;
+			};
+		};
+		if (hit != 1) discard;
+		if (CHECK_ANGLE) {
+			var reflectionNormal = normalMap.get(uv).rgb;
+			if (dot(reflectionNormal, normal) &gt; minCosAngle || reflectionNormal.dot(reflectionNormal) &lt;= 0) discard;
+		};
+		var screenPos = uvToScreen(uv);
+		var dist = length(screenPos);
+		var vignetting = smoothstep(vignettingRadius, vignettingRadius - vignettingSoftness, dist);
+		var fragmentColor = hdrMap.get(uv).rgb;
+		pixelColor = saturate(vec4(fragmentColor * colorMul, intensity * intensityFactor * vignetting * hitDepthRatio));
+	};
+})</span><span class="label label-meta label-meta-build" title="Builds a class or enum from a macro.">@:build(hxsl.Macros.buildShader())</span><span class="label label-meta label-meta-autoBuild" title="Extends `@:build` metadata to all extending and implementing classes.">@:autoBuild(hxsl.Macros.buildShader())</span><hr/><p class="availability"><em>Available on  all platforms</em></p></div><div class="body"><div class="doc doc-main"><p>Ray marches the reflections in screen space.</p></div><h3 class="section">Constructor</h3><div class="fields"><div class="field "><a name="new"></a><h3 class="anchor"><code><a href="#new"><span class="identifier">new</span></a>()</code></h3><div class="doc"><p></p></div></div></div><h3 class="section">Variables</h3><div class="fields"><div class="field "><a name="CHECK_ANGLE"></a><h3 class="anchor"><code><a href="#CHECK_ANGLE"><span class="identifier">CHECK_ANGLE</span></a>:<span class="type">Bool</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="USE_MASK"></a><h3 class="anchor"><code><a href="#USE_MASK"><span class="identifier">USE_MASK</span></a>:<span class="type">Bool</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="USE_ROUGHNESS"></a><h3 class="anchor"><code><a href="#USE_ROUGHNESS"><span class="identifier">USE_ROUGHNESS</span></a>:<span class="type">Bool</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="cameraInverseProj"></a><h3 class="anchor"><code><a href="#cameraInverseProj"><span class="identifier">cameraInverseProj</span></a>:<span class="type">Matrix</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="cameraInverseView"></a><h3 class="anchor"><code><a href="#cameraInverseView"><span class="identifier">cameraInverseView</span></a>:<span class="type">Matrix</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="cameraPos"></a><h3 class="anchor"><code><a href="#cameraPos"><span class="identifier">cameraPos</span></a>:<span class="type">Vec</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="cameraProj"></a><h3 class="anchor"><code><a href="#cameraProj"><span class="identifier">cameraProj</span></a>:<span class="type">Matrix</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="cameraView"></a><h3 class="anchor"><code><a href="#cameraView"><span class="identifier">cameraView</span></a>:<span class="type">Matrix</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="colorMul"></a><h3 class="anchor"><code><a href="#colorMul"><span class="identifier">colorMul</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="depthBuffer"></a><h3 class="anchor"><code><a href="#depthBuffer"><span class="identifier">depthBuffer</span></a>:<span class="type">Texture</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="depthBufferPrecision"></a><h3 class="anchor"><code><a href="#depthBufferPrecision"><span class="identifier">depthBufferPrecision</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="frustum"></a><h3 class="anchor"><code><a href="#frustum"><span class="identifier">frustum</span></a>:<span class="type">Buffer</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="hdrMap"></a><h3 class="anchor"><code><a href="#hdrMap"><span class="identifier">hdrMap</span></a>:<span class="type">Texture</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="intensity"></a><h3 class="anchor"><code><a href="#intensity"><span class="identifier">intensity</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="maxRoughness"></a><h3 class="anchor"><code><a href="#maxRoughness"><span class="identifier">maxRoughness</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="minCosAngle"></a><h3 class="anchor"><code><a href="#minCosAngle"><span class="identifier">minCosAngle</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="normalMap"></a><h3 class="anchor"><code><a href="#normalMap"><span class="identifier">normalMap</span></a>:<span class="type">Texture</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="rayMarchingResolution"></a><h3 class="anchor"><code><a href="#rayMarchingResolution"><span class="identifier">rayMarchingResolution</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="roughnessMap"></a><h3 class="anchor"><code><a href="#roughnessMap"><span class="identifier">roughnessMap</span></a>:<span class="type">Texture</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="ssrNormalMask"></a><h3 class="anchor"><code><a href="#ssrNormalMask"><span class="identifier">ssrNormalMask</span></a>:<span class="type">Texture</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="texSize"></a><h3 class="anchor"><code><a href="#texSize"><span class="identifier">texSize</span></a>:<span class="type">Vec</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="thickness"></a><h3 class="anchor"><code><a href="#thickness"><span class="identifier">thickness</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="vignettingRadius"></a><h3 class="anchor"><code><a href="#vignettingRadius"><span class="identifier">vignettingRadius</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="vignettingSoftness"></a><h3 class="anchor"><code><a href="#vignettingSoftness"><span class="identifier">vignettingSoftness</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div></div><h3 class="section">Methods</h3><div class="fields"></div>  </div></div></div></div><footer class="section site-footer" style="background:#FAFAFA"><div class="container"><div class="copyright"><p style="color:#000000">&copy; 2026 &nbsp;</p></div></div></footer><script src="../../../highlighter.js"></script><link href="../../../highlighter.css" rel="stylesheet"/></body></html>

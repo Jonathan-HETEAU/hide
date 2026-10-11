@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en"><!-- use theme color or fallback -->
+<!--use textcolor from settings, otherwise create a contrasting color to theme color-->
+<head><meta charset="utf-8"/><link href="../../../bootstrap/css/bootstrap.min.css" rel="stylesheet"/><link href="../../../bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet"/><link href="../../../bootstrap/css/bootstrap-select.min.css" rel="stylesheet"/><link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700,700italic,400italic" rel="stylesheet" type="text/css"/><link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600,600italic,400" rel="stylesheet" type="text/css"/><link href="https://netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.css" rel="stylesheet" type="text/css"/><script src="../../../jquery-3.6.0.min.js"></script><script src="../../../bootstrap/js/bootstrap.min.js"></script><script src="../../../bootstrap/js/bootstrap-select.min.js"></script><link href="../../../styles.css" rel="stylesheet"/><link href="../../../extra-styles.css" rel="stylesheet"/><link href="../../../haxe-nav.css" rel="stylesheet"/><link href="../../../dark-mode.css" rel="stylesheet"/><script>var dox = {rootPath: "../../../",platforms: ["hide_js","hide_hrt"]};</script><script src="../../../nav.js"></script><script src="../../../index.js"></script><link rel="icon" href="../../../favicon.ico" type="image/x-icon"/><title>hrt.prefab.l3d.HeightMapShader - Hide API</title><meta name="description" content="Displaces the grid by the height texture and blends the albedo textures."/></head><body><script>/* Here to prevent flash of unstyled content */let systemDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;if ((!localStorage.theme && systemDarkMode) || localStorage.theme == "dark") {document.body.style.backgroundColor = "#111";document.body.style.opacity = "0";document.addEventListener("DOMContentLoaded", function(event) {toggleTheme();document.body.style.backgroundColor = "";document.body.style.opacity = "";});}</script><style>
+.navbar .brand {
+	display: inline-block;
+	float: none;
+	text-shadow: 0 0 0 transparent;
+}
+</style><nav class="nav"><div class="navbar"><div class="navbar-inner" style="background:#FAFAFA; border-bottom:1px solid rgba(0,0,0,.09)"><div class="container"><a class="brand" style="color:#000000" href="../../../">Hide API</a><a href="#" id="theme-toggle" class="brand" style="color:#000000" onclick="toggleTheme()" title="Toggle Dark Mode"><i class="fa fa-moon-o"></i></a></div></div></div></nav><div class="container main-content"><div class="row-fluid"><div class="span3"><div class="well sidebar-nav"><form class="form-search" id="searchForm"><div class="input-prepend input-block-level"><span class="add-on"><i class="fa fa-search"></i></span><input id="search" type="text" placeholder="Filter (Ctrl+P)" autocomplete="off"/></div></form><div class="dropdown"><select id="select-platform" class="selectpicker" title="Filter by platform" data-width="100%"><option value="all" selected="selected">All Platforms</option><option>hide_js</option><option>hide_hrt</option></select></div></div><div class="well sidebar-nav" id="explorer"><div id="nav"></div></div></div><div class="span9"><div class="page-header"><span class="viewsource"><a href="https://github.com/HeapsIO/hide/blob/master/hrt/prefab/l3d/HeightMap.hx" class="btn btn-medium"><i class="fa fa-eye"></i> View source</a></span><h1><small>class</small> HeightMapShader</h1><h4><small>package <a href="../../../hrt/prefab/l3d/index.html">hrt.prefab.l3d</a></small></h4><h4><small>extends <span class="type">Shader</span></small></h4>    <h4><small>import <a href="../../../hrt/prefab/l3d/HeightMap.html">hrt.prefab.l3d.HeightMap</a></small></h4><span class="label label-meta label-meta-directlyUsed" title="Marks types that are directly referenced by non-extern code.">@:directlyUsed</span><span class="label label-meta label-meta-src" title="">@:src({
+	@:import h3d.shader.BaseMesh;
+	@const var hasHeight:Bool;
+	@const var hasNormal:Bool;
+	@param var heightMap:Sampler2D;
+	@param var heightMapFrag:Sampler2D;
+	@param var normalMap:Sampler2D;
+	@param var heightScale:Float;
+	@param var heightOffset:Vec2;
+	@param var normalScale:Float;
+	@param var cellSize:Vec2;
+	@const var heightFlipX:Bool;
+	@const var heightFlipY:Bool;
+	@const var SplatCount:Int;
+	@const var AlbedoCount:Int;
+	@const(8) var SplatMode:Int;
+	@const var albedoIsArray:Bool;
+	@param var albedoTiling:Float;
+	@param var albedos:Array&lt;Sampler2D,AlbedoCount&gt;;
+	@param var albedoArray:Sampler2DArray;
+	@param var albedoIndexes:Array&lt;Vec4,AlbedoCount&gt;;
+	@param var splats:Array&lt;Sampler2D,SplatCount&gt;;
+	@const var USE_BAKED_ALBEDO:Bool;
+	@param var bakedAlbedo:Sampler2D;
+	@input var input2:{ var uv : Vec2};
+	@const var hasAlbedoProps:Bool;
+	@param var albedoProps:Array&lt;Vec4,AlbedoCount&gt;;
+	@param var albedoGamma:Float;
+	@const var hasAlbedoNormals:Bool;
+	@param var albedoNormals:Sampler2DArray;
+	@param var albedoNormalsStrength:Float;
+	@param var albedoRoughness:Float;
+	var calculatedUV:Vec2;
+	var heightUV:Vec2;
+	var roughness:Float;
+	function getPoint(dx:Float, dy:Float):Vec3 {
+		var v = vec2(dx, dy);
+		return vec3(cellSize * v, heightMapFrag.get(heightUV + heightOffset * v).r * heightScale - relativePosition.z);
+	};
+	function vertex() {
+		calculatedUV = input2.uv;
+		heightUV = calculatedUV;
+		if (heightFlipX) heightUV.x = 1 - heightUV.x;
+		if (heightFlipY) heightUV.y = 1 - heightUV.y;
+		if (hasHeight) {
+			var z = heightMap.get(heightUV).x * heightScale;
+			relativePosition.z = z;
+		};
+	};
+	function setNormal(n:Vec3) {
+		transformedNormal = (n.normalize() * global.modelView.mat3()).normalize();
+	};
+	function getAlbedo(index:Int, uv:Vec2):Vec4 {
+		var color = albedoIsArray ? albedoArray.get(vec3(uv, albedoIndexes[index].r)) : albedos[index].get(uv);
+		if (albedoGamma != 1) color = color.pow(albedoGamma.xxxx);
+		return color;
+	};
+	function splat(index:Int, amount:Float):Vec4 {
+		if (index &gt;= AlbedoCount || amount &lt;= 0) return vec4(0.) else if (hasAlbedoProps) {
+			var p = albedoProps[index];
+			return getAlbedo(index, calculatedUV * p.w) * vec4(p.rgb, 1) * amount;
+		} else return getAlbedo(index, calculatedUV * albedoTiling) * amount;
+	};
+	function fragment() {
+		if (hasNormal) {
+			var n = unpackNormal(normalMap.get(calculatedUV));
+			n = n.normalize();
+			n.xy *= normalScale;
+			setNormal(n);
+		} else {
+			var px0 = getPoint(-1, 0);
+			var py0 = getPoint(0, -1);
+			var px1 = getPoint(1, 0);
+			var py1 = getPoint(0, 1);
+			var n = px1.cross(py1) + py1.cross(px0) + px0.cross(py0) + py0.cross(px1);
+			n.xy *= normalScale;
+			setNormal(n);
+		};
+		if (USE_BAKED_ALBEDO) {
+			pixelColor = bakedAlbedo.getLod(calculatedUV, 0);
+		} else if (SplatCount &gt; 0) {
+			var color = vec4(0.);
+			if (SplatMode == 3 || SplatMode == 4) color = splat(0, 1);
+			@unroll for (i  in  0 ... SplatCount) {
+				var s = splats[i].getLod(calculatedUV, 0);
+				switch (SplatMode) {
+					case 0:
+						color += splat(i * 3, s.r);
+						color += splat(i * 3 + 1, s.g);
+						color += splat(i * 3 + 2, s.b);					
+					case 1:
+						color += splat(i * 4, s.r);
+						color += splat(i * 4 + 1, s.g);
+						color += splat(i * 4 + 2, s.b);
+						color += splat(i * 4 + 3, s.a);					
+					case 2:
+						var i1 = int(s.r * 256);
+						var i2 = int(s.g * 256);
+						color += splat(i1, s.b);
+						color += splat(i2, s.a);
+						if (hasAlbedoNormals) {
+							var uv1 = calculatedUV * albedoProps[i1].w;
+							var uv2 = calculatedUV * albedoProps[i2].w;
+							var normal1 = albedoNormals.get(vec3(uv1, albedoIndexes[i1].r));
+							var normal2 = albedoNormals.get(vec3(uv2, albedoIndexes[i2].r));
+							var med = mix(normal1, normal2, s.a);
+							var nf = unpackNormal(med);
+							nf.xy *= albedoNormalsStrength;
+							nf = nf.normalize();
+							var n = transformedNormal;
+							var tanX = vec3(1, 0, 0);
+							var tanY = transformedNormal.cross(tanX);
+							transformedNormal = (nf.x * tanX + nf.y * tanY + nf.z * n).normalize();
+							roughness *= 1 - med.a * med.a * albedoRoughness;
+						};					
+					case 3:
+						color = mix(color, splat(i * 3 + 1, 1), s.r);
+						color = mix(color, splat(i * 3 + 2, 1), s.g);
+						color = mix(color, splat(i * 3 + 3, 1), s.b);					
+					case 4:
+						color = mix(color, splat(i * 4 + 1, 1), s.r);
+						color = mix(color, splat(i * 4 + 2, 1), s.g);
+						color = mix(color, splat(i * 4 + 3, 1), s.b);
+						color = mix(color, splat(i * 4 + 4, 1), s.a);					
+				};
+			};
+			color.a = 1;
+			pixelColor = color;
+		} else {
+			pixelColor = getAlbedo(0, calculatedUV);
+		};
+	};
+})</span><span class="label label-meta label-meta-build" title="Builds a class or enum from a macro.">@:build(hxsl.Macros.buildShader())</span><span class="label label-meta label-meta-autoBuild" title="Extends `@:build` metadata to all extending and implementing classes.">@:autoBuild(hxsl.Macros.buildShader())</span><hr/><p class="availability"><em>Available on  all platforms</em></p></div><div class="body"><div class="doc doc-main"><p>Displaces the grid by the height texture and blends the albedo textures.</p></div><h3 class="section">Constructor</h3><div class="fields"><div class="field "><a name="new"></a><h3 class="anchor"><code><a href="#new"><span class="identifier">new</span></a>()</code></h3><div class="doc"><p></p></div></div></div><h3 class="section">Variables</h3><div class="fields"><div class="field "><a name="AlbedoCount"></a><h3 class="anchor"><code><a href="#AlbedoCount"><span class="identifier">AlbedoCount</span></a>:<span class="type">Int</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="SplatCount"></a><h3 class="anchor"><code><a href="#SplatCount"><span class="identifier">SplatCount</span></a>:<span class="type">Int</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="SplatMode"></a><h3 class="anchor"><code><a href="#SplatMode"><span class="identifier">SplatMode</span></a>:<span class="type">Int</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="USE_BAKED_ALBEDO"></a><h3 class="anchor"><code><a href="#USE_BAKED_ALBEDO"><span class="identifier">USE_BAKED_ALBEDO</span></a>:<span class="type">Bool</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="albedoArray"></a><h3 class="anchor"><code><a href="#albedoArray"><span class="identifier">albedoArray</span></a>:<span class="type">TextureArray</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="albedoGamma"></a><h3 class="anchor"><code><a href="#albedoGamma"><span class="identifier">albedoGamma</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="albedoIndexes"></a><h3 class="anchor"><code><a href="#albedoIndexes"><span class="identifier">albedoIndexes</span></a>:<span class="type">Array</span>&lt;<span class="type">Vec4</span>&gt;</code></h3><div class="doc"><p></p></div></div><div class="field "><a name="albedoIsArray"></a><h3 class="anchor"><code><a href="#albedoIsArray"><span class="identifier">albedoIsArray</span></a>:<span class="type">Bool</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="albedoNormals"></a><h3 class="anchor"><code><a href="#albedoNormals"><span class="identifier">albedoNormals</span></a>:<span class="type">TextureArray</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="albedoNormalsStrength"></a><h3 class="anchor"><code><a href="#albedoNormalsStrength"><span class="identifier">albedoNormalsStrength</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="albedoProps"></a><h3 class="anchor"><code><a href="#albedoProps"><span class="identifier">albedoProps</span></a>:<span class="type">Array</span>&lt;<span class="type">Vec4</span>&gt;</code></h3><div class="doc"><p></p></div></div><div class="field "><a name="albedoRoughness"></a><h3 class="anchor"><code><a href="#albedoRoughness"><span class="identifier">albedoRoughness</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="albedoTiling"></a><h3 class="anchor"><code><a href="#albedoTiling"><span class="identifier">albedoTiling</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="albedos"></a><h3 class="anchor"><code><a href="#albedos"><span class="identifier">albedos</span></a>:<span class="type">Array</span>&lt;<span class="type">Texture</span>&gt;</code></h3><div class="doc"><p></p></div></div><div class="field "><a name="bakedAlbedo"></a><h3 class="anchor"><code><a href="#bakedAlbedo"><span class="identifier">bakedAlbedo</span></a>:<span class="type">Texture</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="cellSize"></a><h3 class="anchor"><code><a href="#cellSize"><span class="identifier">cellSize</span></a>:<span class="type">Vec</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="hasAlbedoNormals"></a><h3 class="anchor"><code><a href="#hasAlbedoNormals"><span class="identifier">hasAlbedoNormals</span></a>:<span class="type">Bool</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="hasAlbedoProps"></a><h3 class="anchor"><code><a href="#hasAlbedoProps"><span class="identifier">hasAlbedoProps</span></a>:<span class="type">Bool</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="hasHeight"></a><h3 class="anchor"><code><a href="#hasHeight"><span class="identifier">hasHeight</span></a>:<span class="type">Bool</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="hasNormal"></a><h3 class="anchor"><code><a href="#hasNormal"><span class="identifier">hasNormal</span></a>:<span class="type">Bool</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="heightFlipX"></a><h3 class="anchor"><code><a href="#heightFlipX"><span class="identifier">heightFlipX</span></a>:<span class="type">Bool</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="heightFlipY"></a><h3 class="anchor"><code><a href="#heightFlipY"><span class="identifier">heightFlipY</span></a>:<span class="type">Bool</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="heightMap"></a><h3 class="anchor"><code><a href="#heightMap"><span class="identifier">heightMap</span></a>:<span class="type">Texture</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="heightMapFrag"></a><h3 class="anchor"><code><a href="#heightMapFrag"><span class="identifier">heightMapFrag</span></a>:<span class="type">Texture</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="heightOffset"></a><h3 class="anchor"><code><a href="#heightOffset"><span class="identifier">heightOffset</span></a>:<span class="type">Vec</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="heightScale"></a><h3 class="anchor"><code><a href="#heightScale"><span class="identifier">heightScale</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="normalMap"></a><h3 class="anchor"><code><a href="#normalMap"><span class="identifier">normalMap</span></a>:<span class="type">Texture</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="normalScale"></a><h3 class="anchor"><code><a href="#normalScale"><span class="identifier">normalScale</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="splats"></a><h3 class="anchor"><code><a href="#splats"><span class="identifier">splats</span></a>:<span class="type">Array</span>&lt;<span class="type">Texture</span>&gt;</code></h3><div class="doc"><p></p></div></div></div><h3 class="section">Methods</h3><div class="fields"></div>  </div></div></div></div><footer class="section site-footer" style="background:#FAFAFA"><div class="container"><div class="copyright"><p style="color:#000000">&copy; 2026 &nbsp;</p></div></div></footer><script src="../../../highlighter.js"></script><link href="../../../highlighter.css" rel="stylesheet"/></body></html>

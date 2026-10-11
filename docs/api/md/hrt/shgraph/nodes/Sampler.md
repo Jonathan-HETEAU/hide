@@ -1,0 +1,40 @@
+# hrt.shgraph.nodes.Sampler
+
+**class** · package [`hrt.shgraph.nodes`](README.md) · source [`hrt/shgraph/nodes/Sampler.hx`](../../../../../../hrt/shgraph/nodes/Sampler.hx)
+
+Extends: [`hrt.shgraph.ShaderNodeHxsl`](../ShaderNodeHxsl.md) → [`hrt.shgraph.ShaderNode`](../ShaderNode.md)
+
+Subclasses: [`hrt.shgraph.nodes.NormalMap`](NormalMap.md), [`hrt.shgraph.nodes.TriplanarNormalMap`](TriplanarNormalMap.md), [`hrt.shgraph.nodes.TriplanarSampler`](TriplanarSampler.md)
+
+The shader graph node "Sample Texture 2D" (Property): get color from texture and UV.
+Inputs: `texture`, `uv` (default `calculatedUV`).
+Outputs: `RGBA`.
+
+## Constructor
+
+### new
+
+```haxe
+function new():Void
+```
+
+## Static variables
+
+### _variablesInfos
+
+```haxe
+static var _variablesInfos:Map<Int, hrt.shgraph.SgHxslVar>
+```
+
+## Methods
+
+### getPropertiesHTML _(editor (js) only)_
+
+```haxe
+override function getPropertiesHTML(width:Float):Array<hide.Element>
+```
+
+## Inherited members
+
+- from [`hrt.shgraph.ShaderNodeHxsl`](../ShaderNodeHxsl.md): `getInputs`, `getOutputs`, `generate`
+- from [`hrt.shgraph.ShaderNode`](../ShaderNode.md): `id`, `x`, `y`, `showPreview`, `graph`, `nameOverride`, `resolvedInputTypes`, `resolvedOutputTypes`, `getResolvedInputType`, `getResolvedOutputType`, `getInfo`, `getId`, `getPos`, `setPos`, `getPropertiesHTML`, `editor`, `setDefaultParam`, `requestRecompile`, `serializeToDynamic`, `defaults`, `getInputs`, `getOutputs`, `generate`, `getAliases`, `connections`, `setId`, `loadProperties`, `shouldShowPreview`, `canHavePreview`, `saveProperties`, `getHTML`

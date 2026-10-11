@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en"><!-- use theme color or fallback -->
+<!--use textcolor from settings, otherwise create a contrasting color to theme color-->
+<head><meta charset="utf-8"/><link href="../../../bootstrap/css/bootstrap.min.css" rel="stylesheet"/><link href="../../../bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet"/><link href="../../../bootstrap/css/bootstrap-select.min.css" rel="stylesheet"/><link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700,700italic,400italic" rel="stylesheet" type="text/css"/><link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600,600italic,400" rel="stylesheet" type="text/css"/><link href="https://netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.css" rel="stylesheet" type="text/css"/><script src="../../../jquery-3.6.0.min.js"></script><script src="../../../bootstrap/js/bootstrap.min.js"></script><script src="../../../bootstrap/js/bootstrap-select.min.js"></script><link href="../../../styles.css" rel="stylesheet"/><link href="../../../extra-styles.css" rel="stylesheet"/><link href="../../../haxe-nav.css" rel="stylesheet"/><link href="../../../dark-mode.css" rel="stylesheet"/><script>var dox = {rootPath: "../../../",platforms: ["hide_js","hide_hrt"]};</script><script src="../../../nav.js"></script><script src="../../../index.js"></script><link rel="icon" href="../../../favicon.ico" type="image/x-icon"/><title>hrt.prefab.l2d.NoiseShader - Hide API</title><meta name="description" content="Renders the noise of a &lt;code&gt;&lt;a href=&quot;../../../hrt/prefab/l2d/NoiseGenerator.html#NoiseGenerator&quot;&gt;NoiseGenerator&lt;/a&gt;&lt;/code&gt;."/></head><body><script>/* Here to prevent flash of unstyled content */let systemDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;if ((!localStorage.theme && systemDarkMode) || localStorage.theme == "dark") {document.body.style.backgroundColor = "#111";document.body.style.opacity = "0";document.addEventListener("DOMContentLoaded", function(event) {toggleTheme();document.body.style.backgroundColor = "";document.body.style.opacity = "";});}</script><style>
+.navbar .brand {
+	display: inline-block;
+	float: none;
+	text-shadow: 0 0 0 transparent;
+}
+</style><nav class="nav"><div class="navbar"><div class="navbar-inner" style="background:#FAFAFA; border-bottom:1px solid rgba(0,0,0,.09)"><div class="container"><a class="brand" style="color:#000000" href="../../../">Hide API</a><a href="#" id="theme-toggle" class="brand" style="color:#000000" onclick="toggleTheme()" title="Toggle Dark Mode"><i class="fa fa-moon-o"></i></a></div></div></div></nav><div class="container main-content"><div class="row-fluid"><div class="span3"><div class="well sidebar-nav"><form class="form-search" id="searchForm"><div class="input-prepend input-block-level"><span class="add-on"><i class="fa fa-search"></i></span><input id="search" type="text" placeholder="Filter (Ctrl+P)" autocomplete="off"/></div></form><div class="dropdown"><select id="select-platform" class="selectpicker" title="Filter by platform" data-width="100%"><option value="all" selected="selected">All Platforms</option><option>hide_js</option><option>hide_hrt</option></select></div></div><div class="well sidebar-nav" id="explorer"><div id="nav"></div></div></div><div class="span9"><div class="page-header"><span class="viewsource"><a href="https://github.com/HeapsIO/hide/blob/master/hrt/prefab/l2d/NoiseGenerator.hx" class="btn btn-medium"><i class="fa fa-eye"></i> View source</a></span><h1><small>class</small> NoiseShader</h1><h4><small>package <a href="../../../hrt/prefab/l2d/index.html">hrt.prefab.l2d</a></small></h4><h4><small>extends <span class="type">ScreenShader</span></small></h4>    <h4><small>import <a href="../../../hrt/prefab/l2d/NoiseGenerator.html">hrt.prefab.l2d.NoiseGenerator</a></small></h4><span class="label label-meta label-meta-directlyUsed" title="Marks types that are directly referenced by non-extern code.">@:directlyUsed</span><span class="label label-meta label-meta-src" title="">@:src({
+	@:import h3d.shader.NoiseLib;
+	@const(5) var channels:Int = 1;
+	@const(64) var octaves:Int = 1;
+	@const(4) var mode:Int;
+	@const var normals:Bool;
+	@const(4) var repeat:Int;
+	@param var seed:Int;
+	@param var scale:Float = 8;
+	@param var persist:Float = 0.5;
+	@param var lacunarity:Float = 2.0;
+	@param var gain:Float;
+	@param var offset:Float;
+	@param var inverse:Float;
+	@param var contrast:Float;
+	@param var brightness:Float;
+	@param var turbulence:Float;
+	@param var turbulenceScale:Float;
+	function makeRepeat(scale:Float):Vec2 {
+		var s = int(scale * 0.5) * 2.;
+		return if (repeat == 0) vec2(s) else if (repeat == 1) vec2(s, scale) else if (repeat == 2) vec2(scale, s) else vec2(scale);
+	};
+	function makePeriod(scale:Vec2):Vec2 {
+		if (repeat == 0) return scale;
+		if (repeat == 1) return vec2(scale.x, 1e9);
+		if (repeat == 2) return vec2(1e9, scale.y);
+		return vec2(1e9);
+	};
+	function perturb(uv:Vec2, scale:Float, seed:Int):Vec2 {
+		if (turbulence &gt; 0.) {
+			var turbScaleRepeat = makeRepeat(scale * turbulenceScale);
+			noiseSeed = channels * octaves + 1 + seed;
+			uv.x += psnoise(calculatedUV * turbScaleRepeat, makePeriod(turbScaleRepeat)) * turbulence;
+			noiseSeed = channels * octaves + 1025 + seed;
+			uv.y += psnoise(calculatedUV * turbScaleRepeat, makePeriod(turbScaleRepeat)) * turbulence;
+		};
+		return uv;
+	};
+	function noise(seed:Int, scale:Float):Float {
+		var scaleRepeat = makeRepeat(scale);
+		var uv = perturb(calculatedUV, scale, seed);
+		noiseSeed = seed;
+		return psnoise(uv * scaleRepeat, makePeriod(scaleRepeat));
+	};
+	function noiseNormal(seed:Int, scale:Float):Vec3 {
+		var scaleRepeat = makeRepeat(scale);
+		var uv = perturb(calculatedUV, scale, seed);
+		noiseSeed = seed;
+		return psrdnoise(uv * scaleRepeat, makePeriod(scaleRepeat), 0.).yzx;
+	};
+	function calc(channel:Int):Float {
+		var v = 0.;
+		var seed = seed + channel * octaves;
+		var scale = scale;
+		switch (mode) {
+			case 0:
+				var k = 1.;
+				for (i  in  0 ... octaves) {
+					v += noise(seed + i, scale) * k;
+					k *= persist;
+					scale *= lacunarity;
+				};			
+			case 1:
+				var k = 1.;
+				var s = lacunarity;
+				var weight = 1.;
+				var tot = 0.;
+				for (i  in  0 ... octaves) {
+					var g = noise(seed + i, scale) * k;
+					g = offset - abs(g);
+					g *= g;
+					g *= weight;
+					v += g * s;
+					tot += k;
+					weight = g * gain;
+					if (weight &lt; 0) weight = 0 else if (weight &gt; 1) weight = 1;
+					k *= persist;
+					scale *= lacunarity;
+				};
+				v /= tot;			
+		};
+		v = (v * (1 + contrast) + 1) * 0.5 + brightness;
+		if (inverse &gt; 0) v = 1 - v;
+		return v;
+	};
+	function calcNormal():Vec3 {
+		var v = vec3(0.);
+		var scale = scale;
+		switch (mode) {
+			case 0:
+				var k = 1.;
+				for (i  in  0 ... octaves) {
+					v += noiseNormal(seed + i, scale) * k;
+					k *= persist;
+					scale *= lacunarity;
+				};			
+			default:
+				v.z = 1.;			
+		};
+		v.z = (v.z + 1) * 0.5 + 10;
+		v = v.normalize();
+		v.xy *= pow(2., 1. + contrast * 4.);
+		return v.normalize();
+	};
+	function fragment() {
+		var out = vec4(0, 0, 0, 1);
+		if (normals) {
+			out = packNormal(calcNormal());
+		} else {
+			if (channels &gt;= 1) {
+				out.r = calc(0);
+				if (channels == 1) out.gb = out.rr;
+			};
+			if (channels &gt;= 2) out.g = calc(1);
+			if (channels &gt;= 3) out.b = calc(2);
+			if (channels &gt;= 4) out.a = calc(3);
+		};
+		output.color = out;
+	};
+})</span><span class="label label-meta label-meta-build" title="Builds a class or enum from a macro.">@:build(hxsl.Macros.buildShader())</span><span class="label label-meta label-meta-autoBuild" title="Extends `@:build` metadata to all extending and implementing classes.">@:autoBuild(hxsl.Macros.buildShader())</span><hr/><p class="availability"><em>Available on  all platforms</em></p></div><div class="body"><div class="doc doc-main"><p>Renders the noise of a <code><a href="../../../hrt/prefab/l2d/NoiseGenerator.html#NoiseGenerator">NoiseGenerator</a></code>.</p></div><h3 class="section">Constructor</h3><div class="fields"><div class="field "><a name="new"></a><h3 class="anchor"><code><a href="#new"><span class="identifier">new</span></a>()</code></h3><div class="doc"><p></p></div></div></div><h3 class="section">Variables</h3><div class="fields"><div class="field "><a name="brightness"></a><h3 class="anchor"><code><a href="#brightness"><span class="identifier">brightness</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="channels"></a><h3 class="anchor"><code><a href="#channels"><span class="identifier">channels</span></a>:<span class="type">Int</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="contrast"></a><h3 class="anchor"><code><a href="#contrast"><span class="identifier">contrast</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="gain"></a><h3 class="anchor"><code><a href="#gain"><span class="identifier">gain</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="inverse"></a><h3 class="anchor"><code><a href="#inverse"><span class="identifier">inverse</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="lacunarity"></a><h3 class="anchor"><code><a href="#lacunarity"><span class="identifier">lacunarity</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="mode"></a><h3 class="anchor"><code><a href="#mode"><span class="identifier">mode</span></a>:<span class="type">Int</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="normals"></a><h3 class="anchor"><code><a href="#normals"><span class="identifier">normals</span></a>:<span class="type">Bool</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="octaves"></a><h3 class="anchor"><code><a href="#octaves"><span class="identifier">octaves</span></a>:<span class="type">Int</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="offset"></a><h3 class="anchor"><code><a href="#offset"><span class="identifier">offset</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="persist"></a><h3 class="anchor"><code><a href="#persist"><span class="identifier">persist</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="repeat"></a><h3 class="anchor"><code><a href="#repeat"><span class="identifier">repeat</span></a>:<span class="type">Int</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="scale"></a><h3 class="anchor"><code><a href="#scale"><span class="identifier">scale</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="seed"></a><h3 class="anchor"><code><a href="#seed"><span class="identifier">seed</span></a>:<span class="type">Int</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="turbulence"></a><h3 class="anchor"><code><a href="#turbulence"><span class="identifier">turbulence</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="turbulenceScale"></a><h3 class="anchor"><code><a href="#turbulenceScale"><span class="identifier">turbulenceScale</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div></div><h3 class="section">Methods</h3><div class="fields"></div>  </div></div></div></div><footer class="section site-footer" style="background:#FAFAFA"><div class="container"><div class="copyright"><p style="color:#000000">&copy; 2026 &nbsp;</p></div></div></footer><script src="../../../highlighter.js"></script><link href="../../../highlighter.css" rel="stylesheet"/></body></html>

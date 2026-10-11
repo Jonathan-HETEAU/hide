@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en"><!-- use theme color or fallback -->
+<!--use textcolor from settings, otherwise create a contrasting color to theme color-->
+<head><meta charset="utf-8"/><link href="../../bootstrap/css/bootstrap.min.css" rel="stylesheet"/><link href="../../bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet"/><link href="../../bootstrap/css/bootstrap-select.min.css" rel="stylesheet"/><link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700,700italic,400italic" rel="stylesheet" type="text/css"/><link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600,600italic,400" rel="stylesheet" type="text/css"/><link href="https://netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.css" rel="stylesheet" type="text/css"/><script src="../../jquery-3.6.0.min.js"></script><script src="../../bootstrap/js/bootstrap.min.js"></script><script src="../../bootstrap/js/bootstrap-select.min.js"></script><link href="../../styles.css" rel="stylesheet"/><link href="../../extra-styles.css" rel="stylesheet"/><link href="../../haxe-nav.css" rel="stylesheet"/><link href="../../dark-mode.css" rel="stylesheet"/><script>var dox = {rootPath: "../../",platforms: ["hide_js","hide_hrt"]};</script><script src="../../nav.js"></script><script src="../../index.js"></script><link rel="icon" href="../../favicon.ico" type="image/x-icon"/><title>hrt.shader.VolumetricLightmap - Hide API</title><meta name="description" content="Applies the irradiance of a volumetric lightmap, interpolated between its probes."/></head><body><script>/* Here to prevent flash of unstyled content */let systemDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;if ((!localStorage.theme && systemDarkMode) || localStorage.theme == "dark") {document.body.style.backgroundColor = "#111";document.body.style.opacity = "0";document.addEventListener("DOMContentLoaded", function(event) {toggleTheme();document.body.style.backgroundColor = "";document.body.style.opacity = "";});}</script><style>
+.navbar .brand {
+	display: inline-block;
+	float: none;
+	text-shadow: 0 0 0 transparent;
+}
+</style><nav class="nav"><div class="navbar"><div class="navbar-inner" style="background:#FAFAFA; border-bottom:1px solid rgba(0,0,0,.09)"><div class="container"><a class="brand" style="color:#000000" href="../../">Hide API</a><a href="#" id="theme-toggle" class="brand" style="color:#000000" onclick="toggleTheme()" title="Toggle Dark Mode"><i class="fa fa-moon-o"></i></a></div></div></div></nav><div class="container main-content"><div class="row-fluid"><div class="span3"><div class="well sidebar-nav"><form class="form-search" id="searchForm"><div class="input-prepend input-block-level"><span class="add-on"><i class="fa fa-search"></i></span><input id="search" type="text" placeholder="Filter (Ctrl+P)" autocomplete="off"/></div></form><div class="dropdown"><select id="select-platform" class="selectpicker" title="Filter by platform" data-width="100%"><option value="all" selected="selected">All Platforms</option><option>hide_js</option><option>hide_hrt</option></select></div></div><div class="well sidebar-nav" id="explorer"><div id="nav"></div></div></div><div class="span9"><div class="page-header"><span class="viewsource"><a href="https://github.com/HeapsIO/hide/blob/master/hrt/shader/VolumetricLightmap.hx" class="btn btn-medium"><i class="fa fa-eye"></i> View source</a></span><h1><small>class</small> VolumetricLightmap</h1><h4><small>package <a href="../../hrt/shader/index.html">hrt.shader</a></small></h4><h4><small>extends <span class="type">Shader</span></small></h4>    <span class="label label-meta label-meta-directlyUsed" title="Marks types that are directly referenced by non-extern code.">@:directlyUsed</span><span class="label label-meta label-meta-src" title="">@:src({
+	function getCoef(shCoords:Vec3, band:Int):Vec3 {
+		var u = (shCoords.x + band * lightmapSize.x) * texelSize.x + texelSize.x / 2.0;
+		var v = (shCoords.y + shCoords.z * lightmapSize.y) * texelSize.y + texelSize.y / 2.0;
+		return lightProbeTexture.get(vec2(u, v)).rgb;
+	};
+	function getCoefFinal(band:Int):Vec3 {
+		var p00 = mix(getCoef(p000, band), getCoef(p100, band), dist.x);
+		var p01 = mix(getCoef(p001, band), getCoef(p101, band), dist.x);
+		var p10 = mix(getCoef(p010, band), getCoef(p110, band), dist.x);
+		var p11 = mix(getCoef(p011, band), getCoef(p111, band), dist.x);
+		var p0 = mix(p00, p10, dist.y);
+		var p1 = mix(p01, p11, dist.y);
+		var p = mix(p0, p1, dist.z);
+		return p;
+	};
+	function computeIrradiance(norm:Vec3):Vec3 {
+		var c1 = 0.429043;
+		var c2 = 0.511664;
+		var c3 = 0.743125;
+		var c4 = 0.886227;
+		var c5 = 0.247708;
+		var irradiance = vec3(0, 0, 0);
+		if (ORDER &gt;= 1) {
+			var L00 = getCoefFinal(0);
+			irradiance += c4 * L00;
+		};
+		if (ORDER &gt;= 2) {
+			var L1n1 = getCoefFinal(1);
+			var L10 = getCoefFinal(2);
+			var L11 = getCoefFinal(3);
+			irradiance += 2 * c2 * (L11 * norm.x + L1n1 * norm.y + L10 * norm.z);
+		};
+		if (ORDER &gt;= 3) {
+			var L2n2 = getCoefFinal(4);
+			var L2n1 = getCoefFinal(5);
+			var L20 = getCoefFinal(6);
+			var L21 = getCoefFinal(7);
+			var L22 = getCoefFinal(8);
+			irradiance += c1 * L22 * (norm.x * norm.x - norm.y * norm.y) + c3 * L20 * (norm.z * norm.z) - c5 * L20 + 2 * c1 * (L2n2 * (norm.x * norm.y) + L21 * (norm.x * norm.z) + L2n1 * (norm.y * norm.z));
+		};
+		return irradiance / 3.14;
+	};
+	function getLightProbeIndex(coords:Vec3):Int {
+		return int(floor(coords.x + lightmapSize.x * coords.y + lightmapSize.y * lightmapSize.x * coords.z));
+	};
+	function getVoxelCoords(pos:Vec3):Vec3 {
+		posLightmapSpace = (vec4(pos, 1) * lightmapInvPos).xyz;
+		return floor(posLightmapSpace * (lightmapSize - vec3(1, 1, 1)));
+	};
+	function getLightProbePosition(coords:Vec3):Vec3 {
+		return coords * voxelSize;
+	};
+	function getPixelPosition():Vec3 {
+		var uv2 = (screenUV - 0.5) * vec2(2, -2);
+		var temp = vec4(uv2, depth, 1) * cameraInverseViewProj;
+		var originWS = temp.xyz / temp.w;
+		return originWS;
+	};
+	function getClampedCoords(coords:Vec3):Vec3 {
+		return min(lightmapSize - vec3(1, 1, 1), max(vec3(0, 0, 0), coords));
+	};
+	@const var ORDER:Int;
+	@param var lightProbeTexture:Sampler2D;
+	@param var lightmapInvPos:Mat4;
+	@param var lightmapSize:Vec3;
+	@param var voxelSize:Vec3;
+	@param var strength:Float;
+	@param var cameraInverseViewProj:Mat4;
+	@param var cameraPos:Vec3;
+	var transformedPosition:Vec3;
+	var screenUV:Vec2;
+	var depth:Float;
+	var normal:Vec3;
+	var position:Vec3;
+	var posLightmapSpace:Vec3;
+	var voxelCoords:Vec3;
+	var albedo:Vec3;
+	var occlusion:Float;
+	var roughness:Float;
+	var metalness:Float;
+	var probeCount:Float;
+	var coefCount:Float;
+	var texelSize:Vec2;
+	var dist:Vec3;
+	var p000:Vec3;
+	var p100:Vec3;
+	var p010:Vec3;
+	var p001:Vec3;
+	var p110:Vec3;
+	var p101:Vec3;
+	var p011:Vec3;
+	var p111:Vec3;
+	var output:{ var color : Vec4};
+	function fragment() {
+		position = getPixelPosition();
+		voxelCoords = getVoxelCoords(position);
+		probeCount = lightmapSize.x * lightmapSize.y * lightmapSize.z;
+		coefCount = float(ORDER * ORDER);
+		texelSize = vec2(1 / (lightmapSize.x * coefCount), 1 / (lightmapSize.y * lightmapSize.z));
+		if (posLightmapSpace.x &lt; 0 || posLightmapSpace.y &lt; 0 || posLightmapSpace.z &lt; 0 || posLightmapSpace.x &gt; 1 || posLightmapSpace.y &gt; 1 || posLightmapSpace.z &gt; 1) discard;
+		p000 = getClampedCoords(voxelCoords + vec3(0, 0, 0));
+		p100 = getClampedCoords(voxelCoords + vec3(1, 0, 0));
+		p010 = getClampedCoords(voxelCoords + vec3(0, 1, 0));
+		p001 = getClampedCoords(voxelCoords + vec3(0, 0, 1));
+		p110 = getClampedCoords(voxelCoords + vec3(1, 1, 0));
+		p101 = getClampedCoords(voxelCoords + vec3(1, 0, 1));
+		p011 = getClampedCoords(voxelCoords + vec3(0, 1, 1));
+		p111 = getClampedCoords(voxelCoords + vec3(1, 1, 1));
+		var voxelPos = (voxelCoords) / (lightmapSize - vec3(1, 1, 1));
+		dist = (posLightmapSpace - voxelPos) * (lightmapSize - vec3(1, 1, 1));
+		var irradiance:Vec3 = computeIrradiance(normal) * min(vec3(1), albedo) * occlusion;
+		var NdV = dot(normal, normalize(cameraPos - position));
+		var F0 = mix(vec3(0.04), albedo, metalness);
+		var F = F0 + (max(vec3(1 - roughness), F0) - F0) * exp2((-5.55473 * NdV - 6.98316) * NdV);
+		var indirect = (irradiance * (1 - metalness) * (1 - F)) * strength;
+		output.color.rgb += indirect;
+	};
+})</span><span class="label label-meta label-meta-build" title="Builds a class or enum from a macro.">@:build(hxsl.Macros.buildShader())</span><span class="label label-meta label-meta-autoBuild" title="Extends `@:build` metadata to all extending and implementing classes.">@:autoBuild(hxsl.Macros.buildShader())</span><hr/><p class="availability"><em>Available on  all platforms</em></p></div><div class="body"><div class="doc doc-main"><p>Applies the irradiance of a volumetric lightmap, interpolated between its probes.</p></div><h3 class="section">Constructor</h3><div class="fields"><div class="field "><a name="new"></a><h3 class="anchor"><code><a href="#new"><span class="identifier">new</span></a>()</code></h3><div class="doc"><p></p></div></div></div><h3 class="section">Variables</h3><div class="fields"><div class="field "><a name="ORDER"></a><h3 class="anchor"><code><a href="#ORDER"><span class="identifier">ORDER</span></a>:<span class="type">Int</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="cameraInverseViewProj"></a><h3 class="anchor"><code><a href="#cameraInverseViewProj"><span class="identifier">cameraInverseViewProj</span></a>:<span class="type">Matrix</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="cameraPos"></a><h3 class="anchor"><code><a href="#cameraPos"><span class="identifier">cameraPos</span></a>:<span class="type">Vec</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="lightProbeTexture"></a><h3 class="anchor"><code><a href="#lightProbeTexture"><span class="identifier">lightProbeTexture</span></a>:<span class="type">Texture</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="lightmapInvPos"></a><h3 class="anchor"><code><a href="#lightmapInvPos"><span class="identifier">lightmapInvPos</span></a>:<span class="type">Matrix</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="lightmapSize"></a><h3 class="anchor"><code><a href="#lightmapSize"><span class="identifier">lightmapSize</span></a>:<span class="type">Vec</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="strength"></a><h3 class="anchor"><code><a href="#strength"><span class="identifier">strength</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="voxelSize"></a><h3 class="anchor"><code><a href="#voxelSize"><span class="identifier">voxelSize</span></a>:<span class="type">Vec</span></code></h3><div class="doc"><p></p></div></div></div><h3 class="section">Methods</h3><div class="fields"></div>  </div></div></div></div><footer class="section site-footer" style="background:#FAFAFA"><div class="container"><div class="copyright"><p style="color:#000000">&copy; 2026 &nbsp;</p></div></div></footer><script src="../../highlighter.js"></script><link href="../../highlighter.css" rel="stylesheet"/></body></html>

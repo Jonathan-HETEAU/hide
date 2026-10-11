@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en"><!-- use theme color or fallback -->
+<!--use textcolor from settings, otherwise create a contrasting color to theme color-->
+<head><meta charset="utf-8"/><link href="../../../bootstrap/css/bootstrap.min.css" rel="stylesheet"/><link href="../../../bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet"/><link href="../../../bootstrap/css/bootstrap-select.min.css" rel="stylesheet"/><link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700,700italic,400italic" rel="stylesheet" type="text/css"/><link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,600,600italic,400" rel="stylesheet" type="text/css"/><link href="https://netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.css" rel="stylesheet" type="text/css"/><script src="../../../jquery-3.6.0.min.js"></script><script src="../../../bootstrap/js/bootstrap.min.js"></script><script src="../../../bootstrap/js/bootstrap-select.min.js"></script><link href="../../../styles.css" rel="stylesheet"/><link href="../../../extra-styles.css" rel="stylesheet"/><link href="../../../haxe-nav.css" rel="stylesheet"/><link href="../../../dark-mode.css" rel="stylesheet"/><script>var dox = {rootPath: "../../../",platforms: ["hide_js","hide_hrt"]};</script><script src="../../../nav.js"></script><script src="../../../index.js"></script><link rel="icon" href="../../../favicon.ico" type="image/x-icon"/><title>hrt.prefab.l3d.LocalVolumetricShader - Hide API</title><meta name="description" content="Renders a volume of fog by integrating it along the view ray."/></head><body><script>/* Here to prevent flash of unstyled content */let systemDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;if ((!localStorage.theme && systemDarkMode) || localStorage.theme == "dark") {document.body.style.backgroundColor = "#111";document.body.style.opacity = "0";document.addEventListener("DOMContentLoaded", function(event) {toggleTheme();document.body.style.backgroundColor = "";document.body.style.opacity = "";});}</script><style>
+.navbar .brand {
+	display: inline-block;
+	float: none;
+	text-shadow: 0 0 0 transparent;
+}
+</style><nav class="nav"><div class="navbar"><div class="navbar-inner" style="background:#FAFAFA; border-bottom:1px solid rgba(0,0,0,.09)"><div class="container"><a class="brand" style="color:#000000" href="../../../">Hide API</a><a href="#" id="theme-toggle" class="brand" style="color:#000000" onclick="toggleTheme()" title="Toggle Dark Mode"><i class="fa fa-moon-o"></i></a></div></div></div></nav><div class="container main-content"><div class="row-fluid"><div class="span3"><div class="well sidebar-nav"><form class="form-search" id="searchForm"><div class="input-prepend input-block-level"><span class="add-on"><i class="fa fa-search"></i></span><input id="search" type="text" placeholder="Filter (Ctrl+P)" autocomplete="off"/></div></form><div class="dropdown"><select id="select-platform" class="selectpicker" title="Filter by platform" data-width="100%"><option value="all" selected="selected">All Platforms</option><option>hide_js</option><option>hide_hrt</option></select></div></div><div class="well sidebar-nav" id="explorer"><div id="nav"></div></div></div><div class="span9"><div class="page-header"><span class="viewsource"><a href="https://github.com/HeapsIO/hide/blob/master/hrt/prefab/l3d/LocalVolumetricLighting.hx" class="btn btn-medium"><i class="fa fa-eye"></i> View source</a></span><h1><small>class</small> LocalVolumetricShader</h1><h4><small>package <a href="../../../hrt/prefab/l3d/index.html">hrt.prefab.l3d</a></small></h4><h4><small>extends <span class="type">Shader</span></small></h4>    <h4><small>import <a href="../../../hrt/prefab/l3d/LocalVolumetricLighting.html">hrt.prefab.l3d.LocalVolumetricLighting</a></small></h4><span class="label label-meta label-meta-directlyUsed" title="Marks types that are directly referenced by non-extern code.">@:directlyUsed</span><span class="label label-meta label-meta-src" title="">@:src({
+	var EPSILON = 1e-4;
+	var FLT_MAX = 3.402823466e+38;
+	@global var depthMap:Channel;
+	@global var camera:{ var position : Vec3; var inverseViewProj : Mat4};
+	@global var global:{ @perObject
+	var modelView : Mat4; @perObject
+	var modelViewInverse : Mat4};
+	@param var shape:Int;
+	@param var obH:Vec3;
+	@param var fogColor:Vec4;
+	@param var fogDensity:Float;
+	@param var cubeCornerRound:Float;
+	@param var coneTipRadius:Float;
+	@param var capsuleZscale:Float;
+	var screenUV:Vec2;
+	var transformedPosition:Vec3;
+	var transformedNormal:Vec3;
+	var pixelColor:Vec4;
+	function isBox():Bool {
+		return shape == 0;
+	};
+	function isCone():Bool {
+		return shape == 1;
+	};
+	function isCapsule():Bool {
+		return shape == 2;
+	};
+	function maxComp(a:Vec3):Float {
+		return max(a.x, max(a.y, a.z));
+	};
+	function minComp(a:Vec3):Float {
+		return min(a.x, min(a.y, a.z));
+	};
+	function getPositionAt(uv:Vec2):Vec3 {
+		var depth = depthMap.get(uv);
+		var uv2 = uvToScreen(uv);
+		var temp = vec4(uv2, depth, 1) * camera.inverseViewProj;
+		var originWS = temp.xyz / temp.w;
+		return originWS;
+	};
+	function getPosition():Vec3 {
+		return getPositionAt(screenUV);
+	};
+	function dot2(v:Vec3):Float {
+		return dot(v, v);
+	};
+	function rayBoxIntersection(o:Vec3, d:Vec3):Vec3 {
+		var m = 1.0 / d;
+		var n = m * o;
+		var k = abs(m) * obH;
+		var t1 = -n - k;
+		var t2 = -n + k;
+		var tN = maxComp(t1);
+		var tF = minComp(t2);
+		var hit = vec3(tN, tF, 1.0);
+		if (tN &gt; tF || tF &lt; 0.0) {
+			hit = vec3(-1.0);
+		};
+		return hit;
+	};
+	function rayCapsuleIntersection(ro:Vec3, rd:Vec3, pa:Vec3, pb:Vec3, r:Float):Float {
+		var ba = pb - pa;
+		var oa = ro - pa;
+		var baba = dot(ba, ba);
+		var bard = dot(ba, rd);
+		var baoa = dot(ba, oa);
+		var rdoa = dot(rd, oa);
+		var oaoa = dot(oa, oa);
+		var a = baba - bard * bard;
+		var b = baba * rdoa - baoa * bard;
+		var c = baba * oaoa - baoa * baoa - r * r * baba;
+		var h = b * b - a * c;
+		var res = -1.0;
+		if (h &gt;= 0.0) {
+			var t = (-b - sqrt(h)) / a;
+			var y = baoa + t * bard;
+			if (y &gt; 0.0 &amp;&amp; y &lt; baba) {
+				res = t;
+			} else {
+				var oc = (y &lt;= 0.0) ? oa : ro - pb;
+				b = dot(rd, oc);
+				c = dot(oc, oc) - r * r;
+				h = b * b - c;
+				if (h &gt; 0.0) {
+					res = -b - sqrt(h);
+				};
+			};
+		};
+		return res;
+	};
+	function intersectCapsule(o:Vec3, d:Vec3):Vec3 {
+		var res = vec3(-1.0);
+		var r = 0.5;
+		var hH = 0.5 * max(capsuleZscale - 2 * r, 0.0);
+		var tN = rayCapsuleIntersection(o, d, vec3(0.0, 0.0, -hH), vec3(0.0, 0.0, hH), r);
+		var offset = max(tN, 0.0) + (1.5) * max(capsuleZscale, 1.0);
+		var oF = o + d * offset;
+		var tF = rayCapsuleIntersection(oF, -d, vec3(0.0, 0.0, -hH), vec3(0.0, 0.0, hH), r);
+		if (tF &gt; 0.0) {
+			tF = offset - tF;
+		};
+		if (tN &gt; 0.0) {
+			res = vec3(tN, tF, 1.0);
+		} else if (tF &gt; 0.0) {
+			res = vec3(-1.0, tF, 1.0);
+		} else {
+			res = vec3(-1.0);
+		};
+		return res;
+	};
+	function rayCappedConeIntersection(o:Vec3, d:Vec3, he:Float, ra:Float, rb:Float):Float {
+		var ob = o - vec3(0.0, 0.0, he);
+		var res = 0.0;
+		var hit = false;
+		if (o.z &lt; 0.0) {
+			if (dot2(o * d.z - d * o.z) &lt; (ra * ra * d.z * d.z)) {
+				res = -o.z / d.z;
+				hit = true;
+			};
+		} else if (o.z &gt; he) {
+			if (dot2(ob * d.z - d * ob.z) &lt; (rb * rb * d.z * d.z)) {
+				res = -ob.z / d.z;
+				hit = true;
+			};
+		};
+		if (!hit) {
+			var m4 = dot(d, o);
+			var m5 = dot(o, o);
+			var rr = ra - rb;
+			var hz = he * he + rr * rr;
+			var k2 = he * he - d.z * d.z * hz;
+			var k1 = he * he * m4 - o.z * d.z * hz + ra * (rr * he * d.z * 1.0);
+			var k0 = he * he * m5 - o.z * o.z * hz + ra * (rr * he * o.z * 2.0 - he * he * ra);
+			var h = k1 * k1 - k2 * k0;
+			if (h &lt; 0.0) {
+				res = -1.0;
+				hit = true;
+			} else {
+				var t = (-k1 - sqrt(h)) / k2;
+				var z = o.z + t * d.z;
+				if (z &gt; 0.0 &amp;&amp; z &lt; he) {
+					res = t;
+					hit = true;
+				};
+			};
+		};
+		return hit ? res : -1.0;
+	};
+	function intersectCone(o:Vec3, d:Vec3):Vec3 {
+		o.z += 0.5;
+		var res = vec3(-1.0);
+		var tN = rayCappedConeIntersection(o, d, 1.0, 0.5, coneTipRadius + 1e-4);
+		var offset = max(tN, 0.0) + 1.5;
+		var oF = o + d * offset;
+		var tF = rayCappedConeIntersection(oF, -d, 1.0, 0.5, coneTipRadius);
+		if (tF &gt; 0.0) {
+			tF = offset - tF;
+		};
+		if (tN &gt; 0.0) {
+			res = vec3(tN, tF, 1.0);
+		} else if (tF &gt; 0.0) {
+			res = vec3(-1.0, tF, 1.0);
+		} else {
+			res = vec3(-1.0);
+		};
+		return res;
+	};
+	function getPath(o:Vec3, d:Vec3):Vec4 {
+		var dir = normalize(d);
+		var hit = vec3(0.0);
+		if (isCone()) {
+			hit = intersectCone(o, dir);
+		} else if (isCapsule()) {
+			hit = intersectCapsule(o, dir);
+		} else {
+			hit = rayBoxIntersection(o, dir);
+		};
+		var path = vec4(o, -1.0);
+		if (hit.z &gt; 0.0) {
+			if (hit.x &gt; 0.0) {
+				path = vec4(o + hit.x * dir, hit.y - hit.x);
+			} else {
+				path.w = hit.y;
+			};
+		};
+		var backgroundLocalPosition = (vec4(getPosition(), 1.0) * global.modelViewInverse).xyz;
+		if (isCapsule()) {
+			backgroundLocalPosition *= vec3(1.0, 1.0, capsuleZscale);
+		};
+		var backgroundDist = length(backgroundLocalPosition - path.xyz);
+		if (dot(dir, backgroundLocalPosition - path.xyz) &lt; 0.0) {
+			backgroundDist = 0.0;
+		};
+		path.w = min(path.w, backgroundDist);
+		return path;
+	};
+	function boxDistance(p:Vec3):Float {
+		var d = abs(p) - obH;
+		return length(max(d, 0.0)) + min(maxComp(d), 0.0);
+	};
+	function boxDensity(o:Vec3, d:Vec3, t:Float):Float {
+		var ir2 = 1.0 / (obH * obH);
+		var a = 1.0 - (o * o) * ir2;
+		var b = -2.0 * (o * d) * ir2;
+		var c = -(d * d) * ir2;
+		var t1 = t;
+		var t2 = t1 * t1;
+		var t3 = t2 * t1;
+		var t4 = t2 * t2;
+		var t5 = t2 * t3;
+		var t6 = t3 * t3;
+		var t7 = t3 * t4;
+		var f = (t1 / 1.0) * (a.x * a.y * a.z) + (t2 / 2.0) * (a.x * a.y * b.z + a.x * b.y * a.z + b.x * a.y * a.z) + (t3 / 3.0) * (a.x * a.y * c.z + a.x * b.y * b.z + a.x * c.y * a.z + b.x * a.y * b.z + b.x * b.y * a.z + c.x * a.y * a.z) + (t4 / 4.0) * (a.x * b.y * c.z + a.x * c.y * b.z + b.x * a.y * c.z + b.x * b.y * b.z + b.x * c.y * a.z + c.x * a.y * b.z + c.x * b.y * a.z) + (t5 / 5.0) * (a.x * c.y * c.z + b.x * b.y * c.z + b.x * c.y * b.z + c.x * a.y * c.z + c.x * b.y * b.z + c.x * c.y * a.z) + (t6 / 6.0) * (b.x * c.y * c.z + c.x * b.y * c.z + c.x * c.y * b.z) + (t7 / 7.0) * (c.x * c.y * c.z);
+		return f;
+	};
+	function sampleFog(pos:Vec3, dir:Vec3, dist:Float):Float {
+		var density = fogDensity;
+		if (isBox()) {
+			density = clamp(fogDensity * boxDensity(pos, dir, dist) / cubeCornerRound, 0.0, fogDensity);
+		};
+		return density;
+	};
+	function integrateShape(pos:Vec3, dir:Vec3, dist:Float, integrationValues:Vec4):Vec4 {
+		var extinction = sampleFog(pos, dir, dist / length(dir));
+		var clampedExtinction = max(extinction, 1e-5);
+		var transmittance = exp(-extinction * dist);
+		var integScatt = fogColor.rgb;
+		integrationValues.rgb += integrationValues.a * integScatt;
+		integrationValues.a *= transmittance;
+		return integrationValues;
+	};
+	function evaluate():Vec4 {
+		var dir = normalize(transformedPosition - camera.position);
+		var pos = camera.position;
+		dir = dir * global.modelViewInverse.mat3();
+		if (isCapsule()) {
+			dir *= vec3(1.0, 1.0, capsuleZscale);
+		};
+		pos = (vec4(pos, 1) * global.modelViewInverse).xyz;
+		if (isCapsule()) {
+			pos *= vec3(1.0, 1.0, capsuleZscale);
+		};
+		var path = getPath(pos, dir);
+		var integrationValues = vec4(0.0, 0.0, 0.0, 1.0);
+		return integrateShape(path.xyz, dir, path.w, integrationValues);
+	};
+	function fragment() {
+		var volumetric = evaluate();
+		volumetric.a = saturate(1.0 - volumetric.a);
+		volumetric.a = volumetric.a &gt; 1.0 - 1e-3 ? 1.0 : volumetric.a;
+		pixelColor = volumetric;
+	};
+})</span><span class="label label-meta label-meta-build" title="Builds a class or enum from a macro.">@:build(hxsl.Macros.buildShader())</span><span class="label label-meta label-meta-autoBuild" title="Extends `@:build` metadata to all extending and implementing classes.">@:autoBuild(hxsl.Macros.buildShader())</span><hr/><p class="availability"><em>Available on  all platforms</em></p></div><div class="body"><div class="doc doc-main"><p>Renders a volume of fog by integrating it along the view ray.</p></div><h3 class="section">Constructor</h3><div class="fields"><div class="field "><a name="new"></a><h3 class="anchor"><code><a href="#new"><span class="identifier">new</span></a>()</code></h3><div class="doc"><p></p></div></div></div><h3 class="section">Variables</h3><div class="fields"><div class="field "><a name="capsuleZscale"></a><h3 class="anchor"><code><a href="#capsuleZscale"><span class="identifier">capsuleZscale</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="coneTipRadius"></a><h3 class="anchor"><code><a href="#coneTipRadius"><span class="identifier">coneTipRadius</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="cubeCornerRound"></a><h3 class="anchor"><code><a href="#cubeCornerRound"><span class="identifier">cubeCornerRound</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="fogColor"></a><h3 class="anchor"><code><a href="#fogColor"><span class="identifier">fogColor</span></a>:<span class="type">Vec4</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="fogDensity"></a><h3 class="anchor"><code><a href="#fogDensity"><span class="identifier">fogDensity</span></a>:<span class="type">Float</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="obH"></a><h3 class="anchor"><code><a href="#obH"><span class="identifier">obH</span></a>:<span class="type">Vec</span></code></h3><div class="doc"><p></p></div></div><div class="field "><a name="shape"></a><h3 class="anchor"><code><a href="#shape"><span class="identifier">shape</span></a>:<span class="type">Int</span></code></h3><div class="doc"><p></p></div></div></div><h3 class="section">Methods</h3><div class="fields"></div>  </div></div></div></div><footer class="section site-footer" style="background:#FAFAFA"><div class="container"><div class="copyright"><p style="color:#000000">&copy; 2026 &nbsp;</p></div></div></footer><script src="../../../highlighter.js"></script><link href="../../../highlighter.css" rel="stylesheet"/></body></html>

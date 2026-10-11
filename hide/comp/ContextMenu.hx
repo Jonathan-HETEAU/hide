@@ -4,7 +4,9 @@ import hrt.ui.HuiMenu.MenuItem;
 
 #if js
 
-// for retrocompat with the old menu system
+/**
+	Deprecated: use `hrt.ui.HuiMenu.MenuItem`. Kept for retrocompat with the old menu system.
+**/
 @:deprecated("Use MenuItem instead")
 typedef ContextMenuItem = hrt.ui.HuiMenu.MenuItem;
 

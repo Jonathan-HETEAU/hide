@@ -1,6 +1,9 @@
 package hrt.prefab.fx;
 
 
+/**
+	Deprecated: use `LookAt`. The object of a `Billboard` prefab.
+**/
 @:access(hrt.prefab.fx.LookAt)
 @:deprecated("Use LookAt instead")
 class BillboardObject extends h3d.scene.Object {
@@ -69,6 +72,9 @@ class BillboardObject extends h3d.scene.Object {
 	}
 }
 
+/**
+	Deprecated: use `LookAt`. Makes the object face the camera.
+**/
 @:allow(hrt.prefab.fx.Billboard.BillboardInstance)
 @:deprecated("Use LookAt instead")
 @:prefabHideInAddMenu
